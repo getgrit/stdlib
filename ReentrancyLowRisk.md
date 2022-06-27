@@ -10,6 +10,7 @@ See case 3 here: https://github.com/runtimeverification/amp/issues/39#issuecomme
 tags: #reentrancy, #vulnerability, #lowrisk
 ```solidity
 language sol
+
 and {
   [ 
       ...
