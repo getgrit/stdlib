@@ -1,0 +1,8 @@
+pattern EtherTransfer($amount) = bubble or {
+    `$sender.call{value: $amount}($_)`
+    `$sender.call.value($amount)($_)`
+    `$call($amount)` where {
+        $call <: MemberAccess(_, $address, _, _, _, _, _, $functionName, _, _, null)
+        $functionName <: r".*transfer.*"
+    }
+}
