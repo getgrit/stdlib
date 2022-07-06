@@ -9,8 +9,6 @@ See case 1 here: https://github.com/runtimeverification/amp/issues/39#issuecomme
 
 tags: #reentrancy, #vulnerability
 ```solidity
-language sol
-
 and {
     [ ... EtherTransfer($amount) ]
     not [ 
