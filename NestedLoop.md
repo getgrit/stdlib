@@ -18,7 +18,7 @@ contains Loop($body) where $body <: contains Loop($_)
 
 ```
 
-## Remove debbuger 
+## Matches a simple nested loop
 
 ```Solidity
 // SPDX-License-Identifier: MIT
