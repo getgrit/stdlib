@@ -8,13 +8,7 @@ Inspect nested loops.
 tags: #reentrancy, #vulnerability
 ```
 
-pattern Loop($body) = orelse {
-  Statement`while($_) { $body; }`
-  Statement`do { $body; } while ($_)`
-  Statement`for ($_; $_; $_) { $body; }`
-}
-
-contains Loop($body) where $body <: contains Loop($_)
+Loop($body) where $body <: contains Loop($_)
 
 ```
 
