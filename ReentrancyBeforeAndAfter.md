@@ -1,33 +1,23 @@
 ---
-title: Reentrancy, not last line
+title: Reentrancy, assignments both before and after
 ---
 # {{ page.title }}
 
-Member assignemnt just before the transfer, but transfer not on the last line
+A transfer with member assignments both before and after the transfer.
 
-See case 3 here: https://github.com/runtimeverification/amp/issues/39#issuecomment-1137314683
+See case 2 here: https://github.com/runtimeverification/amp/issues/39#issuecomment-1137314683
 
-tags: #reentrancy, #vulnerability, #lowrisk
+tags: #reentrancy, #vulnerability
 ```solidity
-and {
-  [ 
-      ...
-      `this.$_ = $_` as $memberAccessBefore
-      ...
-      EtherTransfer($amount) as $theTransfer
-      $anotherLine
-  ]
-  // just a guard so only the ReentrancyBeforeAndAfter matches
-  not [ 
-      ...
-      `this.$_ = $_`
-      ...
-      EtherTransfer($amount) as $theTransfer
-      ...
-      `this.$_ = $_`
-      ...
-  ]
-}
+[
+    ...
+    `this.$_ = $_` as $memberAccessBefore
+    ...
+    EtherTransfer($amount) as $theTransfer
+    ...
+    `this.$_ = $_`as $memberAccessAfter
+    ...
+]
 ```
 
 ## Example

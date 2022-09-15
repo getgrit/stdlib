@@ -8,7 +8,7 @@ pattern EtherTransfer($amount) = bubble or {
 }
 
 pattern Loop($body) = orelse {
-  Statement`while($_) { $body; }`
-  Statement`do { $body; } while ($_)`
-  Statement`for ($_; $_; $_) { $body; }`
+  `while($_) { $body; }`
+  `do { $body; } while ($_)`
+  `for ($_; $_; $_) { $body; }`
 }

@@ -8,17 +8,13 @@ Looking for variations of the upgradable proxy pattern.
 tags: #reentrancy, #vulnerability
 ```
 
-ContractDefinition(_, 
-  ... InheritanceSpecifier(_, IdentifierPath(_, $proxyTypes, _, _), _, _) where {
-    $proxyTypes <: or { "Proxy", "ERC1967Upgrade", "TransparentUpgradeableProxy", "UUPSUpgradeable" }
-  }
-  , $name, _, "contract", _, _, _, $name, _, $body, _, _, []
-)
-
+ContractDefinition(_, $inherited, _, _, "contract", _, _, _, _, _, _, _, _, []) where {
+  $inherited <: contains or { "Proxy", "ERC1967Upgrade", "TransparentUpgradeableProxy", "UUPSUpgradeable" }
+}
 
 ```
 
-## Matches a simple nested loop
+## Simple class extending UUPSUpgradeable
 
 ```Solidity
 // SPDX-License-Identifier: MIT
