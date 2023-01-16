@@ -1,6 +1,4 @@
----
-title: Convert Flow to TypeScript
----
+# Convert Flow to TypeScript
 
 Converts Flow type annotations to TypeScript type annotations on a best-effort basis.
 
@@ -58,6 +56,8 @@ const checkAnimalBreed = async (
 )/*: boolean */ => {
     return dog.breed === breed.name;
 };
+
+export default checkAnimalBreed;
 ```
 
 ```js
@@ -66,7 +66,7 @@ import type { Dog } from './animals';
 
 export type DogBreed = {
   name: string,
-}
+} 
 
 const animal = 'dog';
 
@@ -85,4 +85,7 @@ const checkAnimalBreed = async (
 ) => {
     return dog.breed === breed.name;
 };
+
+export default checkAnimalBreed;
+
 ```
