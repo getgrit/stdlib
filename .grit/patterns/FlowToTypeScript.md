@@ -26,10 +26,11 @@ or {
             }
         ]
     ) as $firstStatement => [$newStatements, $firstStatement]
+    // Handle function return values
+    ArrowFunctionExpression(returnType = $_ => $annotations, innerComments = InlineFlowComment($annotations))
+    FunctionDeclaration(returnType = $_ => $annotations, body=BlockStatement(leadingComments=InlineFlowComment($annotations)))
     // Handle most comment annotations
     node(typeAnnotation = $_ => $annotations, trailingComments = InlineFlowComment($annotations))
-    // Handle function return values
-    FunctionDeclaration(returnType = $any => $annotations, body=BlockStatement(leadingComments=InlineFlowComment($annotations)))
 }
 ```
 
@@ -57,6 +58,10 @@ const checkAnimalBreed = async (
     return dog.breed === breed.name;
 };
 
+const checkBoolean = async ()/*: boolean */ => {
+    return false;
+};
+
 export default checkAnimalBreed;
 ```
 
@@ -81,9 +86,13 @@ const checkAnimalBreed = async (
   }: {
       breed: DogBreed,
       dog: Dog,
-    } /*: boolean */,
-) => {
+    } /*: boolean */
+): boolean  => {
     return dog.breed === breed.name;
+};
+
+const checkBoolean = async (): boolean  => {
+  return false;
 };
 
 export default checkAnimalBreed;
