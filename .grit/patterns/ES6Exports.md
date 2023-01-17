@@ -79,6 +79,6 @@ module.exports = {
 export const king = "9";
 
 module.exports = {
-  queen: "8",
+  queen: "8"
 };
 ```
