@@ -3,8 +3,6 @@
 Converts Flow type annotations to TypeScript type annotations on a best-effort basis.
 
 ```grit
-language js(flow,flowComments)
-
 Program(and {
   [
     maybe bubble or {
