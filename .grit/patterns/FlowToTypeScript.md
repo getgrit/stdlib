@@ -11,7 +11,7 @@ Program(and {
     } as $node => raw("/*" + $c + "*/\n" + unparse($node))
     some bubble or { ImportDeclaration(), ExportDeclaration() } as $node => raw(unparse($node))
   ]
-  maybe contains bubble TypeAnnotation() as $node => raw(unparse($node))
+  maybe contains bubble TypeAnnotation() as $node => raw(unparse($node) + "DELETE_END_COMMENT")
 })
 ```
 
@@ -29,6 +29,16 @@ const animal = 'dog';
 function checkDog(dog/*: Dog */)/*: string */ {
   return dog.name;
 };
+
+function multiLine({
+    foo,
+    bar
+}/*: {
+  foo: string,
+  bar: string
+  } */) {
+  console.log(foo);
+}
 
 const checkAnimalBreed = async (
   { breed, dog } /*: {
@@ -57,6 +67,16 @@ const animal = 'dog';
 
 function checkDog(dog: Dog): string {
   return dog.name;
+}
+
+function multiLine({
+  foo,
+  bar
+}: {
+  foo: string,
+  bar: string
+  }) {
+  console.log(foo);
 }
 
 const checkAnimalBreed = async (
