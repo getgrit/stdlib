@@ -9,7 +9,7 @@ Program(and {
       ImportDeclaration(leadingComments = [CommentBlock($c), ...]),
       ExportDeclaration(leadingComments = [CommentBlock($c), ...]) 
     } as $node => raw("/*" + $c + "*/\n" + unparse($node))
-    maybe some bubble or { ImportDeclaration(), ExportDeclaration() } as $node => raw(unparse($node))
+    some bubble or { ImportDeclaration(), ExportDeclaration() } as $node => raw(unparse($node))
   ]
   maybe contains bubble TypeAnnotation() as $node => raw(unparse($node))
 })
