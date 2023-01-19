@@ -3,14 +3,18 @@
 Converts Flow type annotations to TypeScript type annotations on a best-effort basis.
 
 ```grit
-language js(flow,flowComments)      
+language js(flow,flowComments)
 
-or {
-  ImportDeclaration()
-  ExportDeclaration()
-  TypeAnnotation()
-  // using raw(unparse(_)) to avoid rendering back the flowComments version
-} as $node => raw(unparse($node))
+Program(and {
+  [
+    maybe bubble or {
+      ImportDeclaration(leadingComments = [CommentBlock($c), ...]),
+      ExportDeclaration(leadingComments = [CommentBlock($c), ...]) 
+    } as $node => raw("/*" + $c + "*/\n" + unparse($node))
+    maybe some bubble or { ImportDeclaration(), ExportDeclaration() } as $node => raw(unparse($node))
+  ]
+  maybe contains bubble TypeAnnotation() as $node => raw(unparse($node))
+})
 ```
 
 ## Transform comment-style type annotations
