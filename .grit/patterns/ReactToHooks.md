@@ -2,7 +2,7 @@
 title: Convert React Class Components to Functional Components
 ---
 
-Convert React class components to functional components using hooks.
+# {{ page.title }}
 
 tags: #react, #migration, #complex
 
