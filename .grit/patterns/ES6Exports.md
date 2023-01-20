@@ -1,4 +1,7 @@
-# Convert traditional CommonJS module exports to ES6 modules
+---
+title: Prefer ES6-style exports over module.exports
+---
+# {{ page.title }}
 
 Converts CommonJS `module.exports` to ES6-style exports.
 
@@ -36,7 +39,6 @@ or {
 ```js
 module.exports.king = "9";
 ```
-
 ```js
 export const king = "9";
 ```
@@ -44,8 +46,8 @@ export const king = "9";
 ## Transform default exports
 
 ```js
-async function createTeam() {
-  console.log("cool");
+async function createTeam() { 
+    console.log("cool");
 }
 
 const addTeamToOrgSubscription = () => console.log("cool");
@@ -55,10 +57,9 @@ module.exports = {
   addTeamToOrgSubscription,
 };
 ```
-
 ```js
-export async function createTeam() {
-  console.log("cool");
+export async function createTeam() { 
+    console.log("cool");
 }
 
 export const addTeamToOrgSubscription = () => console.log("cool");
@@ -71,10 +72,9 @@ const king = "9";
 
 module.exports = {
   king,
-  queen: "8",
+  queen: "8"
 };
 ```
-
 ```js
 export const king = "9";
 

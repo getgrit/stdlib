@@ -1,4 +1,7 @@
-# Convert traditional `require` statements to ES6-style imports
+---
+title: Prefer imports over require
+---
+# {{ page.title }}
 
 Converts `require` statements to ES6-style exports.
 
@@ -18,11 +21,11 @@ or {
 ## Transform standard require statements
 
 ```js
-const defaultImport = require("../../shared/default").default;
-const { something, another } = require("./lib");
+const defaultImport =
+  require('../../shared/default').default;
+const { something, another } = require('./lib');
 ```
-
 ```js
-import defaultImport from "../../shared/default";
-import { something, another } from "./lib";
+import defaultImport from '../../shared/default';
+import { something, another } from './lib';
 ```

@@ -1,0 +1,14 @@
+predicate AddToStateDefs($stateDefs, $key, $initialVal) = $key <: let $capitalized, $setter in _ where {
+  $capitalized = capitalize($key)
+  $setter = Identifier(name = s"set${capitalized}")
+  $stateDefs = [...$stateDefs, `const [$key, $setter] = useState($initialVal)`]
+}
+
+predicate DoubleBraceToSingle($inval, $outval) = {
+  $outval = replaceAll($inval, r"\\{\\{([^{}]+)\\}\\}", "{$1}")
+}
+
+pattern ReactNode($name, $props, $children) = or {
+    `<$name $props>$children</$name>`
+    `<$name $props />`
+}
