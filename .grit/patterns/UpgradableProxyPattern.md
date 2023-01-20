@@ -1,12 +1,14 @@
 ---
 title: Upgradable Proxy Pattern
 ---
+
 # {{ page.title }}
 
 Looking for variations of the upgradable proxy pattern.
 
 tags: #reentrancy, #vulnerability
-```
+
+```grit
 
 ContractDefinition(_, $inherited, _, _, "contract", _, _, _, _, _, _, _, _, []) where {
   $inherited <: contains or { "Proxy", "ERC1967Upgrade", "TransparentUpgradeableProxy", "UUPSUpgradeable" }
@@ -30,6 +32,7 @@ contract HelloWorld is UUPSUpgradeable, Another {
 }
 
 ```
+
 ```Solidity
 // SPDX-License-Identifier: MIT
 // compiler version must be greater than or equal to 0.8.13 and less than 0.9.0
@@ -44,5 +47,3 @@ contract HelloWorld is UUPSUpgradeable, Another {
 }
 
 ```
-
-

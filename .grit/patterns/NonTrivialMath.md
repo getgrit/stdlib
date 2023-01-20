@@ -1,9 +1,10 @@
 ---
 title: Non-trivial math
 ---
+
 # {{ page.title }}
 
-```
+```grit
 or {
   // ds-math
   or {  `wmul($_)`, `wdiv($_)`, `rmul($_)`, `rdiv($_)`, `pow($_)` }
@@ -31,6 +32,7 @@ contract HelloWorld is UUPSUpgradeable, Another {
 }
 
 ```
+
 ```Solidity
 // SPDX-License-Identifier: MIT
 // compiler version must be greater than or equal to 0.8.13 and less than 0.9.0
@@ -62,6 +64,7 @@ contract HelloWorld is UUPSUpgradeable, Another {
 }
 
 ```
+
 ```Solidity
 // SPDX-License-Identifier: MIT
 // compiler version must be greater than or equal to 0.8.13 and less than 0.9.0

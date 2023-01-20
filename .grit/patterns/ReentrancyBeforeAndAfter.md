@@ -1,6 +1,7 @@
 ---
 title: Reentrancy, assignments both before and after
 ---
+
 # {{ page.title }}
 
 A transfer with member assignments both before and after the transfer.
@@ -8,7 +9,8 @@ A transfer with member assignments both before and after the transfer.
 See case 2 here: https://github.com/runtimeverification/amp/issues/39#issuecomment-1137314683
 
 tags: #reentrancy, #vulnerability
-```solidity
+
+```grit
 [
     ...
     `this.$_ = $_` as $memberAccessBefore
@@ -30,11 +32,11 @@ function claim(
     bytes32[] calldata merkleProof
 ) external payable {
     require(isValidClaim(numPasses,amount,mpIndex,merkleProof));
-    
+
     //return any excess funds to sender if overpaid
     uint256 excessPayment = msg.value.sub(numPasses.mul(mintPasses[mpIndex].mintPrice));
     (bool returnExcessStatus, ) = _msgSender().call{value: excessPayment}("");
-    
+
     mintPasses[mpIndex].claimedMPs[msg.sender] = mintPasses[mpIndex].claimedMPs[msg.sender].add(numPasses);
     _mint(msg.sender, mpIndex, numPasses, "");
     emit Claimed(mpIndex, msg.sender, numPasses);

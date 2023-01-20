@@ -1,12 +1,14 @@
 ---
 title: Nested Loop
 ---
+
 # {{ page.title }}
 
 Inspect nested loops.
 
 tags: #reentrancy, #vulnerability
-```
+
+```grit
 
 Loop($body) where $body <: contains Loop($_)
 
@@ -32,6 +34,7 @@ contract HelloWorld {
     }
 }
 ```
+
 ```typescript
 // SPDX-License-Identifier: MIT
 // compiler version must be greater than or equal to 0.8.13 and less than 0.9.0
@@ -50,5 +53,3 @@ contract HelloWorld {
     }
 }
 ```
-
-
