@@ -3,5 +3,3 @@ patterns:
   - name: NoConsoleLog
     enabled: false
     description: console.log should not be used in production code.
-    body: |
-      `console.log($any)` => .
