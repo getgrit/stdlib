@@ -1,5 +1,5 @@
 version: 0.0.1
 patterns:
   - name: NoConsoleLog
-    enabled: false
+    enforced: false
     description: console.log should not be used in production code.
