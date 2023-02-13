@@ -10,7 +10,7 @@ tags: #reentrancy, #vulnerability
 
 ```grit
 
-ContractDefinition(_, $inherited, _, _, "contract", _, _, _, _, _, _, _, _, []) where {
+sol_contract_declaration(body = $inherited) where {
   $inherited <: contains or { "Proxy", "ERC1967Upgrade", "TransparentUpgradeableProxy", "UUPSUpgradeable" }
 }
 
