@@ -56,7 +56,7 @@ export default async (test) => {
 ```
 
 ```typescript
-const main = async (test) => {
+const main = async test => {
   console.log("test");
 };
 

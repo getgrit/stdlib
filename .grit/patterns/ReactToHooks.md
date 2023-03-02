@@ -347,10 +347,10 @@ class App extends Component {
 ```
 
 ```js
-import { Component, useEffect, useCallback, useState } from "react";
+import { Component, useEffect, useCallback, useState } from 'react';
 
 const App = () => {
-  const [name, setName] = useState("");
+  const [name, setName] = useState('');
   const [another, setAnother] = useState(3);
   const [isOpen, setIsOpen] = useState();
 
@@ -370,7 +370,7 @@ const App = () => {
     alert(name);
   }, []);
 
-  const handleNameInputHandler = useCallback((e) => {
+  const handleNameInputHandler = useCallback(e => {
     setName(e.target.value);
     setAnother("cooler");
   }, []);
@@ -388,8 +388,12 @@ const App = () => {
         value={name}
         placeholder="Your Name"
       />
-      <button onClick={alertNameHandler}>Alert</button>
-      <button onClick={asyncAlertHandler}>Alert</button>
+      <button onClick={alertNameHandler}>
+        Alert
+      </button>
+      <button onClick={asyncAlertHandler}>
+        Alert
+      </button>
     </div>
   );
 };
@@ -397,11 +401,11 @@ const App = () => {
 App.foo = 1;
 App.fooBar = 21;
 
-App.bar = (input) => {
+App.bar = input => {
   console.log(input);
 };
 
-App.another = (input) => {
+App.another = input => {
   console.error(input);
 };
 ```
@@ -438,9 +442,9 @@ class SampleComponent extends React.Component {
 ```
 
 ```js
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useState } from 'react';
 
-const SampleComponent = (props) => {
+const SampleComponent = props => {
   const [clicks, setClicks] = useState(props.initialCount);
 
   const onClickHandler = useCallback(() => {
@@ -451,13 +455,11 @@ const SampleComponent = (props) => {
     return clicks % 2 === 0;
   }, [clicks]);
 
-  return (
-    <>
+  return <>
       <p>Clicks: {clicks}</p>
       <p>Is even: {isEven}</p>
       <a onClick={onClickHandler}>click</a>
-    </>
-  );
+  </>;
 };
 ```
 
@@ -502,9 +504,9 @@ class SampleComponent extends React.Component {
 ```
 
 ```js
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useState } from 'react';
 
-const SampleComponent = (props) => {
+const SampleComponent = props => {
   const [clicks, setClicks] = useState(props.initialCount);
 
   const onClickHandler = useCallback(() => {
@@ -519,12 +521,10 @@ const SampleComponent = (props) => {
     console.log("second click handler");
   }, [props]);
 
-  return (
-    <>
+  return <>
       <p>Clicks: {clicks}</p>
       <a onClick={onClickHandler}>click</a>
-    </>
-  );
+  </>;
 };
 ```
 
@@ -560,17 +560,13 @@ class SampleComponent extends Component {
 ```
 
 ```js
-import { Component, useRef } from "react";
+import { Component, useRef } from 'react';
 
-import { observer } from "mobx-react";
+import { observer } from 'mobx-react';
 
 const SampleComponent = observer(() => {
   const viewState = useRef(new ViewState());
-  return (
-    <p>
-      This component has a <span onClick={viewState.click}>ViewState</span>
-    </p>
-  );
+  return <p>This component has a <span onClick={viewState.click}>ViewState</span></p>;
 });
 ```
 
@@ -602,11 +598,9 @@ interface Props {
 }
 
 const SampleComponent = (props: Props) => {
-  return (
-    <>
-      <p>Hello {props.name}</p>
-    </>
-  );
+  return <>
+    <p>Hello {props.name}</p>
+  </>;
 };
 ```
 
@@ -679,8 +673,10 @@ export default Link;
 import { Component } from "react";
 import PropTypes from "prop-types";
 
-const Link = (props) => {
-  const { href } = props;
+const Link = props => {
+  const {
+    href
+  } = props;
 
   return <a href={href}>Link Text</a>;
 };
@@ -723,13 +719,9 @@ const ObservedComponent = () => {
   const [name, setName] = useState<string>(undefined);
   const [age, setAge] = useState(21);
 
-  return (
-    <>
-      <p>
-        Hello {name}, you are {age}
-      </p>
-    </>
-  );
+  return <>
+    <p>Hello {name}, you are {age}</p>
+  </>;
 };
 ```
 
@@ -770,20 +762,16 @@ interface Person {
 const ObservedComponent = (inputProps: any) => {
   const props = {
     king: "viking",
-    ...inputProps,
+    ...inputProps
   };
 
   const [me, setMe] = useState<Person>({
     name: "John",
   });
 
-  return (
-    <>
-      <p>
-        This is {me.name}, {props.king}
-      </p>
-    </>
-  );
+  return <>
+    <p>This is {me.name}, {props.king}</p>
+  </>;
 };
 ```
 

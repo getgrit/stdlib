@@ -39,7 +39,7 @@ class Foo extends React.Component {
   shouldComponentUpdate() {}
 
   render() {
-    return <Hello/>
+    return <Hello />;
   }
 }
 ```

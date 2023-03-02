@@ -78,12 +78,6 @@ pattern HTMLTagsWithPair() = or { HTMLHeadings() , HTMLContainers() , HTMLBlockT
 <Hello />
 ```
 
-## Doesn't convert components with explicit whitespace
-
-```javascript
-<Hello> </Hello>
-```
-
 ## Doesn't convert native HTML tags with closing pair: div
 
 ```javascript

@@ -52,7 +52,8 @@ if (foo != NaN) {
 ```
 
 ```
-if (!isNaN(foo)) {}
+if (!isNaN(foo)) {
+}
 ```
 
 ## Converts triple inequality check
