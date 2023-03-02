@@ -13,6 +13,10 @@ Program(and {
     some bubble or { ImportDeclaration(), ExportDeclaration() } as $node => raw(unparse($node))
   ]
   maybe contains bubble TypeAnnotation() as $node => raw(unparse($node))
+  maybe contains bubble CommentBlock(value = $comment) where {
+    $comment <: r"(?s).*@returns.*import\\('(.*)'\\).([^<]*).*"($lib, $type)
+    ensureImportFrom(Identifier(name = $type), $lib)
+  }
 })
 ```
 
@@ -108,16 +112,19 @@ const checkBoolean = async (): boolean => {
 };
 ```
 
-## Space in flow comment
+## Space in flow comment, with @import
 
 Before:
 
 ```js
 // @flow
 
-const checkBoolean = async () /*: boolean */ => {
-  return false;
-};
+/**
+ * @returns {import('somelib').MyType<any, any, any, any>}
+ */
+export function login(foo: string) /* : MyType*/ {
+  console.log("do something");
+}
 ```
 
 After:
@@ -125,7 +132,9 @@ After:
 ```ts
 //@flow
 
-const checkBoolean = async (): boolean => {
-  return false;
-};
+import { MyType } from "somelib";
+
+export function login(foo: string): MyType {
+  console.log("do something");
+}
 ```
