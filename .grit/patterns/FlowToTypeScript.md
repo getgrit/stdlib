@@ -4,7 +4,7 @@ Converts Flow type annotations to TypeScript type annotations on a best-effort b
 
 ```grit
 Program(and {
-  contains CommentLine(value = "@flow")
+  contains CommentLine(value = r" *@flow")
   maybe [
     maybe bubble or  {
       ImportDeclaration(leadingComments = [CommentBlock($c), ...]),
@@ -25,19 +25,18 @@ Program(and {
 /*:: export type DogBreed = {
   name: string,
 } */
-const animal = 'dog';
+const animal = "dog";
 
-function checkDog(dog/*: Dog */)/*: string */ {
+function checkDog(dog /*: Dog */) /*: string */ {
   return dog.name;
-};
+}
 
-function multiLine({
-    foo,
-    bar
-}/*: {
+function multiLine(
+  { foo, bar } /*: {
   foo: string,
   bar: string
-  } */) {
+  } */
+) {
   console.log(foo);
 }
 
@@ -45,13 +44,13 @@ const checkAnimalBreed = async (
   { breed, dog } /*: {
     breed: DogBreed,
     dog: Dog,
-  } */,
-)/*: boolean */ => {
-    return dog.breed === breed.name;
+  } */
+) /*: boolean */ => {
+  return dog.breed === breed.name;
 };
 
-const checkBoolean = async ()/*: boolean */ => {
-    return false;
+const checkBoolean = async () /*: boolean */ => {
+  return false;
 };
 
 export default checkAnimalBreed;
@@ -100,6 +99,28 @@ const checkBoolean = async () /*: boolean */ => {
   return false;
 };
 ```
+
+```ts
+//@flow
+
+const checkBoolean = async (): boolean => {
+  return false;
+};
+```
+
+## Space in flow comment
+
+Before:
+
+```js
+// @flow
+
+const checkBoolean = async () /*: boolean */ => {
+  return false;
+};
+```
+
+After:
 
 ```ts
 //@flow
