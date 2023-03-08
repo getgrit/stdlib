@@ -1,7 +1,8 @@
 ---
 title: Prefer imports over require
 ---
-# {{ page.title }}
+
+# ES6 imports
 
 Converts `require` statements to ES6-style exports.
 
@@ -15,17 +16,20 @@ or {
         } }
     }
     `const $import = require($source).default` => `import $import from "$source"`
+    `const $import = require($source)` => `import * as $import from "$source"`
 }
 ```
 
 ## Transform standard require statements
 
 ```js
-const defaultImport =
-  require('../../shared/default').default;
-const { something, another } = require('./lib');
+const defaultImport = require("../../shared/default").default;
+const { something, another } = require("./lib");
+const starImport = require("star");
 ```
-```js
-import defaultImport from '../../shared/default';
-import { something, another } from './lib';
+
+```ts
+import defaultImport from "../../shared/default";
+import { something, another } from "./lib";
+import * as starImport from "star";
 ```
