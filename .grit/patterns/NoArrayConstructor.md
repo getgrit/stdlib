@@ -15,7 +15,7 @@ or {
   `new Array($args)` => `[$args]`
   `Array($args)` => `[$args]`
 } where {
-  $args <: [_, _, ...]
+  $args <: [$_, $_, ...]
 }
 ```
 

@@ -11,7 +11,7 @@ tags: #good
 ```grit
 `throw $e` => `throw new Error($e)` where {
   // We don't care what the precise $a and $b are as long as they are both string literals, which makes $a + $b a string concatenation.
-  $e <: or { `undefined`, LiteralValue(_), `$a + $b` where or { $a <: StringLiteral() , $b <: StringLiteral() } }
+  $e <: or { `undefined`, LiteralValue($_), `$a + $b` where or { $a <: StringLiteral() , $b <: StringLiteral() } }
 }
 ```
 

@@ -67,7 +67,7 @@ pattern ChangeThis() = maybe contains or {
 pattern HandleOneBodyStatement() = or {
   bubble `constructor($_) { $constructorBody }` where $constructorBody <: ChangeThis()
 
-  let state in ClassProperty(key = `state`, value = ObjectExpression(properties = $state)) where {
+  let $state in ClassProperty(key = `state`, value = ObjectExpression(properties = $state)) where {
     $state <: some let $key, $val, $setter, $capitalized in `$key: $val` where {
       $key <: Identifier()
       $capitalized = capitalize($key)
@@ -232,7 +232,7 @@ pattern MainReactClassToHooks($moveDefaultProps) = or {
     $oldBody <: maybe let($defaultProps) {
         contains `$name.defaultProps = { $defaultProps }` => . where {
         $finalDefaultProps = [`const props = { $defaultProps, ...inputProps }`]
-        movedDefaultProps = true
+        $movedDefaultProps = true
       }
     }
   }
@@ -244,7 +244,7 @@ pattern MainReactClassToHooks($moveDefaultProps) = or {
   $finalProps = distinct($hoistedProps)
 
   // The output of the ReactToHooks migration destructures the props object if the input contained any props.
-  if (! finalProps <: [] ) $propsInit = `const { $finalProps } = props` else $propsInit = .
+  if (! $finalProps <: [] ) $propsInit = `const { $finalProps } = props` else $propsInit = .
 
   // When we use the ... operator to assemble $newBody, Grit's syntax-aware code generation process produces the output code in a reasonable format.
   $newBody = [ ... $finalDefaultProps, ... $newState, ... $propsInit, ... $stateStatements, ... $constructorBody, ...$mountEffect, ...$unmountEffect, ...$updateEffect, ... $callbacks, ... $mobxComputed, ... $mobxEffects, ... $otherProperties, ... $newRenderBody ]

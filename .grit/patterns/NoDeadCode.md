@@ -12,7 +12,7 @@ tags: #good, #SE
 [
   ...
   or { `throw $_` , ContinueStatement() , BreakStatement() , `return $_` }
-  some _ => .
+  some $_ => .
 ]
 ```
 

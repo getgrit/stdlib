@@ -1,4 +1,4 @@
-predicate AddToStateDefs($stateDefs, $key, $initialVal) = $key <: let $capitalized, $setter in _ where {
+predicate AddToStateDefs($stateDefs, $key, $initialVal) = $key <: let $capitalized, $setter in $_ where {
   $capitalized = capitalize($key)
   $setter = Identifier(name = s"set${capitalized}")
   $stateDefs = [...$stateDefs, `const [$key, $setter] = useState($initialVal)`]

@@ -32,7 +32,7 @@ pattern JasmineRewrite() = bubble `$jasmineFn($jasmineArgs)` as $jasmineBody whe
 
 predicate ExtractString($any, $cssString) = $any <: or {
     StringLiteral(value = $cssString)
-    _ where $cssString = "${" + unparse($any) + "}"
+    $_ where $cssString = "${" + unparse($any) + "}"
 }
 
 pattern ByChange($selector, $locator) = or {

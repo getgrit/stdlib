@@ -2,9 +2,9 @@ pattern AnyEquals($a, $b) = or { `$a == $b` , `$a === $b` , `$b == $a` , `$b ===
 
 pattern AnyAnd($a, $b) = or { `$a && $b` , `$b && $a` }
 
-pattern AnyNotEquals(a, b) = or {
-  BinaryExpression(operator = or { "!==" , "!=" }, left = a, right = b)
-  BinaryExpression(operator = or { "!==" , "!=" }, left = b, right = a)
+pattern AnyNotEquals($a, $b) = or {
+  BinaryExpression(operator = or { "!==" , "!=" }, left = $a, right = $b)
+  BinaryExpression(operator = or { "!==" , "!=" }, left = $b, right = $a)
 }
 
 pattern BuiltInObjects() = or { `Object`, `Math`, `Array`, `Number`, `Date`, `RegExp`, `Map`, `Set`, `Atomics`, `ArrayBuffer`, `SharedArrayBuffer`, `DataView`, `JSON`, `Promise`, `Reflect`, `Proxy` }
@@ -12,7 +12,7 @@ pattern BuiltInObjects() = or { `Object`, `Math`, `Array`, `Number`, `Date`, `Re
 pattern AnyEqualsUndefined($aVar) = AnyEquals($aVar,`undefined`)
 
 pattern LiteralValue($v) = or {
-  JSXText(value = $v) 
+  JSXText(value = $v)
   StringLiteral(value = $v)
   NumericLiteral(value = $v)
   BigIntLiteral(value = $v)
@@ -28,13 +28,13 @@ pattern ImportNameFrom($name, $from) = or {
 
 predicate IsImported($name, $from) = {
   $name <: exists $stringName in Identifier(name = $stringName) where {
-    $program <: File(Program([..., ImportNameFrom(Identifier(name = $stringName), $from) ,...]), _)
+    $program <: File(Program([..., ImportNameFrom(Identifier(name = $stringName), $from) ,...]), $_)
   }
 }
 
 predicate RemoveImport($name) = {
   $name <: exists $stringName in Identifier(name = $stringName) where {
-    $program <: maybe contains ImportNameFrom(Identifier(name = $stringName) => ., _)
+    $program <: maybe contains ImportNameFrom(Identifier(name = $stringName) => ., $_)
   }
 }
 
@@ -55,7 +55,7 @@ pattern ImportedFrom($from) = $name where or {
     IsImported($name, $from)
   }
 
-predicate AddImport($m, $fromArg) = 
+predicate AddImport($m, $fromArg) =
   $fromArg <: let $from in or {
     StringLiteral() as $from
     $_ where $from = StringLiteral(value = $fromArg)
@@ -77,7 +77,7 @@ pattern EnsureImportFrom($from) = and {
     exists $alreadyImported in $alreadyImported where { IsImported($alreadyImported, $_), warning "Already imported" on $alreadyImported }
     ImportedFrom($from)
     exists $m in $m where AddImport($m, $from)
-    _
+    $_
   }
 }
 
@@ -85,14 +85,14 @@ predicate IsUsed($name) = $program <: contains $name outside or { `$name = $_`, 
 
 predicate IsJSGlobalIdentifier($var) = $var <: Identifier(binding = not ["root", ...])
 
-pattern EnsureRelativeImportFrom($current, $imported) = exists $directory, importedPath, $name in $name where {
+pattern EnsureRelativeImportFrom($current, $imported) = exists $directory, $importedPath, $name in $name where {
   $current <: r"(.*)/.*"($directory)
   $importedPath = relative($directory, $imported)
   $name <: EnsureImportFrom(StringLiteral(value = $importedPath))
 }
 
-pattern EnsureImportedFrom($imported) = exists $directory, importedPath, $name, $current in $name where {
-  $program <: File(_, $current)
+pattern EnsureImportedFrom($imported) = exists $directory, $importedPath, $name, $current in $name where {
+  $program <: File($_, $current)
   $current <: r"(.*)/.*"($directory)
   $importedPath = relative($directory, $imported)
   $name <: EnsureImportFrom(StringLiteral(value = $importedPath))
@@ -109,19 +109,19 @@ predicate ensureRelativeImportFrom($binding, $from) = {
 pattern ImportLike() = or { `import { $_ } from '$_'`, `import $_ from '$_'` }
 
 predicate InsertAfterImports($inserted) = {
-  $program <: File(Program( 
+  $program <: File(Program(
     or {
       [ ..., [ ImportLike() ]+, . => $inserted, ... ],
       [ . => $inserted, ... ]
     }
-  ), _)
+  ), $_)
 }
 
 predicate IsGlobalVariable($id) = {
   $id <: Identifier(binding = [])
 }
 
-predicate InsertImports() = or { 
+predicate InsertImports() = or {
   and {
     $froms <: exists $from, $allFrom, $fromName in $from where {
       $solvedPairs <: maybe { exists $x in `$x, $from` where { $allFrom = [... $allFrom, $x] } }
@@ -132,28 +132,28 @@ predicate InsertImports() = or {
             ...
             ImportDeclaration(specifiers = $existing, source = $fromHere, importKind = "value") where {
               $existing <: not [ImportNamespaceSpecifier()]
-              $fromHere <: StringLiteral(value = $fromName) 
+              $fromHere <: StringLiteral(value = $fromName)
               $existing => [ $existing, $allFrom ]
             }
             ...
-          ]), _)
+          ]), $_)
         }
         $allNewImports = [$allNewImports, `import { $allFrom } from '$from'`]
       }
     }
     or {
       $allNewImports <: []
-      InsertAfterImports(allNewImports)
+      InsertAfterImports($allNewImports)
     }
   }
   true
 }
 
-pattern PreludeRun() = _ where {
+pattern PreludeRun() = $_ where {
   $alreadySolved = or { }
   $solvedPairs = or { }
   $froms = or { }
-  allNewImports = []
+  $allNewImports = []
 }
 
 pattern ConclusionRun() = InsertImports()

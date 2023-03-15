@@ -11,7 +11,7 @@ tags: $good #SE
 ```grit
 // ArrayExpression`[$elements]` is semantically equivalent to ArrayExpression(elements=`[$elements]`).
 // The element between extra commas is parsed in the syntax-tree as null, so some null => undefined rewrites any number of extra commas within the array expression to undefined.
-ArrayExpression`[$elements]` where { elements <: some null => `undefined` }
+ArrayExpression`[$elements]` where { $elements <: some null => `undefined` }
 ```
 
 ## Replaces holes in array literals, ints

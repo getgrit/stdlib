@@ -12,7 +12,7 @@ tags: #fix #bug #SD
 // ArrayExpression`[$elements]` is semantically equivalent to ArrayExpression(elements=`[$elements]`).
 // The element between extra commas is parsed in the syntax-tree as null.
 // A lone '.' represents the empty concept, so some null => . deletes any number of extra commas within the array expression.
-ArrayExpression`[$elements]` where { elements <: some null => . }
+ArrayExpression`[$elements]` where { $elements <: some null => . }
 ```
 
 ## Removes holes in array literals, ints
