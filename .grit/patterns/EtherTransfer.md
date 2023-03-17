@@ -5,6 +5,8 @@ title: Ether Transfer
 # {{ page.title }}
 
 ```grit
+language sol
+
 pattern EtherTransfer($amount) = bubble($amount) or {
     `$sender.call{value: $amount}($_)`
     `$sender.call.value($amount)($_)`
