@@ -13,6 +13,8 @@ pattern EtherTransfer($amount) = bubble($amount) or {
         $functionName <: r".*transfer.*"
     }
 }
+
+EtherTransfer($_)
 ```
 
 ## Matches an ether transfer
