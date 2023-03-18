@@ -5,6 +5,8 @@ title: Key value pair
 # {{ page.title }}
 
 ```grit
+language hcl
+
 `$arg: $red`
 ```
 
