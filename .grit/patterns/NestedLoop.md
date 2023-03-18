@@ -9,6 +9,7 @@ Inspect nested loops.
 tags: #reentrancy, #vulnerability
 
 ```grit
+language sol
 
 pattern Loop($body) = bubble($body) orelse {
   `while($_) { $body }`

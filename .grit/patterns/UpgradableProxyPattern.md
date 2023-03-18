@@ -9,6 +9,7 @@ Looking for variations of the upgradable proxy pattern.
 tags: #reentrancy, #vulnerability
 
 ```grit
+language sol
 
 sol_contract_declaration(body = $inherited) where {
   $inherited <: contains or { "Proxy", "ERC1967Upgrade", "TransparentUpgradeableProxy", "UUPSUpgradeable" }

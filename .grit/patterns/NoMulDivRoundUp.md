@@ -7,6 +7,7 @@ title: NoMulDiv
 Say we do not want `mulDivRoundUp`.
 
 ```grit
+language sol
 
 `$_.mulDivRoundUp($amount, $_)`
 
