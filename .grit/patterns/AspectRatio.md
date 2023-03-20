@@ -5,6 +5,8 @@ title: Aspect ratio
 # {{ page.title }}
 
 ```grit
+language css
+
 `a { $props }` where {
   $props <: contains `aspect-ratio: $x`
 }
