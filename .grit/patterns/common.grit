@@ -66,6 +66,23 @@ predicate AddImport($m, $fromArg) =
     or { and { ! $from <: $froms, $froms = or { $froms, $from } }, true }
   }
 
+predicate AddNamespaceImport($m, $fromArg) =
+   $fromArg <: let($alias, $from) and {
+    or {
+      Identifier() as $alias
+      $_ where $alias = Identifier(name = $m)
+    }
+    or {
+      StringLiteral() as $from
+      $_ where $from = StringLiteral(value = $fromArg)
+    }
+  } where {
+    $importDeclaration = ImportNamespaceSpecifier(local = $alias, id = null, name = null)
+    $alreadySolved = or { $alreadySolved, $importDeclaration }
+    $solvedPairs = or { $solvedPairs, `$importDeclaration, $from` }
+    or { and { ! $from <: $froms, $froms = or { $froms, $from } }, true }
+  }
+
 predicate ReplaceImport($m, $from) = {
   RemoveImport($m)
   AddImport($m, $from)
@@ -124,7 +141,11 @@ predicate IsGlobalVariable($id) = {
 predicate InsertImports() = or {
   and {
     $froms <: exists $from, $allFrom, $fromName in $from where {
-      $solvedPairs <: maybe { exists $x in `$x, $from` where { $allFrom = [... $allFrom, $x] } }
+      $solvedPairs <: maybe { 
+        exists $x in `$x, $from` where { 
+          $allFrom = [... $allFrom, $x]
+        }
+      }
       $from <: StringLiteral(value = $fromName)
       or {
         $program <: exists $existing, $fromHere in {
