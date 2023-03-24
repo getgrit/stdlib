@@ -23,17 +23,17 @@ pattern LiteralValue($v) = or {
 
 pattern ImportNameFrom($name, $from) = or {
   `import { $..., $name, $... } from '$from'`
-  exists $somethingelse in `import { $..., $somethingelse as $name, $... } from '$from'` where warning s"$name imported but as an alias of $somethingelse" on $name
+  let $somethingelse in `import { $..., $somethingelse as $name, $... } from '$from'` where warning s"$name imported but as an alias of $somethingelse" on $name
 }
 
 predicate IsImported($name, $from) = {
-  $name <: exists $stringName in Identifier(name = $stringName) where {
+  $name <: let $stringName in Identifier(name = $stringName) where {
     $program <: File(Program([..., ImportNameFrom(Identifier(name = $stringName), $from) ,...]), $_)
   }
 }
 
 predicate RemoveImport($name) = {
-  $name <: exists $stringName in Identifier(name = $stringName) where {
+  $name <: let $stringName in Identifier(name = $stringName) where {
     $program <: maybe contains ImportNameFrom(Identifier(name = $stringName) => ., $_)
   }
 }
@@ -91,9 +91,9 @@ predicate ReplaceImport($m, $from) = {
 pattern EnsureImportFrom($from) = and {
   Identifier()
   or {
-    exists $alreadyImported in $alreadyImported where { IsImported($alreadyImported, $_), warning "Already imported" on $alreadyImported }
+    let $alreadyImported in $alreadyImported where { IsImported($alreadyImported, $_), warning "Already imported" on $alreadyImported }
     ImportedFrom($from)
-    exists $m in $m where AddImport($m, $from)
+    let $m in $m where AddImport($m, $from)
     $_
   }
 }
@@ -102,13 +102,13 @@ predicate IsUsed($name) = $program <: contains $name outside or { `$name = $_`, 
 
 predicate IsJSGlobalIdentifier($var) = $var <: Identifier(binding = not ["root", ...])
 
-pattern EnsureRelativeImportFrom($current, $imported) = exists $directory, $importedPath, $name in $name where {
+pattern EnsureRelativeImportFrom($current, $imported) = let $directory, $importedPath, $name in $name where {
   $current <: r"(.*)/.*"($directory)
   $importedPath = relative($directory, $imported)
   $name <: EnsureImportFrom(StringLiteral(value = $importedPath))
 }
 
-pattern EnsureImportedFrom($imported) = exists $directory, $importedPath, $name, $current in $name where {
+pattern EnsureImportedFrom($imported) = let $directory, $importedPath, $name, $current in $name where {
   $program <: File($_, $current)
   $current <: r"(.*)/.*"($directory)
   $importedPath = relative($directory, $imported)
@@ -140,15 +140,15 @@ predicate IsGlobalVariable($id) = {
 
 predicate InsertImports() = or {
   and {
-    $froms <: exists $from, $allFrom, $fromName in $from where {
+    $froms <: let $from, $allFrom, $fromName in $from where {
       $solvedPairs <: maybe { 
-        exists $x in `$x, $from` where { 
+        let $x in `$x, $from` where { 
           $allFrom = [... $allFrom, $x]
         }
       }
       $from <: StringLiteral(value = $fromName)
       or {
-        $program <: exists $existing, $fromHere in {
+        $program <: let $existing, $fromHere in {
           File(Program([
             ...
             ImportDeclaration(specifiers = $existing, source = $fromHere, importKind = "value") where {
