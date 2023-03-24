@@ -39,7 +39,7 @@ predicate RemoveImport($name) = {
 }
 
 predicate IsUsed($name) = {
-  $program <: contains $name outside ImportNameFrom($_, $_)
+  $program <: contains $name until ImportNameFrom($_, $_)
 }
 
 predicate RemoveImportIfUnused($name) = (! IsUsed($name)) && RemoveImport($name)
@@ -50,7 +50,7 @@ predicate IsTypeScript() = $program <: or {
 }
 
 pattern ImportedFrom($from) = $name where or {
-    $name <: semantic outside ImportNameFrom($name, $from)
+    $name <: semantic within ImportNameFrom($name, $from)
     $name <: semantic `require($from)`
     IsImported($name, $from)
   }
@@ -98,7 +98,7 @@ pattern EnsureImportFrom($from) = and {
   }
 }
 
-predicate IsUsed($name) = $program <: contains $name outside or { `$name = $_`, VariableDeclarator(id = $name) }
+predicate IsUsed($name) = $program <: contains $name until or { `$name = $_`, VariableDeclarator(id = $name) }
 
 predicate IsJSGlobalIdentifier($var) = $var <: Identifier(binding = not ["root", ...])
 
