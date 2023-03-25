@@ -2,11 +2,9 @@
 title: Protractor to Playwright
 ---
 
-# {{ page.title }}
-
 Protractor to Playwright.
 
-tags: #good
+tags: #migration, #js, #playwright, #protractor
 
 ```grit
 language js
