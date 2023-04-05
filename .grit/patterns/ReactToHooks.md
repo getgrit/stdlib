@@ -72,7 +72,11 @@ pattern HandleOneBodyStatement() = or {
       $key <: Identifier()
       $capitalized = capitalize($key)
       $setter = Identifier(name = s"set${capitalized}")
-      $stateStatements = [...$stateStatements, `const [$key, $setter] = useState($val)`]
+      
+      if ($processedKeys <: not some $key) then {
+        $processedKeys = [... $processedKeys, $key]
+        $stateStatements = [...$stateStatements, `const [$key, $setter] = useState($val)`]
+      }
       ensureImportFrom(`useState`, `"react"`)
     }
   }
@@ -190,12 +194,15 @@ predicate HandleHoistedStates() = {
       $theValue <: ChangeThis()
       $current <: not `defaultProps`
 
-      if($theType <: null) {
-        $theUpdate = `const [$current, $setter] = useState($initValue)`
-      } else {
-        $theUpdate = `const [$current, $setter] = useState<$theType>($initValue)`
+      if ($processedKeys <: not some $current) then {
+        $processedKeys = [... $processedKeys, $current]
+        if($theType <: null) {
+            $theUpdate = `const [$current, $setter] = useState($initValue)`
+        } else {
+            $theUpdate = `const [$current, $setter] = useState<$theType>($initValue)`
+        }
+        $newState = [...$newState, $theUpdate]
       }
-      $newState = [...$newState, $theUpdate]
       ensureImportFrom(`useState`, `"react"`)
   } until [$_] // remove until after generalizing `...` to match assoc on assigned metavars
 }
@@ -210,6 +217,7 @@ pattern MainReactClassToHooks($moveDefaultProps) = or {
   // TODO: figure out how error boundaries should be converted
   $oldBody <: not contains { `componentDidCatch` }
 
+  $processedKeys = []
   $hoistedProps = []
   $hoistedStates = []
   $mobxStates = []
