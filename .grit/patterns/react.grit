@@ -1,6 +1,6 @@
 predicate AddToStateDefs($stateDefs, $key, $initialVal) = $key <: let $capitalized, $setter in $_ where {
-  $capitalized = capitalize($key),
-  $setter = Identifier(name = s"set${capitalized}"),
+  $capitalized = capitalize($key)
+  $setter = Identifier(name = s"set${capitalized}")
   $stateDefs = [...$stateDefs, `const [$key, $setter] = useState($initialVal)`]
 }
 
@@ -9,6 +9,6 @@ predicate DoubleBraceToSingle($inval, $outval) = {
 }
 
 pattern ReactNode($name, $props, $children) = or {
-    `<$name $props>$children</$name>`,
+    `<$name $props>$children</$name>`
     `<$name $props />`
 }

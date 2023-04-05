@@ -12,7 +12,7 @@ tags: #syntax
 or {
   `export default function $name($args) { $body }` where {
     $name <: null => `main`
-  },
+  }
   `export default $f` => [`const main = $f`, `export default main`] where {
     $f <: `($args) => { $body }`
   }

@@ -11,7 +11,7 @@ tags: #good, #se
 ```grit
 ReturnStatement(argument = AssignmentExpression(operator = $operator, left = $var, right = $value)) => [
   // We replace the `return` with two statements, the assignment and an updated `return`
-  AssignmentExpression(operator = $operator, left = $var, right = $value),
+  AssignmentExpression(operator = $operator, left = $var, right = $value)
   `return $var`
 ] where {
   // We explicitly limit the pattern to matching instances where the operator is an assignment operator, to avoid capturing eg == and ===.

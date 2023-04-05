@@ -14,9 +14,9 @@ or {
         $imports <: some bubble($transformed) {ObjectProperty(key=$key, value=$val) where {
             $transformed = [...$transformed, `$key as $val`]
         } }
-    },
-    `const $import = require($source).default` => `import $import from "$source"`,
-    `const $import = require($source).$foo` => `import { $foo as $import } from "$source"`,
+    }
+    `const $import = require($source).default` => `import $import from "$source"`
+    `const $import = require($source).$foo` => `import { $foo as $import } from "$source"`
     `const $import = require($source)` => `import $import from "$source"` // this relies on healing for correctness
 }
 ```

@@ -12,7 +12,7 @@ tags: #good, #syntax
 
 ```grit
 or {
-  `new Object()` => `{}`,
+  `new Object()` => `{}`
   `new Object` => `{}`
 }
 ```

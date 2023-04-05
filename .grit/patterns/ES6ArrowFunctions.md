@@ -18,7 +18,7 @@ or {
     $body <: not contains {
       or { `this`, `arguments` }
     } until `function $_($_) { $_ }`
-  },
+  }
   `($args) => { return $value }` => `($args) => $value`
 }
 ```

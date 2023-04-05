@@ -5,23 +5,23 @@ so multiple statements are not required.
 
 ```grit
 `it($body)` where {
-    $all = [],
-    $containing = [],
+    $all = []
+    $containing = []
     
     // Collect all arrayContaining
     $body <: contains {
         bubble($value, $containing, $last, $all) `expect($value).toEqual(expect.arrayContaining([$x]))` as $current where {
-            $all = [...$all, $current],
-            $last = $current,
+            $all = [...$all, $current]
+            $last = $current
             $containing = [...$containing, $x]
         }
-    },
+    }
 
     // Make the last one contain all of them
-    $last => `expect($value).toEqual(expect.arrayContaining([$containing]))`,
+    $last => `expect($value).toEqual(expect.arrayContaining([$containing]))`
 
     // Remove the others
-    $others = without($all, [$last]),
+    $others = without($all, [$last])
     $others <: some bubble $expect => .
 }
 ```

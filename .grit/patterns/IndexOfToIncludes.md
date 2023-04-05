@@ -10,7 +10,7 @@ tags: #ES7, #SE
 
 ```grit
 or {
-  or {`$indexOf == -1` , `$indexOf === -1`} => `!$var.includes($key)`,
+  or {`$indexOf == -1` , `$indexOf === -1`} => `!$var.includes($key)`
   or { `~$indexOf` , `$indexOf != -1` , `$indexOf !== -1` } => `$var.includes($key)`
 } where $indexOf <: or { `$var.indexOf($key)` , `$var.lastIndexOf($key)` }
 

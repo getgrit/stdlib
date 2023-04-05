@@ -15,7 +15,7 @@ tags: #fix
 ```grit
 or {
   // AnyEquals and AnyNotEquals are helper patterns defined in common.unhack
-  AnyEquals(`NaN`, $x) => `isNaN($x)`,
+  AnyEquals(`NaN`, $x) => `isNaN($x)`
   AnyNotEquals(`NaN`, $x) => `!isNaN($x)`
 }
 ```

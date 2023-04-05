@@ -16,7 +16,7 @@ tags: #fix
 
 ```grit
 or {
-  `!$key in $collection` => `!($key in $collection)`,
+  `!$key in $collection` => `!($key in $collection)`
   `!$key instanceof $collection` => `!($key instanceof $collection)`
 }
 ```

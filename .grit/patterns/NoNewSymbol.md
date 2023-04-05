@@ -10,7 +10,7 @@ tags: #good
 
 ```grit
 `new $sym($x)` => `$sym($x)` where {
-  $sym <: `Symbol`,
+  $sym <: `Symbol`
   // make sure it is the pre-defined Symbol, avoid rewriting if `Symbol` is redefined by user
   IsJSGlobalIdentifier($sym)
 }

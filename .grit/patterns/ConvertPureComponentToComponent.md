@@ -13,7 +13,7 @@ tags: #SD, #React
 
 ```grit
 `class $name extends $extends { $body }` where {
-  $extends <: contains `PureComponent` => `Component`,
+  $extends <: contains `PureComponent` => `Component`
   $body <: some `shouldComponentUpdate($_) { $_ }`
 }
 ```

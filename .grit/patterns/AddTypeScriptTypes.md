@@ -9,13 +9,13 @@ Copy the actual pattern into ../workflows/js-to-ts.ts as well. -->
 language js
 
 or {
-    ClassMethod(params=$params),
+    ClassMethod(params=$params)
     FunctionDeclaration(params=$params)
 } where {
     $params <: contains bubble {
         or {
             Identifier(name="$TSFixMe") => $type,
-            TSAnyKeyword() as $any => $type,
+            TSAnyKeyword() as $any => $type
             Identifier(typeAnnotation=null => $type)
         } where {
             $type = guess(codePrefix="// fix TypeScript type declarations", fallback="any", stop=["function"])

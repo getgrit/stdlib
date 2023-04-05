@@ -10,11 +10,11 @@ tags: #good
 
 ```grit
 or {
-  `$obj.prototype.__iterator__` => `$obj._iterator_`,
-  `$obj.prototype["__iterator__"]` => `$obj._iterator_`,
-  `$obj.prototype['__iterator__']` => `$obj._iterator_`,
-  `$obj.__iterator__` => `$obj._iterator_`,
-  `$obj["__iterator__"]` => `$obj._iterator_`,
+  `$obj.prototype.__iterator__` => `$obj._iterator_`
+  `$obj.prototype["__iterator__"]` => `$obj._iterator_`
+  `$obj.prototype['__iterator__']` => `$obj._iterator_`
+  `$obj.__iterator__` => `$obj._iterator_`
+  `$obj["__iterator__"]` => `$obj._iterator_`
   `$obj['__iterator__']` => `$obj._iterator_`
 }
 ```

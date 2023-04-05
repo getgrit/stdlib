@@ -12,7 +12,7 @@ tags: #fix, #SD
 
 ```grit
 or {
-  `$x == $y` => `$x === $y`,
+  `$x == $y` => `$x === $y`
   `$x != $y` => `$x !== $y`
 } where {
   $y <: not `null`
