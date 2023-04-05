@@ -11,14 +11,14 @@ tags: #react, #migration, #complex, #knockout, #framework
 ```grit
 or {
   `$vm = function($args) { $body }` where {
-    $vm <: `ViewModel` => `ViewComponent`
-    $args => `props`
+    $vm <: `ViewModel` => `ViewComponent`,
+    $args => `props`,
     $body <: maybe contains bubble or {
       `this.$name = ko.observable($original)` => `const [$name, $setter] = useState(props.$name)` where {
-        $capitalized = capitalize($name)
-        $setter = s"set${capitalized}"
+        $capitalized = capitalize($name),
+        $setter = s"set${capitalized}",
         ensureImportFrom(`useState`, "react")
-      }
+      },
       `this.$name = ko.computed($func, $_)` => `const name = useMemo($func)` where {
         $func <: maybe contains bubble { `this.$name()` => `$name`}
       }

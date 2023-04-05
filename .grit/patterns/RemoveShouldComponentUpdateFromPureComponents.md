@@ -13,7 +13,7 @@ tags: #fix, #React
 ```grit
 `class $_ extends $extended { $body }` where {
   // The contains clause ensures that the pattern above matches only if the $extended metavariable binds to code containing 'PureComponent'
-  $extended <: contains `PureComponent`
+  $extended <: contains `PureComponent`,
   // The condition below is simultaneously a rewrite, which applies to instances of 'shouldComponentUpdate($_) { $_ }' which are contained in code bound to the metavariable $body.
   // The wildcard metavariable $_ is used because we don't care what the arguments or body of shouldComponentUpdate are; we just want to remove the whole code block.
   $body <: contains `shouldComponentUpdate($_) { $_ }` => .

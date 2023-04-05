@@ -10,7 +10,7 @@ tags: #SE
 
 ```grit
 or {
-  or {`+$value`, `1 * $value`} => `Number($value)`
+  or {`+$value`, `1 * $value`} => `Number($value)`,
   or { `"" + $value`, `$value + ""`, `'' + $value`, `$value + ''` } => `String($value)`
 }
 ```

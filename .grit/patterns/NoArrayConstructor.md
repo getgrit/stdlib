@@ -12,7 +12,7 @@ tags: #fix
 
 ```grit
 or {
-  `new Array($args)` => `[$args]`
+  `new Array($args)` => `[$args]`,
   `Array($args)` => `[$args]`
 } where {
   $args <: [$_, $_, ...]

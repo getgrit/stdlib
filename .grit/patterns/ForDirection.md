@@ -11,11 +11,11 @@ tags: #bug, #fix, #good
 ```grit
 or {
   `for ($_; $test; $counter) $_` where {
-      $test <: contains or { `$x < $_` , `$x <= $_` , `$_ > $x` , `$_ >= $x`}
+      $test <: contains or { `$x < $_` , `$x <= $_` , `$_ > $x` , `$_ >= $x`},
       $counter <: contains { `$x--` => `$x++`}
-  }
+  },
   `for ($_; $test; $counter) $_` where {
-      $test <: contains or { `$x > $_` , `$x >= $_` , `$_ < $x` , `$_ <= $x`}
+      $test <: contains or { `$x > $_` , `$x >= $_` , `$_ < $x` , `$_ <= $x`},
       $counter <: contains { `$x++` => Expression`$x--` }
   }
 }

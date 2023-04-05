@@ -14,7 +14,7 @@ tags: #fix
 or {
   `function $name($_) { $body }` where {
     $body <: contains let($arg) { `arguments.callee($arg)` => `$name($arg)`}
-  }
+  },
 
   `function $name($_){ $body }` where {
     $body <: contains  { `arguments.caller` => `$name.caller`}

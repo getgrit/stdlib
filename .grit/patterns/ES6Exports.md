@@ -14,21 +14,21 @@ or {
         `module.exports = { $vals }` where {
             // it's only safe to remove the overall export if every property is individually exported
             $vals <: some let($key, $name, $val, $match, $prop) ObjectProperty(key=$key, value=$name) as $prop => . where {
-                $name <: Identifier()
-                $exportedVals = [... $exportedVals, $prop]
+                $name <: Identifier(),
+                $exportedVals = [... $exportedVals, $prop],
                 $program <: contains or {
-                    `const $name = $val`
-                    `let $name = $val`
-                    `var $name = $val`
-                    `const $name = $val`
+                    `const $name = $val`,
+                    `let $name = $val`,
+                    `var $name = $val`,
+                    `const $name = $val`,
                     FunctionDeclaration(id=$name)
                 } as $match => ExportNamedDeclaration(declaration=$match)
             }
-        }
+        },
         maybe `module.exports = { $vals }` => . where $vals <: $exportedVals
-    }
+    },
     // handle other default exports
-    `module.exports = $export` => `export default $export`
+    `module.exports = $export` => `export default $export`,
     // Handle individually named exports
     `module.exports.$name = $export` => `export const $name = $export`
 }
