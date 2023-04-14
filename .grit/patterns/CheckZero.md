@@ -26,7 +26,7 @@ pattern CheckedBody($address) = bubble($address) contains or {
     }
 }
 
-# Start by checking all top-level functions
+// Start by checking all top-level functions
 sol_function_definition(name=$func, children=$children) where {
     // Look at each address individually (bubble creates a new scope),
     $children <: not within sol_interface_declaration(),
