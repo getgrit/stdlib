@@ -11,7 +11,7 @@ tags: #reentrancy, #vulnerability
 ```grit
 language sol
 
-sol_contract_declaration(body = $inherited) where {
+sol_contract_declaration(children = $inherited) where {
   $inherited <: contains or { "Proxy", "ERC1967Upgrade", "TransparentUpgradeableProxy", "UUPSUpgradeable" }
 }
 
