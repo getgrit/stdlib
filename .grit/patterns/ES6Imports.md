@@ -4,7 +4,7 @@ title: Prefer imports over require
 
 # ES6 imports
 
-Converts `require` statements to ES6-style exports.
+Converts `require` statements to ES6-style `import`.
 
 tags: #js, #es6, #migration, #cjs, #commonjs
 
