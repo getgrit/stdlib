@@ -17,12 +17,22 @@ or {
                 $name <: Identifier()
                 $exportedVals = [... $exportedVals, $prop]
                 $program <: contains or {
-                    `const $name = $val`
-                    `let $name = $val`
-                    `var $name = $val`
-                    `const $name = $val`
-                    FunctionDeclaration(id=$name)
-                } as $match => ExportNamedDeclaration(declaration=$match)
+                    // special case of exporting a require() - see ES6Import pattern
+                    or {
+                        // does not handle difficult trying to match a sublist of the module.exports
+                        `const $name = require($val).default` => `export { default as $name } from "$val"`
+                        `const $name = require($val).$foo` => `export { $foo as $name } from "$val"`
+                        `const $name = require($val)` => `export { default as $name } from "$val"`
+                    }
+                    // normal case
+                    or {
+                        `const $name = $val`
+                        `let $name = $val`
+                        `var $name = $val`
+                        `const $name = $val`
+                        FunctionDeclaration(id=$name)
+                    } as $match => ExportNamedDeclaration(declaration=$match)
+                }
             }
         }
         maybe `module.exports = { $vals }` => . where $vals <: $exportedVals
@@ -81,4 +91,32 @@ export const king = "9";
 module.exports = {
   queen: "8"
 };
+```
+
+### Work on 
+
+```js
+const c1 = require("./mod1");
+const c2 = require("./mod2");
+const c3 = require("./mod3");
+const myDefaultConst = require("./mod4").default;
+const myRenamed = require("mod5").originalName;
+const { sub1, sub2 } = require("mod5"); // not handled
+
+module.exports = { c1, c2, c3, myDefaultConst, myRenamed, sub1, sub2 };
+```
+
+```js
+export { default as c1 } from "./mod1";
+export { default as c2 } from "./mod2";
+export { default as c3 } from "./mod3";
+export { default as myDefaultConst } from "./mod4";
+export { originalName as myRenamed } from "mod5";
+const { sub1, sub2 } = require("mod5"); // not handled
+
+module.exports = {
+  sub1,
+  sub2
+};
+
 ```

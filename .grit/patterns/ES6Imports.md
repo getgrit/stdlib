@@ -43,7 +43,7 @@ import starImport from "star";
 
 ### Handle dotenv
 
-```
+```js
 require("dotenv").config({ path: "../.env" });
 
 // Another example
@@ -54,7 +54,7 @@ function doStuff() {
 }
 ```
 
-```
+```ts
 import * as dotenv from 'dotenv';
 dotenv.config({ path: "../.env" });
 import * as dotenv from 'dotenv';
