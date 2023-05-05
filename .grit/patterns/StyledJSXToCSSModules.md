@@ -91,7 +91,7 @@ pattern RewriteNamedComponents() {
 
 pattern RewriteDefaultComponents() {
   bubble `export default () => $body` where {
-    $file = replaceAll($filename, "tsx", "module.css")
+    $file = replaceAll($filename, r"\\.(tsx|js|jsx|ts)$", ".module.css")
     $body <: contains bubble($file) ExportStyles($file, "styles")
   }
 }
@@ -110,7 +110,7 @@ pattern RewriteNamedStyleExports() {
 pattern RewriteDefaultStyleExports() {
     `export default $body` where {
         $body <: bubble($body) TaggedTemplateExpression(tag=$tag, quasi=$styles) where {
-            $cssFileName = replaceAll($filename, "tsx", "module.css")
+            $cssFileName = replaceAll($filename, r"\\.(tsx|js|jsx|ts)$", ".module.css")
             ensureImportFrom(Identifier(name=s"default as defaultStyles"), `$cssFileName`)
             CreateCSSModule($styles, $cssFileName, $tag)
             $body => `defaultStyles`
@@ -147,24 +147,14 @@ const Button = (props) => (
 ```
 
 ```javascript
-import { default as cn } from 'classnames';
 import { default as button } from 'Button.module.css';
-
+import { default as cn } from 'classnames';
 const Button = (props) => (
   (<button className={cn(button.cta, button.large)}>
     {props.children}
+
   </button>)
 );
-
-// Button.module.css
-.cta {
-  padding: 20px;
-  background: #eee;
-  color: #999;
-}
-.large {
-  padding: 50px;
-}
 ```
 
 ## Convert globally scoped styled JSX
@@ -185,27 +175,19 @@ export default () => (
 ```
 
 ```javascript
-import { default as styles } from 'global.module.css';
-
+import { default as styles } from 'test.module.css';
 export default () => (
   (<div className="container">
+
   </div>)
 );
-
-// global.module.css
-:global{
-  body {
-    background: red;
-  }
-  .container {
-    background: red;
-  }  
-}
 ```
 
 ## Convert exported styles
 
 ```javascript
+import css from "styled-jsx/css";
+
 export const button = css`
   .button {
     color: hotpink;
@@ -214,6 +196,8 @@ export const button = css`
 ```
 
 ```javascript
+import css from "styled-jsx/css";
+
 import { default as buttonStyles } from 'button.module.css';
 
 export const button = buttonStyles;
@@ -253,19 +237,20 @@ const AppContainer = (props) => (
 ```
 
 ```javascript
-import { default as cn } from 'classnames';
 import { default as ctabutton } from 'CTAButton.module.css';
+import { default as cn } from 'classnames';
 import { default as appcontainer } from 'AppContainer.module.css';
-
 const CTAButton = (props) => (
   (<button className={cn(ctabutton.button, ctabutton.large)}>
     {props.children}
+
   </button>)
 );
 
 const AppContainer = (props) => (
   (<div className={cn(appcontainer.main)}>
     {props.children}
+
   </div>)
 );
 ```
