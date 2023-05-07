@@ -38,6 +38,16 @@ predicate RemoveImport($name) = {
   }
 }
 
+predicate moveImport($m, $from) = {
+  RemoveImport($m)
+  AddImport($m, $from)
+}
+
+pattern MoveImport($name, $new_source) = ImportNameFrom($name, $old_source) where {
+  !$old_source <: $new_source
+  replaceImport($name, $new_source)
+}
+
 predicate IsUsed($name) = {
   $program <: contains $name until ImportNameFrom($_, $_)
 }
