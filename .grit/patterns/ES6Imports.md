@@ -10,6 +10,7 @@ tags: #js, #es6, #migration, #cjs, #commonjs
 
 ```grit
 or {
+    `const $sentry = require('@sentry/node')` => `import * as $sentry from '@sentry/node'`,
     `const { $imports } = require($source)` => `import { $transformed } from "$source"` where {
         $imports <: some bubble($transformed) {ObjectProperty(key=$key, value=$val) where {
             $transformed = [...$transformed, `$key as $val`]
@@ -50,17 +51,27 @@ require("dotenv").config({ path: "../.env" });
 require("dotenv").config();
 
 function doStuff() {
-    // hello world
+  // hello world
 }
 ```
 
 ```ts
-import * as dotenv from 'dotenv';
+import * as dotenv from "dotenv";
 dotenv.config({ path: "../.env" });
-import * as dotenv from 'dotenv';
+import * as dotenv from "dotenv";
 dotenv.config();
 
 function doStuff() {
-    // hello world
+  // hello world
 }
+```
+
+### Handle Sentry
+
+```js
+const Sentry = require("@sentry/node");
+```
+
+```ts
+import * as Sentry from "@sentry/node";
 ```
