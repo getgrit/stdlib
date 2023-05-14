@@ -27,28 +27,28 @@ or {
 ## Transform standard require statements
 
 ```js
-const defaultImport = require("../../shared/default").default;
-const { something, another } = require("./lib");
-const assert = require("chai").assert;
-const conf = require("chai").config;
-const starImport = require("star");
+const defaultImport = require('../../shared/default').default;
+const { something, another } = require('./lib');
+const assert = require('chai').assert;
+const conf = require('chai').config;
+const starImport = require('star');
 ```
 
 ```ts
-import defaultImport from "../../shared/default";
-import { something, another } from "./lib";
-import { assert } from "chai";
-import { config as conf } from "chai";
-import starImport from "star";
+import defaultImport from '../../shared/default';
+import { something, another } from './lib';
+import { assert } from 'chai';
+import { config as conf } from 'chai';
+import starImport from 'star';
 ```
 
 ### Handle dotenv
 
 ```js
-require("dotenv").config({ path: "../.env" });
+require('dotenv').config({ path: '../.env' });
 
 // Another example
-require("dotenv").config();
+require('dotenv').config();
 
 function doStuff() {
   // hello world
@@ -56,9 +56,9 @@ function doStuff() {
 ```
 
 ```ts
-import * as dotenv from "dotenv";
-dotenv.config({ path: "../.env" });
-import * as dotenv from "dotenv";
+import * as dotenv from 'dotenv';
+dotenv.config({ path: '../.env' });
+import * as dotenv from 'dotenv';
 dotenv.config();
 
 function doStuff() {
@@ -69,9 +69,9 @@ function doStuff() {
 ### Handle Sentry
 
 ```js
-const Sentry = require("@sentry/node");
+const Sentry = require('@sentry/node');
 ```
 
 ```ts
-import * as Sentry from "@sentry/node";
+import * as Sentry from '@sentry/node';
 ```
