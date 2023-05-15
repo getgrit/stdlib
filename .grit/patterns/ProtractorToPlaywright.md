@@ -88,44 +88,42 @@ pattern ByOtherHandler() =  bubble `$other.$element(by.$by($selector))` => `$oth
     $element <: Elements()
 }
 
-// Work in progress - edge cases
-
 pattern BrowserMisc() = bubble or {
     // need a generic way to handle TIMEOUT
-    `browser.wait($ec.visibilityOf($locator), $timeout)` => `await expect($locator).toBeVisible({timeout: $timeout})`
-    `browser.wait($ec.visibilityOf($locator))` => `await expect($locator).toBeVisible()`
+    `browser.wait($ec.visibilityOf($locator), $timeout)` => `expect($locator).toBeVisible({timeout: $timeout})`
+    `browser.wait($ec.visibilityOf($locator))` => `expect($locator).toBeVisible()`
 
     // need a generic way to create a NOT condition for both of
-    `browser.wait($ec2.not($ec.visibilityOf($locator)), $timeout)` => `await expect($locator).toBeHidden({timeout: $timeout})`
-    `browser.wait($ec2.not($ec.visibilityOf($locator)))` => `await expect($locator).toBeHidden()`
+    `browser.wait($ec2.not($ec.visibilityOf($locator)), $timeout)` => `expect($locator).toBeHidden({timeout: $timeout})`
+    `browser.wait($ec2.not($ec.visibilityOf($locator)))` => `expect($locator).toBeHidden()`
 
-    `browser.wait($ec.presenceOf($element($locator)))` => `await expect(page.locator($locator)).toHaveCount(1)`
-    `browser.wait($ec.presenceOf($element($locator)), $timeout)` => `await expect(page.locator($locator)).toHaveCount(1, {timeout: $timeout})`
-    // could argue that in many cases where presenceOf/stalenessOf is used, you really meant visibilityOf, not toHaveCount(1/0)
-    `browser.wait($ec.presenceOf($locator), $timeout)` => `await expect($locator).toHaveCount(1, {timeout: $timeout})`
-    `browser.wait($ec.presenceOf($locator))` => `await expect($locator).toHaveCount(1)`
-    `browser.wait($ec.stalenessOf($locator), $timeout)` => `await expect($locator).toHaveCount(0, {timeout: $timeout})`
-    `browser.wait($ec.stalenessOf($locator))` => `await expect($locator).toHaveCount(0)`
+    `browser.wait($ec.presenceOf($element($locator)))` => `page.locator($locator).waitFor({ state: "attached"})`
 
-    `browser.wait($ec.invisibilityOf($locator), $timeout)` => `await expect($locator).toBeHidden({timeout: $timeout})`
-    `browser.wait($ec.invisibilityOf($locator))` => `await expect($locator).toBeHidden()`
-    `browser.wait($ec.textToBePresentInElement($locator, $text), $timeout)` => `await expect($locator).toHaveText($text, {timeout: $timeout})`
-    `browser.wait($ec.textToBePresentInElement($locator, $text))` => `await expect($locator).toHaveText($text)`
-    `browser.wait($ec.titleIs($text), $timeout)` => `await expect(page).toHaveTitle($text, {timeout: $timeout})`
-    `browser.wait($ec.titleIs($text))` => `await expect(page).toHaveTitle($text)`
-    `browser.wait($ec.urlIs($text), $timeout)` => `await expect(page).toHaveURL($text, {timeout: $timeout})`
-    `browser.wait($ec.urlIs($text))` => `await expect(page).toHaveURL($text)`
+    `browser.wait($ec.presenceOf($element($locator)), $timeout)` => `page.locator($locator).waitFor({ state: "attached", timeout: $timeout })`
+    `browser.wait($ec.presenceOf($locator), $timeout)` => `page.locator($locator).waitFor({ state: "attached", timeout: $timeout })`
+    `browser.wait($ec.presenceOf($locator))` => `page.locator($locator).waitFor({ state: "attached" })`
+    `browser.wait($ec.stalenessOf($locator), $timeout)` => `page.locator($locator).waitFor({ state: "detached", timeout: $timeout })`
+    `browser.wait($ec.stalenessOf($locator))` => `page.locator($locator).waitFor({ state: "detached" })`
+
+    `browser.wait($ec.invisibilityOf($locator), $timeout)` => `expect($locator).toBeHidden({timeout: $timeout})`
+    `browser.wait($ec.invisibilityOf($locator))` => `expect($locator).toBeHidden()`
+    `browser.wait($ec.textToBePresentInElement($locator, $text), $timeout)` => `expect($locator).toHaveText($text, {timeout: $timeout})`
+    `browser.wait($ec.textToBePresentInElement($locator, $text))` => `expect($locator).toHaveText($text)`
+    `browser.wait($ec.titleIs($text), $timeout)` => `expect(page).toHaveTitle($text, {timeout: $timeout})`
+    `browser.wait($ec.titleIs($text))` => `expect(page).toHaveTitle($text)`
+    `browser.wait($ec.urlIs($text), $timeout)` => `expect(page).toHaveURL($text, {timeout: $timeout})`
+    `browser.wait($ec.urlIs($text))` => `expect(page).toHaveURL($text)`
 
     // backups
-    `browser.wait($fn, $timeout, $message)` => `await page.waitForFunction($fn, { timeout: $timeout })`
-    `browser.wait($fn, $timeout)` => `await page.waitForFunction($fn, { timeout: $timeout })`
-    `browser.wait($args)` => `await page.waitForFunction($args)`
+    `browser.wait($fn, $timeout, $message)` => `page.waitForFunction($fn, { timeout: $timeout })`
+    `browser.wait($fn, $timeout)` => `page.waitForFunction($fn, { timeout: $timeout })`
+    `browser.wait($args)` => `page.waitForFunction($args)`
 
-    `browser.get($url)` => `await page.goto($url)`
-    `browser.sleep($args)` => `await page.waitForTimeout($args)`
+    `browser.get($url)` => `page.goto($url)`
+    `browser.sleep($args)` => `page.waitForTimeout($args)`
 
     // TODO partially supported
-    `browser.executeScript($x)` => `await page.evaluate($x)`
+    `browser.executeScript($x)` => `page.evaluate($x)`
 }
 
 //========================================================================
@@ -138,44 +136,62 @@ Program(contains bubble or {
     `it($name, async function() {$testBody})` => `test($name, async function ({page}) {$testBody})`
     `it($name, () => {$testBody})`      => `test($name, async function ({page}) {$testBody})`
     `it($name, async () => {$testBody})`      => `test($name, async function ({page}) {$testBody})`
-    JasmineRewrite()
 
-    BrowserMisc()
-    ByCssContainingText()
-    `expect(browser.getTitle()).toEqual($res)` => `expect(page).toHaveTitle($res)`
-    `expect(browser.getCurrentUrl()).toEqual($res)` => `expect(page).toHaveURL($res)`
-    `expect($actual.count()).toEqual($expected)` => `await expect($actual).toHaveCount($expected)`
-    `expect($actual.getText()).toEqual($expected)` => `await expect($actual).toHaveText($expected)`
+    or {
+        FunctionDeclaration(body=$body, async=$_ => true),
+        ArrowFunctionExpression(body=$body, async=$_ => true),
+        FunctionExpression(body=$body, async=$_ => true)
+    } where {
+        $body <: contains bubble or {
+            JasmineRewrite()
 
-    `$element(by.$by($selector)).$act($args)` => `await page.locator($locator).$act($args)` where {
-        $act <: or {`click`, `clear`}
-        $element <: Elements()
-        $by <: maybe ByChange($selector, $locator)
+            ByCssContainingText()
+            `expect(browser.getTitle()).toEqual($res)` => `expect(page).toHaveTitle($res)`
+            `expect(browser.getCurrentUrl()).toEqual($res)` => `expect(page).toHaveURL($res)`
+
+            // Awaitable
+            or {
+                BrowserMisc(),
+                `expect($actual.count()).toEqual($expected)` => `expect($actual).toHaveCount($expected)`
+                `expect($actual.getText()).toEqual($expected)` => `expect($actual).toHaveText($expected)`
+                `$element(by.$by($selector)).$act($args)` => `page.locator($locator).$act($args)` where {
+                    $act <: or {`click`, `clear`}
+                    $element <: Elements()
+                    $by <: maybe ByChange($selector, $locator)
+                }
+                `$element($inner).$act($args)` => `page.locator($inner).$act($args)` where {
+                    $act <: or {`click`, `clear`}
+                    $element <: Elements()
+                }
+                `$element(by.$by($selector)).sendKeys($args)` => `page.locator($locator).fill($args)` where $by <: maybe ByChange($selector, $locator)
+                `$element($inner).sendKeys($args)` => `page.locator($inner).fill($args)`
+            } as $exp where {
+                if ($exp <: not within AwaitExpression()) {
+                    $exp => AwaitExpression(argument=$exp)
+                }
+            }
+
+            ByHandler()
+            ByOtherHandler()
+
+            `get` => `nth`
+            `element.all` => `page.locator`
+            `var EC = protractor.ExpectedConditions;` => .
+        } until FunctionLike()
     }
-    `$element($inner).$act($args)` => `await page.locator($inner).$act($args)` where {
-        $act <: or {`click`, `clear`}
-        $element <: Elements()
-    }
-    `$element(by.$by($selector)).sendKeys($args)` => `await page.locator($locator).fill($args)` where $by <: maybe ByChange($selector, $locator)
-    `$element($inner).sendKeys($args)` => `await page.locator($inner).fill($args)`
-    ByHandler()
-    ByOtherHandler()
-
-    `get` => `nth`
-    `element.all` => `page.locator`
-    `var EC = protractor.ExpectedConditions;` => .
 } where {
     ensureImportFrom(`test`, `"@playwright/test"`)
     ensureImportFrom(`expect`, `"@playwright/test"`)
 })
 ```
 
-## Sample
+## Basic Sample
+
 See: https://playwright.dev/docs/protractor
 
 ```javascript
-describe('angularjs homepage todo list', function() {
-  it('should add a todo', function() {
+describe('angularjs homepage todo list', function () {
+  it('should add a todo', function () {
     browser.get('https://angularjs.org');
 
     element(by.model(module.sample)).sendKeys('first test');
@@ -194,9 +210,9 @@ describe('angularjs homepage todo list', function() {
 });
 ```
 
-```
+```typescript
 import { test, expect } from '@playwright/test';
-test.describe('angularjs homepage todo list', function() {
+test.describe('angularjs homepage todo list', function () {
   test('should add a todo', async function(
     {
       page
@@ -218,4 +234,85 @@ test.describe('angularjs homepage todo list', function() {
     await expect(completedAmount).toHaveCount(2);
   });
 });
+```
+
+## Handle Async
+
+```javascript
+var wait = function () {
+  var EC = protractor.ExpectedConditions;
+  browser.wait(EC.presenceOf($('#someId')));
+  browser.wait(EC.presenceOf($('#hello')), 1000);
+};
+
+var two = () => {
+  browser.wait(EC.presenceOf($('#someId')));
+};
+
+// Already sync
+var three = async () => {
+  await browser.wait(EC.presenceOf($('#someId')));
+};
+```
+
+```typescript
+import { test, expect } from '@playwright/test';
+var wait = async function() {
+  await page.locator('#someId').waitFor({
+    state: 'attached'
+  });
+  await page.locator('#hello').waitFor({
+    state: 'attached',
+    timeout: 1000
+  });
+};
+
+var two = async () => {
+  await page.locator('#someId').waitFor({
+    state: 'attached'
+  });
+};
+
+// Already sync
+var three = async () => {
+  await page.locator('#someId').waitFor({
+    state: 'attached'
+  });
+};
+```
+
+## Avoid deleting code
+
+```javascript
+async function attributeNotToMatch(selector, attr, text, { timeout } = {}) {
+  let actual = '';
+
+  return browser.wait(
+    async () => {
+      actual = await attribute(selector, attr, { timeout });
+      return !doMatch(actual, text);
+    },
+    utils.getTimeout(timeout),
+    formatError({
+      selector,
+      method: 'attributeNotToMatch',
+      actual,
+      expected: `not to match "${text}"`,
+    }),
+  );
+}
+```
+
+```typescript
+import { test, expect } from '@playwright/test';
+async function attributeNotToMatch(selector, attr, text, { timeout } = {}) {
+  let actual = '';
+
+  return await page.waitForFunction(async () => {
+    actual = await attribute(selector, attr, { timeout });
+    return !doMatch(actual, text);
+  }, {
+    timeout: utils.getTimeout(timeout)
+  });
+}
 ```
