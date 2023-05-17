@@ -61,7 +61,6 @@ export default checkAnimalBreed;
 ```
 
 ```js
-//@flow
 import type { Foo, Sam } from '../types';
 import type { Dog } from './animals';
 export type DogBreed = {
@@ -115,8 +114,6 @@ const checkBoolean = async () /*: boolean */ => {
 ```
 
 ```ts
-//@flow
-
 const checkBoolean = async (): boolean => {
   return false;
 };
@@ -141,7 +138,6 @@ After:
 
 ```ts
 import { MyType } from 'somelib';
-// @flow
 
 /**
  * @returns {import('somelib').MyType<any, any, any, any>}
