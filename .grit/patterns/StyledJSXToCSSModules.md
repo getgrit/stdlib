@@ -14,8 +14,6 @@ Extract all Styled JSX from a particular file and move it to CSS Module files.
 tags: #good
 
 ```grit
-language js
-
 pattern UpdateClassName($importModule) {
   JSXElement(children=$children, openingElement=JSXOpeningElement(attributes=[..., `className="$classesRaw"`, ...])) where {
     ensureImportFrom(Identifier(name=s"default as cn"), `'classnames'`)
