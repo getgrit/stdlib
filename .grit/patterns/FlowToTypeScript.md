@@ -4,7 +4,7 @@ Converts Flow type annotations to TypeScript type annotations on a best-effort b
 
 ```grit
 Program(and {
-  contains CommentLine(value = r" *@flow")
+  contains CommentLine(value = r" *@flow") => .
   maybe [
     maybe bubble or  {
       ImportDeclaration(leadingComments = [CommentBlock($c), ...]),
