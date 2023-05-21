@@ -48,6 +48,34 @@ predicate removeUnusedImports() = {
     // implementation in engine, this is just a sentinel
 }
 
+pattern FilterUnusedImports($content, $newImports) = some bubble($content, $newImports) `import { $imports } from "$source"` where {
+    $used = []
+    $imports <: maybe some bubble($content, $used) {
+        or {
+            ImportDefaultSpecifier(local=$name) as $import where {
+                $content <: contains $name until ImportLike()
+                append($used, $import)
+            },
+            ImportSpecifier(local=$name) as $import where {
+                $content <: contains $name until ImportLike()
+                append($used, $import)
+            },
+            ImportNamespaceSpecifier(local=$name) as $import where {
+                $content <: contains $name until ImportLike()
+                append($used, $import)
+            },
+            Identifier(name=$name) as $import where {
+                $content <: contains $name until ImportLike()
+                append($used, $import)
+            }
+        }
+    }
+    if (! $used <: [])  {
+        append($newImports, `import { $used } from "$source"`)
+    }
+}
+
+
 predicate moveImport($m, $from) = {
   RemoveImport($m)
   AddImport($m, $from)
