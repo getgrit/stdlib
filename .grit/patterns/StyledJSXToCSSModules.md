@@ -5,6 +5,7 @@ title: Convert Styled JSX to CSS Modules
 # {{ page.title }}
 
 Extract all Styled JSX from a particular file and move it to CSS Module files.
+
 - If there are multiple components in a given file, we create separate CSS Module file for each one.
 - Styles defined as global are currently moved to the same CSS Module file with scope set to global.
 - We use variable/component names for exporeted styles to create CSS Module files, and current filename for default exports.
@@ -145,6 +146,7 @@ const Button = (props) => (
 ```
 
 ```javascript
+// @file test.js
 import { default as button } from 'Button.module.css';
 import { default as cn } from 'classnames';
 const Button = (props) => (
@@ -153,6 +155,17 @@ const Button = (props) => (
 
   </button>)
 );
+// @file Button.module.css
+
+      .cta {
+        padding: 20px;
+        background: #eee;
+        color: #999;
+      }
+      .large {
+        padding: 50px;
+      }
+    
 ```
 
 ## Convert globally scoped styled JSX
@@ -173,12 +186,24 @@ export default () => (
 ```
 
 ```javascript
+// @file test.js
 import { default as styles } from 'test.module.css';
 export default () => (
   (<div className="container">
 
   </div>)
 );
+// @file test.module.css
+:global{
+
+      body {
+        background: red;
+      }
+      .container {
+        background: red;
+      }
+    
+}
 ```
 
 ## Convert exported styles
@@ -194,11 +219,17 @@ export const button = css`
 ```
 
 ```javascript
+// @file test.js
 import css from "styled-jsx/css";
 
 import { default as buttonStyles } from 'button.module.css';
 
 export const button = buttonStyles;
+// @file button.module.css
+
+  .button {
+    color: hotpink;
+  }
 ```
 
 ## Multiple styled jsx in a single file
@@ -235,6 +266,7 @@ const AppContainer = (props) => (
 ```
 
 ```javascript
+// @file test.js
 import { default as ctabutton } from 'CTAButton.module.css';
 import { default as cn } from 'classnames';
 import { default as appcontainer } from 'AppContainer.module.css';
@@ -251,4 +283,23 @@ const AppContainer = (props) => (
 
   </div>)
 );
+// @file AppContainer.module.css
+
+      .main {
+        padding: 20px;
+        background: #eee;
+        color: #999;
+      }
+    
+// @file CTAButton.module.css
+
+      .button {
+        padding: 20px;
+        background: #eee;
+        color: #999;
+      }
+      .large {
+        padding: 50px;
+      }
+    
 ```

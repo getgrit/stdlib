@@ -17,18 +17,21 @@ tags: #good
 ## Removes the statement simple
 
 ```javascript
-console.log("foo");
+// Do not remove this
+console.error('foo');
+console.log('foo');
 ```
 
-```
-
+```javascript
+// Do not remove this
+console.error('foo');
 ```
 
 ## Removes the statement in a function
 
 ```javascript
 function f() {
-  console.log("foo");
+  console.log('foo');
 }
 ```
 
@@ -51,6 +54,6 @@ server.listen(PORT);
 ```javascript
 try {
 } catch (e) {
-  console.log("foo");
+  console.log('foo');
 }
 ```

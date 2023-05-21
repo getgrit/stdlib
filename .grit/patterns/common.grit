@@ -1,3 +1,9 @@
+// Helpful utils
+predicate append($list, $item) = {
+  $list = [...$list, $item]
+}
+
+// Standard AST types
 pattern AnyEquals($a, $b) = or { `$a == $b` , `$a === $b` , `$b == $a` , `$b === $a` }
 
 pattern AnyAnd($a, $b) = or { `$a && $b` , `$b && $a` }
@@ -36,6 +42,10 @@ predicate RemoveImport($name) = {
   $name <: let $stringName in Identifier(name = $stringName) where {
     $program <: maybe contains ImportNameFrom(Identifier(name = $stringName) => ., $_)
   }
+}
+
+predicate removeUnusedImports() = {
+    // implementation in engine, this is just a sentinel
 }
 
 predicate moveImport($m, $from) = {
