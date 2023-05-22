@@ -24,7 +24,7 @@ or {
 }
 ```
 
-## Simple Function Parameters
+Simple Function Parameters
 
 ```js
 function getKey(userId: $TSFixMe) {
@@ -46,7 +46,7 @@ function somethingElse(num: number) {
 }
 ```
 
-## Class Definitions
+Class Definitions
 
 ```js
 class Foo {
@@ -70,7 +70,7 @@ class Foo {
 }
 ```
 
-## Function with no types
+Function with no types
 
 ```js
 function getKey(userId) {
