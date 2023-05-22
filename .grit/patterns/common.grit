@@ -3,6 +3,10 @@ predicate append($list, $item) = {
   $list = [...$list, $item]
 }
 
+predicate get_dirname($dirname) = {
+    $filename <: r"^(.*\\/)[^\\/]+$"($dirname)
+}
+
 // Standard AST types
 pattern AnyEquals($a, $b) = or { `$a == $b` , `$a === $b` , `$b == $a` , `$b === $a` }
 

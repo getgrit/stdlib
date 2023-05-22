@@ -1,8 +1,10 @@
 ---
-title: Split TRPC Router
+title: Split tRPC Router
 ---
 
-tags:
+Split a tRPC router into multiple files, one per route.
+
+tags: #trpc, #router, #split, #typescript
 
 ```grit
 language js
@@ -13,8 +15,8 @@ pattern NamedThing($name) = or {
 }
 
 Program(body=$body) where {
-    // $prefix = "js/"
-    $filename <: r"(.+)trpcRouter.server.ts"($prefix)
+    $body <: contains `t.router($_)`
+    get_dirname($prefix)
     // Look through every statement in the body (in its own scope, bubble creates scopes)
     $body <: some bubble($imports, $refs, $middlewares, $prefix) or {
         ImportDeclaration() as $import where {
