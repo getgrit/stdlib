@@ -1,11 +1,12 @@
 ---
 title: EnzymeToRTL
 ---
+
 # {{ page.title }}
 
 Migrate to react testing library.
 
-tags: 
+tags:
 
 ```grit
 pattern Mount() {
@@ -113,6 +114,7 @@ describe('Modal', () => {
 });
 
 ```
+
 ```js
 import TestModel from './modal';
 import { render, screen } from '@testing-library/react';
@@ -138,7 +140,6 @@ describe('Modal', () => {
     });
   });
 });
-
 ```
 
 ## Use query selector if no role found.
@@ -165,6 +166,7 @@ describe("Inputs Radio", () => {
 });
 
 ```
+
 ```js
 import { render, screen } from '@testing-library/react';
 
@@ -185,7 +187,6 @@ describe("Inputs Radio", () => {
     });
   });
 });
-
 ```
 
 ## Use textContent to find text data
@@ -196,13 +197,13 @@ test('has correct welcome text', () => {
   expect(wrapper.find('h1').text()).toEqual('Welcome, John Doe')
 })
 ```
+
 ```js
 import { render, screen } from '@testing-library/react';
 test('has correct welcome text', () => {
   const wrapper = render(<Welcome firstName="John" lastName="Doe" />)
   expect(screen.getByRole('heading').textContent).toEqual('Welcome, John Doe')
 })
-
 ```
 
 ## Transform input to use correct role
@@ -214,18 +215,18 @@ test('has correct input value', () => {
   expect(wrapper.find('input[name="lastName"]').value).toEqual('Doe')
 })
 ```
+
 ```js
 import { render } from '@testing-library/react';
 test('has correct input value', () => {
   const wrapper = render(<Welcome firstName="John" lastName="Doe" />)
-  expect(wrapper.getByRole('textbox', {
+  expect(wrapper.find('textbox', {
     name: "firstName"
   }).value).toEqual('John')
-  expect(wrapper.getByRole('textbox', {
+  expect(wrapper.find('textbox', {
     name: "lastName"
   }).value).toEqual('Doe')
 })
-
 ```
 
 ## Check variable information to rewrite locator
@@ -241,6 +242,7 @@ describe('Using variable', () => {
     });
 });
 ```
+
 ```js
 describe('Using variable', () => {
     it('Check variable contents when checking locator', () => {
@@ -250,7 +252,4 @@ describe('Using variable', () => {
       expect(wrapper.querySelector(headingClass).exists()).toBeTruthy();
     });
 });
-
 ```
-
-

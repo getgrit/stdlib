@@ -1,6 +1,7 @@
 ---
 title: Function expressions to arrow functions
 ---
+
 # {{ page.title }}
 
 Converts function expressions to ES6 arrow functions
@@ -41,6 +42,7 @@ var sumToValue = function (x, y) {
 
 var times = (x, y) => { return x * y }
 ```
+
 ```js
 var increment = i => {
   return i + 1
