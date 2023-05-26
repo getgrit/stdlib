@@ -34,6 +34,7 @@ Data._iterator_ = function () {
 ```
 
 ## `prototype["__iterator__"]` property => `_iterator_`
+
 ## `prototype["__iterator__"]` property => `_iterator_`
 
 ```javascript
@@ -48,7 +49,7 @@ Data._iterator_ = function () {
 };
 ```
 
-## `__iterator__ ` => `_iterator_`
+## `__iterator__` => `_iterator_`
 
 ```javascript
 bar.__iterator__ = function () {
@@ -76,7 +77,7 @@ bar._iterator_ = function () {
 };
 ```
 
-## Do not change `__iterator__ `
+## Do not change `__iterator__`
 
 ```javascript
 var __iterator__ = function () {

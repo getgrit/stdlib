@@ -334,7 +334,7 @@ class App extends Component {
   }
   render() {
     return (
-      <div>
+      (<div>
         <h3>This is a Class Component</h3>
         <input
           type="text"
@@ -348,7 +348,7 @@ class App extends Component {
         <button onClick={this.asyncAlert}>
           Alert
         </button>
-      </div>
+      </div>)
     );
   }
 }
@@ -388,7 +388,7 @@ const App = () => {
   }, []);
 
   return (
-    <div>
+    (<div>
       <h3>This is a Class Component</h3>
       <input
         type="text"
@@ -402,7 +402,7 @@ const App = () => {
       <button onClick={asyncAlertHandler}>
         Alert
       </button>
-    </div>
+    </div>)
   );
 };
 
@@ -463,11 +463,11 @@ const SampleComponent = props => {
     return clicks % 2 === 0;
   }, [clicks]);
 
-  return <>
-      <p>Clicks: {clicks}</p>
-      <p>Is even: {isEven}</p>
-      <a onClick={onClickHandler}>click</a>
-  </>;
+  return (<>
+    <p>Clicks: {clicks}</p>
+    <p>Is even: {isEven}</p>
+    <a onClick={onClickHandler}>click</a>
+  </>);
 };
 ```
 
@@ -529,10 +529,10 @@ const SampleComponent = props => {
     console.log("second click handler");
   }, [props]);
 
-  return <>
-      <p>Clicks: {clicks}</p>
-      <a onClick={onClickHandler}>click</a>
-  </>;
+  return (<>
+    <p>Clicks: {clicks}</p>
+    <a onClick={onClickHandler}>click</a>
+  </>);
 };
 ```
 
@@ -574,7 +574,7 @@ import { observer } from 'mobx-react';
 
 const SampleComponent = observer(() => {
   const viewState = useRef(new ViewState());
-  return <p>This component has a <span onClick={viewState.click}>ViewState</span></p>;
+  return (<p>This component has a<span onClick={viewState.click}>ViewState</span></p>);
 });
 ```
 
@@ -606,9 +606,9 @@ interface Props {
 }
 
 const SampleComponent = (props: Props) => {
-  return <>
+  return (<>
     <p>Hello {props.name}</p>
-  </>;
+  </>);
 };
 ```
 
@@ -727,9 +727,9 @@ const ObservedComponent = () => {
   const [name, setName] = useState<string>(undefined);
   const [age, setAge] = useState(21);
 
-  return <>
+  return (<>
     <p>Hello {name}, you are {age}</p>
-  </>;
+  </>);
 };
 ```
 
@@ -777,9 +777,9 @@ const ObservedComponent = (inputProps: any) => {
     name: "John",
   });
 
-  return <>
+  return (<>
     <p>This is {me.name}, {props.king}</p>
-  </>;
+  </>);
 };
 ```
 

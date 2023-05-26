@@ -29,6 +29,7 @@ so multiple statements are not required.
 ## Basic example
 
 Before:
+
 ```js
 describe('test', () => {
   it('consolidates', async () => {
@@ -45,6 +46,7 @@ describe('test', () => {
 ```
 
 After:
+
 ```
 describe('test', () => {
   it('consolidates', async () => {

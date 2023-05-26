@@ -1,6 +1,7 @@
 ---
 title: Prefer ES6-style exports over module.exports
 ---
+
 # {{ page.title }}
 
 Converts CommonJS `module.exports` to ES6-style exports.
@@ -49,6 +50,7 @@ or {
 ```js
 module.exports.king = "9";
 ```
+
 ```js
 export const king = "9";
 ```
@@ -67,6 +69,7 @@ module.exports = {
   addTeamToOrgSubscription,
 };
 ```
+
 ```js
 export async function createTeam() { 
     console.log("cool");
@@ -85,6 +88,7 @@ module.exports = {
   queen: "8"
 };
 ```
+
 ```js
 export const king = "9";
 
@@ -93,7 +97,7 @@ module.exports = {
 };
 ```
 
-### Work on 
+### Work on
 
 ```js
 const c1 = require("./mod1");

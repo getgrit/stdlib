@@ -1,6 +1,7 @@
 ---
 title: Migrate Knockout to React
 ---
+
 # {{ page.title }}
 
 Knockout.js is an older JavaScript framework that is still used by many developers.
@@ -39,6 +40,7 @@ var ViewModel = function(first, last) {
     }, this);
 };
 ```
+
 ```typescript
 import { useState } from 'react';
 var ViewComponent = function(props) {
@@ -100,6 +102,6 @@ ko.components.register('legal-hold-dot', {
 # Prior Art
 
 - https://github.com/wireapp/wire-webapp/wiki/Knockout-to-React-Migration
-    - https://github.com/wireapp/wire-webapp/pull/10329/files
-    - https://github.com/wireapp/wire-webapp/pull/10387/files
+  - https://github.com/wireapp/wire-webapp/pull/10329/files
+  - https://github.com/wireapp/wire-webapp/pull/10387/files
 - https://github.com/lelandrichardson/knockout-react
