@@ -12,12 +12,12 @@ tags: #reentrancy, #vulnerability
 
 ```grit
 and {
-    [ ... contains EtherTransfer($amount) ]
+    [ ... contains EtherTransfer($amount) ],
     not [
-        ...
-        `this.$x = $y`
-        ...
-        EtherTransfer($amount)
+        ...,
+        `this.$x = $y`,
+        ...,
+        EtherTransfer($amount),
         ...
     ]
 }

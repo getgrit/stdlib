@@ -12,12 +12,12 @@ tags: #reentrancy, #vulnerability
 
 ```grit
 [
-    ...
-    `this.$_ = $_` as $memberAccessBefore
-    ...
-    EtherTransfer($amount) as $theTransfer
-    ...
-    `this.$_ = $_`as $memberAccessAfter
+    ...,
+    `this.$_ = $_` as $memberAccessBefore,
+    ...,
+    EtherTransfer($amount) as $theTransfer,
+    ...,
+    `this.$_ = $_`as $memberAccessAfter,
     ...
 ]
 ```

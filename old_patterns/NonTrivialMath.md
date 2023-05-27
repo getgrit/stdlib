@@ -7,7 +7,7 @@ title: Non-trivial math
 ```grit
 or {
   // ds-math
-  or {  `wmul($_)`, `wdiv($_)`, `rmul($_)`, `rdiv($_)`, `pow($_)` }
+  or {  `wmul($_)`, `wdiv($_)`, `rmul($_)`, `rdiv($_)`, `pow($_)` },
 
   // modulus
   `$_ % $_`

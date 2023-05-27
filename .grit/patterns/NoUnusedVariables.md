@@ -10,9 +10,9 @@ language sol
 or {
   // find all our state variable definitions
   sol_state_variable_declaration(name = $name) as $dec where {
-      $dec <: within sol_contract_declaration() as $contract
+      $dec <: within sol_contract_declaration() as $contract,
       $contract <: not contains sol_function_definition(children=contains $name)
-  }
+  },
 
   // find all our local variable definitions
   sol_variable_declaration(name=$id) as $def where {

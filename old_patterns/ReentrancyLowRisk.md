@@ -13,20 +13,20 @@ tags: #reentrancy, #vulnerability, #lowrisk
 ```grit
 and {
   [
-      ...
-      `this.$_ = $_` as $memberAccessBefore
-      ...
-      EtherTransfer($amount) as $theTransfer
+      ...,
+      `this.$_ = $_` as $memberAccessBefore,
+      ...,
+      EtherTransfer($amount) as $theTransfer,
       $anotherLine
-  ]
+  ],
   // just a guard so only the ReentrancyBeforeAndAfter matches
   not [
-      ...
-      `this.$_ = $_`
-      ...
-      EtherTransfer($amount) as $theTransfer
-      ...
-      `this.$_ = $_`
+      ...,
+      `this.$_ = $_`,
+      ...,
+      EtherTransfer($amount) as $theTransfer,
+      ...,
+      `this.$_ = $_`,
       ...
   ]
 }

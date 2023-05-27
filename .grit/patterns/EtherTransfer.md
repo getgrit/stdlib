@@ -8,10 +8,10 @@ title: Ether Transfer
 language sol
 
 pattern EtherTransfer($amount) = bubble($amount) or {
-    `$sender.call{value: $amount}($_)`
-    `$sender.call.value($amount)($_)`
+    `$sender.call{value: $amount}($_)`,
+    `$sender.call.value($amount)($_)`,
     `$call($amount)` where {
-        $call <: `$address.$functionName`
+        $call <: `$address.$functionName`,
         $functionName <: r".*transfer.*"
     }
 }

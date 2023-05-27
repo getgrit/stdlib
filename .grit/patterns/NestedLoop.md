@@ -12,7 +12,7 @@ tags: #reentrancy, #vulnerability
 language sol
 
 pattern Loop($body) = bubble($body) orelse {
-  `while($_) { $body }`
+  `while($_) { $body }`,
   `for ($_; $_; $_) { $body }`
 }
 
