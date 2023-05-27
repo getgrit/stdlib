@@ -17,7 +17,7 @@ tags: #good
 ```grit
 pattern UpdateClassName($importModule) {
   JSXElement(children=$children, openingElement=JSXOpeningElement(attributes=[..., `className="$classesRaw"`, ...])) where {
-    ensureImportFrom(Identifier(name=s"default as cn"), `'classnames'`)
+    ensureImportFrom(Identifier(name=s"default as cn"), `'classnames'`),
     $children <: contains bubble($classesRaw, $importModule) `<style $_>{$styles}</style>` where {
       $styles <: contains bubble($classesRaw, $importModule) TemplateElement(value=RawCooked(raw=$css)) where {
         
@@ -25,18 +25,18 @@ pattern UpdateClassName($importModule) {
         // Idea is to select all classnames from the style.
 
         // Replace everything but the classnames.
-        $classNames = replaceAll($css, r"(?:\\s*\\{[\\s\\S]*?\\})|(?:\\b(?!\\.)\\w+\\b(?!\\s*\\{))", "")
+        $classNames = replaceAll($css, r"(?:\\s*\\{[\\s\\S]*?\\})|(?:\\b(?!\\.)\\w+\\b(?!\\s*\\{))", ""),
         // Remove extra spaces and new lines.
-        $classNames = replaceAll($classNames, r"[\\s\\n]+", "")
+        $classNames = replaceAll($classNames, r"[\\s\\n]+", ""),
         // Split classnames
-        $classNames = split("\\.", $classNames)
+        $classNames = split("\\.", $classNames),
         
-        $classList = []
+        $classList = [],
         $classNames <: some bubble($classList, $importModule) $class where {
           if (! $class <: "") {
             $classList = [... $classList, raw(s"${importModule}.${class}") ]
           }
-        }
+        },
 
         $classesRaw => `cn($classList)`
       }
@@ -59,7 +59,7 @@ predicate CreateCSSModule($styles, $cssFileName, $scope) {
         $scopedCSS = raw(unparse($css))
       }
       $newFiles = [File(name = $cssFileName, program = Program([$scopedCSS]))]
-    }
+    },
     bubble($scope, $cssFileName) RawCooked(raw=$css) where {
       if (IsGlobalStyle($scope)) {
         $scopedCSS = raw(":global{\n" + $css + "\n}")
@@ -73,24 +73,24 @@ predicate CreateCSSModule($styles, $cssFileName, $scope) {
 
 pattern ExportStyles($cssFile, $importModule) {
   bubble($cssFile, $importModule) `<style $scope>{$styles}</style>` as $jsxMatch where {
-    $jsxMatch => .
-    CreateCSSModule($styles, $cssFile, $scope)
+    $jsxMatch => .,
+    CreateCSSModule($styles, $cssFile, $scope),
     ensureImportFrom(Identifier(name=s"default as ${importModule}"), `$cssFile`)
   }
 }
 
 pattern RewriteNamedComponents() {
   bubble `const $compName = ($_) => $body` where {
-    $file = join(".", [$compName, "module.css"])
-    $importModule = toLowerCase($compName)
-    $body <: contains bubble($file, $compName, $importModule) ExportStyles($file, $importModule)
+    $file = join(".", [$compName, "module.css"]),
+    $importModule = toLowerCase($compName),
+    $body <: contains bubble($file, $compName, $importModule) ExportStyles($file, $importModule),
     $body <: maybe contains bubble($importModule) UpdateClassName($importModule)
   }
 }
 
 pattern RewriteDefaultComponents() {
   bubble `export default () => $body` where {
-    $file = replaceAll($filename, r"\\.(tsx|js|jsx|ts)$", ".module.css")
+    $file = replaceAll($filename, r"\\.(tsx|js|jsx|ts)$", ".module.css"),
     $body <: contains bubble($file) ExportStyles($file, "styles")
   }
 }
@@ -98,9 +98,9 @@ pattern RewriteDefaultComponents() {
 pattern RewriteNamedStyleExports() {
     `const $styleName = $body` where {
         $body <: bubble($body, $styleName) TaggedTemplateExpression(tag=$tag, quasi=$styles) where {
-            $cssFileName = join(".", [$styleName, "module.css"])
-            ensureImportFrom(Identifier(name=s"default as ${styleName}Styles"), `$cssFileName`)
-            CreateCSSModule($styles, $cssFileName, $tag)
+            $cssFileName = join(".", [$styleName, "module.css"]),
+            ensureImportFrom(Identifier(name=s"default as ${styleName}Styles"), `$cssFileName`),
+            CreateCSSModule($styles, $cssFileName, $tag),
             $body => raw(s"${styleName}Styles")
         }
     }
@@ -109,18 +109,18 @@ pattern RewriteNamedStyleExports() {
 pattern RewriteDefaultStyleExports() {
     `export default $body` where {
         $body <: bubble($body) TaggedTemplateExpression(tag=$tag, quasi=$styles) where {
-            $cssFileName = replaceAll($filename, r"\\.(tsx|js|jsx|ts)$", ".module.css")
-            ensureImportFrom(Identifier(name=s"default as defaultStyles"), `$cssFileName`)
-            CreateCSSModule($styles, $cssFileName, $tag)
+            $cssFileName = replaceAll($filename, r"\\.(tsx|js|jsx|ts)$", ".module.css"),
+            ensureImportFrom(Identifier(name=s"default as defaultStyles"), `$cssFileName`),
+            CreateCSSModule($styles, $cssFileName, $tag),
             $body => `defaultStyles`
         }
     }
 }
 
 or {
-  RewriteNamedComponents()
-  RewriteDefaultComponents()
-  RewriteNamedStyleExports()
+  RewriteNamedComponents(),
+  RewriteDefaultComponents(),
+  RewriteNamedStyleExports(),
   RewriteDefaultStyleExports()
 }
 ```

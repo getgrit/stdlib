@@ -12,7 +12,7 @@ tags: #lint, #style
 language js
 
 [...$others, `if ($cond) { $condTrue }` => $newIf, `return $else` => $condTrue] where {
-    $condTrue <: contains `return $_`
+    $condTrue <: contains `return $_`,
     $newIf = `if (!$cond) { return $else }`
 }
 ```

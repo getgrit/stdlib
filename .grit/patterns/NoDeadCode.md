@@ -10,8 +10,8 @@ tags: #good, #SE
 
 ```grit
 [
-  ...
-  or { `throw $_` , ContinueStatement() , BreakStatement() , `return $_` }
+  ...,
+  or { `throw $_` , ContinueStatement() , BreakStatement() , `return $_` },
   some $_ => .
 ]
 ```

@@ -12,18 +12,18 @@ tags:
 pattern Mount() {
     or {
         `$mount($comp)` as $mountComp where {
-            $mount <: or { `mount`, `shallow` }
-            ensureImportFrom(`render`, `"@testing-library/react"`)
+            $mount <: or { `mount`, `shallow` },
+            ensureImportFrom(`render`, `"@testing-library/react"`),
             $mountComp => `render($comp)`
-        }
+        },
         `import { $imports } from 'enzyme'` => .
     }
 }
 
 pattern SimulateInput() {
     `$inputFind.simulate($type, $value)` as $simulate where {
-        ensureImportFrom(`fireEvent`, `"@testing-library/react"`)
-        $eventType = Identifier(name = s"${type}")
+        ensureImportFrom(`fireEvent`, `"@testing-library/react"`),
+        $eventType = Identifier(name = s"${type}"),
         $simulate => [
             `const selector = $inputFind`,
             `fireEvent.$eventType(selector, { target: { value: $value } });`
@@ -33,9 +33,9 @@ pattern SimulateInput() {
 
 pattern BaseRewrite() {
     or {
-        `$_.update()` => .
-        `$_.act()` => .
-        `$textFind.text()` => `$textFind.textContent`
+        `$_.update()` => .,
+        `$_.act()` => .,
+        `$textFind.text()` => `$textFind.textContent`,
         `$inputFind.prop('value')` => `$inputFind.value`
     }
 }
@@ -52,24 +52,24 @@ predicate SelectorRewrite($value, $locator, $compVar, $selector) {
             ObjectProperty(key=Identifier(name="name"), value=raw($formField))
         ])]
     } else {
-        ensureImportFrom(`screen`, `"@testing-library/react"`)
-        $compVar => `screen`
-        $locator => `getByRole`
-        $guessRole = guess(codePrefix="// fix role using HTML tag", fallback=unparse($selector), stop=["function"])
+        ensureImportFrom(`screen`, `"@testing-library/react"`),
+        $compVar => `screen`,
+        $locator => `getByRole`,
+        $guessRole = guess(codePrefix="// fix role using HTML tag", fallback=unparse($selector), stop=["function"]),
         $selector => $guessRole
     }
 }
 
 pattern RewriteSelector() {
     `$compVar.$locator($selector)` where {
-        $locator <: `find`
+        $locator <: `find`,
         if ($selector <: StringLiteral(value=$value)) {
             SelectorRewrite($value, $locator, $compVar, $selector)
         } else {
             // If the variable used in the selector has a classname assigned rewrite it
             $program <: contains VariableDeclaration() as $var where {
                 $var <: contains `$selector = $varSelector` where {
-                    $varSelector <: StringLiteral(value=$value)
+                    $varSelector <: StringLiteral(value=$value),
                     SelectorRewrite($value, $locator, $compVar, $selector)
                 }
             }
@@ -78,9 +78,9 @@ pattern RewriteSelector() {
 }
  
 or {
-    Mount()
-    RewriteSelector()
-    SimulateInput()
+    Mount(),
+    RewriteSelector(),
+    SimulateInput(),
     BaseRewrite()
 }
 ```

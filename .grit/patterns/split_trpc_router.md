@@ -10,17 +10,17 @@ tags: #trpc, #router, #split, #typescript
 language js
 
 pattern NamedThing($name) = or {
-    `const $name = $_`
+    `const $name = $_`,
     `function $name($_) { $_ }`
 }
 
 Program(body=$body) where {
-    $body <: contains `t.router($_)`
-    get_dirname($prefix)
+    $body <: contains `t.router($_)`,
+    get_dirname($prefix),
     // Look through every statement in the body (in its own scope, bubble creates scopes)
     $body <: some bubble($imports, $refs, $middlewares, $prefix) or {
         ImportDeclaration() as $import where {
-            $import => .
+            $import => .,
             append($imports, $import)
         },
         `export const $_ = t.router({$routes})` as $router where {
@@ -28,46 +28,46 @@ Program(body=$body) where {
             $routes <: some bubble($imports, $refs, $prefix) `$key: $proc` => `$key: $routeName` where {
                 // Find only the top-level things referenced in this route to carry over
                 $refs <: maybe some bubble($ourRefs, $proc, $prefix) NamedThing($name) as $ref where {
-                    $proc <: contains $name
+                    $proc <: contains $name,
                     append($ourRefs, $ref)
-                }
+                },
 
-                $routeName = $key + "Route"
-                $newFileName = $key+".route"
+                $routeName = $key + "Route",
+                $newFileName = $key+".route",
                 $f = [
                     // Insert the middleware
-                    `import { proc } from "./middleware"`
+                    `import { proc } from "./middleware"`,
                     ...$ourRefs,
                     `export const $routeName = $proc`
-                ]
-                $newImports = []
-                $imports <: FilterUnusedImports($f, $newImports)
-                $newFile = [...$newImports, $f]
-                $newFiles = [ File(name = $prefix + $newFileName + ".ts", program = Program($newFile)) ]
+                ],
+                $newImports = [],
+                $imports <: FilterUnusedImports($f, $newImports),
+                $newFile = [...$newImports, $f],
+                $newFiles = [ File(name = $prefix + $newFileName + ".ts", program = Program($newFile)) ],
 
-                $relativeFilename = "./" + $newFileName
+                $relativeFilename = "./" + $newFileName,
                 ensureImportFrom(Identifier(name=$routeName), `$relativeFilename`)
             }
-        }
+        },
         // Grab middlewares
         `export const t = $_` as $t => . where { append($middlewares, $t) },
         `const $name = $thing` => . where {
             $thing <: or {
-                `t.middleware($_)`
+                `t.middleware($_)`,
                 `t.procedure.use($_)`
-            }
-            $export = `export const $name = $thing`
+            },
+            $export = `export const $name = $thing`,
             append($middlewares, $export)
-        }
+        },
         // Gather all other global functions/conts
         NamedThing($_) as $ref => . where { append($refs, $ref) }
-    }
+    },
     // Put all the middleware in a new file
-    $middlewareImports = []
-    $imports <: FilterUnusedImports($middlewares, $middlewareImports)
+    $middlewareImports = [],
+    $imports <: FilterUnusedImports($middlewares, $middlewareImports),
     $newFiles = [...$newFiles, File(name=$prefix + "middleware.ts", program=Program([
       ...$middlewareImports, ...$middlewares
-    ]))]
+    ]))],
 
     ensureImportFrom(`t`, "./middleware")
 }

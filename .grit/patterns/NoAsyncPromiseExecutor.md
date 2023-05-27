@@ -13,12 +13,12 @@ tags: #fix, #bug
 ```grit
 or {
   `new Promise($promise)` where {
-    $promise <: contains { `async $args => $body` => `$args => $body`}
+    $promise <: contains { `async $args => $body` => `$args => $body`},
     $body <: not contains { AwaitExpression() }
-  }
+  },
 
   `new Promise(async ($resolve, $reject) => $body)` => `(async () => $body)()` where {
-    $body <: contains { AwaitExpression() }
+    $body <: contains { AwaitExpression() },
     $body <: contains bubble or { `resolve($a)` =>  `return $a;` , `reject($a)`  =>  `throw $a;` }
   }
 }

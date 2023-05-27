@@ -10,15 +10,15 @@ tags: #js, #es6, #migration, #cjs, #commonjs
 
 ```grit
 or {
-    `import $import from "$source"` => `const $import = require("$source")`
+    `import $import from "$source"` => `const $import = require("$source")`,
     `import { $import } from "$source"` => `const { $newports } = require("$source")` where {
-        $newports = []
+        $newports = [],
         $import <: some bubble($newports) `$key as $val` where { 
-            $obj = ObjectProperty(key=$key, value=$val)
+            $obj = ObjectProperty(key=$key, value=$val),
             // no need to do {foo: foo}, just say {foo}
             if ($key <: $val) {
                 $obj = $key
-            }
+            },
             $newports = [...$newports, $obj]
         }
     }

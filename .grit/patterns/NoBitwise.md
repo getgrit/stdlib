@@ -8,7 +8,7 @@ Bitwise operators `&` or `|` are often used by mistake instead of `&&` or `||`, 
 
 ```grit
 or {
-  `$x & $y` => `$x && $y`
+  `$x & $y` => `$x && $y`,
   `$x | $y` => `$x || $y`
 }
 ```

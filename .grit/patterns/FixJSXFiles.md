@@ -6,11 +6,11 @@ Files containing JSX should have a .jsx extension.
 language js
 
 File(name=$name, program=$body) where {
-    $body <: contains JSXElement()
+    $body <: contains JSXElement(),
     $name <: or {
       r"(.+).js" where {
         $name => replaceAll($name, ".js", ".jsx")
-      }
+      },
       r"(.+).ts" where {
         $name => replaceAll($name, ".ts", ".tsx")
       }

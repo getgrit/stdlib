@@ -4,17 +4,17 @@ Converts Flow type annotations to TypeScript type annotations on a best-effort b
 
 ```grit
 Program(and {
-  contains CommentLine(value = r" *@flow") => .
+  contains CommentLine(value = r" *@flow") => .,
   maybe [
     maybe bubble or  {
       ImportDeclaration(leadingComments = [CommentBlock($c), ...]),
       ExportDeclaration(leadingComments = [CommentBlock($c), ...])
-    } as $node => raw("/*" + $c + "*/\n" + unparse($node))
+    } as $node => raw("/*" + $c + "*/\n" + unparse($node)),
     some bubble or { ImportDeclaration(), ExportDeclaration() } as $node => raw(unparse($node))
-  ]
-  maybe contains bubble TypeAnnotation() as $node => raw(unparse($node))
+  ],
+  maybe contains bubble TypeAnnotation() as $node => raw(unparse($node)),
   maybe contains bubble CommentBlock(value = $comment) where {
-    $comment <: r"(?s).*@returns.*import\\('(.*)'\\).([^<]*).*"($lib, $type)
+    $comment <: r"(?s).*@returns.*import\\('(.*)'\\).([^<]*).*"($lib, $type),
     ensureImportFrom(Identifier(name = $type), $lib)
   }
 })
