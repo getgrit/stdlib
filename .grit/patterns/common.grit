@@ -73,7 +73,7 @@ pattern FilterUnusedImports($content, $newImports) = some bubble($content, $newI
                 append($used, $import)
             }
         }
-    }
+    },
     if (! $used <: [])  {
         append($newImports, `import { $used } from "$source"`)
     }
@@ -197,7 +197,7 @@ predicate InsertImports() = or {
         let $x in `$x, $from` where { 
           $allFrom = [... $allFrom, $x]
         }
-      }
+      },
       $from <: StringLiteral(value = $fromName),
       or {
         $program <: let $existing, $fromHere in {
@@ -213,7 +213,7 @@ predicate InsertImports() = or {
         },
         $allNewImports = [$allNewImports, `import { $allFrom } from '$from'`]
       }
-    }
+    },
     or {
       $allNewImports <: [],
       InsertAfterImports($allNewImports)

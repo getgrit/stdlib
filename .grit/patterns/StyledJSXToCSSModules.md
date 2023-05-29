@@ -57,7 +57,7 @@ predicate CreateCSSModule($styles, $cssFileName, $scope) {
         $scopedCSS = raw(":global{\n" + unparse($css) + "\n}")
       } else {
         $scopedCSS = raw(unparse($css))
-      }
+      },
       $newFiles = [File(name = $cssFileName, program = Program([$scopedCSS]))]
     },
     bubble($scope, $cssFileName) RawCooked(raw=$css) where {
@@ -65,7 +65,7 @@ predicate CreateCSSModule($styles, $cssFileName, $scope) {
         $scopedCSS = raw(":global{\n" + $css + "\n}")
       } else {
         $scopedCSS = raw($css)
-      }
+      },
       $newFiles = [File(name = $cssFileName, program = Program([$scopedCSS]))]
     }
   }

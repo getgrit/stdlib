@@ -200,7 +200,7 @@ predicate HandleHoistedStates() = {
             $theUpdate = `const [$current, $setter] = useState($initValue)`
         } else {
             $theUpdate = `const [$current, $setter] = useState<$theType>($initValue)`
-        }
+        },
         $newState = [...$newState, $theUpdate]
       },
       ensureImportFrom(`useState`, `"react"`)
@@ -243,7 +243,7 @@ pattern MainReactClassToHooks($moveDefaultProps) = or {
         $movedDefaultProps = true
       }
     }
-  }
+  },
 
   HandleHoistedStates(),
 
