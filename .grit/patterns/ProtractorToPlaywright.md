@@ -14,7 +14,8 @@ language js
 //========================================================================
 // High level function rewrites
 
-pattern JasmineRewrite() = bubble `$jasmineFn($jasmineArgs)` as $jasmineBody where {
+pattern JasmineRewrite() {
+  bubble `$jasmineFn($jasmineArgs)` as $jasmineBody where {
     $jasmineFn <: or {
         `beforeEach`,
         `afterEach`,
@@ -23,17 +24,21 @@ pattern JasmineRewrite() = bubble `$jasmineFn($jasmineArgs)` as $jasmineBody whe
         `fail`
     },
     $jasmineFn => `test.$jasmineFn`
+  }
 }
 
 //========================================================================
 // Fancy string replacement for: by => page.locator
 
-predicate ExtractString($any, $cssString) = $any <: or {
+predicate ExtractString($any, $cssString) {
+  $any <: or {
     StringLiteral(value = $cssString),
     $_ where $cssString = "${" + unparse($any) + "}"
+  }
 }
 
-pattern ByChange($selector, $locator) = or {
+pattern ByChange($selector, $locator) {
+  or {
     `buttonText` where {
         ExtractString($selector, $selectorString),
         $almost = s"button, input[type=\"button\"], input[type=\"submit\"] >> text=\"${selectorString}\"",
@@ -60,8 +65,11 @@ pattern ByChange($selector, $locator) = or {
         $almost = s"xpath=${selectorString}",
         $locator = raw(s"`${almost}`")
     }
+  }
 }
-pattern ByCssContainingText() = bubble or {
+
+pattern ByCssContainingText() {
+  bubble or {
     `$element(by.cssContainingText($css, $text))` where {$element <: Elements()},
     `by.cssContainingText($css, $text)`
 } => `page.locator($locator)` where {
@@ -69,26 +77,34 @@ pattern ByCssContainingText() = bubble or {
     ExtractString($text, $textString),
     $almost = $cssString + " >> text=" + $textString,
     $locator = raw(s"`${almost}`")
+  }
 }
 
 //========================================================================
 // expect() and element()
 
-pattern Elements() = or { `element`, `element.all`, `$`}
+pattern Elements() {
+  or { `element`, `element.all`, `$`}
+}
 
-pattern ByHandler() = bubble or {
+pattern ByHandler() {
+  bubble or {
     `$element(by.$by($selector))` where {$element <: Elements()},
     `by.$by($selector)`
-} => `page.locator($locator)` where {
-    $by <: ByChange($selector, $locator)
+  } => `page.locator($locator)` where {
+      $by <: ByChange($selector, $locator)
+  }
 }
 
-pattern ByOtherHandler() =  bubble `$other.$element(by.$by($selector))` => `$other.locator($locator)` where {
+pattern ByOtherHandler() {
+  bubble `$other.$element(by.$by($selector))` => `$other.locator($locator)` where {
     $by <: ByChange($selector, $locator),
     $element <: Elements()
+  }
 }
 
-pattern BrowserMisc() = bubble or {
+pattern BrowserMisc() {
+  bubble or {
     // need a generic way to handle TIMEOUT
     `browser.wait($ec.visibilityOf($locator), $timeout)` => `expect($locator).toBeVisible({timeout: $timeout})`,
     `browser.wait($ec.visibilityOf($locator))` => `expect($locator).toBeVisible()`,
@@ -124,6 +140,7 @@ pattern BrowserMisc() = bubble or {
 
     // TODO partially supported
     `browser.executeScript($x)` => `page.evaluate($x)`
+  }
 }
 
 //========================================================================

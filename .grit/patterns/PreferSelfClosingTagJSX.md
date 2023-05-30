@@ -11,16 +11,16 @@ tags: #SE, #syntax, #React
 ```grit
 // The 'pattern' keyword is used to define custom named patterns at the top of this Grit snippet.
 // We use separate patterns for matching different groups of html tags to aid readability.
-pattern HTMLHeadings() = or { "h1" , "h2" , "h3" , "h4" , "h5" , "h6", "title" }
-pattern HTMLContainers() = or { "div" , "section" , "article" , "nav" , "main" , "aside" , "footer" , "header" , "hgroup" }
-pattern HTMLBlockText() = or { "address" , "blockquote" , "dl" , "dt" , "dd" , "ul" , "ol" , "li" , "figcaption" , "figure" , "p" , "pre" }
-pattern HTMLInlineText() = or { "a" , "b" , "span" , "abbr" , "bdi" , "bdo" , "cite" , "code" , "data" , "dfn" , "em" , "i" , "kbd" , "mark" , "q" , "ruby" , "rp" , "rt" , "rtc" , "s" , "samp" , "small" , "strong" , "sub" , "sup" , "time" , "u" , "var" , "small" , "del" , "ins" }
-pattern HTMLTables() = or { "table" , "tbody" , "thead" , "tfoot" , "tr" , "th" , "td" , "caption" , "optgroup" }
-pattern HTMLForms() = or { "form" , "button" , "label" , "fieldset" , "legend" , "select" , "datalist" , "option" , "textarea" , "progress" , "output" , "meter" }
-pattern HTMLWebComponents() = or { "content" , "element" , "shadow" , "slot" , "template" }
-pattern HTMLInteractive() = or { "dialog" , "details" , "summary" , "menu" , "menuitem" }
+pattern HTMLHeadings() { or { "h1" , "h2" , "h3" , "h4" , "h5" , "h6", "title" } }
+pattern HTMLContainers() { or { "div" , "section" , "article" , "nav" , "main" , "aside" , "footer" , "header" , "hgroup" } }
+pattern HTMLBlockText() { or { "address" , "blockquote" , "dl" , "dt" , "dd" , "ul" , "ol" , "li" , "figcaption" , "figure" , "p" , "pre" } }
+pattern HTMLInlineText() { or { "a" , "b" , "span" , "abbr" , "bdi" , "bdo" , "cite" , "code" , "data" , "dfn" , "em" , "i" , "kbd" , "mark" , "q" , "ruby" , "rp" , "rt" , "rtc" , "s" , "samp" , "small" , "strong" , "sub" , "sup" , "time" , "u" , "var" , "small" , "del" , "ins" } }
+pattern HTMLTables() { or { "table" , "tbody" , "thead" , "tfoot" , "tr" , "th" , "td" , "caption" , "optgroup" } }
+pattern HTMLForms() { or { "form" , "button" , "label" , "fieldset" , "legend" , "select" , "datalist" , "option" , "textarea" , "progress" , "output" , "meter" } }
+pattern HTMLWebComponents() { or { "content" , "element" , "shadow" , "slot" , "template" } }
+pattern HTMLInteractive() { or { "dialog" , "details" , "summary" , "menu" , "menuitem" } }
 // Finally, the pattern HTMLTagsWithPair() is defined as the disjunction of all the above defined patterns
-pattern HTMLTagsWithPair() = or { HTMLHeadings() , HTMLContainers() , HTMLBlockText() , HTMLInlineText() , HTMLTables() , HTMLForms() , HTMLWebComponents() }
+pattern HTMLTagsWithPair() { or { HTMLHeadings() , HTMLContainers() , HTMLBlockText() , HTMLInlineText() , HTMLTables() , HTMLForms() , HTMLWebComponents() } }
 
 `<$name $props> $body </$name>` => `<$name $props />` where {
   // In order for a snippet of code to be rewritten, it must satisfy both of the where conditions below

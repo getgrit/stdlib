@@ -1,58 +1,73 @@
 // Helpful utils
-predicate append($list, $item) = {
+predicate append($list, $item) {
   $list = [...$list, $item]
 }
 
-predicate get_dirname($dirname) = {
+predicate get_dirname($dirname) {
     $filename <: r"^(.*\\/)[^\\/]+$"($dirname)
 }
 
 // Standard AST types
-pattern AnyEquals($a, $b) = or { `$a == $b` , `$a === $b` , `$b == $a` , `$b === $a` }
-
-pattern AnyAnd($a, $b) = or { `$a && $b` , `$b && $a` }
-
-pattern AnyNotEquals($a, $b) = or {
-  BinaryExpression(operator = or { "!==" , "!=" }, left = $a, right = $b),
-  BinaryExpression(operator = or { "!==" , "!=" }, left = $b, right = $a)
+pattern AnyEquals($a, $b) {
+  or { `$a == $b` , `$a === $b` , `$b == $a` , `$b === $a` }
 }
 
-pattern BuiltInObjects() = or { `Object`, `Math`, `Array`, `Number`, `Date`, `RegExp`, `Map`, `Set`, `Atomics`, `ArrayBuffer`, `SharedArrayBuffer`, `DataView`, `JSON`, `Promise`, `Reflect`, `Proxy` }
-
-pattern AnyEqualsUndefined($aVar) = AnyEquals($aVar,`undefined`)
-
-pattern LiteralValue($v) = or {
-  JSXText(value = $v),
-  StringLiteral(value = $v),
-  NumericLiteral(value = $v),
-  BigIntLiteral(value = $v),
-  NullLiteral(value = $v),
-  BooleanLiteral(value = $v),
-  RegExpLiteral(value = $v)
+pattern AnyAnd($a, $b) {
+  or { `$a && $b` , `$b && $a` }
 }
 
-pattern ImportNameFrom($name, $from) = or {
-  `import { $..., $name, $... } from '$from'`,
-  let $somethingelse in `import { $..., $somethingelse as $name, $... } from '$from'` where warning s"$name imported but as an alias of $somethingelse" on $name
+pattern AnyNotEquals($a, $b) {
+  or {
+    BinaryExpression(operator = or { "!==" , "!=" }, left = $a, right = $b),
+    BinaryExpression(operator = or { "!==" , "!=" }, left = $b, right = $a)
+  }
 }
 
-predicate IsImported($name, $from) = {
+pattern BuiltInObjects() {
+  or { `Object`, `Math`, `Array`, `Number`, `Date`, `RegExp`, `Map`, `Set`, `Atomics`, `ArrayBuffer`, `SharedArrayBuffer`, `DataView`, `JSON`, `Promise`, `Reflect`, `Proxy` }
+}
+
+pattern AnyEqualsUndefined($aVar) {
+  AnyEquals($aVar,`undefined`)
+}
+
+pattern LiteralValue($v) {
+  or {
+    JSXText(value = $v),
+    StringLiteral(value = $v),
+    NumericLiteral(value = $v),
+    BigIntLiteral(value = $v),
+    NullLiteral(value = $v),
+    BooleanLiteral(value = $v),
+    RegExpLiteral(value = $v)
+  }
+}
+
+pattern ImportNameFrom($name, $from) {
+  or {
+    `import { $..., $name, $... } from '$from'`,
+    let $somethingelse in `import { $..., $somethingelse as $name, $... } from '$from'` where warning s"$name imported but as an alias of $somethingelse" on $name
+  }
+}
+
+predicate IsImported($name, $from) {
   $name <: let $stringName in Identifier(name = $stringName) where {
     $program <: File(Program([..., ImportNameFrom(Identifier(name = $stringName), $from) ,...]), $_)
   }
 }
 
-predicate RemoveImport($name) = {
+predicate RemoveImport($name) {
   $name <: let $stringName in Identifier(name = $stringName) where {
     $program <: maybe contains ImportNameFrom(Identifier(name = $stringName) => ., $_)
   }
 }
 
-predicate removeUnusedImports() = {
+predicate removeUnusedImports() {
     // implementation in engine, this is just a sentinel
 }
 
-pattern FilterUnusedImports($content, $newImports) = some bubble($content, $newImports) `import { $imports } from "$source"` where {
+pattern FilterUnusedImports($content, $newImports) {
+  some bubble($content, $newImports) `import { $imports } from "$source"` where {
     $used = [],
     $imports <: maybe some bubble($content, $used) {
         or {
@@ -77,37 +92,46 @@ pattern FilterUnusedImports($content, $newImports) = some bubble($content, $newI
     if (! $used <: [])  {
         append($newImports, `import { $used } from "$source"`)
     }
+  }
 }
 
 
-predicate moveImport($m, $from) = {
+predicate moveImport($m, $from) {
   RemoveImport($m),
   AddImport($m, $from)
 }
 
-pattern MoveImport($name, $new_source) = ImportNameFrom($name, $old_source) where {
-  !$old_source <: $new_source,
-  replaceImport($name, $new_source)
+pattern MoveImport($name, $new_source) {
+  ImportNameFrom($name, $old_source) where {
+    !$old_source <: $new_source,
+    replaceImport($name, $new_source)
+  }
 }
 
-predicate IsUsed($name) = {
+predicate IsUsed($name) {
   $program <: contains $name until ImportNameFrom($_, $_)
 }
 
-predicate RemoveImportIfUnused($name) = (! IsUsed($name)) && RemoveImport($name)
-
-predicate IsTypeScript() = $program <: or {
-    File(name = or { r".*tsx?", r".*ts?" }),
-    File(program = contains { TSTypeAnnotation() })
+predicate RemoveImportIfUnused($name) {
+  (! IsUsed($name)) && RemoveImport($name)
 }
 
-pattern ImportedFrom($from) = $name where or {
+predicate IsTypeScript() {
+  $program <: or {
+    File(name = or { r".*tsx?", r".*ts?" }),
+    File(program = contains { TSTypeAnnotation() })
+  }
+}
+
+pattern ImportedFrom($from) {
+  $name where or {
     $name <: semantic within ImportNameFrom($name, $from),
     $name <: semantic `require($from)`,
     IsImported($name, $from)
   }
+}
 
-predicate AddImport($m, $fromArg) =
+predicate AddImport($m, $fromArg) {
   $fromArg <: let $from in or {
     StringLiteral() as $from,
     $_ where $from = StringLiteral(value = $fromArg)
@@ -117,8 +141,9 @@ predicate AddImport($m, $fromArg) =
     $solvedPairs = or { $solvedPairs, `$m, $from` },
     or { and { ! $from <: $froms, $froms = or { $froms, $from } }, true }
   }
+}
 
-predicate AddNamespaceImport($m, $fromArg) =
+predicate AddNamespaceImport($m, $fromArg) {
    $fromArg <: let($alias, $from) and {
     or {
       Identifier() as $alias,
@@ -134,50 +159,63 @@ predicate AddNamespaceImport($m, $fromArg) =
     $solvedPairs = or { $solvedPairs, `$importDeclaration, $from` },
     or { and { ! $from <: $froms, $froms = or { $froms, $from } }, true }
   }
+}
 
-predicate ReplaceImport($m, $from) = {
+predicate ReplaceImport($m, $from) {
   RemoveImport($m),
   AddImport($m, $from)
 }
 
-pattern EnsureImportFrom($from) = and {
-  Identifier(),
-  or {
-    let $alreadyImported in $alreadyImported where { IsImported($alreadyImported, $_), warning "Already imported" on $alreadyImported },
-    ImportedFrom($from),
-    let $m in $m where AddImport($m, $from),
-    $_
+pattern EnsureImportFrom($from) {
+  and {
+    Identifier(),
+    or {
+      let $alreadyImported in $alreadyImported where { IsImported($alreadyImported, $_), warning "Already imported" on $alreadyImported },
+      ImportedFrom($from),
+      let $m in $m where AddImport($m, $from),
+      $_
+    }
   }
 }
 
-predicate IsUsed($name) = $program <: contains $name until or { `$name = $_`, VariableDeclarator(id = $name) }
-
-predicate IsJSGlobalIdentifier($var) = $var <: Identifier(binding = not ["root", ...])
-
-pattern EnsureRelativeImportFrom($current, $imported) = let $directory, $importedPath, $name in $name where {
-  $current <: r"(.*)/.*"($directory),
-  $importedPath = relative($directory, $imported),
-  $name <: EnsureImportFrom(StringLiteral(value = $importedPath))
+predicate IsUsed($name) {
+  $program <: contains $name until or { `$name = $_`, VariableDeclarator(id = $name) }
 }
 
-pattern EnsureImportedFrom($imported) = let $directory, $importedPath, $name, $current in $name where {
-  $program <: File($_, $current),
-  $current <: r"(.*)/.*"($directory),
-  $importedPath = relative($directory, $imported),
-  $name <: EnsureImportFrom(StringLiteral(value = $importedPath))
+predicate IsJSGlobalIdentifier($var) {
+  $var <: Identifier(binding = not ["root", ...])
 }
 
-predicate ensureImportFrom($binding, $from) = {
+pattern EnsureRelativeImportFrom($current, $imported) {
+  let $directory, $importedPath, $name in $name where {
+    $current <: r"(.*)/.*"($directory),
+    $importedPath = relative($directory, $imported),
+    $name <: EnsureImportFrom(StringLiteral(value = $importedPath))
+  }
+}
+
+pattern EnsureImportedFrom($imported) {
+  let $directory, $importedPath, $name, $current in $name where {
+    $program <: File($_, $current),
+    $current <: r"(.*)/.*"($directory),
+    $importedPath = relative($directory, $imported),
+    $name <: EnsureImportFrom(StringLiteral(value = $importedPath))
+  }
+}
+
+predicate ensureImportFrom($binding, $from) {
   $binding <: EnsureImportFrom($from)
 }
 
-predicate ensureRelativeImportFrom($binding, $from) = {
+predicate ensureRelativeImportFrom($binding, $from) {
   $binding <: EnsureImportedFrom($from)
 }
 
-pattern ImportLike() = or { `import { $_ } from '$_'`, `import $_ from '$_'` }
+pattern ImportLike() {
+  or { `import { $_ } from '$_'`, `import $_ from '$_'` }
+}
 
-predicate InsertAfterImports($inserted) = {
+predicate InsertAfterImports($inserted) {
   $program <: File(Program(
     or {
       [ ..., [ ImportLike() ]+, . => $inserted, ... ],
@@ -186,53 +224,61 @@ predicate InsertAfterImports($inserted) = {
   ), $_)
 }
 
-predicate IsGlobalVariable($id) = {
+predicate IsGlobalVariable($id) {
   $id <: Identifier(binding = [])
 }
 
-predicate InsertImports() = or {
-  and {
-    $froms <: let $from, $allFrom, $fromName in $from where {
-      $solvedPairs <: maybe { 
-        let $x in `$x, $from` where { 
-          $allFrom = [... $allFrom, $x]
+predicate InsertImports() {
+  or {
+    and {
+      $froms <: let $from, $allFrom, $fromName in $from where {
+        $solvedPairs <: maybe { 
+          let $x in `$x, $from` where { 
+            $allFrom = [... $allFrom, $x]
+          }
+        },
+        $from <: StringLiteral(value = $fromName),
+        or {
+          $program <: let $existing, $fromHere in {
+            File(Program([
+              ...,
+              ImportDeclaration(specifiers = $existing, source = $fromHere, importKind = "value") where {
+                $existing <: not [ImportNamespaceSpecifier()],
+                $fromHere <: StringLiteral(value = $fromName),
+                $existing => [ $existing, $allFrom ]
+              },
+              ...
+            ]), $_)
+          },
+          $allNewImports = [$allNewImports, `import { $allFrom } from '$from'`]
         }
       },
-      $from <: StringLiteral(value = $fromName),
       or {
-        $program <: let $existing, $fromHere in {
-          File(Program([
-            ...,
-            ImportDeclaration(specifiers = $existing, source = $fromHere, importKind = "value") where {
-              $existing <: not [ImportNamespaceSpecifier()],
-              $fromHere <: StringLiteral(value = $fromName),
-              $existing => [ $existing, $allFrom ]
-            },
-            ...
-          ]), $_)
-        },
-        $allNewImports = [$allNewImports, `import { $allFrom } from '$from'`]
+        $allNewImports <: [],
+        InsertAfterImports($allNewImports)
       }
     },
-    or {
-      $allNewImports <: [],
-      InsertAfterImports($allNewImports)
-    }
-  },
-  true
+    true
+  }
 }
 
-pattern PreludeRun() = $_ where {
-  $alreadySolved = or { },
-  $solvedPairs = or { },
-  $froms = or { },
-  $allNewImports = []
+pattern PreludeRun() {
+  $_ where {
+    $alreadySolved = or { },
+    $solvedPairs = or { },
+    $froms = or { },
+    $allNewImports = []
+  }
 }
 
-pattern ConclusionRun() = InsertImports()
+pattern ConclusionRun() {
+  InsertImports()
+}
 
-pattern FunctionLike($name, $args, $statements) = or {
-  `function $name($args) { $statements }`,
-  `($args) => { $statements }`,
-  `($args) => $statements`
+pattern FunctionLike($name, $args, $statements) {
+  or {
+    `function $name($args) { $statements }`,
+    `($args) => { $statements }`,
+    `($args) => $statements`
+  }
 }

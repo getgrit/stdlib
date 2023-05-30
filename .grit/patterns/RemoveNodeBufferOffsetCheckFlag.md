@@ -10,23 +10,31 @@ tags: #security, #fix, #node
 
 ```grit
 // We define extracted patterns at the top of the file for readability.
-pattern Falsy() = or { `0`, `""`, `''`, TemplateLiteral(quasis = "``"), `null`, `undefined`, `NaN` }
-
-pattern OneArg() = or {
-  `readUInt16LE` , `readUInt16BE` , `readInt8`,
-  `readInt16LE` , `readInt16BE` , `readInt32LE` , `readInt32BE`,
-  `readFloatLE` , `readFloatBE` , `readDoubleLE` , `readDoubleBE`
+pattern Falsy() {
+  or { `0`, `""`, `''`, TemplateLiteral(quasis = "``"), `null`, `undefined`, `NaN` }
 }
 
-pattern TwoArgs() = or {
-  `readUIntLE` , `readUIntBE` , `readIntLE` , `readIntBE` , `writeUInt8` , `readUInt8`,
-  `writeUInt32LE` , `writeUInt32BE` , `writeUInt16LE` , `writeUInt16BE`,
-  `writeInt32LE` , `writeInt32BE` , `writeInt16LE` , `writeInt16BE`,
-  `writeFloatLE` , `writeFloatBE` , `writeFloatLE` , `writeFloatBE`,
-  `writeDoubleLE` , `writeDoubleBE` , `writeDoubleLE` , `writeDoubleBE`
+pattern OneArg() {
+  or {
+    `readUInt16LE` , `readUInt16BE` , `readInt8`,
+    `readInt16LE` , `readInt16BE` , `readInt32LE` , `readInt32BE`,
+    `readFloatLE` , `readFloatBE` , `readDoubleLE` , `readDoubleBE`
+  }
 }
 
-pattern ThreeArgs() = or { `writeUIntLE` , `writeUIntBE` , `writeIntLE` , `writeIntBE` }
+pattern TwoArgs() {
+  or {
+    `readUIntLE` , `readUIntBE` , `readIntLE` , `readIntBE` , `writeUInt8` , `readUInt8`,
+    `writeUInt32LE` , `writeUInt32BE` , `writeUInt16LE` , `writeUInt16BE`,
+    `writeInt32LE` , `writeInt32BE` , `writeInt16LE` , `writeInt16BE`,
+    `writeFloatLE` , `writeFloatBE` , `writeFloatLE` , `writeFloatBE`,
+    `writeDoubleLE` , `writeDoubleBE` , `writeDoubleLE` , `writeDoubleBE`
+  }
+}
+
+pattern ThreeArgs() {
+  or { `writeUIntLE` , `writeUIntBE` , `writeIntLE` , `writeIntBE` }
+}
 
 // Buffer has methods with one, two or three arguments before a final argument to set the noAssert flag.
 // The or conditions match each of these scenarios respectively, while binding the final argument to the $theFlag metavariable.

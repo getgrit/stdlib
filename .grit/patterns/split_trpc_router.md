@@ -9,9 +9,11 @@ tags: #trpc, #router, #split, #typescript
 ```grit
 language js
 
-pattern NamedThing($name) = or {
+pattern NamedThing($name) {
+  or {
     `const $name = $_`,
     `function $name($_) { $_ }`
+  }
 }
 
 Program(body=$body) where {
