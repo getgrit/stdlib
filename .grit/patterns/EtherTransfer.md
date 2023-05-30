@@ -7,13 +7,15 @@ title: Ether Transfer
 ```grit
 language sol
 
-pattern EtherTransfer($amount) = bubble($amount) or {
-    `$sender.call{value: $amount}($_)`,
-    `$sender.call.value($amount)($_)`,
-    `$call($amount)` where {
-        $call <: `$address.$functionName`,
-        $functionName <: r".*transfer.*"
-    }
+pattern EtherTransfer($amount) {
+  bubble($amount) or {
+      `$sender.call{value: $amount}($_)`,
+      `$sender.call.value($amount)($_)`,
+      `$call($amount)` where {
+          $call <: `$address.$functionName`,
+          $functionName <: r".*transfer.*"
+      }
+  }
 }
 
 EtherTransfer($_)

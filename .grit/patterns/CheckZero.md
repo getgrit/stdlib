@@ -10,18 +10,20 @@ Ensure that all functions that take an address as a parameter check that it is n
 language sol
 
 // Marks the body of a function as "checked"
-pattern CheckedBody($address) = bubble($address) contains or {
-    // Directly checks the require
-    `require($address != address(0), $_)`,
-    `require($address != address(0))`,
-    `require(address(0) != $address, $_)`,
-    `require(address(0) != $address)`,
+pattern CheckedBody($address) {
+    bubble($address) contains or {
+        // Directly checks the require
+        `require($address != address(0), $_)`,
+        `require($address != address(0))`,
+        `require(address(0) != $address, $_)`,
+        `require(address(0) != $address)`,
 
-    // Or look for a function call
-    sol_call_expression(function=`$id`, children=contains $address) where {
-        $program <: contains bubble($id) sol_function_definition(name=$id, children=$child2) where {
-            // Inspect the body of the transitive function recursively
-            $child2 <: CheckedBody($address)
+        // Or look for a function call
+        sol_call_expression(function=`$id`, children=contains $address) where {
+            $program <: contains bubble($id) sol_function_definition(name=$id, children=$child2) where {
+                // Inspect the body of the transitive function recursively
+                $child2 <: CheckedBody($address)
+            }
         }
     }
 }

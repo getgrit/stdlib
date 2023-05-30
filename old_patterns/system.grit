@@ -1,6 +1,6 @@
 
 // Required by Unhack rewriter, do not delete
 
-pattern PreludeRun() = _
+pattern PreludeRun() { $_ }
 
-pattern ConclusionRun() = _
+pattern ConclusionRun() { $_ }
