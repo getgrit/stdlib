@@ -145,9 +145,9 @@ predicate AddImport($m, $fromArg) {
 
 predicate AddNamespaceImport($m, $fromArg) {
    $fromArg <: let($alias, $from) and {
-    or {
-      Identifier() as $alias,
-      $_ where $alias = Identifier(name = $m)
+    $_ where or {
+      $m <: Identifier() as $alias,
+      $alias = Identifier(name = $m)
     },
     or {
       StringLiteral() as $from,
@@ -155,11 +155,23 @@ predicate AddNamespaceImport($m, $fromArg) {
     }
   } where {
     $importDeclaration = ImportNamespaceSpecifier(local = $alias, id = null, name = null),
+    ! $importDeclaration <: $alreadySolved,
     $alreadySolved = or { $alreadySolved, $importDeclaration },
     $solvedPairs = or { $solvedPairs, `$importDeclaration, $from` },
     or { and { ! $from <: $froms, $froms = or { $froms, $from } }, true }
   }
 }
+
+predicate ensureNamespaceImportFrom($what, $from) {
+  if (!isNamespaceImported($what, $_)) {
+    or { AddNamespaceImport($what, $from), true } // we don't have a maybe predicate
+  }
+}
+
+predicate isNamespaceImported($name, $from) {
+    $program <: File(Program([..., ImportDeclaration(specifiers = some ImportNamespaceSpecifier(local = $name)) ,...]), $_)
+}
+
 
 predicate ReplaceImport($m, $from) {
   RemoveImport($m),
@@ -264,6 +276,7 @@ predicate InsertImports() {
 
 pattern PreludeRun() {
   $_ where {
+    $seen = or { },
     $alreadySolved = or { },
     $solvedPairs = or { },
     $froms = or { },
