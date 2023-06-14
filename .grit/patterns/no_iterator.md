@@ -9,6 +9,9 @@ Use `_iterator_` instead of `__iterator__`. `__iterator__` is obsolete and is no
 tags: #good
 
 ```grit
+engine marzano(1.0)
+language js
+
 or {
   `$obj.prototype.__iterator__` => `$obj._iterator_`,
   `$obj.prototype["__iterator__"]` => `$obj._iterator_`,
@@ -25,11 +28,19 @@ or {
 Data.prototype.__iterator__ = function () {
   return new DataIterator(this);
 };
+
+var __iterator__ = function () {
+  doIterator();
+};
 ```
 
 ```
 Data._iterator_ = function () {
   return new DataIterator(this);
+};
+
+var __iterator__ = function () {
+  doIterator();
 };
 ```
 
@@ -73,14 +84,6 @@ bar["__iterator__"] = function () {
 
 ```typescript
 bar._iterator_ = function () {
-  doIterator();
-};
-```
-
-## Do not change `__iterator__`
-
-```javascript
-var __iterator__ = function () {
   doIterator();
 };
 ```
