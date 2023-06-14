@@ -11,6 +11,9 @@ See the [OWASP DOM XSS cheatsheet](https://cheatsheetseries.owasp.org/cheatsheet
 tags: #security, #fix
 
 ```grit
+engine marzano(1.0)
+language js
+
 `$x.innerHtml` => `$x.innerText`
 ```
 
