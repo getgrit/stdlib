@@ -12,9 +12,12 @@ If you overwrite it with your own implementation, it doesn't make sense to exten
 tags: #SD, #React
 
 ```grit
-`class $name extends $extends { $body }` where {
-  $extends <: contains `PureComponent` => `Component`,
-  $body <: some `shouldComponentUpdate($_) { $_ }`
+engine marzano(1.0)
+language js
+
+class_declaration($heritage, $body) where {
+    $heritage <: contains `PureComponent` => `Component`,
+    $body <: contains `shouldComponentUpdate`
 }
 ```
 
@@ -30,9 +33,29 @@ class Foo extends React.PureComponent {
     return <Hello />;
   }
 }
+
+class Foo extends React.Component {
+  customMethod() {}
+
+  shouldComponentUpdate() {}
+
+  render() {
+    return <Hello />;
+  }
+}
 ```
 
 ```
+class Foo extends React.Component {
+  customMethod() {}
+
+  shouldComponentUpdate() {}
+
+  render() {
+    return <Hello />;
+  }
+}
+
 class Foo extends React.Component {
   customMethod() {}
 
@@ -60,20 +83,6 @@ class Foo extends PureComponent {
 
 ```typescript
 class Foo extends Component {
-  customMethod() {}
-
-  shouldComponentUpdate() {}
-
-  render() {
-    return <Hello />;
-  }
-}
-```
-
-## Do nothing when extending Component
-
-```javascript
-class Foo extends React.Component {
   customMethod() {}
 
   shouldComponentUpdate() {}
