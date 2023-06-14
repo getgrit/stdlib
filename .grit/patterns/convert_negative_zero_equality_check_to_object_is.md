@@ -11,22 +11,27 @@ Details on [on StackOverflow](https://stackoverflow.com/questions/7223359/are-0-
 tags: #SD
 
 ```grit
-or {
-  or { `$x == -0` , `$x === -0` } => `Object.is($x, -0)`,
-  or { `$x != -0` , `$x !== -0` } => `!Object.is($x, -0)`
+engine marzano(1.0)
+language js(typescript)
+
+binary_expression($left, $operator, $right) as $exp where {
+    $operator <: or {
+        or { "==", "===" } where $exp => `Object.is($left, -0)`,
+        or { "!=", "!==" } where $exp => `!Object.is($left, -0)`
+    }
 }
 ```
 
 ## Example
 
 ```javascript
-if (x == -0) {
+if (x == -0 || x !== -0) {
   foo();
 }
 ```
 
 ```typescript
-if (Object.is(x, -0)) {
+if (Object.is(x, -0) || !Object.is(x, -0)) {
   foo();
 }
 ```
@@ -89,10 +94,4 @@ if (x == -0 && y != -0) {
 if (Object.is(x, -0) && !Object.is(y, -0)) {
   foo();
 }
-```
-
-## Outside conditional
-
-```javascript
-foo(-0);
 ```
