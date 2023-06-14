@@ -9,10 +9,12 @@ Add `any` type annotation to caught errors. It is a common source of tsc errors.
 tags: #js, #ts
 
 ```grit
+engine marzano(1.0)
 language js
 
-`try { $_ } catch ($err) { $_ }` where {
-    $err <: Identifier(typeAnnotation = null => `any`)
+catch_clause($parameter, $type) where {
+    $type <: .,
+    $parameter => `$parameter: any`
 }
 ```
 
@@ -26,6 +28,12 @@ function foo() {
     console.log('oops')
   }
 };
+
+try {
+  console.log('tada')
+} catch (e: Foo) {
+  console.log('oops')
+}
 ```
 
 ```ts
@@ -36,4 +44,10 @@ function foo() {
     console.log('oops')
   }
 };
+
+try {
+  console.log('tada')
+} catch (e: Foo) {
+  console.log('oops')
+}
 ```
