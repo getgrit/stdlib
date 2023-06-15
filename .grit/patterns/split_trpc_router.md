@@ -185,11 +185,13 @@ import { db } from '../db';
 export const goodbyeRoute = proc.input(z.object({ name: z.string() })).query(async ({ input }) => {
     await db.remove(input.name);
     return { text: `Goodbye ${input.name}` };
-  })// @file js/hello.route.ts
+  })
+// @file js/hello.route.ts
 import { proc } from "./middleware";
 export const helloRoute = proc.input(z.object({ name: z.string() })).query(async ({ input }) => {
     return { text: `Hello ${input.name}` };
-  })// @file js/middleware.ts
+  })
+// @file js/middleware.ts
 import { initTRPC } from '@trpc/server';
 import * as Sentry from '@sentry/remix';
 import { Context } from './trpcContext.server';
