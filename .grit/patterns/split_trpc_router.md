@@ -7,71 +7,100 @@ Split a tRPC router into multiple files, one per route.
 tags: #trpc, #router, #split, #typescript
 
 ```grit
+engine marzano(0.1)
 language js
 
-pattern NamedThing($name) {
-  or {
-    `const $name = $_`,
-    `function $name($_) { $_ }`
-  }
+pattern process_route($imports, $refs, $dir) {
+    pair($key, $value) where {
+        $route_name = `${key}Route`,
+        $value => `${route_name},`, // todo: drop comma after fixing bug
+        $file_name = `$dir/${key}.route.ts`,
+        $new_file_statements = [`import { proc } from "./middleware"`],
+        $imports <: maybe some filter_used_imports(local_imports = $new_file_statements, content = $value),
+
+        $refs <: maybe some bubble($value, $new_file_statements) named_thing($name) as $s where {
+            $value <: contains $name,
+            $new_file_statements += $s
+        },
+
+        $new_file_statements += `export ${route_name} = $value`,
+
+        $separator = `;\n`,
+        $body = join(list = $new_file_statements, $separator),
+        $new_files += file(name = $file_name, $body)
+    }
 }
 
-Program(body=$body) where {
-    $body <: contains `t.router($_)`,
-    get_dirname($prefix),
-    // Look through every statement in the body (in its own scope, bubble creates scopes)
-    $body <: some bubble($imports, $refs, $middlewares, $prefix) or {
-        ImportDeclaration() as $import where {
-            $import => .,
-            append($imports, $import)
+pattern filter_used_imports($local_imports, $content) {
+    import_statement($source) as $import where {
+        $used_list = [],
+        $import <: contains bubble($used_list, $content) or {
+            import_specifier($name),
+            namespace_import(namespace = $name) 
+        } as $i where {
+            // replace `includes` below with `contains` once we
+            // do contains matching on rhs snippet parts
+            $content <: includes $name,
+            $used_list += $i
         },
-        `export const $_ = t.router({$routes})` as $router where {
-            // Look at each route
-            $routes <: some bubble($imports, $refs, $prefix) `$key: $proc` => `$key: $routeName` where {
-                // Find only the top-level things referenced in this route to carry over
-                $refs <: maybe some bubble($ourRefs, $proc, $prefix) NamedThing($name) as $ref where {
-                    $proc <: contains $name,
-                    append($ourRefs, $ref)
-                },
+        $separator = `, `,
+        $used = join(list = $used_list, $separator),
+        $local_imports += `import { $used } from $source`
+    }
+}
 
-                $routeName = $key + "Route",
-                $newFileName = $key+".route",
-                $f = [
-                    // Insert the middleware
-                    `import { proc } from "./middleware"`,
-                    ...$ourRefs,
-                    `export const $routeName = $proc`
-                ],
-                $newImports = [],
-                $imports <: FilterUnusedImports($f, $newImports),
-                $newFile = [...$newImports, $f],
-                $newFiles = [ File(name = $prefix + $newFileName + ".ts", program = Program($newFile)) ],
+pattern named_thing($name) {
+    or {
+        lexical_declaration(declarations = [variable_declarator($name)]),
+        function_declaration($name)
+    }
+}
 
-                $relativeFilename = "./" + $newFileName,
-                ensureImportFrom(Identifier(name=$routeName), `$relativeFilename`)
+pattern process_one_statement($imports, $middlewares, $refs, $dir) {
+    or {
+        import_statement() as $import where {
+            $import => .,
+            $imports += $import
+        },
+        export_statement(declaration = lexical_declaration(declarations = [variable_declarator($name, $value)])) as $s where or {
+            and {
+                $value <: `t.router($routes_object)`,
+                $routes_object <: object($properties),
+                $properties <: some process_route($imports, $refs, $dir) // todo: drop comma after fixing bug
+            },
+            and {
+                $middlewares += $s,
+                $s => .
             }
         },
-        // Grab middlewares
-        `export const t = $_` as $t => . where { append($middlewares, $t) },
-        `const $name = $thing` => . where {
-            $thing <: or {
-                `t.middleware($_)`,
-                `t.procedure.use($_)`
-            },
-            $export = `export const $name = $thing`,
-            append($middlewares, $export)
+        lexical_declaration(declarations = [variable_declarator($value)]) as $s => . where {
+            $value <: or { `t.middleware($_)`, `t.procedure.use($_)` },
+            $middlewares += `export $s`
         },
-        // Gather all other global functions/conts
-        NamedThing($_) as $ref => . where { append($refs, $ref) }
-    },
-    // Put all the middleware in a new file
-    $middlewareImports = [],
-    $imports <: FilterUnusedImports($middlewares, $middlewareImports),
-    $newFiles = [...$newFiles, File(name=$prefix + "middleware.ts", program=Program([
-      ...$middlewareImports, ...$middlewares
-    ]))],
+        named_thing($_) as $s => . where $refs += $s
+    }
+}
+ 
+file($name, body = program($statements) as $p) where {
+    $name <: r"(.*)/[^/]*"($dir),
+    $statements <: contains `t.router($_)`,
+    $imports = [],
+    $middlewares = [],
+    $refs = [],
+    $statements <: some process_one_statement($imports, $middlewares, $refs, $dir),
 
-    ensureImportFrom(`t`, "./middleware")
+    // construct the middleware file
+    
+    $middleware_statments = [],
+    $imports <: maybe some filter_used_imports(local_imports = $middleware_statments, content = $middlewares),
+
+    // we can simplify this traversal to list concatenation once we implement that
+    $middlewares <: some bubble($middleware_statments) $s where $middleware_statments += $s,
+
+    $separator = `;\n`,
+    $middleware_body = join(list = $middleware_statments, $separator),
+    $middleware_file = `$dir/middleware.ts`,
+    $new_files += file(name = $middleware_file, body = $middleware_body)
 }
 ```
 
