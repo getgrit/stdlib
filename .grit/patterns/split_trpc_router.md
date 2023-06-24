@@ -73,9 +73,7 @@ pattern process_one_statement($imports, $middlewares, $refs, $dir, $main_file_im
         export_statement(declaration = lexical_declaration(declarations = [variable_declarator($name, $value)])) as $s where or {
             and {
                 $value <: `t.router($routes_object)`,
-                // some should be replaced with brackets,
-                // but currently lists cannot be executed.
-                $routes_object <: some object($properties),
+                $routes_object <: object($properties),
                 $properties <: some process_route($imports, $refs, $dir, $main_file_imports) // todo: drop comma after fixing bug
             },
             and {
