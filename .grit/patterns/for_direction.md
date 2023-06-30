@@ -9,15 +9,20 @@ If a `for` counter moves in the wrong direction the loop will run infinitely. Mo
 tags: #bug, #fix, #good
 
 ```grit
-or {
-  `for ($_; $test; $counter) $_` where {
-      $test <: contains or { `$x < $_` , `$x <= $_` , `$_ > $x` , `$_ >= $x`},
-      $counter <: contains { `$x--` => `$x++`}
-  },
-  `for ($_; $test; $counter) $_` where {
-      $test <: contains or { `$x > $_` , `$x >= $_` , `$_ < $x` , `$_ <= $x`},
-      $counter <: contains { `$x++` => Expression`$x--` }
-  }
+engine marzano(0.1)
+language js
+
+for_statement($condition, $increment, $initializer) where {
+    or {
+        and {
+            $condition <: contains or { `$x < $_` , `$x <= $_` , `$_ > $x` , `$_ >= $x`},
+            $increment <: contains { `$x--` => `$x++`}
+        },
+        and {
+            $condition <: contains or { `$x > $_` , `$x >= $_` , `$_ < $x` , `$_ <= $x`},
+            $increment <: contains { `$x++` => `$x--` }
+        }
+    }
 }
 
 ```
