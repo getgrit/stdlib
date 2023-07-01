@@ -10,6 +10,9 @@ Otherwise it can cause errors.
 tags: #fix
 
 ```grit
+engine marzano(0.1)
+language js
+
 `$obj.$method($arg)` => `Object.prototype.$method.call($obj, $arg)` where {
   $method <: or { `hasOwnProperty`, `isPrototypeOf`, `propertyIsEnumerable` }
 }

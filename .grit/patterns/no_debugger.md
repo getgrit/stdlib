@@ -9,7 +9,10 @@ The code in production should not contain a `debugger`. It causes the browser to
 tags: #fix
 
 ```grit
-DebuggerStatement() => .
+engine marzano(0.1)
+language js
+
+debugger_statement() => .
 ```
 
 ```

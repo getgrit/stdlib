@@ -11,15 +11,19 @@ They make code optimizations difficult and their use is forbidden in ECMAScript 
 tags: #fix
 
 ```grit
+engine marzano(0.1)
+language js
+
 or {
   `function $name($_) { $body }` where {
-    $body <: contains let($arg) { `arguments.callee($arg)` => `$name($arg)`}
+    $body <: contains { `arguments.callee` => `$name` }
   },
 
   `function $name($_){ $body }` where {
     $body <: contains  { `arguments.caller` => `$name.caller`}
   }
 }
+
 ```
 
 ## Remove arguments.callee

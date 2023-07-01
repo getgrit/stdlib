@@ -15,6 +15,9 @@ For `!obj instanceof Ctor`, operator precedence makes it equivalent to `(!obj) i
 tags: #fix
 
 ```grit
+engine marzano(0.1)
+language js
+
 or {
   `!$key in $collection` => `!($key in $collection)`,
   `!$key instanceof $collection` => `!($key instanceof $collection)`

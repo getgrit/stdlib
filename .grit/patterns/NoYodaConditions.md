@@ -21,7 +21,6 @@ or {
   $x <: LiteralValue($_),
   ! $y <: LiteralValue($_)
 }
-
 ```
 
 ## Change in if

@@ -9,7 +9,9 @@ Some template engines allow disabling HTML escaping, which can allow XSS vulnera
 tags: #security, #fix
 
 ```grit
-// The lone '.' represents the concept of "empty", so code matching the LHS is simply removed.
+engine marzano(0.1)
+language js
+
 `$object.escapeMarkup = false` => .
 ```
 
@@ -25,5 +27,6 @@ object.escapeMarkup = false;
 
 ```typescript
 something;
+
 something(els);
 ```

@@ -7,6 +7,9 @@ title: Rewrite `&` ⇒ `&&`, `|` ⇒ `||`
 Bitwise operators `&` or `|` are often used by mistake instead of `&&` or `||`, which can cause unexpected errors.
 
 ```grit
+engine marzano(0.1)
+language js
+
 or {
   `$x & $y` => `$x && $y`,
   `$x | $y` => `$x || $y`

@@ -9,8 +9,11 @@ Remove `console.log` statements.
 tags: #good
 
 ```grit
+engine marzano(0.1)
+language js
+
 `console.log($arg)` => . where {
-  $arg <: not within CatchClause()
+  $arg <: not within catch_clause()
 }
 ```
 
