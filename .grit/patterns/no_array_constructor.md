@@ -11,6 +11,9 @@ Use of the Array constructor to create a new array is discouraged in favor of ar
 tags: #fix
 
 ```grit
+engine marzano(0.1)
+language js
+
 or {
   `new Array($args)` => `[$args]`,
   `Array($args)` => `[$args]`
@@ -30,7 +33,7 @@ Array(0, 1, 2);
 ```
 
 ```typescript
-[0, 1, 2];
+[0, 1, 2]
 ```
 
 ## Transform Array constructor using `new` to Array object.
@@ -40,7 +43,7 @@ new Array(0, 1, 2);
 ```
 
 ```typescript
-[0, 1, 2];
+[0, 1, 2]
 ```
 
 ## Don't transform Array constructor.
