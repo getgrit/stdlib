@@ -2,8 +2,6 @@
 title: Non-strict `==` ⇒  strict `===`
 ---
 
-# {{ page.title }}
-
 Convert non-strict equality checking, using `==`, to the strict version, using `===`.
 
 Details on [StackOverflow](https://stackoverflow.com/questions/359494/which-equals-operator-vs-should-be-used-in-javascript-comparisons).
@@ -11,6 +9,9 @@ Details on [StackOverflow](https://stackoverflow.com/questions/359494/which-equa
 tags: #fix, #SD
 
 ```grit
+engine marzano(0.1)
+language js
+
 or {
   `$x == $y` => `$x === $y`,
   `$x != $y` => `$x !== $y`
