@@ -13,11 +13,25 @@ In JavaScript, `NaN` is a special value of `Number` type. It’s used to represe
 tags: #fix
 
 ```grit
-or {
-  // AnyEquals and AnyNotEquals are helper patterns defined in common.unhack
-  AnyEquals(`NaN`, $x) => `isNaN($x)`,
-  AnyNotEquals(`NaN`, $x) => `!isNaN($x)`
+engine marzano(0.1)
+language js
+
+pattern any_equals($a, $b) {
+  or { `$a == $b` , `$a === $b` , `$b == $a` , `$b === $a` }
 }
+
+pattern any_not_equals($a, $b) {
+  or {
+      binary_expression(operator = or { `!==` , `!=` }, left = $a, right = $b),
+      binary_expression(operator = or { `!==` , `!=` }, left = $b, right = $a)
+  }
+}
+
+or {
+  any_equals(a = `NaN`, $b) => `isNaN($b)`,
+  any_not_equals(a = `NaN`, $b) => `!isNaN($b)`
+}
+
 ```
 
 ## Converts double equality check

@@ -116,30 +116,31 @@ describe('Modal', () => {
 ```
 
 ```js
-import TestModel from './modal';
-import { render, screen } from '@testing-library/react';
+import TestModel from "./modal";
+import { render, screen } from "@testing-library/react";
 
-describe('Modal', () => {
+describe("Modal", () => {
   beforeEach(() => {
     closeModal = jest.fn();
     testObject.render = (props = {}) => {
-      const element = (<TestModel />);
+      const element = <TestModel />;
       testObject.component = render(element);
     };
   });
 
-  describe('render', () => {
-    it('should render', () => {
+  describe("render", () => {
+    it("should render", () => {
       testObject.render({ showModal: true });
-      expect(screen.getByRole('heading').textContent).toEqual('Test Modal');
+      expect(screen.getByRole("heading").textContent).toEqual("Test Modal");
     });
 
-    it('renders header as the first child', () => {
-      const header = screen.getByRole('heading').at(0);
-      expect(header.textContent).toEqual('Hello, Header!');
+    it("renders header as the first child", () => {
+      const header = screen.getByRole("heading").at(0);
+      expect(header.textContent).toEqual("Hello, Header!");
     });
   });
 });
+
 ```
 
 ## Use query selector if no role found.

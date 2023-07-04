@@ -9,11 +9,16 @@ Comparing to `null` needs a type-checking operator (=== or !==), to avoid incorr
 tags: #good
 
 ```grit
-// We use the syntax-tree node BinaryExpression to capture all expressions where $a and $b are operated on by "==" or "!=".
+engine marzano(0.1)
+language js
+
+// We use the syntax-tree node binary_expression to capture all expressions where $a and $b are operated on by "==" or "!=".
 // This code takes advantage of Grit's allowing us to nest rewrites inside match conditions and to match syntax-tree fields on patterns.
-BinaryExpression(operator = or { "==" => "===" , "!=" => "!==" }, left = $a, right = $b) where {
-  or { $a <: `null`, $b <: `null` }
+binary_expression($operator, $left, $right) where {
+    $operator <: or  { "==" => `===` , "!=" => `!==` },
+    or { $left <: `null`, $right <: `null`}
 }
+
 ```
 
 ```
