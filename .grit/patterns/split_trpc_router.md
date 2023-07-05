@@ -117,6 +117,7 @@ file($name, body = program($statements) as $p) where {
     $main_file_imports_merged = join(list = $main_file_imports, $separator),
     $statements <: some bubble ($main_file_imports_merged) $s where {
         $s <: contains `initTRPC`,
+        $s <: not import_statement(),
         $s => `$main_file_imports_merged;`
     }
 }
