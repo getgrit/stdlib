@@ -4,31 +4,34 @@
 so multiple statements are not required.
 
 ```grit
-`it($body)` where {
-    $all = [],
-    $containing = [],
+engine marzano(1.0)
+language js
+
+pattern expect($last, $value, $containing) {
+    `expect($value).toEqual(expect.arrayContaining([$x]));` as $current where {
+        // put a DELETE marker, use it to delete in the next sequential step
+        $x => `DELETE`,
+        $last = $current,
+        $containing += $x
+    }
+}
+sequential {
+    contains `it($_, $body)` where {
+        $containing = [],
     
-    // Collect all arrayContaining
-    $body <: contains {
-        bubble($value, $containing, $last, $all) `expect($value).toEqual(expect.arrayContaining([$x]))` as $current where {
-            $all = [...$all, $current],
-            $last = $current,
-            $containing = [...$containing, $x]
-        }
+        // Collect all arrayContaining
+        $body <: contains expect($last, $value, $containing),
+    
+        // Make the last one contain all of them
+        $separator = `,\n        `,
+        $containing_joined = join(list = $containing, $separator),
+        $last => `expect($value).toEqual(expect.arrayContaining([$containing_joined]));`
     },
-
-    // Make the last one contain all of them
-    $last => `expect($value).toEqual(expect.arrayContaining([$containing]))`,
-
-    // Remove the others
-    $others = without($all, [$last]),
-    $others <: some bubble $expect => .
+    maybe contains `expect($value).toEqual(expect.arrayContaining([DELETE]))` => .
 }
 ```
 
 ## Basic example
-
-Before:
 
 ```js
 describe('test', () => {
@@ -45,19 +48,17 @@ describe('test', () => {
 });
 ```
 
-After:
-
-```
+```js
 describe('test', () => {
   it('consolidates', async () => {
     const values = ['console.log($9o)', 'console.log($x)', 'PatternWithArgs($arg)'];
     const anotherValues = ['nine'];
+    
     expect(anotherValues).toEqual(expect.arrayContaining([expect.stringContaining('nine')]));
-    expect(values).toEqual(expect.arrayContaining([
-      expect.stringContaining('console.log($9o)'),
-      expect.stringContaining('console.log($x)'),
-      expect.stringContaining('PatternWithArgs($arg)')
-    ]));
+    
+    expect(values).toEqual(expect.arrayContaining([expect.stringContaining('console.log($9o)'),
+    expect.stringContaining('console.log($x)'),
+    expect.stringContaining('PatternWithArgs($arg)')]));
   });
 });
 ```
