@@ -3,17 +3,14 @@
 Files containing JSX should have a .jsx extension.
 
 ```grit
+engine marzano(0.1)
 language js
 
-File(name=$name, program=$body) where {
-    $body <: contains JSXElement(),
+file($name, $body) where {
+    $body <: contains jsx_element(),
     $name <: or {
-      r"(.+).js" where {
-        $name => replaceAll($name, ".js", ".jsx")
-      },
-      r"(.+).ts" where {
-        $name => replaceAll($name, ".ts", ".tsx")
-      }
+        r"(.+).js"($base) => `$base.jsx`,
+        r"(.+).ts"($base) => `$base.tsx`,
     }
 }
 ```
