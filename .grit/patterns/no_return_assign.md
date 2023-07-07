@@ -9,14 +9,16 @@ This rule hoists the assignments out of `return`. Does not apply when assignment
 tags: #good, #se
 
 ```grit
-ReturnStatement(argument = AssignmentExpression(operator = $operator, left = $var, right = $value)) => [
-  // We replace the `return` with two statements, the assignment and an updated `return`
-  AssignmentExpression(operator = $operator, left = $var, right = $value),
-  `return $var`
-] where {
-  // We explicitly limit the pattern to matching instances where the operator is an assignment operator, to avoid capturing eg == and ===.
-  $operator <: or { "=", "+=", "-=", "*=", "/=", "%=", "**=", "&=", "|=", "^=" }
-}
+engine marzano(0.1)
+language js
+
+// We replace the `return` with two statements, the assignment and an updated `return`
+`return $something` where {
+    $something <: contains or {
+      assignment_expression($left),
+      augmented_assignment_expression($left)
+    } as $assignment
+} => `$assignment;\n  return $left;`
 ```
 
 ```
