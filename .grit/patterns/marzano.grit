@@ -1,0 +1,6 @@
+engine marzano(0.1)
+language js
+
+pattern literal_value() {
+  or { number(), string(), `null`, `undefined`}
+}

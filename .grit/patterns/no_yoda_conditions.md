@@ -9,6 +9,9 @@ Prefer natural language style conditions in favour of Yoda style conditions.
 tags: #good, #syntax
 
 ```grit
+engine marzano(0.1)
+language js
+
 or {
   `$x == $y` => `$y == $x`,
   `$x === $y` => `$y === $x`,
@@ -18,8 +21,8 @@ or {
   `$x <= $y` => `$y >= $x`
 } where {
   // In order to capture a yoda condition, the LHS $x must be a LiteralValue and the RHS $y must not be one
-  $x <: LiteralValue($_),
-  ! $y <: LiteralValue($_)
+  $x <: literal_value(),
+  ! $y <: literal_value()
 }
 ```
 
