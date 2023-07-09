@@ -1,7 +1,7 @@
 engine marzano(0.1)
 language js
 
-pattern before_each_file() {
+pattern before_each_file_prep_imports() {
     $_ where {
         $GLOBAL_IMPORTED_SOURCES = [],
         $GLOBAL_IMPORTED_NAMES = [],
@@ -67,6 +67,6 @@ pattern insert_imports() {
     }
 }
 
-pattern after_each_file() {
-    file(body = $p) where $p <: maybe insert_imports()
+pattern after_each_file_handle_imports() {
+  file(body = $p) where $p <: maybe insert_imports()
 }
