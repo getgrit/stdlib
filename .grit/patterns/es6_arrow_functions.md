@@ -1,21 +1,24 @@
 ---
-title: Legacy - function expressions to arrow functions
+title: Function expressions to arrow functions
 ---
-
-# {{ page.title }}
 
 Converts function expressions to ES6 arrow functions
 
 tags: #js, #es6, #migration
 
 ```grit
+engine marzano(0.1)
+language js
+
 /*
 The following pattern transforms JS traditional functions to arrow functions.
 
 To see how it works, follow the tutorial.
 */
 or {
-  `function ($args) { $body }` => `($args) => { $body }` where {
+  `function ($args) { $body }` => `($args) => {
+  $body
+}` where {
     $body <: not contains {
       or { `this`, `arguments` }
     } until `function $_($_) { $_ }`
