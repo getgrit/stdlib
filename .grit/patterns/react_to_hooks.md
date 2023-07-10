@@ -2,303 +2,339 @@
 title: Convert React Class Components to Functional Components
 ---
 
-# {{ page.title }}
+This pattern converts React class components to functional components, with hooks.
 
 tags: #react, #migration, #complex
 
 ```grit
-// To improve readability, we make extensive use of named patterns defined at the top of the file whose results are ultimately consumed by the final MainReactClassToHooks pattern.
-pattern HandleOneSetState($stateUpdaters) {
-  some {
-    let $key, $val, $setter, $capitalized in ObjectProperty`$key: $val` where {
-      $key <: Identifier(),
-      $capitalized = capitalize($key),
-      $setter = Identifier(name = s"set${capitalized}"),
-      $stateUpdaters = [...$stateUpdaters, `$setter($val)`]
-    }
-  }
-}
+engine marzano(0.1)
+language js
 
-pattern ChangeThis() {
-  maybe contains or {
-    let $props in `const {$props} = this.props` => . where {
-        $hoistedProps = [...$hoistedProps, ...$props]
-    },
-    let $states in `const {$states} = this.state` => . where {
-        $hoistedStates = [...$hoistedStates, ...$states]
-    },
-    let $states in `this.state = { $states }` => . where {
-        $hoistedStates = [...$hoistedStates, ... $states]
-    },
-    bubble or {
-      //   TODO: handle prevProps
-      `this.setState($setStateBody, $secondArg)` where $stateUpdaters = [...$stateUpdaters],
-      `this.setState($setStateBody)`
-      } => $stateUpdaters where $setStateBody <: or {
-      `{ $stateUpdate }` where $stateUpdate <: HandleOneSetState($stateUpdaters),
-      `() => { $bodyLike }` where
-       $bodyLike <: HandleOneSetState($stateUpdaters)
-    },
-
-    let $name, $setter, $value, $capitalized in `this.$name = $value` => `$setter($value)` where {
-      $mobxStates <: contains $name,
-      $capitalized = capitalize($name),
-      $setter = Identifier(name = s"set${capitalized}")
-    },
-
-    let $name in `this.$name` => $name where or {
-      $mobxStates <: contains $name,
-      $mobxComputedFields <: contains $name
-    },
-
-    bubble or {
-      // don't append handler on viewState references
-      `this.$vs` => `$vs` where {
-        $vs <: or { `viewState`, `viewstate` }
-      },
-      `this.state.$name` => $name,
-      `this.props` => `props`,
-      `this.state.$foo` => `$foo`,
-      `this.$name` => `$newName` where $newName = Identifier(name = s"${name}Handler")
-    },
-
-    `ViewState` where {
-      $foundViewState = true
-    }
-  }
-}
-
-pattern HandleOneBodyStatement() {
-  or {
-    bubble `constructor($_) { $constructorBody }` where $constructorBody <: ChangeThis(),
-
-    let $state in ClassProperty(key = `state`, value = ObjectExpression(properties = $state)) where {
-      $state <: some let $key, $val, $setter, $capitalized in `$key: $val` where {
-        $key <: Identifier(),
-        $capitalized = capitalize($key),
-        $setter = Identifier(name = s"set${capitalized}"),
-
-        if ($processedKeys <: not some $key) then {
-          $processedKeys = [... $processedKeys, $key],
-          $stateStatements = [...$stateStatements, `const [$key, $setter] = useState($val)`]
-        },
-        ensureImportFrom(`useState`, `"react"`)
-      }
-    },
-
-    let $updateEffectBody in ClassMethod(key = `componentDidUpdate`, body = $updateEffectBody) where {
-      ensureImportFrom(`useEffect`, `"react"`),
-      $updateEffectBody <: ChangeThis(),
-      $updateEffect = [ `useEffect(() => $updateEffectBody, [])` ]
-
-      // if ($updateEffectBody <: contains {`prevProps`}) then {
-      //   $updateEffect = [...$updateEffect, `TODO("the above effect references previous props")`]
-      // } else {}
-    },
-
-    let $mountEffectBody in ClassMethod(key = `componentDidMount`, body = $mountEffectBody) where {
-      if $oldBody <: contains `componentDidUpdate() { $mountEffectBody }` then {
-        $mountEffect = []
-      } else {
-        $mountEffect = `useEffect(() => $mountEffectBody, [])`,
-        ensureImportFrom(`useEffect`, `"react"`),
-        $mountEffectBody <: ChangeThis()
-      }
-    },
-
-    let $unmountBody in ClassMethod(key = `componentWillUnmount`, body = $unmountBody) where {
-      $unmountEffect = `useEffect(() => { return () => $unmountBody })`,
-      ensureImportFrom(`useEffect`, `"react"`),
-      $unmountBody <: ChangeThis()
-    },
-
-    `render() { $renderBody }` where {
-      $renderBody <: ChangeThis(),
-      $renderBody <: some or {
-        `const {$_} = this.props`,
-        `const {$_} = this.state`,
-        `const {$_} = this`,
-        let $keep in $keep where $savedRenderBody = [ ... $savedRenderBody, $keep ]
-      },
-      $newRenderBody = $savedRenderBody
-    },
-    // statics
-    let $staticFuncName, $staticFuncBody, $args in or {
-      `static $staticFuncName = ($args) => { $staticFuncBody }`,
-      `static $staticFuncName($args) { $staticFuncBody }`
-    } where {
-      $staticMethods = [ ... $staticMethods, `$name.$staticFuncName = ($args) => { $staticFuncBody }`]
-    },
-    let $defaultProps in `static defaultProps = { $defaultProps }` where {
-      $finalDefaultProps = [`const props = { $defaultProps, ...inputProps }`],
-      $movedDefaultProps = true
-    },
-    let $staticProp, $staticValue in `static $staticProp = $staticValue` where {
-      $staticProps = [ ... $staticProps, `$name.$staticProp = $staticValue` ]
-    },
-    let $funcName, $funcBody in ClassMethod(key = $funcName, body = $funcBody, kind = "get", params = [], static = false, decorators = [`@computed`]) where {
-      $mobxComputed = [ ... $mobxComputed, `const $funcName = useMemo(() => $funcBody, [ $mobxStates ])` ],
-      $funcBody <: ChangeThis()
-    },
-
-    let $funcName, $funcBody, $args in ClassMethod(key = $funcName, body = $funcBody, params = $args, static = false) where {
-      $newName = s"${funcName}Handler",
-      if ($funcBody <: contains `await $_` ) then {
-        $callbacks = [...$callbacks, `const $newName = useCallback(async ($args) => $funcBody, [])`]
-      } else {
-        $callbacks = [...$callbacks, `const $newName = useCallback(($args) => $funcBody, [])`]
-      },
-      ensureImportFrom(`useCallback`, `"react"`),
-      $funcBody <: ChangeThis()
-    },
-
-    let $funcName, $entireFunc, $vars in ClassProperty(key = $funcName, value = `($_) => { $_ }` as $entireFunc) where {
-      $newName = s"${funcName}Handler",
-      $callbacks = [...$callbacks, `const $newName = useCallback($entireFunc, [])`],
-      ensureImportFrom(`useCallback`, `"react"`),
-      $entireFunc <: ChangeThis()
-    },
-
-    let $stateVar, $initValue, $typeArgs in ClassProperty(key = $stateVar, value = $initValue, typeAnnotation = $typeArgs, decorators = contains `@observable`) where {
-      $hoistedStates = [ ...$hoistedStates, ClassProperty(key = $stateVar, value = $initValue, typeAnnotation = $typeArgs) ]
-    },
-
-    bubble($mobxEffects) { `$_ = reaction(() => $depends, ($_) => $effect)` where {
-      $newDepends = [],
-      // TODO: this is a bit of a hack to remove the `this` from dependencies by rebuilding newDepends
-      $depends <: maybe { contains bubble($newDepends) `this.$z` where $newDepends = [$newDepends, $z] },
-      $mobxEffects = [ ... $mobxEffects, `useEffect(() => $effect, [$newDepends])`],
-      $effect <: ChangeThis()
-    } },
-
-    // handling remaining class properties
-    let $name, $value in ClassProperty(key = $name, value = $value, decorators = not contains `@observable`) where {
-      $otherProperties = [ ...$otherProperties, `const $name = useRef($value)` ],
-      ensureImportFrom(`useRef`, `"react"`),
-      $value <: ChangeThis()
-    }
-  }
-}
-
-pattern CollectMobxFields() {
-  let $stateVar, $funcName in or {
-    ClassProperty(key = $stateVar, decorators = [`@observable`], static = false) where $mobxStates = [ ... $mobxStates, $stateVar ],
-    ClassMethod(key = $funcName, kind = "get", params = [], static = false, decorators = [`@computed`]) where $mobxComputedFields = [ ... $mobxComputedFields, $funcName ]
-  }
-}
-
-predicate HandleHoistedStates() {
-  $hoistedStates <: maybe contains let $name, $theValue, $current, $initValue, $setter, $capitalized, $theType, $theUpdate in
+pattern handle_one_statement($class_name, $statements, $states_statements, $static_statements, $render_statements) {
     or {
-      ObjectProperty(key = $current, value = $theValue) where $theType = null,
-      ClassProperty(key = $current, value = $theValue, typeAnnotation = $theType)
-    } where {
-      $capitalized = capitalize($current),
-      $setter = Identifier(name = s"set${capitalized}"),
-
-      if($theValue <: $current) $initValue = [] else $initValue = $theValue,
-      if($initValue <: null) $initValue = `undefined`,
-
-      $theValue <: ChangeThis(),
-      $current <: not `defaultProps`,
-
-      if ($processedKeys <: not some $current) then {
-        $processedKeys = [... $processedKeys, $current],
-        if($theType <: null) {
-            $theUpdate = `const [$current, $setter] = useState($initValue)`
-        } else {
-            $theUpdate = `const [$current, $setter] = useState<$theType>($initValue)`
+        method_definition($static, $async, $name, $body, $parameters) as $statement where or {
+            and {
+                $name <: `constructor`,
+                $body <: change_this($states_statements)
+            },
+            and {
+                $name <: or { `componentDidUpdate`, `componentDidMount` },
+                $body <: change_this($states_statements),
+                $statements += `useEffect(() => $body, []);`
+            },
+            and {
+                $name <: `componentWillUnmount`,
+                $body <: change_this($states_statements),
+                $statements += `useEffect(() => { \n    return () => $body;\n});`
+            },
+            and {
+                $name <: `render`,
+                $body <: statement_block(statements = $render_statements)
+            },
+            and {
+                $static <: `static`,
+                $body <: change_this($states_statements),
+                $static_statements += `$class_name.$name = $parameters => $body;`
+            },
+            and {
+                $async <: `async`,
+                $statements += `const ${name}Handler = useCallback(async () => $body, []);`
+            },
+            and {
+                $statement <: after `@computed`,
+                $statements += `const ${name} = useMemo(() => $body, []);`
+            },
+            and {
+                $statements += `const ${name}Handler = useCallback(() => $body, []);`
+            }
         },
-        $newState = [...$newState, $theUpdate]
-      },
-      ensureImportFrom(`useState`, `"react"`)
-  } until [$_] // remove until after generalizing `...` to match assoc on assigned metavars
+
+        public_field_definition($static, $name, $value, $type) as $statement where or {
+            and {
+                $value <: contains or { `reaction($_, $effect_function)`, `reaction($_, $effect_function, $_)` },
+                $effect_function <: or { `($_) => $effect` , `() => $effect` },
+                $statements += `useEffect(() => $effect, []);`
+            },
+
+            and {
+                $value <: object($properties),
+                $name <: `defaultProps`,
+                $statements += `const props = { \n    $properties,\n    ...inputProps,\n  };`
+            },
+
+            and {
+                $static <: `static`,
+                $static_statements += `$class_name.$name = $value;`
+            },
+            and {
+                $statement <: after `@observable`,
+                $capitalized = capitalize(string = $name),
+                or {
+                    and {
+                        $value <: .,
+                        $after_value = `undefined`,
+                    },
+                    $after_value = $value,
+                },
+                or {
+                    and {
+                        $type <:  type_annotation(type = $inner_type),
+                        $states_statements += `const [$name, set$capitalized] = useState<$inner_type>($after_value);`
+                    },
+                    and {
+                        $states_statements += `const [$name, set$capitalized] = useState($after_value);`
+                    }
+                }
+            },
+            and {
+                $value <: arrow_function(),
+                $statements += `const ${name}Handler = useCallback($value, []);`
+            },
+            and {
+                $statements += `const $name = useRef($value);`
+            }
+        },
+    }
 }
 
-pattern MainReactClassToHooks($moveDefaultProps) {
-  or {
-    `class $name extends $component<$propType> {$oldBody }`,
-    // Check for a class component with no base, so that we match both class components with and without explicit typing.
-    `class $name extends $component {$oldBody }` where { $propType = `any` }
-    // The overall class $name extends React.Component pattern is aliased as $match to improve readability.
-  } as $match => $newStatements where {
-    $component <: or { `Component`, `React.Component` },
-    // TODO: figure out how error boundaries should be converted
-    $oldBody <: not contains { `componentDidCatch` },
+pattern change_this($states_statements) {
+    maybe contains or {
+        assignment_expression(
+            left = `this.state`,
+            right = object (
+                properties = some bubble($states_statements) pair($key, $value) where {
+                $capitalized = capitalize(string = $key),
+                $states_statements += `const [$key, set$capitalized] = useState($value);`
+            }
+            )
+        ) => .,
+        variable_declarator(
+            name = object_pattern(properties = some bubble($states_statements) $prop where {
+                $capitalized = capitalize(string = $prop),
+                $states_statements += `const [$prop, set$capitalized] = useState();`
+            }),
+            value = `this.state`
+        ) => .
+    }
+}
 
-    $processedKeys = [],
-    $hoistedProps = [],
-    $hoistedStates = [],
-    $mobxStates = [],
-    $mobxComputedFields = [],
-    $foundViewState = false,
-    $movedDefaultProps = false,
-
-    // nested components are not currently supported
-    !$match <: within { ClassDeclaration(id = !$name) },
-
-    // The ReactToHooks migration supports migrating React Mobx components, but "maybe" ensures that Mobx is optional.
-    $oldBody <: maybe some CollectMobxFields(),
-
-    // The body of a React class component will have at least one body statement since the render() method is required, so "maybe" is not necessary here.
-    $oldBody <: some HandleOneBodyStatement(),
-
-    // React class components can have default props as the static property defaultProps.
-    // We remove this code entirely (the " => . " transformation) and assign the conjunction of the default props and input props to the metavariable $finalDefaultProps for later use.
-    if ($moveDefaultProps <: true) then {
-      $oldBody <: maybe let($defaultProps) {
-          contains `$name.defaultProps = { $defaultProps }` => . where {
-          $finalDefaultProps = [`const props = { $defaultProps, ...inputProps }`],
-          $movedDefaultProps = true
+pattern gather_hooks($hooks) {
+    contains or {
+        `useEffect` where {
+            $hooks <: not some `useEffect`,
+            $hooks += `useEffect`
+        },
+        `useCallback` where {
+            $hooks <: not some `useCallback`,
+            $hooks += `useCallback`
+        },
+        `useState` where {
+            $hooks <: not some `useState`,
+            $hooks += `useState`
+        },
+        `useRef` where {
+            $hooks <: not some `useRef`,
+            $hooks += `useRef`
         }
-      }
-    },
-
-    HandleHoistedStates(),
-
-    // $hoistedProps began as an empty list at the beginning of this pattern, but may have been mutated by ChangeThis() called within HandleOneBodyStatement().
-    // distinct() is one of several utility functions built into the engine.
-    $finalProps = distinct($hoistedProps),
-
-    // The output of the ReactToHooks migration destructures the props object if the input contained any props.
-    if (! $finalProps <: [] ) $propsInit = `const { $finalProps } = props` else $propsInit = .,
-
-    // When we use the ... operator to assemble $newBody, Grit's syntax-aware code generation process produces the output code in a reasonable format.
-    $newBody = [ ... $finalDefaultProps, ... $newState, ... $propsInit, ... $stateStatements, ... $constructorBody, ...$mountEffect, ...$unmountEffect, ...$updateEffect, ... $callbacks, ... $mobxComputed, ... $mobxEffects, ... $otherProperties, ... $newRenderBody ],
-
-    // If we moved default props defined as static class variables earlier in the pattern, we now set $propsArgName to be "inputProps" instead of "props" so that our rewritten `const props = { $defaultProps, ...inputProps }` snippet syntactically coheres.
-    if ($moveDefaultProps <: true && $movedDefaultProps <: true) then {
-      $propsArgName = `inputProps`
-    } else {
-      $propsArgName = `props`
-    },
-
-    if (or { $oldBody <: contains or {`this.props`, `static defaultProps`} , $movedDefaultProps <: true }) then {
-      $propsArg = $propsArgName
-    } else {
-      $propsArg = []
-    },
-
-    if (IsTypeScript()) {
-      $funcDef = `($propsArg: $propType) => { $newBody }`
-    } else {
-      $funcDef = `($propsArg) => { $newBody }`
-    },
-
-    if($foundViewState <: true) {
-      $funcDef = `observer(($propsArg) => { $newBody })`,
-      // ensureImportFrom is a utility predicate defined in common.unhack
-      ensureImportFrom(`observer`, `"mobx-react"`)
-    },
-    $theFunction = `const $name = $funcDef`,
-
-    // Finally, we assemble the $newStatement metavariable declared all the way at the top of the MainReactClassToHooks pattern.
-    // $theFunction comprises the const () => {} format of React function components, while static props and static methods are declared outside the body of the function as properties of the function itself.
-    $newStatements = [ $theFunction, ... $staticProps, ... $staticMethods ]
-  }
+    }
 }
 
-MainReactClassToHooks(true)
+pattern adjust_imports() {
+    maybe and {
+        $hooks = [],
+        gather_hooks($hooks),
+        $hooks = join(list = $hooks, separator = ", "),
+        or {
+            // ugly dealing with imports
+            contains import_specifier(name = `Component`) => `$hooks`,
+            contains `import React from 'react'` as $i where {
+                $i <: not contains namespace_import(),
+                $i => `import React, { $hooks } from 'react';`
+            },
+            contains `import React from "react"` as $i where {
+                if ($i <: not contains namespace_import()) {
+                    $i => `import React, { $hooks } from 'react';`
+                } else {
+                    $i => `$i\nimport { $hooks } from 'react';`
+                }
+            }
+        }
+    }
+}
+
+pattern maybe_wrapped_class_declaration($class_name, $body, $class) {
+    or {
+        export_statement(declaration = class_declaration(name = $class_name, $body, $heritage) as $class),
+        class_declaration(name = $class_name, $body, $heritage) as $class
+    } where {
+        $heritage <: contains extends_clause(value = contains `Component`)
+    }
+}
+
+pattern first_step() {
+    maybe_wrapped_class_declaration($class_name, $body, $class) where {
+        $statements = [],
+        $states_statements = [],
+        $static_statements = [],
+
+        if ($class <: contains extends_clause(type_arguments = contains type_arguments($types))) {
+            $type_annotation = `: $types`
+        } else {
+            $type_annotation = .
+        },
+
+        // todo: replace contains with list pattern match once we have the field set
+        // we are missing a field for the statements in class_body
+        $body <: contains handle_one_statement($class_name, $statements, $states_statements, $static_statements, $render_statements),
+        $body <: not contains `componentDidCatch`,
+        $class <: not within class_declaration(name = not $class_name),
+
+        if ($body <: contains `static defaultProps = $default_props`) {
+            $the_props = "inputProps"
+        } else {
+            $the_props = "props"
+        },
+
+
+        if ($body <: contains `props`) {
+            $args = `${the_props}${type_annotation}`
+        } else {
+            $args = .
+        },
+
+        $separator = `\n    `,
+        // a bit of hack because we cannot use a code snippet as an argument to a builtin function yet
+        $separator += "",
+        $states_statements = join(list = $states_statements, $separator),
+        $statements = join(list = $statements, $separator),
+        $the_function = `($args) => {\n    $states_statements\n\n    ${statements}\n\n    ${render_statements} \n}`,
+
+        if ($body <: contains `ViewState`) {
+            $the_const = `import { observer } from "mobx-react";\n\nconst $class_name = observer($the_function);`
+        } else {
+            $the_const = `const $class_name = $the_function;`
+        },
+
+        $static_statements = join(list = $static_statements, $separator),
+        $class => `$the_const\n$static_statements\n`
+    }
+}
+
+pattern find_dependencies($hoisted_states, $dependencies) {
+    contains bubble($hoisted_states, $dependencies) identifier() as $i where {
+        $i <: not `props`,
+        $hoisted_states <: some $i,
+        $dependencies <: not some $i,
+        $dependencies += `$i`
+    }
+}
+
+pattern rewrite_accesses($hoisted_states) {
+    or {
+        `this.state.$x` => `$x`,
+        `this.$property` as $p where {
+            if ($hoisted_states <: some $property) {
+                $p => `${property}`
+            } else {
+                $p => `${property}Handler`
+            }
+        },
+
+        lexical_declaration(declarations = [variable_declarator(value = or { `this.state`, `this` })]) => .,
+
+        assignment_expression($left, $right) as $assignment where {
+            $hoisted_states <: some $left,
+            $capitalized = capitalize(string = $left),
+            $assignment => `set${capitalized}($right)`
+        },
+
+        `this.setState($x)` as $set_state where {
+            $statements = [],
+            $x <: contains bubble($statements) pair(key = $key, value = $value) where {
+                $capitalized = capitalize(string = $key),
+                $statements += `set$capitalized($value);`
+            },
+            $separator = `\n    `,
+            // a bit of hack because we cannot use a code snippet as an argument to a builtin function yet
+            $separator += "",
+            $statements = join(list = $statements, $separator),
+            $set_state => `$statements`
+        },
+
+        // to deactivate dependency detection, comment out the following lines
+        `$method($f, $dependencies_array)` where {
+            $method <: or { `useEffect`, `useCallback`, `useMemo` },
+            $dependencies = [],
+            $f <: find_dependencies($hoisted_states, $dependencies),
+            $dependencies = join(list = $dependencies, separator = ", "),
+            $dependencies_array => `[$dependencies]`
+        },
+
+        // clean-up props arg -- not needed if only used in constructor, and first step introduced it
+        // if it sees it anywhere in the pattern
+        arrow_function(parameters=$props, body=$body) where {
+            $props <: contains or { `props`, `inputProps` },
+            $body <: not contains `props`,
+            $props => `()`
+        }
+    }
+}
+
+pattern gather_accesses($hoisted_states) {
+    contains bubble($hoisted_states) variable_declarator($name, $value) where {
+        or {
+            and {
+                $name <: array_pattern(elements = [$used_name, $_]),
+                $value <: `useState($_)`
+            },
+            and {
+                $name <: $used_name,
+                $value <: or { `useRef($_)`, `useMemo($_, $_)` }
+            }
+        },
+        $hoisted_states += $name
+    },
+
+    contains bubble($hoisted_states) or {
+        variable_declarator(
+            name = array_pattern(elements = [$name, $_]),
+            value = `useState($_)`
+        ),
+        variable_declarator(
+            name = $name,
+            value = or { `useRef($_)`, `useMemo($_, $_)` }
+        )
+    } where $hoisted_states += $name
+}
+
+pattern second_step() {
+    maybe and {
+        $hoisted_states = [],
+        $hoisted_states += `props`,
+        maybe gather_accesses($hoisted_states), // where $_ = log(string = $hoisted_states)
+        program(statements =
+            some or {
+                export_statement(
+                    decorator = contains `@observer` => .,
+                    declaration = lexical_declaration(declarations = contains rewrite_accesses($hoisted_states))
+                ),
+                export_statement(
+                    declaration = lexical_declaration(declarations = contains rewrite_accesses($hoisted_states))
+                ),
+                lexical_declaration(declarations = contains rewrite_accesses($hoisted_states))
+            }
+        )
+    }
+}
+
+sequential {
+    file(body = program(statements = some bubble first_step())),
+    file(body = second_step()),
+    file(body = second_step()),
+    file(body = second_step()),
+    //maybe contains bubble `this.$props` => `$props`
+    file(body = adjust_imports())
+}
 ```
 
 ## Input for playground
@@ -365,8 +401,7 @@ class App extends Component {
 ```
 
 ```js
-import { Component, useEffect, useCallback, useState } from 'react';
-
+import { useState, useEffect, useCallback } from 'react';
 const App = () => {
   const [name, setName] = useState('');
   const [another, setAnother] = useState(3);
@@ -375,55 +410,40 @@ const App = () => {
   useEffect(() => {
     document.title = `You clicked ${count} times`;
   }, []);
-
   useEffect(() => {
     // alert("This component was mounted");
     document.title = `You clicked ${count} times`;
-    if (isOpen && !prevProps.isOpen) {
-      alert("You just opened the modal!");
-    }
-  }, []);
 
+    if (isOpen && !prevProps.isOpen) {
+      alert('You just opened the modal!');
+    }
+  }, [isOpen]);
   const alertNameHandler = useCallback(() => {
     alert(name);
-  }, []);
-
-  const handleNameInputHandler = useCallback(e => {
+  }, [name]);
+  const handleNameInputHandler = useCallback((e) => {
     setName(e.target.value);
-    setAnother("cooler");
+    setAnother('cooler');
   }, []);
-
   const asyncAlertHandler = useCallback(async () => {
-    await alert("async alert");
+    await alert('async alert');
   }, []);
 
   return (
-    (<div>
+    <div>
       <h3>This is a Class Component</h3>
-      <input
-        type="text"
-        onChange={handleNameInputHandler}
-        value={name}
-        placeholder="Your Name"
-      />
-      <button onClick={alertNameHandler}>
-        Alert
-      </button>
-      <button onClick={asyncAlertHandler}>
-        Alert
-      </button>
-    </div>)
+      <input type='text' onChange={handleNameInputHandler} value={name} placeholder='Your Name' />
+      <button onClick={alertNameHandler}>Alert</button>
+      <button onClick={asyncAlertHandler}>Alert</button>
+    </div>
   );
 };
-
 App.foo = 1;
 App.fooBar = 21;
-
-App.bar = input => {
+App.bar = (input) => {
   console.log(input);
 };
-
-App.another = input => {
+App.another = (input) => {
   console.error(input);
 };
 ```
@@ -460,24 +480,25 @@ class SampleComponent extends React.Component {
 ```
 
 ```js
-import React, { useCallback, useState } from 'react';
+import React, { useState, useCallback } from 'react';
 
-const SampleComponent = props => {
+const SampleComponent = (props) => {
   const [clicks, setClicks] = useState(props.initialCount);
 
   const onClickHandler = useCallback(() => {
     setClicks(clicks + 1);
-  }, []);
-
+  }, [clicks]);
   const isEven = useMemo(() => {
     return clicks % 2 === 0;
   }, [clicks]);
 
-  return (<>
-    <p>Clicks: {clicks}</p>
-    <p>Is even: {isEven}</p>
-    <a onClick={onClickHandler}>click</a>
-  </>);
+  return (
+    <>
+      <p>Clicks: {clicks}</p>
+      <p>Is even: {isEven}</p>
+      <a onClick={onClickHandler}>click</a>
+    </>
+  );
 };
 ```
 
@@ -522,34 +543,34 @@ class SampleComponent extends React.Component {
 ```
 
 ```js
-import React, { useCallback, useState } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 
-const SampleComponent = props => {
+const SampleComponent = (props) => {
   const [clicks, setClicks] = useState(props.initialCount);
 
   const onClickHandler = useCallback(() => {
     setClicks(clicks + 1);
+  }, [clicks]);
+  useEffect(() => {
+    console.log('clicks', clicks);
+  }, [clicks]);
+  useEffect(() => {
+    console.log('second click handler');
   }, []);
 
-  useEffect(() => {
-    console.log("clicks", clicks);
-  }, [clicks]);
-
-  useEffect(() => {
-    console.log("second click handler");
-  }, [props]);
-
-  return (<>
-    <p>Clicks: {clicks}</p>
-    <a onClick={onClickHandler}>click</a>
-  </>);
+  return (
+    <>
+      <p>Clicks: {clicks}</p>
+      <a onClick={onClickHandler}>click</a>
+    </>
+  );
 };
 ```
 
 ## Only processes top-level components
 
 ```js
-import React from "react";
+import React from 'react';
 
 class FooClass {
   static component = class extends React.Component {
@@ -578,20 +599,25 @@ class SampleComponent extends Component {
 ```
 
 ```js
-import { Component, useRef } from 'react';
+import { useRef } from 'react';
 
 import { observer } from 'mobx-react';
 
 const SampleComponent = observer(() => {
   const viewState = useRef(new ViewState());
-  return (<p>This component has a<span onClick={viewState.click}>ViewState</span></p>);
+
+  return (
+    <p>
+      This component has a <span onClick={viewState.click}>ViewState</span>
+    </p>
+  );
 });
 ```
 
 ## Prop types are preserved
 
 ```js
-import React from "react";
+import React from 'react';
 
 interface Props {
   name: string;
@@ -609,32 +635,34 @@ class SampleComponent extends React.Component<Props> {
 ```
 
 ```ts
-import React from "react";
+import React from 'react';
 
 interface Props {
   name: string;
 }
 
 const SampleComponent = (props: Props) => {
-  return (<>
-    <p>Hello {props.name}</p>
-  </>);
+  return (
+    <>
+      <p>Hello {props.name}</p>
+    </>
+  );
 };
 ```
 
 ## Handle lifecycle events
 
 ```js
-import { Component } from "react";
-import PropTypes from "prop-types";
+import { Component } from 'react';
+import PropTypes from 'prop-types';
 
 class Foo extends Component {
   componentDidMount() {
-    console.log("mounted");
+    console.log('mounted');
   }
 
   componentWillUnmount() {
-    console.log("unmounted");
+    console.log('unmounted');
   }
 
   render() {
@@ -646,17 +674,16 @@ export default Foo;
 ```
 
 ```js
-import { Component, useEffect } from "react";
-import PropTypes from "prop-types";
+import { useEffect } from 'react';
+import PropTypes from 'prop-types';
 
 const Foo = () => {
   useEffect(() => {
-    console.log("mounted");
+    console.log('mounted');
   }, []);
-
   useEffect(() => {
     return () => {
-      console.log("unmounted");
+      console.log('unmounted');
     };
   });
 
@@ -669,8 +696,8 @@ export default Foo;
 ## Pure JavaScript works, with no types inserted
 
 ```js
-import { Component } from "react";
-import PropTypes from "prop-types";
+import { Component } from 'react';
+import PropTypes from 'prop-types';
 
 class Link extends Component {
   static propTypes = {
@@ -688,17 +715,14 @@ export default Link;
 ```
 
 ```js
-import { Component } from "react";
-import PropTypes from "prop-types";
+import { Component } from 'react';
+import PropTypes from 'prop-types';
 
-const Link = props => {
-  const {
-    href
-  } = props;
+const Link = (props) => {
+  const { href } = props;
 
   return <a href={href}>Link Text</a>;
 };
-
 Link.propTypes = {
   href: PropTypes.string.isRequired,
 };
@@ -731,15 +755,19 @@ class ObservedComponent extends React.Component {
 ```
 
 ```ts
-import React, { useState } from "react";
+import React, { useState } from 'react';
 
 const ObservedComponent = () => {
   const [name, setName] = useState<string>(undefined);
   const [age, setAge] = useState(21);
 
-  return (<>
-    <p>Hello {name}, you are {age}</p>
-  </>);
+  return (
+    <>
+      <p>
+        Hello {name}, you are {age}
+      </p>
+    </>
+  );
 };
 ```
 
@@ -771,25 +799,29 @@ class ObservedComponent extends React.Component {
 ```
 
 ```ts
-import React, { useState } from "react";
+import React, { useState } from 'react';
 
 interface Person {
   name: string;
 }
 
-const ObservedComponent = (inputProps: any) => {
-  const props = {
-    king: "viking",
-    ...inputProps
-  };
-
+const ObservedComponent = (inputProps) => {
   const [me, setMe] = useState<Person>({
-    name: "John",
+    name: 'John',
   });
 
-  return (<>
-    <p>This is {me.name}, {props.king}</p>
-  </>);
+  const props = {
+    king: 'viking',
+    ...inputProps,
+  };
+
+  return (
+    <>
+      <p>
+        This is {me.name}, {props.king}
+      </p>
+    </>
+  );
 };
 ```
 
