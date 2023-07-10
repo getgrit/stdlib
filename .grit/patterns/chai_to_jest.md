@@ -2,8 +2,6 @@
 title: Chai to Jest
 ---
 
-# {{ page.title }}
-
 Convert Chai test assertions to Jest.
 
 tags: #migration, #js

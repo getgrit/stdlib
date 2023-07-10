@@ -2,8 +2,6 @@
 title: Remove `noAssert` from `Buffer` calls
 ---
 
-# {{ page.title }}
-
 If the `noAssert` flag is set, `offset` can go beyond the end of the `Buffer`, which is a security vulnerability.
 
 tags: #security, #fix, #node

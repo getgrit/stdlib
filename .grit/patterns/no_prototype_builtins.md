@@ -2,8 +2,6 @@
 title: Prototype methods ⇒ `Object.prototype` methods
 ---
 
-# {{ page.title }}
-
 Call `hasOwnProperty`, `isPrototypeOf`, `propertyIsEnumerable` methods only from `Object.prototype`.  
 Otherwise it can cause errors.
 

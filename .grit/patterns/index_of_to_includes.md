@@ -2,8 +2,6 @@
 title: Rewrite `indexOf(...) === -1` ⇒ `includes`
 ---
 
-# {{ page.title }}
-
 ES7 introduced the `includes` method for arrays so bitwise and comparisons to `-1` are no longer needed.
 
 tags: #ES7, #SE

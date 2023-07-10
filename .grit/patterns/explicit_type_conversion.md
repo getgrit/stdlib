@@ -2,8 +2,6 @@
 title: ⇒ explicit conversion between types
 ---
 
-# {{ page.title }}
-
 Use explicit conversions between types, e.g., `'' + x` => `String(s)`.
 
 tags: #SE

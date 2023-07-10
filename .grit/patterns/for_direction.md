@@ -2,8 +2,6 @@
 title: Fix `for` counter direction
 ---
 
-# {{ page.title }}
-
 If a `for` counter moves in the wrong direction the loop will run infinitely. Mostly, an infinite `for` loop is a typo and causes a bug.
 
 tags: #bug, #fix, #good

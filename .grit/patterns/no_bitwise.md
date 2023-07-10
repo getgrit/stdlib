@@ -2,8 +2,6 @@
 title: Rewrite `&` ⇒ `&&`, `|` ⇒ `||`
 ---
 
-# {{ page.title }}
-
 Bitwise operators `&` or `|` are often used by mistake instead of `&&` or `||`, which can cause unexpected errors.
 
 ```grit

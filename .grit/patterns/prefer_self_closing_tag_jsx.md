@@ -2,8 +2,6 @@
 title: ⇒ self-closing JSX tags
 ---
 
-# {{ page.title }}
-
 Components without children can be self-closed to avoid unnecessary extra closing tag.
 
 tags: #SE, #syntax, #React

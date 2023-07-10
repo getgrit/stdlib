@@ -2,8 +2,6 @@
 title: Rewrite `new Object()` ⇒ `{}`
 ---
 
-# {{ page.title }}
-
 The `{}` literal form is a more concise way of creating an object.
 
 There is no performance difference.

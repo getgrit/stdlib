@@ -2,8 +2,6 @@
 title: Rewrite `PureComponent` ⇒ `Component`
 ---
 
-# {{ page.title }}
-
 If a `PureComponent` has the `shouldComponentUpdate` method, convert it to a regular `Component`.
 
 `React.PureComponent` provides an implementation for `shouldComponentUpdate()` which compares props by reference to determine if they have changed.

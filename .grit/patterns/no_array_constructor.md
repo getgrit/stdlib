@@ -2,8 +2,6 @@
 title: Rewrite `Array(a, b, ...)` ⇒ `[a, b, ...]`
 ---
 
-# {{ page.title }}
-
 The literal notation avoids the single-argument pitfall or the Array global being redefined.
 
 Use of the Array constructor to create a new array is discouraged in favor of array literal notation, i.e., `[a, b, ...]`. The exception is when the Array constructor is used to intentionally create sparse arrays of a specified size by giving the constructor a single numeric argument.

@@ -2,8 +2,6 @@
 title: Remove `.escapeMarkup = false`
 ---
 
-# {{ page.title }}
-
 Some template engines allow disabling HTML escaping, which can allow XSS vulnerabilities.
 
 tags: #security, #fix

@@ -2,8 +2,6 @@
 title: Prefer ES6-style exports over module.exports
 ---
 
-# {{ page.title }}
-
 Converts CommonJS `module.exports` to ES6-style exports.
 
 tags: #js, #es6, #migration, #cjs, #commonjs

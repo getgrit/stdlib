@@ -2,8 +2,6 @@
 title: Compare `null` using  `===` or `!==`
 ---
 
-# {{ page.title }}
-
 Comparing to `null` needs a type-checking operator (=== or !==), to avoid incorrect results when the value is `undefined`.
 
 tags: #good

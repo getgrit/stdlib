@@ -2,8 +2,6 @@
 title: Remove `console.log`
 ---
 
-# {{ page.title }}
-
 Remove `console.log` statements.
 
 tags: #good

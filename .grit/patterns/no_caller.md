@@ -2,8 +2,6 @@
 title: Remove `arguments.caller` and `arguments.callee`
 ---
 
-# {{ page.title }}
-
 `arguments.caller` and `arguments.called` have been deprecated.
 
 They make code optimizations difficult and their use is forbidden in ECMAScript 5 while in strict mode.

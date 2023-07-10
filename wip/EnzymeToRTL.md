@@ -2,8 +2,6 @@
 title: EnzymeToRTL
 ---
 
-# {{ page.title }}
-
 Migrate to react testing library.
 
 tags:
@@ -76,7 +74,7 @@ pattern RewriteSelector() {
         }
     }
 }
- 
+
 or {
     Mount(),
     RewriteSelector(),

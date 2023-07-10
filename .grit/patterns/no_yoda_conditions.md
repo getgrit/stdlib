@@ -2,8 +2,6 @@
 title: Yoda conditions not
 ---
 
-# {{ page.title }}
-
 Prefer natural language style conditions in favour of Yoda style conditions.
 
 tags: #good, #syntax

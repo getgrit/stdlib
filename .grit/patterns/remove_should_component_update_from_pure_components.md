@@ -2,8 +2,6 @@
 title: Rewrite `shouldComponentUpdate` ⇒ `.`
 ---
 
-# {{ page.title }}
-
 Remove the `shouldComponentUpdate` method from `PureComponent`. `PureComponent` already has an implementation.
 
 `PureComponent` provides an implementation for `shouldComponentUpdate` which compares props by reference to determine if they have changed.
@@ -38,8 +36,6 @@ class Foo extends React.PureComponent {
 class Foo extends React.PureComponent {
   customMethod() {}
 
-  
-
   render() {
     return <Hello />;
   }
@@ -63,8 +59,6 @@ class Foo extends PureComponent {
 ```typescript
 class Foo extends PureComponent {
   customMethod() {}
-
-  
 
   render() {
     return <Hello />;

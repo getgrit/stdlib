@@ -2,8 +2,6 @@
 title: Remove unreachable code
 ---
 
-# {{ page.title }}
-
 Remove unreachable code found after `return` / `throw` / `continue` or `break` statements.
 
 tags: #good, #SE

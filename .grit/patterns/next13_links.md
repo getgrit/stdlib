@@ -2,8 +2,6 @@
 title: Remove `<a>` Tags From Link Components
 ---
 
-# {{ page.title }}
-
 Migrate Link component children to Next13
 
 tags: #good
