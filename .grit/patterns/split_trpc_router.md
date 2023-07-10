@@ -102,14 +102,14 @@ file($name, body = program($statements) as $p) where {
 
     // construct the middleware file
     
-    $middleware_statments = [],
-    $imports <: maybe some filter_used_imports(local_imports = $middleware_statments, content = $middlewares),
+    $middleware_statements = [],
+    $imports <: maybe some filter_used_imports(local_imports = $middleware_statements, content = $middlewares),
 
     // we can simplify this traversal to list concatenation once we implement that
-    $middlewares <: some bubble($middleware_statments) $s where $middleware_statments += $s,
+    $middlewares <: some bubble($middleware_statements) $s where $middleware_statements += $s,
 
     $separator = `;\n`,
-    $middleware_body = join(list = $middleware_statments, $separator),
+    $middleware_body = join(list = $middleware_statements, $separator),
     $middleware_file = `$dir/middleware.ts`,
     $new_files += file(name = $middleware_file, body = $middleware_body),
 
