@@ -5,6 +5,14 @@ pattern literal_value() {
   or { number(), string(), `null`, `undefined`}
 }
 
+pattern function_like($name, $args, $statements) {
+  or {
+    `function $name($args) { $statements }`,
+    `($args) => { $statements }`,
+    `($args) => $statements`
+  }
+}
+
 // All core stdlib functions can be done here
 pattern before_each_file_stdlib() {
   before_each_file_prep_imports()
