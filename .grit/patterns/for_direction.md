@@ -24,11 +24,6 @@ for_statement($condition, $increment, $initializer) where {
         }
     }
 }
-
-```
-
-```
-
 ```
 
 ## Transform `for` counter for `<`/`<=` directions
