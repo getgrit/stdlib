@@ -16,13 +16,14 @@ or {
     `import { $import } from "$source"` where {
         $newports = [],
         $import <: some bubble($newports) {
-            import_specifier(name = aliased_name($alias, $name)) where {
-                if (!$alias <: .) {
-                $newports += `$name: $alias`
-                } else {
+            import_specifier(name = or { 
+                identifier() as $name where {
                     $newports += `$name`
+                },
+                aliased_name($alias, $name) where {
+                    $newports += `$name: $alias` 
                 }
-            }
+            })
         },
         $transformed = join(list = $newports, separator = ", "),
     } => `const { $transformed } = require("$source")`,
