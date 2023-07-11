@@ -16,7 +16,7 @@ or {
     `import { $import } from "$source"` where {
         $newports = [],
         $import <: some bubble($newports) {
-            import_specifier($alias, $name) where {
+            import_specifier(name = aliased_name($alias, $name)) where {
                 if (!$alias <: .) {
                 $newports += `$name: $alias`
                 } else {
