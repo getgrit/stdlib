@@ -4,42 +4,51 @@ title: Strict tsconfig
 
 # Strict tsconfig
 
-Adds `"strict": true, "allowJs": true, "checkJs": false` from a tsconfig's `compilerOptions`, and then sets existing redundant options (such as `noImplicitAny`) to `true`.
+Adds `"strict": true, "allowJs": true, "checkJs": false` from a tsconfig's `compilerOptions`, and then removes existing redundant options (such as `noImplicitAny`).
 
-tags: #js, #ts
+tags: #js, #ts, #tsconfig, #strict
 
 ```grit
+engine marzano(0.1)
 language json
-json_pair(key="compilerOptions", value=$val) where {
-    $val <: json_object(properties=$options)
-    $newOptions = $options
 
-    $options <: maybe contains json_pair(key="noImplicitAny", value=`false` => `true`)
-    $options <: maybe contains json_pair(key="strict", value=`false` => `true`)
-    if ($options <: contains json_pair(key="strict", value=$declStrict)) {
-        $declStrict <: maybe `false` => `true`
+pair(key=`"compilerOptions"`, $value) where {
+    $value <: object($properties),
+    $newOptions = [],
+
+    $properties <: maybe contains pair(key=`"noImplicitAny"`, value=`false` => `true`),
+    $properties <: maybe contains pair(key=`"strict"`, value=`false` => `true`),
+    if ($properties <: contains pair(key=`"strict"`, value=$strict)) {
+        $strict <: maybe `false` => `true`
     } else {
-        $newOptions = [...$options, json_pair(key=`"strict"`, value=`true`)]
-        $val => json_object(properties=$newOptions)
-    }
-    // // These are all included by default; ideally we'd delete, but can't, so just mark as true
-    $options <: maybe contains json_pair(key="noImplicitThis", value=`false` => `true`)
-    $options <: maybe contains json_pair(key="alwaysStrict", value=`false` => `true`)
-    $options <: maybe contains json_pair(key="strictBindCallApply", value=`false` => `true`)
-    $options <: maybe contains json_pair(key="strictNullChecks", value=`false` => `true`)
-    $options <: maybe contains json_pair(key="strictFunctionTypes", value=`false` => `true`)
-    $options <: maybe contains json_pair(key="strictPropertyInitialization", value=`false` => `true`)
-    if ($options <: contains json_pair(key="allowJs", value=$declAllowJs)) {
-        $declAllowJs <: maybe `false` => `true`
+        $newOptions += `"strict": true`
+    },
+
+    // These are all included by default; ideally we'd delete, but can't, so just mark as true
+    $properties <: maybe contains pair(key=`"noImplicitThis"`) => .,
+    $properties <: maybe contains pair(key=`"alwaysStrict"`) => .,
+    $properties <: maybe contains pair(key=`"strictBindCallApply"`) => .,
+    $properties <: maybe contains pair(key=`"strictNullChecks"`) => .,
+    $properties <: maybe contains pair(key=`"strictFunctionTypes"`) => .,
+    $properties <: maybe contains pair(key=`"strictPropertyInitialization"`) => .,
+
+    // allow JS
+    if ($properties <: contains pair(key=`"allowJs"`, value=$allow_js)) {
+        $allow_js <: maybe `false` => `true`
     } else {
-        $newOptions = [...$newOptions, json_pair(key=`"allowJs"`, value=`true`)]
-        $val => json_object(properties=$newOptions)
-    }
-    if ($options <: contains json_pair(key="checkJs", value=$declCheckJs)) {
-        $declCheckJs <: maybe `true` => `false`
+        $newOptions += `"allowJs": true`
+    },
+
+    // check JS
+    if ($properties <: contains pair(key=`"checkJs"`, value=$check_js)) {
+        $check_js <: maybe `true` => `false`
     } else {
-        $newOptions = [...$newOptions, json_pair(key=`"checkJs"`, value=`false`)]
-        $val => json_object(properties=$newOptions)
+        $newOptions += `"checkJs": false`
+    },
+
+    if (!$newOptions <: []) {
+        $joined = join(list=$newOptions, separator=", "),
+        $properties => `$joined, $properties`
     }
 }
 ```
@@ -63,16 +72,13 @@ json_pair(key="compilerOptions", value=$val) where {
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
-    "outDir": "../../dist/out-tsc",
+    "strict": true, "allowJs": true, "checkJs": false, "outDir": "../../dist/out-tsc",
     "types": ["node"],
-    "foo": "bar",
-    "strict": true,
-    "allowJs": true,
-    "checkJs": false
-   },
+    "foo": "bar"
+  },
   "exclude": ["**/*.spec.ts"],
   "include": ["**/*.ts"]
- }
+}
 ```
 
 ## Handles redundant options
@@ -84,13 +90,6 @@ json_pair(key="compilerOptions", value=$val) where {
     "outDir": "../../dist/out-tsc",
     "types": ["node"],
     "foo": "bar",
-    "noImplicitAny": true,
-    "noImplicitThis": true,
-    "alwaysStrict": true,
-    "strictBindCallApply": false,
-    "strictNullChecks": false,
-    "strictFunctionTypes": false,
-    "strictPropertyInitialization": false,
     "baz": "raz"
   },
   "exclude": ["**/*.spec.ts"],
@@ -102,28 +101,17 @@ json_pair(key="compilerOptions", value=$val) where {
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
-    "outDir": "../../dist/out-tsc",
+    "strict": true, "allowJs": true, "checkJs": false, "outDir": "../../dist/out-tsc",
     "types": ["node"],
     "foo": "bar",
-    "noImplicitAny": true,
-    "noImplicitThis": true,
-    "alwaysStrict": true,
-    "strictBindCallApply": true,
-    "strictNullChecks": true,
-    "strictFunctionTypes": true,
-    "strictPropertyInitialization": true,
-    "baz": "raz",
-    "strict": true,
-    "allowJs": true,
-    "checkJs": false
-   },
+    "baz": "raz"
+  },
   "exclude": ["**/*.spec.ts"],
   "include": ["**/*.ts"]
- }
+}
 ```
 
 ## Handles existing strict
-
 
 ```json
 {
@@ -161,7 +149,7 @@ json_pair(key="compilerOptions", value=$val) where {
 ```json
 {
   "compilerOptions": {
-    "target": "es5",
+    "checkJs": false, "target": "es5",
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
@@ -184,16 +172,15 @@ json_pair(key="compilerOptions", value=$val) where {
     "baseUrl": ".",
     "paths": {
       "@/*": ["./*"]
-    },
-    "checkJs": false
-   },
+    }
+  },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
   "exclude": ["node_modules"]
- }
-
+}
 ```
 
 ## Bugfix $decl <: false
+
 ```json
 {
   "extends": "./tsconfig.json",
@@ -212,14 +199,14 @@ json_pair(key="compilerOptions", value=$val) where {
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
+    "strict": true,
+    "checkJs": false,
     "outDir": "../../dist/out-tsc",
     "module": "commonjs",
     "types": ["node", "express"],
-    "allowJs": true,
-    "strict": true,
-    "checkJs": false
-   },
+    "allowJs": true
+  },
   "exclude": ["jest.config.ts", "**/*.spec.ts", "**/*.test.ts"],
   "include": ["**/*.ts"]
- }
+}
 ```
