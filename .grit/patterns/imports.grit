@@ -50,7 +50,7 @@ pattern process_one_source($p, $all_imports) {
         if ($p <: program(statements = some the_import_statement($imports, $source))) {
             $imports => `$imports, $joined_imported_names`
         } else {
-            $all_imports += `import { $joined_imported_names } from $source;`
+            $all_imports += `import { $joined_imported_names } from $source;\n`
         }
     }
 }
@@ -69,4 +69,35 @@ pattern insert_imports() {
 
 pattern after_each_file_handle_imports() {
   file(body = $p) where $p <: maybe insert_imports()
+}
+
+pattern remove_import($from) {
+    $name where {
+        // Handle named imports
+        $program <: maybe contains bubble($name, $from) `import $clause from $raw_source` as $import where {
+          $raw_source <: contains `$from`,
+          $clause <: or {
+            // Handle module import
+            import_clause(default=$name) where {
+                $import => .
+            },
+            // Handle named import
+            import_clause(name = named_imports($imports)) where {
+                $others = `false`,
+                if ($imports <: [$name]) {
+                    $import => .
+                } else {
+                    $imports <: some $name => .
+                }
+            }
+          }
+        }
+    }
+}
+
+pattern replace_import($from, $new) {
+    $name where {
+        $name <: remove_import($from),
+        $name <: ensure_import_from(source=$new)
+    }
 }

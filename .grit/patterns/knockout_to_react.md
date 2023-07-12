@@ -45,6 +45,7 @@ var ViewModel = function (first, last) {
 
 ```typescript
 import { useState } from 'react';
+
 var ViewComponent = function (props) {
   const [firstName, setFirstName] = useState(props.firstName);
   const [lastName, setLastName] = useState(props.lastName);
