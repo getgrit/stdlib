@@ -38,14 +38,14 @@ pattern handle_one_statement($class_name, $statements, $states_statements, $stat
             },
             and {
                 $async <: `async`,
-                $statements += `const ${name}Handler = useCallback(async () => $body, []);`
+                $statements += `const ${name}Handler = useCallback(async $parameters => $body, []);`
             },
             and {
                 $statement <: after `@computed`,
                 $statements += `const ${name} = useMemo(() => $body, []);`
             },
             and {
-                $statements += `const ${name}Handler = useCallback(() => $body, []);`
+                $statements += `const ${name}Handler = useCallback($parameters => $body, []);`
             }
         },
 
@@ -907,6 +907,55 @@ const Link = () => {
 };
 
 export default Link;
+```
+
+## Identifier conflicts
+
+Notice how the showDetails in `show()` should _not_ be replaced.
+
+```js
+import React, { Component, ReactNode } from 'react'
+
+class InnerStuff extends Component<Props, State> {
+    override state: State = { visible: false, showDetails: true }
+
+    constructor(props: Props) {
+        super(props)
+    }
+
+    render() {
+        return <>Component</>
+    }
+
+    show(options: Options): void {
+        const {
+            otherStuff,
+            showDetails = true,
+        } = options;
+
+        console.log("options are", showDetails);
+    }
+}
+```
+
+```ts
+import React, { useState, useCallback, ReactNode } from 'react';
+
+const InnerStuff = () => {
+  const [visible, setVisible] = useState(false);
+  const [showDetails, setShowDetails] = useState(true);
+
+  const showHandler = useCallback(
+    (options: Options) => {
+      const { otherStuff, showDetails = true } = options;
+
+      console.log('options are', showDetails);
+    },
+    [showDetails],
+  );
+
+  return <>Component</>;
+};
 ```
 
 ## State defined in interface
