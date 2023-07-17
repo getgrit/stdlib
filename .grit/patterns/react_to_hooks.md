@@ -228,7 +228,7 @@ pattern first_step() {
                     },
                     $states_statements += `const [$name, set$capitalized] = useState<$inner_type | undefined>(undefined);`
                 }
-            }            
+            }
         },
         $body <: not contains `componentDidCatch`,
         $class <: not within class_declaration(name = not $class_name),
@@ -349,7 +349,9 @@ pattern gather_accesses($hoisted_states) {
         variable_declarator(
             name = array_pattern(elements = [$name, $_]),
             value = `useState($_)`
-        ),
+        ) as $var where {
+            $var <: not within object()
+        },
         variable_declarator(
             name = $name,
             value = or { `useRef($_)`, `useMemo($_, $_)` }
@@ -361,19 +363,21 @@ pattern second_step() {
     maybe and {
         $hoisted_states = [],
         $hoisted_states += `props`,
-        maybe gather_accesses($hoisted_states), // where $_ = log(string = $hoisted_states)
-        program(statements =
-            some or {
-                export_statement(
-                    decorator = contains `@observer` => .,
-                    declaration = lexical_declaration(declarations = contains rewrite_accesses($hoisted_states))
-                ),
-                export_statement(
-                    declaration = lexical_declaration(declarations = contains rewrite_accesses($hoisted_states))
-                ),
-                lexical_declaration(declarations = contains rewrite_accesses($hoisted_states))
+        program($statements) where {
+            and {
+                $statements <: maybe gather_accesses($hoisted_states),
+                $statements <: some or {
+                    export_statement(
+                        decorator = contains `@observer` => .,
+                        declaration = lexical_declaration(declarations = contains rewrite_accesses($hoisted_states))
+                    ),
+                    export_statement(
+                        declaration = lexical_declaration(declarations = contains rewrite_accesses($hoisted_states))
+                    ),
+                    lexical_declaration(declarations = contains rewrite_accesses($hoisted_states))
+                }
             }
-        )
+        }
     }
 }
 
@@ -923,7 +927,7 @@ interface State {
 export default Link;
 ```
 
-```js
+```ts
 import { useState } from 'react';
 
 const Link = () => {
