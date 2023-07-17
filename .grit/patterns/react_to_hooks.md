@@ -91,6 +91,15 @@ pattern handle_one_statement($class_name, $statements, $states_statements, $stat
                 $statements += `const ${name}Handler = useCallback($value, []);`
             },
             and {
+                $name <: js"state",
+                $value <: object($properties) where {
+                    $properties <: contains bubble($states_statements) pair($key, value=$val) where {
+                        $capitalized = capitalize(string = $key),
+                        $states_statements += `const [$key, set$capitalized] = useState($val);`
+                    }
+                }
+            },
+            and {
                 $statements += `const $name = useRef($value);`
             }
         },
@@ -177,8 +186,13 @@ pattern first_step() {
         $states_statements = [],
         $static_statements = [],
 
+        if ($body <: contains js"$class_name.$name = $_" ) {
+            $static_statements += raw`/*\n* TODO: Class component's static variables are reassigned, needs manual handling\n*/`,
+        },
+
         if ($class <: contains extends_clause(type_arguments = contains type_arguments($types))) {
-            $type_annotation = `: $types`
+            $types <: [$first_type, ...],
+            $type_annotation = `: $first_type`
         } else {
             $type_annotation = .
         },
