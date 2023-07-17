@@ -78,7 +78,7 @@ pattern handle_one_statement($class_name, $statements, $states_statements, $stat
                 },
                 or {
                     and {
-                        $type <:  type_annotation(type = $inner_type),
+                        $type <: type_annotation(type = $inner_type),
                         $states_statements += `const [$name, set$capitalized] = useState<$inner_type>($after_value);`
                     },
                     and {
@@ -191,15 +191,45 @@ pattern first_step() {
         },
 
         if ($class <: contains extends_clause(type_arguments = contains type_arguments($types))) {
-            $types <: [$first_type, ...],
-            $type_annotation = `: $first_type`
+            or {
+                $types <: [$props_type, $state_type, ...],
+                and {
+                    $types <: [$props_type, ...],
+                    $state_type = .
+                }
+            },
+            $type_annotation = `: $props_type`,
         } else {
-            $type_annotation = .
+            $type_annotation = .,
+            $state_type = .
         },
 
         // todo: replace contains with list pattern match once we have the field set
         // we are missing a field for the statements in class_body
         $body <: contains handle_one_statement($class_name, $statements, $states_statements, $static_statements, $render_statements),
+        $program <: maybe contains interface_declaration(body=$interface, name=$interface_name) where {
+            $state_type <: $interface_name,
+            $interface <: contains bubble($states_statements, $body) {
+                property_signature($name, $type) where {
+                    $type <: type_annotation(type = $inner_type),
+                    $capitalized = capitalize(string = $name),
+                    $body <: not contains or {
+                        public_field_definition(name=$public_name, $value) where or {
+                            $public_name <: $name,
+                            and {
+                                $public_name <: js"state",
+                                $value <: contains $name
+                            }
+                        },
+                        method_definition(name=$method_name) where {
+                            $method_name <: js"constructor",
+                            $body <: contains `this.state.$name = $_`
+                        }
+                    },
+                    $states_statements += `const [$name, set$capitalized] = useState<$inner_type | undefined>(undefined);`
+                }
+            }            
+        },
         $body <: not contains `componentDidCatch`,
         $class <: not within class_declaration(name = not $class_name),
 
@@ -264,9 +294,15 @@ pattern rewrite_accesses($hoisted_states) {
 
         `this.setState($x)` as $set_state where {
             $statements = [],
-            $x <: contains bubble($statements) pair(key = $key, value = $value) where {
-                $capitalized = capitalize(string = $key),
-                $statements += `set$capitalized($value);`
+            $x <: contains bubble($statements) or {
+                pair(key = $key, value = $value) where {
+                    $capitalized = capitalize(string = $key),
+                    $statements += `set$capitalized($value);`
+                },
+                shorthand_property_identifier() as $identifier where {
+                    $capitalized = capitalize(string = $identifier),
+                    $statements += `set$capitalized($identifier);`
+                }
             },
             $separator = `\n    `,
             // a bit of hack because we cannot use a code snippet as an argument to a builtin function yet
@@ -342,7 +378,7 @@ pattern second_step() {
 }
 
 sequential {
-    file(body = program(statements = some bubble first_step())),
+    file(body = program(statements = some bubble($program) first_step())),
     file(body = second_step()),
     file(body = second_step()),
     file(body = second_step()),
@@ -837,6 +873,70 @@ const ObservedComponent = (inputProps) => {
     </>
   );
 };
+```
+
+## State defined as class attribute
+
+```js
+import { Component } from 'react';
+
+class Link extends Component {
+  state = {
+    visible: false,
+  };
+
+  render() {
+    return <></>;
+  }
+}
+
+export default Link;
+```
+
+```js
+import { useState } from 'react';
+
+const Link = () => {
+  const [visible, setVisible] = useState(false);
+
+  return <></>;
+};
+
+export default Link;
+```
+
+## State defined in interface
+
+```js
+import { Component } from 'react';
+
+class Link extends Component<Props, State> {
+  render() {
+    return <></>;
+  }
+}
+
+interface State {
+  visible?: boolean;
+}
+
+export default Link;
+```
+
+```js
+import { useState } from 'react';
+
+const Link = () => {
+  const [visible, setVisible] = useState<boolean | undefined>(undefined);
+
+  return <></>;
+};
+
+interface State {
+  visible?: boolean;
+}
+
+export default Link;
 ```
 
 # Examples
