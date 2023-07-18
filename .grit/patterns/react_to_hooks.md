@@ -18,11 +18,13 @@ pattern handle_one_statement($class_name, $statements, $states_statements, $stat
                 $body <: change_this($states_statements)
             },
             and {
+                $statement <: prepend_comment($statements),
                 $name <: or { `componentDidUpdate`, `componentDidMount` },
                 $body <: change_this($states_statements),
                 $statements += `useEffect(() => $body, []);`
             },
             and {
+                $statement <: prepend_comment($statements),
                 $name <: `componentWillUnmount`,
                 $body <: change_this($states_statements),
                 $statements += `useEffect(() => { \n    return () => $body;\n});`
@@ -32,19 +34,23 @@ pattern handle_one_statement($class_name, $statements, $states_statements, $stat
                 $body <: statement_block(statements = $render_statements)
             },
             and {
+                $statement <: prepend_comment(statements=$static_statements),
                 $static <: `static`,
                 $body <: change_this($states_statements),
                 $static_statements += `$class_name.$name = $parameters => $body;`
             },
             and {
+                $statement <: prepend_comment($statements),
                 $async <: `async`,
                 $statements += `const ${name}Handler = useCallback(async $parameters => $body, []);`
             },
             and {
+                $statement <: prepend_comment($statements),
                 $statement <: after `@computed`,
                 $statements += `const ${name} = useMemo(() => $body, []);`
             },
             and {
+                $statement <: prepend_comment($statements),
                 $statements += `const ${name}Handler = useCallback($parameters => $body, []);`
             }
         },
@@ -71,6 +77,7 @@ pattern handle_one_statement($class_name, $statements, $states_statements, $stat
                     },
                     $after_value = $value,
                 },
+                $statement <: prepend_comment(statements=$static_statements),
                 $static_statements += `$class_name.$name = $after_value;`
             },
             and {
@@ -106,22 +113,31 @@ pattern handle_one_statement($class_name, $statements, $states_statements, $stat
                     }
                 }
             },
-            or {
-                and {
-                    or {
-                        and {
-                            $statement <: contains js"?",
-                            $type <: type_annotation(type=$annotated),
-                            $annotated <: not contains js"undefined",
-                            $inner_type = js"$annotated | undefined"
+            and {
+                $statement <: prepend_comment($statements),
+                or {
+                    and {
+                        or {
+                            and {
+                                $statement <: contains js"?",
+                                $type <: type_annotation(type=$annotated),
+                                $annotated <: not contains js"undefined",
+                                $inner_type = js"$annotated | undefined"
+                            },
+                            $type <: type_annotation(type = $inner_type),
                         },
-                        $type <: type_annotation(type = $inner_type),
+                        $statements += `const $name = useRef<$inner_type>($value);`
                     },
-                    $statements += `const $name = useRef<$inner_type>($value);`
-                },
-                $statements += `const $name = useRef($value);`
+                    $statements += `const $name = useRef($value);`
+                }
             }
         },
+    }
+}
+
+pattern prepend_comment($statements) {
+    maybe after comment() as $comment where {
+        $statements += js"$comment"
     }
 }
 
@@ -279,7 +295,7 @@ pattern first_step() {
         },
 
         $static_statements = join(list = $static_statements, $separator),
-        $class => `$the_const\n$static_statements\n`
+        $class => `$the_const\n\n$static_statements\n`
     }
 }
 
@@ -442,7 +458,7 @@ sequential {
 
 ## Input for playground
 
-```
+```js
 import { Component } from 'react';
 class App extends Component {
   constructor(...args) {
@@ -503,7 +519,7 @@ class App extends Component {
 }
 ```
 
-```js
+```ts
 import { useState, useEffect, useCallback } from 'react';
 const App = () => {
   const [name, setName] = useState('');
@@ -541,6 +557,7 @@ const App = () => {
     </div>
   );
 };
+
 App.foo = 1;
 App.fooBar = 21;
 App.bar = (input) => {
@@ -827,6 +844,7 @@ const Link = (props) => {
 
   return <a href={href}>Link Text</a>;
 };
+
 Link.propTypes = {
   href: PropTypes.string.isRequired,
 };
@@ -1074,6 +1092,42 @@ const Link = () => {
 };
 
 export default Link;
+```
+
+## Preserves comments
+
+```js
+class MyComponent extends Component<PropsWithChildren> {
+  /**
+   * Comment on a static variable
+   */
+  private static someVariable: number | undefined
+
+  /**
+   * Comment on a private class property
+   */
+  private lucy = 'good'
+
+  render() {
+      return <></>
+  }
+}
+```
+
+```ts
+const MyComponent = () => {  
+  /**
+   * Comment on a private class property
+   */
+  const lucy = useRef('good')
+
+  return <></>
+}
+
+/**
+ * Comment on a static variable
+ */
+MyComponent.someVariable = undefined;
 ```
 
 # Examples
