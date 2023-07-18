@@ -51,6 +51,11 @@ pattern handle_one_statement($class_name, $statements, $states_statements, $stat
             },
             and {
                 $statement <: prepend_comment($statements),
+                $statement <: contains js"get",
+                $statements += `const ${name} = useMemo(() => $body, []);`
+            },
+            and {
+                $statement <: prepend_comment($statements),
                 $statements += `const ${name}Handler = useCallback($parameters => $body, []);`
             }
         },
@@ -115,6 +120,14 @@ pattern handle_one_statement($class_name, $statements, $states_statements, $stat
             },
             and {
                 $statement <: prepend_comment($statements),
+                if ($value <: or {
+                    js"React.createRef($ref)",
+                    js"createRef($ref)",
+                }) {
+                    $new_value = $ref
+                } else {
+                    $new_value = $value
+                },
                 or {
                     and {
                         or {
@@ -125,11 +138,18 @@ pattern handle_one_statement($class_name, $statements, $states_statements, $stat
                                 $inner_type = js"$annotated | undefined"
                             },
                             $type <: type_annotation(type = $inner_type),
+                            and {
+                                $value <: contains js"createRef",
+                                $statement <: contains or { 
+                                    type_identifier(),
+                                    predefined_type() 
+                                } as $inner_type
+                            }
                         },
-                        $statements += `const $name = useRef<$inner_type>($value);`
+                        $statements += `const $name = useRef<$inner_type>($new_value);`
                     },
-                    $statements += `const $name = useRef($value);`
-                }
+                    $statements += `const $name = useRef($new_value);`
+                },
             }
         },
     }
@@ -258,7 +278,10 @@ pattern first_step() {
                         },
                         method_definition(name=$method_name) where {
                             $method_name <: js"constructor",
-                            $body <: contains `this.state.$name = $_`
+                            $body <: contains  or {
+                                `this.state.$name = $_`,
+                                js"this.state = $obj" where $obj <: contains pair(key=$name)
+                            }
                         }
                     },
                     $states_statements += `const [$name, set$capitalized] = useState<$inner_type | undefined>(undefined);`
@@ -1066,6 +1089,7 @@ export default Link;
 import { Component } from 'react';
 
 class Link extends Component {
+  input = React.createRef<string>()
   private previouslyFocusedTextInput: InputHandle = {}
   show(options: Options): void {
     this.previouslyFocusedTextInput = KeyboardHelper.currentlyFocusedInput()
@@ -1083,6 +1107,7 @@ export default Link;
 import { useRef, useCallback } from 'react';
 
 const Link = () => {
+  const input = useRef<string>();
   const previouslyFocusedTextInput = useRef<InputHandle>({});
   const showHandler = useCallback((options: Options) => {
     previouslyFocusedTextInput.current = KeyboardHelper.currentlyFocusedInput()
