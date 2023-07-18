@@ -106,7 +106,19 @@ pattern handle_one_statement($class_name, $statements, $states_statements, $stat
                     }
                 }
             },
-            and {
+            or {
+                and {
+                    or {
+                        and {
+                            $statement <: contains js"?",
+                            $type <: type_annotation(type=$annotated),
+                            $annotated <: not contains js"undefined",
+                            $inner_type = js"$annotated | undefined"
+                        },
+                        $type <: type_annotation(type = $inner_type),
+                    },
+                    $statements += `const $name = useRef<$inner_type>($value);`
+                },
                 $statements += `const $name = useRef($value);`
             }
         },
@@ -286,10 +298,11 @@ pattern rewrite_accesses($hoisted_states, $hoisted_refs, $use_memos) {
         `this.$property` as $p where {
             if (or {
                 $hoisted_states <: some $property,
-                $hoisted_refs <: some $property,
                 $use_memos <: some $property
             }) {
                 $p => `${property}`
+            } else if ($hoisted_refs <: some $property) {
+                $p => `${property}.current`
             } else {
                 $p => `${property}Handler`
             }
@@ -698,7 +711,8 @@ const SampleComponent = observer(() => {
 
   return (
     <p>
-      This component has a <span onClick={viewState.click}>ViewState</span>
+      This component has a{" "}
+      <span onClick={viewState.current.click}>ViewState</span>
     </p>
   );
 });
@@ -1051,7 +1065,7 @@ export default Link;
 import { useRef, useCallback } from 'react';
 
 const Link = () => {
-  const previouslyFocusedTextInput = useRef({});
+  const previouslyFocusedTextInput = useRef<InputHandle>({});
   const showHandler = useCallback((options: Options) => {
     previouslyFocusedTextInput.current = KeyboardHelper.currentlyFocusedInput()
   }, []);
