@@ -10,11 +10,19 @@ tags: #react, #migration, #complex
 engine marzano(0.1)
 language js
 
-pattern handle_one_statement($class_name, $statements, $states_statements, $static_statements, $render_statements) {
+pattern handle_one_statement($class_name, $statements, $states_statements, $static_statements, $render_statements, $constructor_statements) {
     or {
         method_definition($static, $async, $name, $body, $parameters) as $statement where or {
             and {
-                $name <: `constructor`,
+                $name <: js"constructor",
+                $body <: maybe contains bubble($constructor_statements) {
+                    lexical_declaration($declarations) as $decl where $declarations <: 
+                        variable_declarator($name, $value) where {
+                            $name <: not contains js"this.state",
+                            $value <: not contains js"this.state",
+                            $constructor_statements += $decl
+                        }
+                },
                 $body <: change_this($states_statements)
             },
             and {
@@ -238,6 +246,7 @@ pattern maybe_wrapped_class_declaration($class_name, $body, $class) {
 pattern first_step() {
     maybe_wrapped_class_declaration($class_name, $body, $class) where {
         $statements = [],
+        $constructor_statements = [],
         $states_statements = [],
         $static_statements = [],
 
@@ -261,7 +270,7 @@ pattern first_step() {
 
         // todo: replace contains with list pattern match once we have the field set
         // we are missing a field for the statements in class_body
-        $body <: contains handle_one_statement($class_name, $statements, $states_statements, $static_statements, $render_statements),
+        $body <: contains handle_one_statement($class_name, $statements, $states_statements, $static_statements, $render_statements, $constructor_statements),
         $program <: maybe contains interface_declaration(body=$interface, name=$interface_name) where {
             $state_type <: $interface_name,
             $interface <: contains bubble($states_statements, $body) {
@@ -309,7 +318,8 @@ pattern first_step() {
         $separator += "",
         $states_statements = join(list = $states_statements, $separator),
         $statements = join(list = $statements, $separator),
-        $the_function = `($args) => {\n    $states_statements\n\n    ${statements}\n\n    ${render_statements} \n}`,
+        $constructor_statements = join(list = $constructor_statements, $separator),
+        $the_function = `($args) => {\n$constructor_statements\n\n    $states_statements\n\n    ${statements}\n\n    ${render_statements} \n}`,
 
         if ($body <: contains `ViewState`) {
             $the_const = `import { observer } from "mobx-react";\n\nconst $class_name = observer($the_function);`
@@ -341,7 +351,15 @@ pattern rewrite_accesses($hoisted_states, $hoisted_refs, $use_memos) {
             }) {
                 $p => `${property}`
             } else if ($hoisted_refs <: some $property) {
-                $p => `${property}.current`
+                or {
+                    and {
+                        $property <: within member_expression() as $already_ref where $already_ref <: {
+                            js"$p.current"
+                        },
+                        $p => `${property}`
+                    },
+                    $p => `${property}.current`
+                }
             } else {
                 $p => `${property}Handler`
             }
@@ -1083,6 +1101,37 @@ interface State {
 export default Link;
 ```
 
+## Preserves constructor logic
+
+```js
+import { Component } from 'react';
+
+class MyComponent extends Component {
+  constructor(props: Props) {
+    const five = 2 + 3;
+    this.state = {
+      secret: five;
+    }
+  }
+
+  render() {
+    return <></>
+  }
+}
+```
+
+```ts
+import { useState } from 'react';
+
+const MyComponent = () => {
+  const five = 2 + 3;
+
+  const [secret, setSecret] = useState(five);
+
+  return <></>
+}
+```
+
 ## Initializes and sets refs correctly
 
 ```js
@@ -1092,6 +1141,7 @@ class Link extends Component {
   input = React.createRef<string>()
   private previouslyFocusedTextInput: InputHandle = {}
   show(options: Options): void {
+    this.input.current = 'Hello world'
     this.previouslyFocusedTextInput = KeyboardHelper.currentlyFocusedInput()
   }
 
@@ -1110,6 +1160,7 @@ const Link = () => {
   const input = useRef<string>();
   const previouslyFocusedTextInput = useRef<InputHandle>({});
   const showHandler = useCallback((options: Options) => {
+    input.current = 'Hello world'
     previouslyFocusedTextInput.current = KeyboardHelper.currentlyFocusedInput()
   }, []);
 
