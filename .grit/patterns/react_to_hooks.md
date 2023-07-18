@@ -64,7 +64,14 @@ pattern handle_one_statement($class_name, $statements, $states_statements, $stat
 
             and {
                 $static <: `static`,
-                $static_statements += `$class_name.$name = $value;`
+                or {
+                    and {
+                        $value <: .,
+                        $after_value = `undefined`,
+                    },
+                    $after_value = $value,
+                },
+                $static_statements += `$class_name.$name = $after_value;`
             },
             and {
                 $statement <: after `@observable`,
@@ -273,11 +280,15 @@ pattern find_dependencies($hoisted_states, $dependencies) {
     }
 }
 
-pattern rewrite_accesses($hoisted_states) {
+pattern rewrite_accesses($hoisted_states, $hoisted_refs, $use_memos) {
     or {
         `this.state.$x` => `$x`,
         `this.$property` as $p where {
-            if ($hoisted_states <: some $property) {
+            if (or {
+                $hoisted_states <: some $property,
+                $hoisted_refs <: some $property,
+                $use_memos <: some $property
+            }) {
                 $p => `${property}`
             } else {
                 $p => `${property}Handler`
@@ -286,10 +297,17 @@ pattern rewrite_accesses($hoisted_states) {
 
         lexical_declaration(declarations = [variable_declarator(value = or { `this.state`, `this` })]) => .,
 
-        assignment_expression($left, $right) as $assignment where {
-            $hoisted_states <: some $left,
-            $capitalized = capitalize(string = $left),
-            $assignment => `set${capitalized}($right)`
+        assignment_expression($left, $right) as $assignment where or {
+            and {
+                $hoisted_refs <: some $left,
+                $assignment => `$left.current = $right`
+            },
+            and {
+                $hoisted_states <: some $left,
+                $capitalized = capitalize(string = $left),
+                $assignment => `set${capitalized}($right)`
+            },
+
         },
 
         `this.setState($x)` as $set_state where {
@@ -330,51 +348,69 @@ pattern rewrite_accesses($hoisted_states) {
     }
 }
 
-pattern gather_accesses($hoisted_states) {
-    contains bubble($hoisted_states) variable_declarator($name, $value) where {
+pattern gather_accesses($hoisted_states, $hoisted_refs, $use_memos) {
+    contains bubble($hoisted_states, $hoisted_refs, $use_memos) variable_declarator($name, $value) where {
         or {
             and {
                 $name <: array_pattern(elements = [$used_name, $_]),
-                $value <: `useState($_)`
+                $value <: `useState($_)`,
+                $hoisted_states += $name
             },
             and {
                 $name <: $used_name,
-                $value <: or { `useRef($_)`, `useMemo($_, $_)` }
+                $value <: `useRef($_)`,
+                $hoisted_refs += $name
+            },
+            and {
+                $name <: $used_name,
+                $value <: `useMemo($_)`,
+                $use_memos += $name
             }
         },
-        $hoisted_states += $name
     },
 
-    contains bubble($hoisted_states) or {
+    contains bubble($hoisted_states, $hoisted_refs, $use_memos) or {
         variable_declarator(
             name = array_pattern(elements = [$name, $_]),
             value = `useState($_)`
         ) as $var where {
             $var <: not within object()
-        },
+        } where $hoisted_states += $name,
+
         variable_declarator(
             name = $name,
-            value = or { `useRef($_)`, `useMemo($_, $_)` }
-        )
-    } where $hoisted_states += $name
+            value = `useRef($_)`
+        ) as $var where {
+            $var <: not within object()
+        } where $hoisted_refs += $name,
+
+        variable_declarator(
+            name = $name,
+            value = `useMemo($_)`
+        ) as $var where {
+            $var <: not within object()
+        } where $use_memos += $name,
+    }
 }
 
 pattern second_step() {
     maybe and {
         $hoisted_states = [],
+        $hoisted_refs = [],
+        $use_memos = [],
         $hoisted_states += `props`,
         program($statements) where {
             and {
-                $statements <: maybe gather_accesses($hoisted_states),
+                $statements <: maybe gather_accesses($hoisted_states, $hoisted_refs, $use_memos),
                 $statements <: some or {
                     export_statement(
                         decorator = contains `@observer` => .,
-                        declaration = lexical_declaration(declarations = contains rewrite_accesses($hoisted_states))
+                        declaration = lexical_declaration(declarations = contains rewrite_accesses($hoisted_states, $hoisted_refs, $use_memos))
                     ),
                     export_statement(
-                        declaration = lexical_declaration(declarations = contains rewrite_accesses($hoisted_states))
+                        declaration = lexical_declaration(declarations = contains rewrite_accesses($hoisted_states, $hoisted_refs, $use_memos))
                     ),
-                    lexical_declaration(declarations = contains rewrite_accesses($hoisted_states))
+                    lexical_declaration(declarations = contains rewrite_accesses($hoisted_states, $hoisted_refs, $use_memos))
                 }
             }
         }
@@ -988,6 +1024,40 @@ const Link = () => {
 interface State {
   visible?: boolean;
 }
+
+export default Link;
+```
+
+## Initializes and sets refs correctly
+
+```js
+import { Component } from 'react';
+
+class Link extends Component {
+  private previouslyFocusedTextInput: InputHandle = {}
+  show(options: Options): void {
+    this.previouslyFocusedTextInput = KeyboardHelper.currentlyFocusedInput()
+  }
+
+  render() {
+    return <></>;
+  }
+}
+
+export default Link;
+```
+
+```ts
+import { useRef, useCallback } from 'react';
+
+const Link = () => {
+  const previouslyFocusedTextInput = useRef({});
+  const showHandler = useCallback((options: Options) => {
+    previouslyFocusedTextInput.current = KeyboardHelper.currentlyFocusedInput()
+  }, []);
+
+  return <></>;
+};
 
 export default Link;
 ```
