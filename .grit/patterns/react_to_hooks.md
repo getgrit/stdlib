@@ -16,7 +16,7 @@ pattern handle_one_statement($class_name, $statements, $states_statements, $stat
             and {
                 $name <: js"constructor",
                 $body <: maybe contains bubble($constructor_statements) {
-                    lexical_declaration($declarations) as $decl where $declarations <: 
+                    lexical_declaration($declarations) as $decl where $declarations <:
                         variable_declarator($name, $value) where {
                             $name <: not contains js"this.state",
                             $value <: not contains js"this.state",
@@ -148,9 +148,9 @@ pattern handle_one_statement($class_name, $statements, $states_statements, $stat
                             $type <: type_annotation(type = $inner_type),
                             and {
                                 $value <: contains js"createRef",
-                                $statement <: contains or { 
+                                $statement <: contains or {
                                     type_identifier(),
-                                    predefined_type() 
+                                    predefined_type()
                                 } as $inner_type
                             }
                         },
@@ -264,6 +264,7 @@ pattern first_step() {
             },
             $type_annotation = `: $props_type`,
         } else {
+            $props_type = `{}`,
             $type_annotation = .,
             $state_type = .
         },
@@ -306,6 +307,11 @@ pattern first_step() {
             $the_props = "props"
         },
 
+        $const_type_annotation = .,
+        if ($program <: contains `FunctionComponent`) {
+            $const_type_annotation = `: React.FunctionComponent<${props_type}>`,
+            $type_annotation = .
+        },
 
         if ($body <: contains `props`) {
             $args = `${the_props}${type_annotation}`
@@ -321,10 +327,11 @@ pattern first_step() {
         $constructor_statements = join(list = $constructor_statements, $separator),
         $the_function = `($args) => {\n$constructor_statements\n\n    $states_statements\n\n    ${statements}\n\n    ${render_statements} \n}`,
 
+
         if ($body <: contains `ViewState`) {
-            $the_const = `import { observer } from "mobx-react";\n\nconst $class_name = observer($the_function);`
+            $the_const = `import { observer } from "mobx-react";\n\nconst $class_name$const_type_annotation = observer($the_function);`
         } else {
-            $the_const = `const $class_name = $the_function;`
+            $the_const = `const $class_name$const_type_annotation = $the_function;`
         },
 
         $static_statements = join(list = $static_statements, $separator),
@@ -988,6 +995,53 @@ const ObservedComponent = (inputProps) => {
 };
 ```
 
+## Use function component type definitions
+
+If the codebase already uses `FunctionComponent`, use it.
+
+```js
+import { Component } from 'react';
+
+const OtherComponent: React.FunctionComponent<{}> = () => {
+  return <>Other</>;
+};
+
+class Link extends Component {
+  state = {
+    visible: false,
+  };
+
+  render() {
+    return <></>;
+  }
+}
+
+export default Link;
+```
+
+```js
+import { useState } from 'react';
+
+const OtherComponent: React.FunctionComponent<{}> = () => {
+  return <>Other</>;
+};
+
+const Link: React.FunctionComponent<{}> = () => {
+
+
+    const [visible, setVisible] = useState(false);
+
+    
+
+    return <></>; 
+};
+
+
+
+
+export default Link;
+```
+
 ## State defined as class attribute
 
 ```js
@@ -1128,8 +1182,8 @@ const MyComponent = () => {
 
   const [secret, setSecret] = useState(five);
 
-  return <></>
-}
+  return <></>;
+};
 ```
 
 ## Initializes and sets refs correctly
@@ -1160,8 +1214,8 @@ const Link = () => {
   const input = useRef<string>();
   const previouslyFocusedTextInput = useRef<InputHandle>({});
   const showHandler = useCallback((options: Options) => {
-    input.current = 'Hello world'
-    previouslyFocusedTextInput.current = KeyboardHelper.currentlyFocusedInput()
+    input.current = 'Hello world';
+    previouslyFocusedTextInput.current = KeyboardHelper.currentlyFocusedInput();
   }, []);
 
   return <></>;
@@ -1191,14 +1245,14 @@ class MyComponent extends Component<PropsWithChildren> {
 ```
 
 ```ts
-const MyComponent = () => {  
+const MyComponent = () => {
   /**
    * Comment on a private class property
    */
-  const lucy = useRef('good')
+  const lucy = useRef('good');
 
-  return <></>
-}
+  return <></>;
+};
 
 /**
  * Comment on a static variable
