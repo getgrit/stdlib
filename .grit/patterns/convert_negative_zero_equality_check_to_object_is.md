@@ -10,7 +10,7 @@ tags: #SD
 
 ```grit
 engine marzano(1.0)
-language js(typescript)
+language js
 
 binary_expression($left, $operator, $right) as $exp where {
     $operator <: or {
