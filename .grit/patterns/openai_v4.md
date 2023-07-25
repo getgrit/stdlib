@@ -11,7 +11,6 @@ engine marzano(0.1)
 language js
 
 // Rewrite the constructor
-
 pattern change_constructor() {
     `new $constructor($params)` where {
         $constructor <: `OpenAIApi` => `OpenAI`,
@@ -29,23 +28,41 @@ pattern change_constructor() {
     }
 }
 
+pattern match_create_chat_completion() {
+    member_expression($object, $property) where {
+        $object <: js"openai",
+        $property <: js"createChatCompletion" => js"chat.completions.create"
+    }
+}
+
 pattern change_chat_completion() {
     or {
-        member_expression($object, $property) where {
-            $object <: js"openai",
-            $property <: js"createChatCompletion" => js"chat.completions.create"
+        js"$chatCompletion.data.choices" => js"$chatCompletion.choices" where {
+            $program <: contains variable_declarator($name, $value) where {
+                $name <: $chatCompletion,
+                $value <: contains match_create_chat_completion()
+            }
         },
-        js"chatCompletion.data.choices" => js"chatCompletion.choices"
+        match_create_chat_completion()
+    }
+}
+
+pattern match_create_completion() {
+    member_expression($object, $property) where {
+        $object <: js"openai",
+        $property <: js"createCompletion" => js"completions.create"
     }
 }
 
 pattern change_completion() {
     or {
-        member_expression($object, $property) where {
-            $object <: js"openai",
-            $property <: js"createCompletion" => js"completions.create"
+        js"$completion.data.choices" => js"$completion.choices" where {
+            $program <: contains variable_declarator($name, $value) where {
+                $name <: $completion,
+                $value <: contains match_create_completion()
+            }
         },
-        js"completion.data.choices" => js"completion.choices"
+        match_create_completion()
     }
 }
 
@@ -122,6 +139,24 @@ const chatCompletion = await openai.chat.completions.create({
   messages: [{role: "user", content: "Hello world"}],
 });
 console.log(chatCompletion.choices[0].message);
+```
+
+## Creating a chat completion with custom name
+
+```js
+const mango = await openai.createChatCompletion({
+  model: "gpt-3.5-turbo",
+  messages: [{role: "user", content: "Hello world"}],
+});
+console.log(mango.data.choices[0].message);
+```
+
+```ts
+const mango = await openai.chat.completions.create({
+  model: "gpt-3.5-turbo",
+  messages: [{role: "user", content: "Hello world"}],
+});
+console.log(mango.choices[0].message);
 ```
 
 ## Creating a completion
