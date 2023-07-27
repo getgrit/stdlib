@@ -28,9 +28,20 @@ pattern change_constructor() {
     }
 }
 
+pattern openai_named($var) {
+    variable_declarator(name=$var, $value) where {
+        $value <: contains `new $constructor($_)` where {
+            $constructor <: js"OpenAIApi"
+        }
+    }
+}
+
 pattern match_create_chat_completion() {
     member_expression($object, $property) where {
-        $object <: js"openai",
+        or {
+            $object <: js"openai",
+            $program <: contains openai_named($object),
+        },
         $property <: js"createChatCompletion" => js"chat.completions.create"
     }
 }
@@ -49,7 +60,10 @@ pattern change_chat_completion() {
 
 pattern match_create_completion() {
     member_expression($object, $property) where {
-        $object <: js"openai",
+        or {
+            $object <: js"openai",
+            $program <: contains openai_named($object),
+        },
         $property <: js"createCompletion" => js"completions.create"
     }
 }
@@ -69,7 +83,10 @@ pattern change_completion() {
 pattern change_transcription() {
     call_expression($function, $arguments) where {
         $function <: member_expression($object, $property) where {
-            $object <: js"openai",
+            or {
+                $object <: js"openai",
+                $program <: contains openai_named($object),
+            },
             $property <: js"createTranscription" => js"audio.transcriptions.create"
         },
         $arguments <: [$stream, $model, ...] => js"{ model: $model, file: $stream }"
@@ -177,6 +194,37 @@ const completion = await openai.completions.create({
   max_tokens: 30,
 });
 console.log(completion.choices[0].text);
+```
+
+## Creating a completion with openai alias
+
+```js
+import { myConfig, OpenAIApi } from 'openai';
+
+const myConfig = new Configuration({
+  apiKey: process.env.OPENAI_API_KEY,
+});
+const beach = new OpenAIApi(myConfig);
+
+const completion = await myOpenAi.createCompletion({
+  model: "text-davinci-003",
+  prompt: "This story begins",
+  max_tokens: 30,
+});
+```
+
+```ts
+import OpenAI from 'openai';
+
+const beach = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
+
+const completion = await myOpenAi.completions.create({
+  model: "text-davinci-003",
+  prompt: "This story begins",
+  max_tokens: 30,
+});
 ```
 
 ## Creating a transcription (whisper)
