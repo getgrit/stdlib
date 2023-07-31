@@ -17,7 +17,7 @@ debugger_statement() => .
 
 ```
 
-## Remove debbuger
+## Remove debugger
 
 ```javascript
 function isTruthy(x) {
