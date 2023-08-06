@@ -16,7 +16,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        runner: [nscloud-ubuntu-22.04-amd64-4x16, macos-latest]
+        runner: [nscloud-ubuntu-22.04-amd64-4x16, macos-latest, ubuntu-latest]
         node-version: [18.x]
 
     steps:
