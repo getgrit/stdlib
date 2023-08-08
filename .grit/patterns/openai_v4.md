@@ -112,7 +112,7 @@ pattern change_completion_try_catch() {
     }
 }
 
-file(name= $_, body = program($statements)) where $statements <: and {
+file(body = program($statements)) where $statements <: and {
   or { includes "openai", includes "createCompletion", includes "OpenAIAPI", includes "createTranscription" },
   any {
     contains bubble change_constructor(),
