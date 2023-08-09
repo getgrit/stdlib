@@ -58,3 +58,17 @@ try {
   console.log('foo');
 }
 ```
+
+## Works on multiple console logs in the same file
+
+```javascript
+// Do not remove this
+console.error('foo');
+console.log('foo');
+console.log('bar');
+```
+
+```javascript
+// Do not remove this
+console.error('foo');
+```
