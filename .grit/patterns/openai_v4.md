@@ -202,7 +202,7 @@ console.log(completion.choices[0].text);
 ## Creating a completion with openai alias
 
 ```js
-import { myConfig, OpenAIApi } from 'openai';
+import { Configuration, OpenAIApi } from 'openai';
 
 const myConfig = new Configuration({
   apiKey: process.env.OPENAI_API_KEY,
