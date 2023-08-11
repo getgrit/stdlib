@@ -21,7 +21,10 @@ pattern change_constructor() {
             `var $config = new Configuration($details)`
         } => .,
         $params => `$details`,
-        $program <: contains `import $old from $src` where {
+        $program <: contains or {
+            `import $old from $src`,
+            `$old = require($src)`
+        } where {
             $src <: `"openai"`,
             $old => `OpenAI`
         }
@@ -137,6 +140,27 @@ const openai = new OpenAIApi(myConfig);
 
 ```ts
 import OpenAI from 'openai';
+
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
+```
+
+## CommonJS initialization
+
+It also works with `require` syntax.
+
+```js
+const { Configuration, OpenAIApi } = require('openai');
+
+const myConfig = new Configuration({
+  apiKey: process.env.OPENAI_API_KEY,
+});
+const openai = new OpenAIApi(myConfig);
+```
+
+```ts
+const OpenAI = require('openai');
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
