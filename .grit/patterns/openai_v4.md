@@ -4,7 +4,7 @@ title: Upgrade OpenAI SDK to v4
 
 Upgrade the OpenAI SDK to v4 following [this guide](https://github.com/openai/openai-node/discussions/182).
 
-tags: #js, #ts, #npm, #upgrade, #openai
+tags: #js, #ts, #npm, #upgrade, #openai, #migration
 
 ```grit
 engine marzano(0.1)
