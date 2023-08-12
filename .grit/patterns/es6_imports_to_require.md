@@ -6,7 +6,7 @@ title: Prefer require over imports
 
 Converts ES6-style `import` to `require` statements.
 
-tags: #js, #es6, #migration, #cjs, #commonjs
+tags: #js, #es6, #cjs, #commonjs
 
 ```grit
 engine marzano(0.1)
