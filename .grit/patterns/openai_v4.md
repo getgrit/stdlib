@@ -376,22 +376,22 @@ import {
 } from 'openai';
 
 // imported, so should change
-const messages: ChatCompletionRequestMessage;
-const request: CreateChatCompletionRequest;
-const response: CreateChatCompletionResponse;
+const messages: ChatCompletionRequestMessage = 1;
+const request: CreateChatCompletionRequest = 2;
+const response: CreateChatCompletionResponse = 3;
 
 // should not be changed because not imported from 'openai'
-const fineTune: FineTune;
+const fineTune: FineTune = 4;
 ```
 
 ```ts
 import OpenAI from "openai"
 
 // imported, so should change
-const messages: OpenAI.Chat.CreateChatCompletionRequestMessage;
-const request: OpenAI.Chat.CompletionCreateParamsNonStreaming;
-const response: OpenAI.Chat.Completions.ChatCompletion;
+const messages: OpenAI.Chat.CreateChatCompletionRequestMessage = 1;
+const request: OpenAI.Chat.CompletionCreateParamsNonStreaming = 2;
+const response: OpenAI.Chat.Completions.ChatCompletion = 3;
 
 // should not be changed because not imported from 'openai'
-const fineTune: FineTune;
+const fineTune: FineTune = 4;
 ```
