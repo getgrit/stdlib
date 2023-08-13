@@ -21,13 +21,7 @@ pattern change_constructor() {
             `var $config = new Configuration($details)`
         } => .,
         $params => `$details`,
-        $program <: contains or {
-            `import $old from $src`,
-            `$old = require($src)`
-        } where {
-            $src <: `"openai"`,
-            $old => `OpenAI`
-        }
+        $program <: contains change_imports(),
     }
 }
 
@@ -115,6 +109,54 @@ pattern change_completion_try_catch() {
     }
 }
 
+pattern change_imports() {
+    or {
+        `import $old from $src`,
+        `$old = require($src)`
+    } where {
+        $src <: `"openai"`,
+        $old => `OpenAI`
+    }
+}
+
+pattern fix_types() {
+    or {
+        `ChatCompletionRequestMessage` => `OpenAI.Chat.CreateChatCompletionRequestMessage`,
+        `ChatCompletionResponseMessage` => `OpenAI.Chat.Completions.ChatCompletionMessage`,
+        `CreateChatCompletionRequest` => `OpenAI.Chat.CompletionCreateParamsNonStreaming`,
+        `CreateChatCompletionResponse` => `OpenAI.Chat.Completions.ChatCompletion`,
+        `CreateChatCompletionResponseChoicesInner` => `OpenAI.Chat.ChatCompletion.Choice`,
+        `CreateCompletionRequest` => `OpenAI.CompletionCreateParamsNonStreaming`,
+        `CreateCompletionResponse` => `OpenAI.Completion`,
+        `CreateCompletionResponseChoicesInner` => `OpenAI.CompletionChoice`,
+        `CreateCompletionResponseChoicesInnerLogprobs` => `OpenAI.CompletionChoice.Logprobs`,
+        `CreateCompletionResponseUsage` => `OpenAI.Completion.Usage`,
+        `CreateEditRequest` => `OpenAI.EditCreateParams`,
+        `CreateEditResponse` => `OpenAI.Edit`,
+        `CreateEmbeddingRequest` => `OpenAI.EmbeddingCreateParams`,
+        `CreateEmbeddingResponse` => `OpenAI.Embedding`,
+        `CreateEmbeddingResponseDataInner` => `OpenAI.Embedding.Data`,
+        `CreateEmbeddingResponseUsage` => `OpenAI.Embedding.Usage`,
+        `CreateFineTuneRequest` => `OpenAI.FineTuneCreateParams`,
+        `CreateImageRequest` => `OpenAI.Images.ImageGenerateParams`,
+        `CreateModerationRequest` => `OpenAI.ModerationCreateParams`,
+        `CreateModerationResponse` => `OpenAI.Moderation`,
+        `CreateModerationResponseResultsInnerCategories` => `OpenAI.Moderation.Categories`,
+        `CreateModerationResponseResultsInnerCategoryScores` => `OpenAI.Moderation.CategoryScores`,
+        `CreateTranscriptionResponse` => `OpenAI.Audio.Transcription`,
+        `CreateTranslationResponse` => `OpenAI.Audio.Translation`,
+        `DeleteFileResponse` => `OpenAI.FileDeleted`,
+        `DeleteModelResponse` => `OpenAI.ModelDeleted`,
+        `FineTune` => `OpenAI.FineTune`,
+        `FineTuneEvent` => `OpenAI.FineTuneEvent`,
+        `ImagesResponse` => `OpenAI.ImagesResponse`,
+        `OpenAIFile` => `OpenAI.FileObject`,
+    } as $thing where {
+        $thing <: imported_from(from=`"openai"`)
+    }
+}
+
+
 file(body = program($statements)) where $statements <: and {
   or { includes "openai", includes "createCompletion", includes "OpenAIAPI", includes "createTranscription" },
   any {
@@ -122,7 +164,9 @@ file(body = program($statements)) where $statements <: and {
     contains bubble change_chat_completion(),
     contains bubble change_completion(),
     contains bubble change_transcription(),
-    contains bubble change_completion_try_catch()
+    contains bubble change_completion_try_catch(),
+    contains bubble change_imports(),
+    contains bubble fix_types()
   }
 }
 ```
@@ -320,4 +364,34 @@ var sumToValue = function (x, y) {
 var times = (x, y) => {
   return x * y;
 };
+```
+
+## Fixes imports if imported from OpenAI
+
+```ts
+import {
+  ChatCompletionRequestMessage,
+  CreateChatCompletionRequest,
+  CreateChatCompletionResponse,
+} from 'openai';
+
+// imported, so should change
+const messages: ChatCompletionRequestMessage;
+const request: CreateChatCompletionRequest;
+const response: CreateChatCompletionResponse;
+
+// should not be changed because not imported from 'openai'
+const fineTune: FineTune;
+```
+
+```ts
+import OpenAI from "openai"
+
+// imported, so should change
+const messages: OpenAI.Chat.CreateChatCompletionRequestMessage;
+const request: OpenAI.Chat.CompletionCreateParamsNonStreaming;
+const response: OpenAI.Chat.Completions.ChatCompletion;
+
+// should not be changed because not imported from 'openai'
+const fineTune: FineTune;
 ```
