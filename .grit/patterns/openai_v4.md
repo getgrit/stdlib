@@ -134,9 +134,9 @@ pattern fix_types() {
         `CreateEditRequest` => `OpenAI.EditCreateParams`,
         `CreateEditResponse` => `OpenAI.Edit`,
         `CreateEmbeddingRequest` => `OpenAI.EmbeddingCreateParams`,
-        `CreateEmbeddingResponse` => `OpenAI.Embedding`,
-        `CreateEmbeddingResponseDataInner` => `OpenAI.Embedding.Data`,
-        `CreateEmbeddingResponseUsage` => `OpenAI.Embedding.Usage`,
+        `CreateEmbeddingResponse` => `OpenAI.CreateEmbeddingResponse`,
+        `CreateEmbeddingResponseDataInner` => `OpenAI.Embedding`,
+        `CreateEmbeddingResponseUsage` => `OpenAI.CreateEmbeddingResponse.Usage`,
         `CreateFineTuneRequest` => `OpenAI.FineTuneCreateParams`,
         `CreateImageRequest` => `OpenAI.Images.ImageGenerateParams`,
         `CreateModerationRequest` => `OpenAI.ModerationCreateParams`,
@@ -385,7 +385,7 @@ const fineTune: FineTune = 4;
 ```
 
 ```ts
-import OpenAI from "openai"
+import OpenAI from 'openai';
 
 // imported, so should change
 const messages: OpenAI.Chat.CreateChatCompletionRequestMessage = 1;
