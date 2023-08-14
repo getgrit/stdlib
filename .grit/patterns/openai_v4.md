@@ -160,13 +160,13 @@ pattern fix_types() {
 file(body = program($statements)) where $statements <: and {
   or { includes "openai", includes "createCompletion", includes "OpenAIAPI", includes "createTranscription" },
   any {
-    contains bubble change_constructor(),
-    contains bubble change_chat_completion(),
-    contains bubble change_completion(),
-    contains bubble change_transcription(),
-    contains bubble change_completion_try_catch(),
-    contains bubble change_imports(),
-    contains bubble fix_types()
+    contains change_constructor(),
+    contains change_chat_completion(),
+    contains change_completion(),
+    contains change_transcription(),
+    contains change_completion_try_catch(),
+    contains change_imports(),
+    contains fix_types()
   }
 }
 ```
