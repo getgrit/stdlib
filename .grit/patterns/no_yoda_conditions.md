@@ -19,8 +19,8 @@ or {
   `$x <= $y` => `$y >= $x`
 } where {
   // In order to capture a yoda condition, the LHS $x must be a LiteralValue and the RHS $y must not be one
-  $x <: literal_value(),
-  ! $y <: literal_value()
+  $x <: literal(),
+  ! $y <: literal()
 }
 ```
 
@@ -76,5 +76,5 @@ foo(x > 10);
 ## Avoid `in`
 
 ```javascript
-foo("foo" in c);
+foo('foo' in c);
 ```
