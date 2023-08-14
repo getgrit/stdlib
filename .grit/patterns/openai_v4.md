@@ -25,8 +25,8 @@ pattern change_constructor() {
     }
 }
 
-pattern openai_named($var) {
-    variable_declarator(name=$var, $value) where {
+pattern openai_named($object) {
+    variable_declarator(name=$object, $value) where {
         $value <: contains `new $constructor($_)` where {
             $constructor <: js"OpenAIApi"
         }
