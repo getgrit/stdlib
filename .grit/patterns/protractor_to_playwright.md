@@ -75,7 +75,7 @@ pattern by_containing_text() {
     } where {
         $t = "`",
         $css <: extract_string($css_string),
-        $text <: extract_string(text_string=$text_string),
+        $text <: extract_string(css_string=$text_string),
         $locator = `$t$css_string >> text="$text_string"$t`,
     } => `page.locator($locator)`
 }

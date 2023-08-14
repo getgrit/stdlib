@@ -275,7 +275,7 @@ import { Configuration, OpenAIApi } from 'openai';
 const myConfig = new Configuration({
   apiKey: process.env.OPENAI_API_KEY,
 });
-const beach = new OpenAIApi(myConfig);
+const myOpenAi = new OpenAIApi(myConfig);
 
 const completion = await myOpenAi.createCompletion({
   model: 'text-davinci-003',
@@ -287,7 +287,7 @@ const completion = await myOpenAi.createCompletion({
 ```ts
 import OpenAI from 'openai';
 
-const beach = new OpenAI({
+const myOpenAi = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 

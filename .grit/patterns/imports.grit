@@ -75,7 +75,7 @@ pattern remove_import($from) {
     $name where {
         // Handle named imports
         $program <: maybe contains bubble($name, $from) `import $clause from $raw_source` as $import where {
-          $raw_source <: contains `$from`,
+          $raw_source <: contains $from,
           $clause <: or {
             // Handle module import
             import_clause(default=$name) where {
@@ -95,9 +95,9 @@ pattern remove_import($from) {
     }
 }
 
-pattern replace_import($from, $new) {
+pattern replace_import($old, $new) {
     $name where {
-        $name <: remove_import($from),
+        $name <: remove_import(from=$old),
         $name <: ensure_import_from(source=$new)
     }
 }

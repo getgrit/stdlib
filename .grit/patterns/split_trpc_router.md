@@ -87,7 +87,7 @@ pattern process_one_statement($imports, $middlewares, $refs, $dir, $main_file_im
             $value <: or { `t.middleware($_)`, `t.procedure.use($_)` },
             $middlewares += `export $s`
         },
-        named_thing($_) as $s => . where $refs += $s
+        named_thing() as $s => . where $refs += $s
     }
 }
 

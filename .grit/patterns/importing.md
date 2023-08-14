@@ -17,9 +17,7 @@ and {
           $v4 <: ensure_import_from($source),
       },
       `orderBy` as $orderBy where {
-          $old = `"underscore"`,
-          $new = `"lodash"`,
-          $orderBy <: replace_import($old, $new)
+          $orderBy <: replace_import(old=`"underscore"`, new=`"lodash"`)
       },
       `fetch` as $fetch where {
           $from = `node-fetch`,
