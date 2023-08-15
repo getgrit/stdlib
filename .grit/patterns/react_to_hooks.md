@@ -779,3 +779,31 @@ const MyComponent = () => {
  */
 MyComponent.someVariable = undefined;
 ```
+
+## Handles an inline export
+
+```js
+import { Component } from 'react';
+
+export class MyComponent extends Component {
+  constructor(props: Props) {
+    this.state = {
+      secret: 5,
+    };
+  }
+
+  render() {
+    return <></>;
+  }
+}
+```
+
+```ts
+import { useState } from 'react';
+
+export const MyComponent = () => {
+  const [secret, setSecret] = useState(5);
+
+  return <></>;
+};
+```

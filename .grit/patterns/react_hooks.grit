@@ -389,10 +389,6 @@ export const $original_name = observer($base_name);`,
             $the_const = `const $class_name$const_type_annotation = $the_function;`
         },
 
-        if ($class <: within export_statement()) {
-            $the_const = `export $the_const`
-        },
-
         $static_statements = join(list = $static_statements, $separator),
         $class => `$the_const\n\n$static_statements\n`
     }
@@ -527,25 +523,35 @@ pattern gather_accesses($hoisted_states, $hoisted_refs, $use_memos) {
 
 // Rewrite accesses to state, refs, and memos
 pattern second_step($handler_callback_suffix) {
-    maybe and {
-        $hoisted_states = [],
-        $hoisted_refs = [],
-        $use_memos = [],
-        $hoisted_states += `props`,
-        program($statements) where {
-            and {
-                $statements <: maybe gather_accesses($hoisted_states, $hoisted_refs, $use_memos),
-                $statements <: some or {
-                    export_statement(
-                        decorator = contains `@observer` => .,
-                        declaration = lexical_declaration(declarations = contains rewrite_accesses($hoisted_states, $hoisted_refs, $use_memos, $handler_callback_suffix))
-                    ),
-                    export_statement(
-                        declaration = lexical_declaration(declarations = contains rewrite_accesses($hoisted_states, $hoisted_refs, $use_memos, $handler_callback_suffix))
-                    ),
-                    lexical_declaration(declarations = contains rewrite_accesses($hoisted_states, $hoisted_refs, $use_memos, $handler_callback_suffix))
+    and {
+        maybe and {
+            $hoisted_states = [],
+            $hoisted_refs = [],
+            $use_memos = [],
+            $hoisted_states += `props`,
+            program($statements) where {
+                and {
+                    $statements <: maybe gather_accesses($hoisted_states, $hoisted_refs, $use_memos),
+                    $statements <: some or {
+                        export_statement(
+                            decorator = contains `@observer` => .,
+                            declaration = lexical_declaration(declarations = contains rewrite_accesses($hoisted_states, $hoisted_refs, $use_memos, $handler_callback_suffix))
+                        ),
+                        export_statement(
+                            declaration = lexical_declaration(declarations = contains rewrite_accesses($hoisted_states, $hoisted_refs, $use_memos, $handler_callback_suffix))
+                        ),
+                        lexical_declaration(declarations = contains rewrite_accesses($hoisted_states, $hoisted_refs, $use_memos, $handler_callback_suffix))
+                    }
                 }
             }
-        }
+        },
+        maybe contains fix_export(),
+    }
+}
+
+pattern fix_export() {
+    js"export default const $name = $component" as $default_export where { 
+        $default_export <: contains "export default",
+        $default_export => js"const $name = $component\n\nexport default $name;"
     }
 }
