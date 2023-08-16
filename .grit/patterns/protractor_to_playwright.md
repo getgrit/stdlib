@@ -36,6 +36,17 @@ pattern extract_string($css_string) {
   }
 }
 
+pattern test_function() {
+    call_expression($function) where {
+        $function <: or {
+            js"describe",
+            js"fdescribe",
+            js"it",
+            js"fit",
+            member_expression(object="browser", property="wait"),
+        }
+    }
+}
 
 pattern change_by($selector, $locator) {
     $t = "`",
@@ -164,6 +175,7 @@ pattern main_playwright_migration() {
     and {
         before_each_file(),
         file($body) where {
+            $body <: contains test_function(),
             $body <: contains bubble or {
                 `describe($name, $body)` => `test.describe($name, $body)`,
                 `fdescribe($name, $body)` => `test.describe($name, $body)`,
@@ -220,6 +232,7 @@ pattern main_playwright_migration() {
 
 pattern fix_await() {
     file($body) where {
+        $body <: contains "@playwright/test",
         $body <: contains bubble expression_statement() as $exp where {
           $exp <: or {
             things_to_await(),
@@ -355,5 +368,13 @@ async function attributeNotToMatch(selector, attr, text, { timeout } = {}) {
     },
     { timeout: utils.getTimeout(timeout) },
   );
+}
+```
+
+## Does not modify unrelated files
+
+```javascript
+function () {
+    todoList.get(2).element(by.css('input')).click();
 }
 ```
