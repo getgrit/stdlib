@@ -77,14 +77,34 @@ pattern change_completion() {
     }
 }
 
-pattern change_file() {
+pattern openai_misc_renames() {
     call_expression($function, $arguments) where {
         $function <: member_expression($object, $property) where {
             or {
                 $object <: js"openai",
                 $program <: contains openai_named($object),
             },
-            $property <: js"downloadFile" => js"files.retrieveContent"
+            $property <: or {
+              `createFineTune` => `fineTunes.create`,
+              `cancelFineTune` => `fineTunes.cancel`,
+              `retrieveFineTune` => `fineTunes.retrieve`,
+              `listFineTunes` => `fineTunes.list`,
+              `listFineTuneEvents` => `fineTunes.listEvents`,
+              `createFile` => `files.create`,
+              `deleteFile` => `files.del`,
+              `retrieveFile` => `files.retrieve`,
+              `downloadFile` => `files.retrieveContent`,
+              `listFiles` => `files.list`,
+              `deleteModel` => `models.del`,
+              `listModels` => `models.list`,
+              `retrieveModel` => `models.del`,
+              `createImage` => `images.generate`,
+              `createImageEdit` => `images.edit`,
+              `createImageVariation` => `images.createVariation`,
+              `createEdit` => `edits.create`,
+              `createEmbedding` => `embeddings.create`,
+              `createModeration` => `moderations.create`,
+            }
         },
     }
 }
@@ -176,7 +196,7 @@ file(body = program($statements)) where $statements <: and {
     contains change_chat_completion(),
     contains change_completion(),
     contains change_transcription(),
-    contains change_file(),
+    contains openai_misc_renames(),
     contains change_completion_try_catch(),
     contains change_imports(),
     contains fix_types()
