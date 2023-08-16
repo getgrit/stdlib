@@ -807,3 +807,33 @@ export const MyComponent = () => {
   return <></>;
 };
 ```
+
+## Handles an inline default export
+
+```js
+import { Component } from 'react';
+
+export default class MyComponent extends Component {
+  constructor(props: Props) {
+    this.state = {
+      secret: 5,
+    };
+  }
+
+  render() {
+    return <></>;
+  }
+}
+```
+
+```ts
+import { useState } from 'react';
+
+const MyComponent = () => {
+  const [secret, setSecret] = useState(5);
+
+  return <></>;
+};
+
+export default MyComponent;
+```
