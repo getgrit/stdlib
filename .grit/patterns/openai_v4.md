@@ -146,13 +146,60 @@ pattern change_completion_try_catch() {
     }
 }
 
+pattern openai_v4_exports() {
+    or {
+        "ClientOptions",
+        "OpenAI",
+        "toFile",
+        "fileFromPath",
+        "APIError",
+        "APIConnectionError",
+        "APIConnectionTimeoutError",
+        "APIUserAbortError",
+        "NotFoundError",
+        "ConflictError",
+        "RateLimitError",
+        "BadRequestError",
+        "AuthenticationError",
+        "InternalServerError",
+        "PermissionDeniedError",
+        "UnprocessableEntityError",
+    }
+}
+
 pattern change_imports() {
     or {
-        `import $old from $src`,
-        `$old = require($src)`
-    } where {
-        $src <: `"openai"`,
-        $old => `OpenAI`
+        `import $old from $src` where {
+            $src <: `"openai"`,
+            $old <: or {
+                import_clause(name = named_imports($imports)) where {
+                    if ($imports <: not contains $import_name where $import_name <: openai_v4_exports()) {
+                        $old => js"OpenAI",
+                    } else {
+                        $imports <: some bubble $name => . where {
+                          $name <: not openai_v4_exports(),
+                        },
+                        if ($old <: not contains js"OpenAI") {
+                            $old => js"OpenAI, $old",
+                        }
+                    }
+                }
+            },
+        },
+        `$old = require($src)` as $require where {
+            $old <: object_pattern($properties) where {
+                if ($properties <: not contains $import_name where $import_name <: openai_v4_exports()) {
+                    $old => js"OpenAI",
+                } else {
+                    $properties <: some bubble $name => . where {
+                      $name <: not openai_v4_exports(),
+                    },
+                    if ($program <: not contains `OpenAI = require($src)`) {
+                        $require => `OpenAI = require($src);\nconst $require`
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -188,8 +235,12 @@ pattern fix_types() {
         `FineTuneEvent` => `OpenAI.FineTuneEvent`,
         `ImagesResponse` => `OpenAI.ImagesResponse`,
         `OpenAIFile` => `OpenAI.FileObject`,
-    } as $thing where {
-        $thing <: imported_from(from=`"openai"`)
+    } as $thing where or {
+        $thing <: imported_from(from=`"openai"`),
+        $program <: contains `$old = require($from)` where {
+            $from <: `"openai"`,
+            $old <: contains $thing,
+        },
     }
 }
 
@@ -204,7 +255,12 @@ file(body = program($statements)) where $statements <: and {
     contains openai_misc_renames(),
     contains change_completion_try_catch(),
     contains change_imports(),
-    contains fix_types()
+    contains fix_types() until or {
+        import_statement(),
+        variable_declarator($value) where {
+            $value <: call_expression(function="require")
+        }
+    },
   }
 }
 ```
@@ -446,6 +502,101 @@ const fineTune: FineTune = 4;
 
 ```ts
 import OpenAI from 'openai';
+
+// imported, so should change
+const messages: OpenAI.Chat.CreateChatCompletionRequestMessage = 1;
+const request: OpenAI.Chat.CompletionCreateParamsNonStreaming = 2;
+const response: OpenAI.Chat.Completions.ChatCompletion = 3;
+
+// should not be changed because not imported from 'openai'
+const fineTune: FineTune = 4;
+```
+
+## Preserves v4 OpenAI ESM imports
+
+```ts
+import {
+  ChatCompletionRequestMessage,
+  CreateChatCompletionRequest,
+  CreateChatCompletionResponse,
+  toFile,
+} from 'openai';
+
+// imported, so should change
+const messages: ChatCompletionRequestMessage = 1;
+const request: CreateChatCompletionRequest = 2;
+const response: CreateChatCompletionResponse = 3;
+
+// should not be changed because not imported from 'openai'
+const fineTune: FineTune = 4;
+```
+
+```ts
+import OpenAI, { toFile } from 'openai';
+
+// imported, so should change
+const messages: OpenAI.Chat.CreateChatCompletionRequestMessage = 1;
+const request: OpenAI.Chat.CompletionCreateParamsNonStreaming = 2;
+const response: OpenAI.Chat.Completions.ChatCompletion = 3;
+
+// should not be changed because not imported from 'openai'
+const fineTune: FineTune = 4;
+```
+
+## Does not double import OpenAI
+
+```ts
+import OpenAI, {
+  ChatCompletionRequestMessage,
+  CreateChatCompletionRequest,
+  CreateChatCompletionResponse,
+  toFile,
+} from 'openai';
+
+// imported, so should change
+const messages: ChatCompletionRequestMessage = 1;
+const request: CreateChatCompletionRequest = 2;
+const response: CreateChatCompletionResponse = 3;
+
+// should not be changed because not imported from 'openai'
+const fineTune: FineTune = 4;
+```
+
+```ts
+import OpenAI, { toFile } from 'openai';
+
+// imported, so should change
+const messages: OpenAI.Chat.CreateChatCompletionRequestMessage = 1;
+const request: OpenAI.Chat.CompletionCreateParamsNonStreaming = 2;
+const response: OpenAI.Chat.Completions.ChatCompletion = 3;
+
+// should not be changed because not imported from 'openai'
+const fineTune: FineTune = 4;
+```
+
+## Preserves v4 OpenAI CommonJS imports
+
+```ts
+const {
+  ChatCompletionRequestMessage,
+  CreateChatCompletionRequest,
+  CreateChatCompletionResponse,
+  Configuration,
+  toFile,
+} = require('openai');
+
+// imported, so should change
+const messages: ChatCompletionRequestMessage = 1;
+const request: CreateChatCompletionRequest = 2;
+const response: CreateChatCompletionResponse = 3;
+
+// should not be changed because not imported from 'openai'
+const fineTune: FineTune = 4;
+```
+
+```ts
+const OpenAI = require('openai');
+const { toFile } = require('openai');
 
 // imported, so should change
 const messages: OpenAI.Chat.CreateChatCompletionRequestMessage = 1;
