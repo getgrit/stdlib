@@ -14,14 +14,19 @@ language js
 pattern change_constructor() {
     `new $constructor($params)` where {
         $constructor <: `OpenAIApi` => `OpenAI`,
-        $params <: [$config],
-        $program <: contains or {
-            `const $config = new Configuration($details)`,
-            `let $config = new Configuration($details)`,
-            `var $config = new Configuration($details)`
-        } => .,
+        or {
+          $params <: contains `new Configuration($details)`,
+          and {
+            $params <: [$config],
+            $program <: contains or {
+                `const $config = new Configuration($details)`,
+                `let $config = new Configuration($details)`,
+                `var $config = new Configuration($details)`
+            } => .,
+          }
+        },
         $params => `$details`,
-        $program <: contains change_imports(),
+        $program <: maybe contains change_imports(),
     }
 }
 
@@ -347,11 +352,21 @@ const response = await openai.audio.transcriptions.create({
 ## File handling
 
 ```js
+const openai = new OpenAIApi(
+  new Configuration({
+    apiKey: process.env.OPENAI_API_KEY,
+  }),
+);
+
 const myFile = await openai.downloadFile('my-file', options);
 console.log(myFile);
 ```
 
 ```ts
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
+
 const myFile = await openai.files.retrieveContent('my-file', options);
 console.log(myFile);
 ```
