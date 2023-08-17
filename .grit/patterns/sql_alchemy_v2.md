@@ -47,9 +47,17 @@ pattern convert_to_subquery() {
     } => `$var = select($args).subquery()`
 }
 
+// this pattern can probably be more general
+pattern c_to_selected_columns() {
+    `$x.where($args)` where { 
+        $args <: contains bubble($x) `$x.c.$b` => `$x.selected_columns.$b`
+    }
+}
+
 file($body) where $body <: any {
     contains bulk_update(),
-    contains convert_to_subquery()
+    contains convert_to_subquery(),
+    contains c_to_selected_columns()
 }
 ```
 
@@ -63,6 +71,9 @@ session.query(User).filter(User.name == "sandy").update({ password: "foobar", ot
 stmt1 = select(user.c.id, user.c.name)
 stmt2 = select(user.c.id, user.c.name)
 stmt3 = select(addresses, stmt2).select_from(addresses.join(stmt1))
+
+stmt = select(users)
+stmt = stmt.where(stmt.c.name == "foo")
 ```
 
 ```python
@@ -74,4 +85,7 @@ with Session(engine, future=True) as sess:
 stmt1 = select(user.c.id, user.c.name)
 stmt2 = select(user.c.id, user.c.name).subquery()
 stmt3 = select(addresses, stmt2).select_from(addresses.join(stmt1))
+
+stmt = select(users)
+stmt = stmt.where(stmt.selected_columns.name == "foo")
 ```
