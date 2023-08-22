@@ -10,38 +10,76 @@ tags: #js, #migration, #serverless, #fermyon, #alpha
 engine marzano(0.1)
 language js
 
-pattern spin_fix_response() {
-     object($properties) where {
-        $properties <: contains bubble {
-            pair($key, $value) where {
-                $key <: "body",
-                $value <: $old => js"encoder.encode($old).buffer" where {
-                    $program => js"const encoder = new TextEncoder('utf-8');\n\n$program"
-                  }
-            }
-        },
-        $properties <: contains bubble {
-            pair($key, $value) where {
-                $key <: "statusCode",
-                $key => js"status"
-            }
-        },
+predicate insert_statement($statement) {
+    $program <: or {
+        contains `"use strict"` as $old => `$old\n\n$statement`,
+        $program => js"$statement\n\n$program"
     }
 }
 
-or {
-    js"module.exports.$_ = ($args) => { $body }"
-    //     \`module.exports.$name = $handler\` => \`export async function handleRequest(request) { $handler }\` where $handler <: not arrow_function(),
-//     \`export const $_ = ($event) => { $response };\` => \`export async function handleRequest($event) { $response }\`,
-//     export_statement($declaration) where $declaration <: contains object() as $response where {$response <: contains \`status\`, $response <: contains \`body\`}
-} where {
-    $body <: maybe contains `return $response` where $response <: spin_fix_response(),
-    $args <: [$event],
-    $event => `request`,
-    $body <: contains $event => `request`
-} => js"export async function handleRequest($event) {
-    $body
-}"
+pattern encode() {
+    $old => js"encoder.encode($old).buffer"
+}
+
+pattern spin_fix_response() {
+     or {
+         object($properties) where {
+            $properties <: contains bubble {
+                pair($key, $value) where {
+                    $key <: "body",
+                    $value <: $old => js"encoder.encode($old).buffer"
+                }
+            },
+            $properties <: contains bubble {
+                pair($key, $value) where {
+                    $key <: "statusCode",
+                    $key => js"status"
+                }
+            },
+        },
+        object() as $obj where { $obj <: encode() }
+    } where {
+        insert_statement(statement=js"const encoder = new TextEncoder('utf-8');")
+    }
+}
+
+pattern spin_fix_request($request) {
+    `$request.$prop` => `JSON.parse(decoder.decode($request)).$prop` where {
+        insert_statement(statement=js"const decoder = new TextDecoder('utf-8')")
+    }
+}
+
+pattern spin_main_fix_handler() {
+  js"module.exports.$_ = ($args) => { $body }" as $func where {
+        $request = `request`,
+        $args <: or { [$event], [$event, $context, $callback] },
+        $body <: contains or {
+            `return $response`,
+            `callback(null, $response)` => `return $response`
+        } where {
+            $response <: or {
+                spin_fix_response(),
+                identifier() where { $body <: contains `$response = $def` where $def <: spin_fix_response() }
+            }
+        },
+        $event => `request`,
+        $body <: contains $event => `request`
+    } => js"export async function handleRequest($event) {
+        $body
+    }"
+}
+
+pattern spin_main_fix_request() {
+    `function handleRequest($request) { $body }` where {
+        $body <: contains spin_fix_request(request=`request`)
+    }
+}
+
+
+sequential {
+    contains spin_main_fix_handler(),
+    maybe contains spin_main_fix_request()
+}
 ```
 
 ## grit/example.js
