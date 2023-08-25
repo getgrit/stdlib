@@ -17,10 +17,6 @@ predicate insert_statement($statement) {
     }
 }
 
-pattern encode() {
-    $old => js"encoder.encode($old).buffer"
-}
-
 pattern spin_fix_response() {
      or {
          object($properties) where {
@@ -37,14 +33,19 @@ pattern spin_fix_response() {
                 }
             },
         },
-        object() as $obj where { $obj <: encode() }
+        object() as $obj where {
+          $obj => js"{
+            status: 200,
+            body: encoder.encode($obj).buffer
+          }"
+        }
     } where {
         insert_statement(statement=js"const encoder = new TextEncoder('utf-8');")
     }
 }
 
-pattern spin_fix_request($request) {
-    `$request.$prop` => `JSON.parse(decoder.decode($request)).$prop` where {
+pattern spin_fix_request($event) {
+    `$event.request.$prop` => `JSON.parse(decoder.decode($event.body)).$prop` where {
         insert_statement(statement=js"const decoder = new TextDecoder('utf-8')")
     }
 }
@@ -71,7 +72,7 @@ pattern spin_main_fix_handler() {
 
 pattern spin_main_fix_request() {
     `function handleRequest($request) { $body }` where {
-        $body <: contains spin_fix_request(request=`request`)
+        $body <: contains spin_fix_request(event=`request`)
     }
 }
 
@@ -117,5 +118,64 @@ export async function handleRequest(request) {
       ),
     ).buffer,
   };
+}
+```
+
+## With inputs
+
+This example is based on [serverless example](https://github.com/custodian-sample-org/serverless-examples/blob/v3/aws-node-alexa-skill/handler.js).
+
+```
+'use strict';
+
+// Returns a random integer between min (inclusive) and max (inclusive)
+const getRandomInt = (min, max) => Math.floor(Math.random() * ((max - min) + 1)) + min;
+
+module.exports.luckyNumber = (event, context, callback) => {
+  const upperLimit = event.request.intent.slots.UpperLimit.value || 100;
+  const number = getRandomInt(0, upperLimit);
+  const response = {
+    version: '1.0',
+    response: {
+      outputSpeech: {
+        type: 'PlainText',
+        text: `Your lucky number is ${number}`,
+      },
+      shouldEndSession: false,
+    },
+  };
+
+  callback(null, response);
+};
+```
+
+```js
+'use strict';
+
+const decoder = new TextDecoder('utf-8');
+
+const encoder = new TextEncoder('utf-8');
+
+// Returns a random integer between min (inclusive) and max (inclusive)
+const getRandomInt = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+
+export async function handleRequest(request) {
+  const upperLimit = JSON.parse(decoder.decode(request.body)).intent.slots.UpperLimit.value || 100;
+  const number = getRandomInt(0, upperLimit);
+  const response = {
+    status: 200,
+    body: encoder.encode({
+      version: '1.0',
+      response: {
+        outputSpeech: {
+          type: 'PlainText',
+          text: `Your lucky number is ${number}`,
+        },
+        shouldEndSession: false,
+      },
+    }).buffer,
+  };
+
+  return response;
 }
 ```
