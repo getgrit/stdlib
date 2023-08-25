@@ -54,10 +54,45 @@ pattern c_to_selected_columns() {
     }
 }
 
+pattern select_list_to_vargs() {
+    `select([$args])` => `select($args)`
+}
+
+
+pattern session_scalars($selection, $stmt, $expr) {
+    `session.scalars(select($selection).from_statement($stmt1)).all()` =>
+    `session.scalars(
+    select($selection)
+    .from_statement($stmt)
+    .options(with_expression($expr, $stmt.selected_columns.some_literal))
+).all()` where {
+        // todo come up with a better way to handle this
+        $stmt1 == $stmt
+    }
+}
+
+pattern select_options($var, $selection, $expr) {
+    `$var = select($selection).options(with_expression($expr, $literal))`
+    => `$var = select($selection, $literal.label("some_literal"))`
+} 
+
+pattern no_nested_with_expr() {
+    `$stmt = union_all($args)` where  {
+        // todo add all replace some
+        $args <: some bubble($selection, $expr) $var where {
+            $program <: contains select_options($var, $selection, $expr)
+        },
+        $program <: contains session_scalars($selection, $stmt, $expr)
+    }
+}
+
+
 file($body) where $body <: any {
     contains bulk_update(),
     contains convert_to_subquery(),
-    contains c_to_selected_columns()
+    contains c_to_selected_columns(),
+    contains select_list_to_vargs(),
+    contains no_nested_with_expr()
 }
 ```
 
@@ -74,6 +109,14 @@ stmt3 = select(addresses, stmt2).select_from(addresses.join(stmt1))
 
 stmt = select(users)
 stmt = stmt.where(stmt.c.name == "foo")
+
+stmt = select([table.c.col1, table.c.col2, ...])
+
+s1 = select(User).options(with_expression(User.expr, literal("u1")))
+s2 = select(User).options(with_expression(User.expr, literal("u2")))
+
+stmt = union_all(s1, s2)
+session.scalars(select(User).from_statement(stmt)).all()
 ```
 
 ```python
@@ -88,4 +131,16 @@ stmt3 = select(addresses, stmt2).select_from(addresses.join(stmt1))
 
 stmt = select(users)
 stmt = stmt.where(stmt.selected_columns.name == "foo")
+
+stmt = select(table.c.col1, table.c.col2, ...)
+
+s1 = select(User, literal("u1").label("some_literal"))
+s2 = select(User, literal("u2").label("some_literal"))
+
+stmt = union_all(s1, s2)
+session.scalars(
+    select(User)
+    .from_statement(stmt)
+    .options(with_expression(User.expr, stmt.selected_columns.some_literal))
+).all()
 ```
