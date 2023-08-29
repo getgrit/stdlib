@@ -36,10 +36,16 @@ pattern process_one_source($p, $all_imports) {
         $GLOBAL_IMPORTED_NAMES <: some bubble($p, $source, $imported_names, $all_imports) [$p, $name, $source] where {
             $imported_names += $name,
         },
-        $joined_imported_names = join(list = $imported_names, separator = ", "),
         if ($p <: module(statements = some python_import($imports, $source))) {
-            $imports => `$imports, $joined_imported_names`
+          $pruned_imports = [],
+          $imported_names <: some bubble($pruned_imports, $imports) $candidate where {
+            !$imports <: some $candidate,
+            $pruned_imports += $candidate
+          },
+          $joined_imported_names = join(list = $pruned_imports, separator = ", "),
+          $imports => `$imports, $joined_imported_names`
         } else {
+            $joined_imported_names = join(list = $imported_names, separator = ", "),
             $all_imports += `from $source import $joined_imported_names\n`
         }
     }
@@ -109,13 +115,19 @@ and {
     contains or {
         python_import(source=`pydantic`) => .,
         python_import(source=`fools`) => .,
-        `unittest` as $test where {
-            $source = `testing`,
-            $test <: ensure_import_from($source),
+        `$testlib.TestCase` where {
+            $newtest = `newtest`,
+            $testlib <: `unittest` => `$newtest`,
+            $newtest <: ensure_import_from(source=`testing`),
         },
         `othermodule` as $other where {
             $other <: ensure_imported()
         },
+        `$bob.caller` where {
+          $newbob = `newbob`,
+          $bob <: `thingbob` => `$newbob`,
+          $newbob <: ensure_import_from(source=`ourlib.goodlib`),
+        }
     },
     after_each_file()
 }
@@ -146,25 +158,57 @@ unittest.TestCase()
 ```
 
 ```python
-from testing import unittest
+from testing import newtest
 
 import somewhere
 
-unittest.TestCase()
+newtest.TestCase()
 ```
 
 ## Ensure no duplicate imports
 
 ```python
-from testing import unittest, another
+from testing import newtest, unittest
 
 unittest.TestCase()
 ```
 
 ```python
-from testing import unittest, another
+from testing import newtest, unittest
+
+newtest.TestCase()
+```
+
+## Ensure we don't append to the same import
+
+```python
+from testing import unittest, newtest
 
 unittest.TestCase()
+```
+
+```python
+from testing import unittest, newtest
+
+newtest.TestCase()
+```
+
+## Ensure we handle nested modules correctly
+
+```python
+from ourlib.goodlib import thingbob, newbob
+
+newbob.caller()
+
+thingbob.caller()
+```
+
+```python
+from ourlib.goodlib import thingbob, newbob
+
+newbob.caller()
+
+newbob.caller()
 ```
 
 ## Add a bare import
