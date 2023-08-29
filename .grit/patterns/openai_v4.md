@@ -208,7 +208,7 @@ pattern fix_types() {
     or {
         `ChatCompletionRequestMessage` => `OpenAI.Chat.CreateChatCompletionRequestMessage`,
         `ChatCompletionResponseMessage` => `OpenAI.Chat.Completions.ChatCompletionMessage`,
-        `CreateChatCompletionRequest` => `OpenAI.Chat.CompletionCreateParamsNonStreaming`,
+        `CreateChatCompletionRequest` => `OpenAI.Chat.ChatCompletionCreateParamsNonStreaming`,
         `CreateChatCompletionResponse` => `OpenAI.Chat.Completions.ChatCompletion`,
         `CreateChatCompletionResponseChoicesInner` => `OpenAI.Chat.ChatCompletion.Choice`,
         `CreateCompletionRequest` => `OpenAI.CompletionCreateParamsNonStreaming`,
@@ -237,7 +237,7 @@ pattern fix_types() {
         `ImagesResponse` => `OpenAI.ImagesResponse`,
         `OpenAIFile` => `OpenAI.FileObject`,
         `ChatCompletionRequestMessageFunctionCall` => `OpenAI.Chat.ChatCompletionMessage.FunctionCall`,
-        `ChatCompletionFunctions` => `OpenAI.Chat.CompletionCreateParams.Function`,
+        `ChatCompletionFunctions` => `OpenAI.Chat.ChatCompletionMessageParam.Function`,
         `ConfigurationParameters` => `ClientOptions`,
         `OpenAIApi` => `OpenAI`,
     } as $thing where or {
@@ -247,6 +247,17 @@ pattern fix_types() {
             $old <: contains $thing,
         },
     }
+}
+
+pattern openai_change_v4_names() {
+  `OpenAI.Chat.$old` where {
+    $old <: or {
+      `CompletionCreateParams` => `ChatCompletionCreateParams`,
+      `CompletionCreateParamsStreaming` => `ChatCompletionCreateParamsStreaming`,
+      `CompletionCreateParamsNonStreaming` => `ChatCompletionCreateParamsNonStreaming`,
+      `CreateChatCompletionRequestMessage` => `ChatCompletionCreateMessageParam`,
+    }
+  }
 }
 
 
@@ -260,6 +271,7 @@ file(body = program($statements)) where $statements <: and {
     contains openai_misc_renames(),
     contains change_completion_try_catch(),
     contains change_imports(),
+    contains openai_change_v4_names(),
     contains fix_types() until or {
         import_statement(),
         variable_declarator($value) where {
@@ -510,7 +522,7 @@ import OpenAI from 'openai';
 
 // imported, so should change
 const messages: OpenAI.Chat.CreateChatCompletionRequestMessage = 1;
-const request: OpenAI.Chat.CompletionCreateParamsNonStreaming = 2;
+const request: OpenAI.Chat.ChatCompletionCreateParamsNonStreaming = 2;
 const response: OpenAI.Chat.Completions.ChatCompletion = 3;
 
 // should not be changed because not imported from 'openai'
@@ -541,7 +553,7 @@ import OpenAI, { toFile } from 'openai';
 
 // imported, so should change
 const messages: OpenAI.Chat.CreateChatCompletionRequestMessage = 1;
-const request: OpenAI.Chat.CompletionCreateParamsNonStreaming = 2;
+const request: OpenAI.Chat.ChatCompletionCreateParamsNonStreaming = 2;
 const response: OpenAI.Chat.Completions.ChatCompletion = 3;
 
 // should not be changed because not imported from 'openai'
@@ -572,7 +584,7 @@ import OpenAI, { toFile } from 'openai';
 
 // imported, so should change
 const messages: OpenAI.Chat.CreateChatCompletionRequestMessage = 1;
-const request: OpenAI.Chat.CompletionCreateParamsNonStreaming = 2;
+const request: OpenAI.Chat.ChatCompletionCreateParamsNonStreaming = 2;
 const response: OpenAI.Chat.Completions.ChatCompletion = 3;
 
 // should not be changed because not imported from 'openai'
@@ -605,9 +617,25 @@ const { toFile } = require('openai');
 
 // imported, so should change
 const messages: OpenAI.Chat.CreateChatCompletionRequestMessage = 1;
-const request: OpenAI.Chat.CompletionCreateParamsNonStreaming = 2;
+const request: OpenAI.Chat.ChatCompletionCreateParamsNonStreaming = 2;
 const response: OpenAI.Chat.Completions.ChatCompletion = 3;
 
 // should not be changed because not imported from 'openai'
 const fineTune: FineTune = 4;
+```
+
+## Handle rename within v4
+
+This handles https://github.com/openai/openai-node/pull/266/files
+
+```ts
+import OpenAI, { toFile } from 'openai';
+
+const myCompletion: OpenAI.Chat.CompletionCreateParams = 1;
+```
+
+```ts
+import OpenAI, { toFile } from 'openai';
+
+const myCompletion: OpenAI.Chat.ChatCompletionCreateParams = 1;
 ```
