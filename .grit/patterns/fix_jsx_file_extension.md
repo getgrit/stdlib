@@ -15,7 +15,7 @@ file($name, $body) where {
 }
 ```
 
-## example.js
+## Handles a basic JSX element
 
 ```js
 export default function SomeReact() {
@@ -23,11 +23,8 @@ export default function SomeReact() {
 }
 ```
 
-## For jsx_self_closing_element.js
+## Handles a self-closing JSX element
 
 ```js
-export default () => (
-  <ExampleItem code={code} hint={hint} label="Avengers Example" />
-);
-
+export default () => <ExampleItem code={code} hint={hint} label='Avengers Example' />;
 ```

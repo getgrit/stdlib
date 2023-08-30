@@ -35,7 +35,7 @@ sequential {
 }
 ```
 
-## Input for playground
+## Converts a React class component
 
 ```js
 import { Component } from 'react';

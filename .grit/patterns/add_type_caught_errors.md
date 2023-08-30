@@ -23,31 +23,31 @@ catch_clause($parameter, $type) where {
 ```ts
 function foo() {
   try {
-    console.log('tada')
+    console.log('tada');
   } catch (e) {
-    console.log('oops')
+    console.log('oops');
   }
-};
+}
 
 try {
-  console.log('tada')
+  console.log('tada');
 } catch (e: Foo) {
-  console.log('oops')
+  console.log('oops');
 }
 ```
 
 ```ts
 function foo() {
   try {
-    console.log('tada')
+    console.log('tada');
   } catch (e: any) {
-    console.log('oops')
+    console.log('oops');
   }
-};
+}
 
 try {
-  console.log('tada')
+  console.log('tada');
 } catch (e: Foo) {
-  console.log('oops')
+  console.log('oops');
 }
 ```

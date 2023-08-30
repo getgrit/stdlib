@@ -85,7 +85,7 @@ or {
 }
 ```
 
-## Convert equals
+## Convert assertions
 
 ```javascript
 describe('sum', () => {

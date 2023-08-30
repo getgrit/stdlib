@@ -15,7 +15,7 @@ language js
 }
 ```
 
-## Removes the statement simple
+## Removes a simple `console.log` statement
 
 ```javascript
 // Do not remove this
@@ -50,7 +50,7 @@ server.listen(PORT, console.log(`Server started on port ${PORT}`));
 server.listen(PORT);
 ```
 
-## Doesn't remove it in the catch clause
+## Doesn't remove `console.log` in a catch clause
 
 ```javascript
 try {

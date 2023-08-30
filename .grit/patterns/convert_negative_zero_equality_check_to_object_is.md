@@ -20,7 +20,7 @@ binary_expression($left, $operator, $right) as $exp where {
 }
 ```
 
-## Example
+## Basic example
 
 ```javascript
 if (x == -0 || x !== -0) {
@@ -34,7 +34,7 @@ if (Object.is(x, -0) || !Object.is(x, -0)) {
 }
 ```
 
-## If with else
+## Converts an if condition
 
 ```javascript
 if (x == -0) {
@@ -52,7 +52,7 @@ if (Object.is(x, -0)) {
 }
 ```
 
-## While
+## Converts a while condition
 
 ```javascript
 while (x == -0) {
@@ -66,7 +66,7 @@ while (Object.is(x, -0)) {
 }
 ```
 
-## For
+## Converts a for condition
 
 ```javascript
 for (let x = 6; x != -0; x--) {
@@ -80,7 +80,7 @@ for (let x = 6; !Object.is(x, -0); x--) {
 }
 ```
 
-## Complex conditions
+## Converts complex conditions
 
 ```javascript
 if (x == -0 && y != -0) {

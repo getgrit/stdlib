@@ -20,57 +20,37 @@ or {
 
 ```
 
-## '' +
+## Handles string preceding variable
 
 ```javascript
-var x = "" + foo;
+var x = '' + foo;
 ```
 
 ```typescript
 var x = String(foo);
 ```
 
-## ('' + )
+## Handles string following variable
 
 ```javascript
-var x = "" + foo;
-```
-
-```typescript
-var x = String(foo);
-```
-
-## (a) + ''
-
-```javascript
-var x = a + "";
+var x = a + '';
 ```
 
 ```typescript
 var x = String(a);
 ```
 
-## + ''
+## Handles interpolated string
 
 ```javascript
-var x = foo + "";
-```
-
-```typescript
-var x = String(foo);
-```
-
-## foo + '' + bar
-
-```javascript
-var x = foo + "" + bar;
+var x = foo + '' + bar;
 ```
 
 ```typescript
 var x = String(foo) + bar;
 ```
 
-## +
+## Handles number conversion using +
 
 ```javascript
 var x = +foo;
@@ -80,7 +60,7 @@ var x = +foo;
 var x = Number(foo);
 ```
 
-## 1 \*
+## Handles number conversion using \*
 
 ```javascript
 var x = 1 * foo;

@@ -13,7 +13,7 @@ language js
 `$object.escapeMarkup = false` => .
 ```
 
-## Simple
+## Removes `.escapeMarkup = false`
 
 ```javascript
 something;

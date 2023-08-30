@@ -36,7 +36,7 @@ sequential {
 }
 ```
 
-## Input for playground
+## Respects `useRefFrom`
 
 ```js
 import React from "react";

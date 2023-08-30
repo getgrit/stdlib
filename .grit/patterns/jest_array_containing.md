@@ -1,4 +1,6 @@
-# Consolidate Jest arrayContaining expectations
+---
+title: Consolidate Jest arrayContaining assertions
+---
 
 `expect.arrayContaining` can be used to validate an array containing multiple different elements,
 so multiple statements are not required.
@@ -18,10 +20,10 @@ pattern expect($last, $value, $containing) {
 sequential {
     contains `it($_, $body)` where {
         $containing = [],
-    
+
         // Collect all arrayContaining
         $body <: contains expect($last, $value, $containing),
-    
+
         // Make the last one contain all of them
         $separator = `,\n        `,
         $containing_joined = join(list = $containing, $separator),
@@ -53,12 +55,16 @@ describe('test', () => {
   it('consolidates', async () => {
     const values = ['console.log($9o)', 'console.log($x)', 'PatternWithArgs($arg)'];
     const anotherValues = ['nine'];
-    
+
     expect(anotherValues).toEqual(expect.arrayContaining([expect.stringContaining('nine')]));
-    
-    expect(values).toEqual(expect.arrayContaining([expect.stringContaining('console.log($9o)'),
-    expect.stringContaining('console.log($x)'),
-    expect.stringContaining('PatternWithArgs($arg)')]));
+
+    expect(values).toEqual(
+      expect.arrayContaining([
+        expect.stringContaining('console.log($9o)'),
+        expect.stringContaining('console.log($x)'),
+        expect.stringContaining('PatternWithArgs($arg)'),
+      ]),
+    );
   });
 });
 ```

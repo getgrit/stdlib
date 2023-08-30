@@ -83,7 +83,7 @@ sequential {
 }
 ```
 
-## grit/example.js
+## Converts a basic Serverless component
 
 ```js
 module.exports.handler = async (event) => {
@@ -121,15 +121,15 @@ export async function handleRequest(request) {
 }
 ```
 
-## With inputs
+## Converts a handler with inputs
 
 This example is based on [serverless example](https://github.com/custodian-sample-org/serverless-examples/blob/v3/aws-node-alexa-skill/handler.js).
 
-```
+```js
 'use strict';
 
 // Returns a random integer between min (inclusive) and max (inclusive)
-const getRandomInt = (min, max) => Math.floor(Math.random() * ((max - min) + 1)) + min;
+const getRandomInt = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
 
 module.exports.luckyNumber = (event, context, callback) => {
   const upperLimit = event.request.intent.slots.UpperLimit.value || 100;

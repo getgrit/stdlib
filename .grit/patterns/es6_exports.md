@@ -83,7 +83,7 @@ export async function createTeam() {
 export const addTeamToOrgSubscription = () => console.log('cool');
 ```
 
-### Keep inline values in tact
+### Keep inline values intact
 
 ```js
 const king = '9';
@@ -100,7 +100,7 @@ export const king = '9';
 export const queen = '8';
 ```
 
-### Work on
+### Transforms a mix of direct and default exports
 
 ```js
 const c1 = require('./mod1');
@@ -114,11 +114,11 @@ module.exports = { c1, c2, c3, myDefaultConst, myRenamed, sub1, sub2 };
 ```
 
 ```js
-export { default as c1 } from './mod1'
-export { default as c2 } from './mod2'
-export { default as c3 } from './mod3'
-export { default as myDefaultConst } from './mod4'
-export { originalName as myRenamed } from 'mod5'
+export { default as c1 } from './mod1';
+export { default as c2 } from './mod2';
+export { default as c3 } from './mod3';
+export { default as myDefaultConst } from './mod4';
+export { originalName as myRenamed } from 'mod5';
 const { sub1, sub2 } = require('mod5'); // not handled
 
 export { sub1 };

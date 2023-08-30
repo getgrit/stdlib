@@ -44,10 +44,8 @@ var __iterator__ = function () {
 
 ## `prototype["__iterator__"]` property => `_iterator_`
 
-## `prototype["__iterator__"]` property => `_iterator_`
-
 ```javascript
-Data.prototype["__iterator__"] = function () {
+Data.prototype['__iterator__'] = function () {
   return new DataIterator(this);
 };
 ```
@@ -75,7 +73,7 @@ bar._iterator_ = function () {
 ## `['__iterator__']` property => `_iterator_`
 
 ```javascript
-bar["__iterator__"] = function () {
+bar['__iterator__'] = function () {
   doIterator();
 };
 ```

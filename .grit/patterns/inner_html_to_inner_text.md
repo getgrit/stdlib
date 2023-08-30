@@ -15,12 +15,12 @@ language js
 `$x.innerHtml` => `$x.innerText`
 ```
 
-## Simple test
+## Transforms innerHtml to innerText
 
 ```javascript
-x.innerHtml = "foo";
+x.innerHtml = 'foo';
 ```
 
 ```typescript
-x.innerText = "foo";
+x.innerText = 'foo';
 ```

@@ -34,7 +34,7 @@ and {
 }
 ```
 
-## Sample code
+## Ensures, replaces and removes specified imports
 
 ```js
 import { orderBy } from 'underscore';
@@ -65,7 +65,7 @@ console.log(v4());
 fetch();
 ```
 
-## Docs example
+## Ensures a React import
 
 From https://docs.grit.io/guides/imports:
 
