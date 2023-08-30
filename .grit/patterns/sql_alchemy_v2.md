@@ -49,7 +49,7 @@ pattern convert_to_subquery() {
 
 // this pattern can probably be more general
 pattern c_to_selected_columns() {
-    `$x.where($args)` where { 
+    `$x.where($args)` where {
         $args <: contains bubble($x) `$x.c.$b` => `$x.selected_columns.$b`
     }
 }
@@ -74,7 +74,7 @@ pattern session_scalars($selection, $stmt, $expr) {
 pattern select_options($var, $selection, $expr) {
     `$var = select($selection).options(with_expression($expr, $literal))`
     => `$var = select($selection, $literal.label("some_literal"))`
-} 
+}
 
 pattern no_nested_with_expr() {
     `$stmt = union_all($args)` where  {
@@ -96,7 +96,7 @@ file($body) where $body <: any {
 }
 ```
 
-## grit/example.python
+## Upgrades to SQL Alchemy v2
 
 Use the [query API](https://docs.sqlalchemy.org/en/20/changelog/migration_14.html#orm-query-is-internally-unified-with-select-update-delete-2-0-style-execution-available)
 
