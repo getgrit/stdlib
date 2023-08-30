@@ -415,9 +415,7 @@ pattern rewrite_accesses($hoisted_states, $hoisted_refs, $use_memos, $handler_ca
             } else if ($hoisted_refs <: some $property) {
                 or {
                     and {
-                        $property <: within member_expression() as $already_ref where $already_ref <: {
-                            js"$p.current"
-                        },
+                        $property <: within member_expression() as $already_ref where $already_ref <: js"$p.current",
                         $p => `${property}`
                     },
                     $p => `${property}.current`
