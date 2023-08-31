@@ -12,9 +12,9 @@ language js
 
 pattern process_route($imports, $refs, $dir, $main_file_imports) {
     pair($key, $value) where {
-        $route_name = `${key}Route`,
-        $value => `${route_name},`, // todo: drop comma after fixing bug
-        $file_name = `$dir/${key}.route.ts`,
+        $route_name = `$[key]Route`,
+        $value => `$route_name,`, // todo: drop comma after fixing bug
+        $file_name = `$dir/$key.route.ts`,
         $new_file_statements = [`import { proc } from "./middleware"`],
         $imports <: maybe some filter_used_imports(local_imports = $new_file_statements, content = $value),
 
@@ -23,11 +23,11 @@ pattern process_route($imports, $refs, $dir, $main_file_imports) {
             $new_file_statements += $s
         },
 
-        $new_file_statements += `export const ${route_name} = $value`,
+        $new_file_statements += `export const $route_name = $value`,
 
         $separator = `;\n`,
         $body = join(list = $new_file_statements, $separator),
-        $main_file_imports += `import { $route_name } from './${key}.route'`,
+        $main_file_imports += `import { $route_name } from './$key.route'`,
         $new_files += file(name = $file_name, $body)
     }
 }

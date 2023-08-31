@@ -79,27 +79,27 @@ pattern handle_one_statement($class_name, $statements, $states_statements, $stat
                 $statement <: prepend_comment($statements),
                 $async <: `async`,
                 if ($handler_callback_suffix <: .) {
-                  $statements += `const ${name} = async $parameters => $body;`
+                  $statements += `const $name = async $parameters => $body;`
                 } else {
-                  $statements += `const ${name}${handler_callback_suffix} = useCallback(async $parameters => $body, []);`
+                  $statements += `const $[name]$[handler_callback_suffix] = useCallback(async $parameters => $body, []);`
                 }
             },
             and {
                 $statement <: prepend_comment($statements),
                 $statement <: after `@computed`,
-                $statements += `const ${name} = useMemo(() => $body, []);`
+                $statements += `const $name = useMemo(() => $body, []);`
             },
             and {
                 $statement <: prepend_comment($statements),
                 $statement <: contains js"get",
-                $statements += `const ${name} = useMemo(() => $body, []);`
+                $statements += `const $name = useMemo(() => $body, []);`
             },
             and {
                 $statement <: prepend_comment($statements),
                 if ($handler_callback_suffix <: .) {
-                  $statements += `const ${name} = $parameters => $body;`
+                  $statements += `const $name = $parameters => $body;`
                 } else {
-                  $statements += `const ${name}${handler_callback_suffix} = useCallback($parameters => $body, []);`
+                  $statements += `const $[name]$[handler_callback_suffix] = useCallback($parameters => $body, []);`
                 }
             }
         },
@@ -149,9 +149,9 @@ pattern handle_one_statement($class_name, $statements, $states_statements, $stat
             and {
                 $value <: arrow_function(),
                 if ($handler_callback_suffix <: .) {
-                  $statements += `const ${name} = $value;`
+                  $statements += `const $name = $value;`
                 } else {
-                  $statements += `const ${name}${handler_callback_suffix} = useCallback($value, []);`
+                  $statements += `const $[name]$[handler_callback_suffix] = useCallback($value, []);`
                 }
             },
             and {
@@ -360,12 +360,12 @@ pattern first_step($use_ref_from, $handler_callback_suffix) {
           // If we have useRefFrom, then we force useFunctionComponent
           $use_ref_from <: not .
         }) {
-            $const_type_annotation = `: React.FunctionComponent<${props_type}>`,
+            $const_type_annotation = `: React.FunctionComponent<$props_type>`,
             $type_annotation = .
         },
 
         if ($body <: contains `props`) {
-            $args = `${the_props}${type_annotation}`
+            $args = `$[the_props]$[type_annotation]`
         } else {
             $args = .
         },
@@ -376,12 +376,12 @@ pattern first_step($use_ref_from, $handler_callback_suffix) {
         $states_statements = join(list = $states_statements, $separator),
         $statements = join(list = $statements, $separator),
         $constructor_statements = join(list = $constructor_statements, $separator),
-        $the_function = `($args) => {\n$constructor_statements\n\n    $states_statements\n\n    ${statements}\n\n    ${render_statements} \n}`,
+        $the_function = `($args) => {\n$constructor_statements\n\n    $states_statements\n\n    $statements\n\n    $render_statements \n}`,
 
         // Construct the final class name
         $original_name = $class_name,
         if ($body <: contains r"(v|V)iewState"($_)) {
-            $base_name = js"${class_name}Base",
+            $base_name = js"$[class_name]Base",
             $the_const = `const $base_name$const_type_annotation = $the_function;
 
 export const $original_name = observer($base_name);`,
@@ -411,20 +411,20 @@ pattern rewrite_accesses($hoisted_states, $hoisted_refs, $use_memos, $handler_ca
                 $hoisted_states <: some $property,
                 $use_memos <: some $property
             }) {
-                $p => `${property}`
+                $p => `$property`
             } else if ($hoisted_refs <: some $property) {
                 or {
                     and {
                         $property <: within member_expression() as $already_ref where $already_ref <: js"$p.current",
-                        $p => `${property}`
+                        $p => `$property`
                     },
-                    $p => `${property}.current`
+                    $p => `$property.current`
                 }
             } else {
               if ($handler_callback_suffix <: .) {
-                  $p => `${property}`
+                  $p => `$property`
               } else {
-                  $p => `${property}${handler_callback_suffix}`
+                  $p => `$[property]$[handler_callback_suffix]`
               }
             }
         },
@@ -437,7 +437,7 @@ pattern rewrite_accesses($hoisted_states, $hoisted_refs, $use_memos, $handler_ca
             and {
                 $hoisted_states <: some $left,
                 $capitalized = capitalize(string = $left),
-                $assignment => `set${capitalized}($right)`
+                $assignment => `set$[capitalized]($right)`
             },
         },
         `this.setState($x)` as $set_state where {
