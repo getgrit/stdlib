@@ -418,7 +418,11 @@ pattern rewrite_accesses($hoisted_states, $hoisted_refs, $use_memos, $handler_ca
                         $property <: within member_expression() as $already_ref where $already_ref <: js"$p.current",
                         $p => `$property`
                     },
-                    $p => `$property.current`
+                    if ($p <: within member_expression(property=`current`)) {
+                        $p => `$property`
+                    } else {
+                        $p => `$property.current`
+                    }
                 }
             } else {
               if ($handler_callback_suffix <: .) {
