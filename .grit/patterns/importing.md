@@ -27,7 +27,10 @@ and {
       `class $_ extends $comp { $_ }` where {
         $comp <: `Component`,
         $source = `"React"`,
-        $comp <: ensure_import_from($source)
+        $comp <: ensure_import_from($source),
+        // This is just a test of bindings
+        $thing = `Button`,
+        $thing <: `Button`
       }
     },
     after_each_file()
