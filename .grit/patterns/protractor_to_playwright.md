@@ -172,60 +172,56 @@ pattern things_to_await() {
 }
 
 pattern main_playwright_migration() {
-    and {
-        before_each_file(),
-        file($body) where {
-            $body <: contains test_function(),
-            $body <: contains bubble or {
-                `describe($name, $body)` => `test.describe($name, $body)`,
-                `fdescribe($name, $body)` => `test.describe($name, $body)`,
-                `it($name, function() {$testBody})`       => `test($name, async function ({page}) { $testBody })`,
-                `it($name, async function() {$testBody})` => `test($name, async function ({page}) {$testBody})`,
-                `it($name, () => {$testBody})`      => `test($name, async function ({page}) {$testBody})`,
-                `it($name, async () => {$testBody})`      => `test($name, async function ({page}) {$testBody})`,
+    file($body) where {
+        $body <: contains test_function(),
+        $body <: contains bubble or {
+            `describe($name, $body)` => `test.describe($name, $body)`,
+            `fdescribe($name, $body)` => `test.describe($name, $body)`,
+            `it($name, function() {$testBody})`       => `test($name, async function ({page}) { $testBody })`,
+            `it($name, async function() {$testBody})` => `test($name, async function ({page}) {$testBody})`,
+            `it($name, () => {$testBody})`      => `test($name, async function ({page}) {$testBody})`,
+            `it($name, async () => {$testBody})`      => `test($name, async function ({page}) {$testBody})`,
 
-                or {
-                    function($body, $async) where { $async <: . } as $func => `async $func`,
-                    arrow_function($body, $async) where { $async <: . } as $func => `async $func`,
-                    function($body),
-                    arrow_function($body),
-                    function_declaration($body),
-                } where {
-                    $body <: contains bubble or {
-                        jasmine_rewrite(),
-                        by_containing_text(),
-                        `expect(browser.getTitle()).toEqual($res)` => `expect(page).toHaveTitle($res)`,
-                        `expect(browser.getCurrentUrl()).toEqual($res)` => `expect(page).toHaveURL($res)`,
-                         browser_misc(),
-                        `expect($actual.count()).toEqual($expected)` => `expect($actual).toHaveCount($expected)`,
-                        `expect($actual.getText()).toEqual($expected)` => `expect($actual).toHaveText($expected)`,
-                        `$element(by.$by($selector)).$act($args)` where {
-                            $act <: or {`click`, `clear`},
-                            $element <: pw_elements(),
-                            $by <: maybe change_by($selector, $locator)
-                        } => `page.locator($locator).$act($args)`,
-                        `$element($inner).$act($args)` where {
-                            $act <: or {`click`, `clear`},
-                            $element <: pw_elements()
-                        } => `page.locator($inner).$act($args)`,
-                        `$element(by.$by($selector)).sendKeys($args)` where { $by <: maybe change_by($selector, $locator) } => `page.locator($locator).fill($args)` ,
-                        `$element($inner).sendKeys($args)` => `page.locator($inner).fill($args)`,
-                        by_handler(),
-                        by_other_handler(),
-                        `get` => `nth`,
-                        `element.all` => `page.locator`,
-                        `var EC = protractor.ExpectedConditions;` => .
-                    } until function_like()
-                }
+            or {
+                function($body, $async) where { $async <: . } as $func => `async $func`,
+                arrow_function($body, $async) where { $async <: . } as $func => `async $func`,
+                function($body),
+                arrow_function($body),
+                function_declaration($body),
             } where {
-                $test = `test`,
-                $source = `"@playwright/test"`,
-                $test <: ensure_import_from($source),
-                $expect = `expect`,
-                $expect <: ensure_import_from($source)
+                $body <: contains bubble or {
+                    jasmine_rewrite(),
+                    by_containing_text(),
+                    `expect(browser.getTitle()).toEqual($res)` => `expect(page).toHaveTitle($res)`,
+                    `expect(browser.getCurrentUrl()).toEqual($res)` => `expect(page).toHaveURL($res)`,
+                     browser_misc(),
+                    `expect($actual.count()).toEqual($expected)` => `expect($actual).toHaveCount($expected)`,
+                    `expect($actual.getText()).toEqual($expected)` => `expect($actual).toHaveText($expected)`,
+                    `$element(by.$by($selector)).$act($args)` where {
+                        $act <: or {`click`, `clear`},
+                        $element <: pw_elements(),
+                        $by <: maybe change_by($selector, $locator)
+                    } => `page.locator($locator).$act($args)`,
+                    `$element($inner).$act($args)` where {
+                        $act <: or {`click`, `clear`},
+                        $element <: pw_elements()
+                    } => `page.locator($inner).$act($args)`,
+                    `$element(by.$by($selector)).sendKeys($args)` where { $by <: maybe change_by($selector, $locator) } => `page.locator($locator).fill($args)` ,
+                    `$element($inner).sendKeys($args)` => `page.locator($inner).fill($args)`,
+                    by_handler(),
+                    by_other_handler(),
+                    `get` => `nth`,
+                    `element.all` => `page.locator`,
+                    `var EC = protractor.ExpectedConditions;` => .
+                } until function_like()
             }
-        },
-        after_each_file()
+        } where {
+            $test = `test`,
+            $source = `"@playwright/test"`,
+            $test <: ensure_import_from($source),
+            $expect = `expect`,
+            $expect <: ensure_import_from($source)
+        }
     }
 }
 
