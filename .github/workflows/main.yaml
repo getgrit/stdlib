@@ -1,0 +1,40 @@
+name: Run grit patterns test
+
+env:
+  GRIT_TELEMETRY_DISABLED: "true"
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ${{ matrix.runner }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        runner: [nscloud-ubuntu-22.04-amd64-4x16, macos-latest, ubuntu-latest]
+        node-version: [18.x]
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Install @getgrit/launcher
+        run: npm install -g @getgrit/launcher
+
+      - name: Run doctor
+        run: npx grit doctor
+
+      - name: Remove grit modules
+        run: rm -rf .grit/.gritmodules
+
+      - name: Run grit patterns test
+        run: npx grit patterns test

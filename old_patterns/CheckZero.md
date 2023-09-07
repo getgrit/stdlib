@@ -19,8 +19,8 @@ pattern CheckedBody($address) {
         `require(address(0) != $address)`,
 
         // Or look for a function call
-        sol_call_expression(function=`$id`, children=contains $address) where {
-            $program <: contains bubble($id) sol_function_definition(name=$id, children=$child2) where {
+        call_expression(function=`$id`, arguments=contains $address) where {
+            $program <: contains bubble($id) function_definition(name=$id, body=$child2) where {
                 // Inspect the body of the transitive function recursively
                 $child2 <: CheckedBody($address)
             }
@@ -29,11 +29,11 @@ pattern CheckedBody($address) {
 }
 
 // Start by checking all top-level functions
-sol_function_definition(name=$func, children=$children) where {
+function_definition(name=$func, $body, $parameters) where {
     // Look at each address individually (bubble creates a new scope),
-    $children <: not within sol_interface_declaration(),
-    $children <: contains bubble($children) sol_parameter(name=$address, type=`address`) where {
-        !$children <: CheckedBody($address)
+    $parameters <: not within interface_declaration(),
+    $parameters <: contains bubble($body) parameter(name=$address, type=`address`) where {
+        !$body <: CheckedBody($address)
     }
 }
 ```
