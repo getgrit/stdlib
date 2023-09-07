@@ -8,19 +8,19 @@ Tags: #security, #solidity, #hygiene, #swc, #swc-131
 language sol
 
 or {
-  // find all our state variable definitions
-  sol_state_variable_declaration(name = $name) as $dec where {
-      $dec <: within sol_contract_declaration() as $contract,
-      $contract <: not contains sol_function_definition(children=contains $name)
-  },
+    // find all our state variable definitions
+    state_variable_declaration(name = $name) as $dec where {
+        $dec <: within contract_declaration() as $contract,
+        $contract <: not contains function_definition(body=contains $name)
+    },
 
-  // find all our local variable definitions
-  sol_variable_declaration(name=$id) as $def where {
-      // that are *not* used outside the variable declaration
-      ! $def <: within sol_function_body(children=contains sol_identifier(value=$id) where {
-          $id <: not within $def
-      })
-  }
+    // find all our local variable definitions
+    variable_declaration(name=$id) as $def where {
+        // that are *not* used outside the variable declaration
+        ! $def <: within function_body(body=contains identifier() as $id where {
+            $id <: not within $def
+        })
+    }
 }
 ```
 

@@ -7,7 +7,7 @@ title: Ether Transfer
 ```grit
 language sol
 
-pattern EtherTransfer($amount) {
+pattern ether_transfer($amount) {
   bubble($amount) or {
       `$sender.call{value: $amount}($_)`,
       `$sender.call.value($amount)($_)`,
@@ -18,7 +18,7 @@ pattern EtherTransfer($amount) {
   }
 }
 
-EtherTransfer($_)
+ether_transfer(amount=$_)
 ```
 
 ## Matches an ether transfer

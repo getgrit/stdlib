@@ -11,14 +11,14 @@ tags: #reentrancy, #vulnerability
 ```grit
 language sol
 
-pattern Loop($body) {
+pattern loop($body) {
     bubble($body) orelse {
         `while($_) { $body }`,
         `for ($_; $_; $_) { $body }`
     }
 }
 
-Loop($body) where $body <: contains Loop($_)
+loop($body) where $body <: contains loop(body=$_)
 
 ```
 
