@@ -100,12 +100,14 @@ pattern ensure_import_from($source) {
 
 pattern ensure_imported() {
     $name where {
-      and {
-        $program <: not contains python_import(source=$source) where {
-          $source = $name,
-        },
-        $GLOBAL_BARE_IMPORTS += [$name]
-      }
+        and {
+            $program <: not contains python_import(source=$name),
+            if ($GLOBAL_BARE_IMPORTS <: not some $name) {
+                $GLOBAL_BARE_IMPORTS += [$name]
+            } else {
+                true
+            }
+        }
     }
 }
 
