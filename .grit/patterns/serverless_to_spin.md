@@ -23,12 +23,6 @@ pattern spin_fix_response() {
          object($properties) where {
             $properties <: contains bubble {
                 pair($key, $value) where {
-                    $key <: "body",
-                    $value <: $old => js"encoder.encode($old).buffer"
-                }
-            },
-            $properties <: contains bubble {
-                pair($key, $value) where {
                     $key <: "statusCode",
                     $key => js"status"
                 }
@@ -37,7 +31,7 @@ pattern spin_fix_response() {
         object() as $obj where {
           $obj => js"{
             status: 200,
-            body: encoder.encode($obj).buffer
+            body: JSON.stringify($obj)
           }"
         }
     }
@@ -98,16 +92,9 @@ pattern spin_main_fix_request() {
     }
 }
 
-pattern spin_add_encoder() {
-    `encoder.encode` where {
-        insert_statement(statement=js"const encoder = new TextEncoder('utf-8');")
-    }
-}
-
 sequential {
     contains spin_main_fix_handler(),
     maybe contains spin_main_fix_request(),
-    maybe contains spin_add_encoder(),
     maybe contains spin_remove_lambda(),
 }
 ```
@@ -131,21 +118,17 @@ module.exports.handler = async (event) => {
 ```
 
 ```js
-const encoder = new TextEncoder('utf-8');
-
 export async function handleRequest(request) {
   return {
     status: 200,
-    body: encoder.encode(
-      JSON.stringify(
-        {
-          message: 'Go Serverless v3.0! Your function executed successfully!',
-          input: request,
-        },
-        null,
-        2,
-      ),
-    ).buffer,
+    body: JSON.stringify(
+      {
+        message: 'Go Serverless v3.0! Your function executed successfully!',
+        input: request,
+      },
+      null,
+      2,
+    ),
   };
 }
 ```
@@ -173,21 +156,17 @@ export const hello = async (event: APIGatewayProxyEvent): Promise<APIGatewayProx
 ```ts
 import { HttpRequest, HttpResponse } from '@fermyon/spin-sdk';
 
-const encoder = new TextEncoder('utf-8');
-
 export async function handleRequest(request: HttpRequest): Promise<HttpResponse> {
   return {
     status: 200,
-    body: encoder.encode(
-      JSON.stringify(
-        {
-          message: 'Go Serverless v3.0! Your function executed successfully!',
-          input: request,
-        },
-        null,
-        2,
-      ),
-    ).buffer,
+    body: JSON.stringify(
+      {
+        message: 'Go Serverless v3.0! Your function executed successfully!',
+        input: request,
+      },
+      null,
+      2,
+    ),
   };
 }
 ```
@@ -228,14 +207,12 @@ const getRandomInt = (min, max) => Math.floor(Math.random() * (max - min + 1)) +
 
 const decoder = new TextDecoder('utf-8');
 
-const encoder = new TextEncoder('utf-8');
-
 export async function handleRequest(request) {
   const upperLimit = JSON.parse(decoder.decode(request.body)).intent.slots.UpperLimit.value || 100;
   const number = getRandomInt(0, upperLimit);
   const response = {
     status: 200,
-    body: encoder.encode({
+    body: JSON.stringify({
       version: '1.0',
       response: {
         outputSpeech: {
@@ -244,7 +221,7 @@ export async function handleRequest(request) {
         },
         shouldEndSession: false,
       },
-    }).buffer,
+    }),
   };
 
   return response;
