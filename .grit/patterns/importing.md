@@ -81,3 +81,11 @@ class Button extends Component {
   // ...
 }
 ```
+
+## Leaves correct imports alone
+
+```js
+import { orderBy } from 'lodash';
+
+orderBy([1, 2, 3]);
+```
