@@ -187,9 +187,8 @@ file($body) where {
     },
 
     // Mark all the places where we they configure openai as something that requires manual intervention
-    $body <: maybe contains bubble `openai.$field = $val` as $stmt where {
+    $body <: maybe contains bubble($need_openai_import) `openai.$field = $val` => `raise Exception("The 'openai.$field' option isn't read in the client API. You will need to pass it when you instantiate the client, e.g. 'OpenAI($field=$val)'")` where {
         $need_openai_import = `true`,
-        $stmt => `$stmt # TODO: Manual intervention required. This config needs to be set on the instances of OpenAI/AsyncOpenAI`
     },
 
     $body <: maybe contains `import openai` as $import_stmt where {
@@ -316,8 +315,8 @@ if openai_proxy:
 import openai
 
 if openai_proxy:
-    openai.proxy = openai_proxy # TODO: Manual intervention required. This config needs to be set on the instances of OpenAI/AsyncOpenAI
-    openai.api_base = self.openai_api_base # TODO: Manual intervention required. This config needs to be set on the instances of OpenAI/AsyncOpenAI
+    raise Exception("The 'openai.proxy' option isn't read in the client API. You will need to pass it when you instantiate the client, e.g. 'OpenAI(proxy=openai_proxy)'")
+    raise Exception("The 'openai.api_base' option isn't read in the client API. You will need to pass it when you instantiate the client, e.g. 'OpenAI(api_base=self.openai_api_base)'")
 ```
 
 # Remap errors
