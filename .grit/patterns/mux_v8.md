@@ -110,10 +110,18 @@ pattern change_destructured_property_call() {
 }
 
 pattern replace_verify_headers() {
-    or {
-        `Mux.Webhooks.verifyHeader($body, $headers['mux-signature'], $secret)` => `Mux.Webhooks.prototype.verifySignature(Buffer.isBuffer($body) ? $body.toString('utf8') : $body, $headers, $secret)`,
-        `Mux.Webhooks.verifyHeader($body, $headers['mux-signature'] as $_, $secret)` => `Mux.Webhooks.prototype.verifySignature(Buffer.isBuffer($body) ? $body.toString('utf8') : $body, $headers, $secret)`,
+  $mux = `mux`,
+  or {
+    `Mux.Webhooks.verifyHeader($body, $headers['mux-signature'], $secret)`,
+    `Mux.Webhooks.verifyHeader($body, $headers['mux-signature'] as $_, $secret)`
+  } where {
+    // If there is no Mux instance in the file, we need to create one
+    if ($program <: contains `$mux = $_`) {
+      $prefix = .
+    } else {
+      $prefix = `const $mux = new Mux()\n`,
     }
+  } => `$prefix$mux.webhooks.verifyHeader(Buffer.isBuffer($body) ? $body.toString('utf8') : $body, $headers, $secret)`
 }
 
 sequential {
@@ -257,9 +265,46 @@ Mux.Webhooks.verifyHeader(rawBody, req.headers['mux-signature'] as string, webho
 ```
 
 ```ts
-Mux.Webhooks.prototype.verifySignature(
+const mux = new Mux();
+mux.webhooks.verifyHeader(
   Buffer.isBuffer(rawBody) ? rawBody.toString('utf8') : rawBody,
   req.headers,
   webhookSignatureSecret,
 );
+```
+
+## Verify webhooks with existing Mux instance
+
+If there is an existing Mux instance in the file, the webhook verifier should use it.
+
+```js
+const Mux = require('@mux/mux-node');
+
+const { Video, Data } = new Mux({
+  baseUrl: 'test.com',
+});
+
+export const verifyWebhookSignature = (rawBody: string | Buffer, req: NextApiRequest) => {
+  if (webhookSignatureSecret) {
+    Mux.Webhooks.verifyHeader(rawBody, req.headers['mux-signature'] as string, webhookSignatureSecret);
+  }
+};
+```
+
+```ts
+const Mux = require('@mux/mux-node');
+
+const mux = new Mux({
+  baseURL: 'test.com',
+});
+
+export const verifyWebhookSignature = (rawBody: string | Buffer, req: NextApiRequest) => {
+  if (webhookSignatureSecret) {
+    mux.webhooks.verifyHeader(
+      Buffer.isBuffer(rawBody) ? rawBody.toString('utf8') : rawBody,
+      req.headers,
+      webhookSignatureSecret,
+    );
+  }
+};
 ```
