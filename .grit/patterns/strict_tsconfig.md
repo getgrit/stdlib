@@ -199,9 +199,7 @@ pair(key=`"compilerOptions"`, $value) where {
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
-    "strict": true,
-    "checkJs": false,
-    "outDir": "../../dist/out-tsc",
+    "strict": true, "checkJs": false, "outDir": "../../dist/out-tsc",
     "module": "commonjs",
     "types": ["node", "express"],
     "allowJs": true

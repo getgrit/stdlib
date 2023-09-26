@@ -102,7 +102,7 @@ upgrade_dependency(target_dep="typescript", target_version="5.0.3", dependency_k
   "files": ["/dist"],
   "dependencies": {
     "typescript": "5.0.3",
-  "diff": "^5.1.0",
+"diff": "^5.1.0",
     "@types/diff": "^5.0.2",
     "@getgrit/internal": "*",
     "winston": "^3.8.2"
