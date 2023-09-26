@@ -55,12 +55,24 @@ pattern process_one_source($p, $all_imports) {
     }
 }
 
+pattern get_shebang($shebang) {
+    r"^#!(.*)"($sb) as $curr where {
+        $shebang = $curr
+    }
+}
+
 pattern insert_imports() {
     $p where {
         $all_imports = [],
+        $shebang = "",
         $GLOBAL_IMPORTED_SOURCES <: some process_one_source($p, $all_imports),
         if ($all_imports <: not []) {
-            $p => `$all_imports\n$p`
+            $p <: maybe contains bubble($shebang) get_shebang($shebang),
+            if ($shebang <: not .) {
+                $shebang => `$shebang\n$all_imports`,
+            } else {
+                $p => `$all_imports\n$p`
+            }
         } else {
             true
         }

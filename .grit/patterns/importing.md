@@ -64,6 +64,39 @@ console.log(v4());
 fetch();
 ```
 
+## Ignores Shebang
+```js
+#!/usr/bin/env node
+
+import { orderBy } from 'underscore';
+import fetch from 'elsewhere';
+import { fetch } from 'node-fetch';
+import { fetch, more } from 'node-fetch';
+import fetch from 'node-fetch';
+
+console.log(orderBy([1, 2, 3]));
+
+console.log(v4());
+
+fetch()
+```
+
+```js
+#!/usr/bin/env node
+import { orderBy } from 'lodash';
+import { v4 } from 'uuid';
+
+import fetch from 'elsewhere';
+
+import { more } from 'node-fetch';
+
+console.log(orderBy([1, 2, 3]));
+
+console.log(v4());
+
+fetch()
+```
+
 ## Ensures a React import
 
 From https://docs.grit.io/guides/imports:
