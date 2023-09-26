@@ -25,7 +25,6 @@ this_moment_utc = datetime.utcnow()
 ```
 
 ```python
-
 from datetime import datetime, timezone
 
 this_moment_utc = datetime.now(timezone.utc)

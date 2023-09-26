@@ -24,7 +24,7 @@ pattern re_match_function() {
 pattern imported_match_function() {
     $func where {
         $func <: re_match_function(),
-        $func <: imported_from(source = `re`),
+        $func <: is_imported_from(source = `re`),
     },
 }
 

@@ -28,7 +28,7 @@ for_statement(body=block(statements=[prod_accum(accum = $var, factor = $left)]),
     $for <: after prod_init(accum = $var) => .,
     $left <: identifier(),
     $import = `math`,
-    $import <: ensure_imported(),
+    $import <: ensure_bare_import(),
 } => `math.prod($right)`
 ```
 
@@ -36,6 +36,8 @@ for_statement(body=block(statements=[prod_accum(accum = $var, factor = $left)]),
 
 
 ```python
+from math import log
+
 n = 1
 for x in range(10):
     n *= x
@@ -70,6 +72,8 @@ for x in range(10):
 
 ```python
 import math
+
+from math import log
 
 
 math.prod(range(10))
