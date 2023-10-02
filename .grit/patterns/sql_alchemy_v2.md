@@ -86,13 +86,107 @@ pattern no_nested_with_expr() {
     }
 }
 
+pattern get_directly_on_session() {
+    `$sess.query($cls).get($id)` => `$sess.get($cls, $id)`
+}
+
+pattern cmp_statements() {
+    r"^.+ (?:(?:==)|(?:>=)|(?:<=)|>|<) .+(?: (?:and)|(?:or) .+ (?:(?:==)|(?:>=)|(?:<=)|>|<) .+)*$",
+}
+
+pattern migrate_old_select_args($call_chain, $args) {
+    $stmt where {
+        if ($args <: contains list(elements=$items)) {
+            $call_chain += `select($items)`,
+        } else {
+            $call_chain += `select()`,
+        },
+        $args <: maybe contains keyword_argument(name=`select_from`, value=$table) where {
+            $call_chain += `select_from($table)`,
+        },
+        $args <: maybe contains keyword_argument(name=`order_by`, value=$col) where {
+            $call_chain += `order_by($col)`,
+        },
+        $args <: maybe contains cmp_statements() as $cmp_stmt where {
+            $call_chain += `where($cmp_stmt)`,
+        },
+        $new_stmt = join(list = $call_chain, separator = "."),
+        $stmt => `$new_stmt`,
+    }
+}
+
+pattern migrate_pre_1_4_select() {
+    $call_chain = [],
+    or {
+        `select($args)`,
+        `$table.select($args)` where {
+            $call_chain += `$table`,
+        },
+    } as $stmt where {
+        or {
+            $args <: contains list(),
+            $args <: contains keyword_argument(),
+            $args <: contains cmp_statements(),
+        },
+        $stmt <: migrate_old_select_args($call_chain, $args),
+    },
+}
+
+pattern migrate_post_1_4_create_legacy_select() {
+    $call_chain = [],
+    or {
+        `create_legacy_select($args)`,
+        `$table.create_legacy_select($args)` where {
+            $call_chain += `$table`,
+        },
+    } as $stmt where {
+        $stmt <: migrate_old_select_args($call_chain, $args),
+    },
+}
+
+pattern migrate_executes() {
+    `$var.execute($param)` where {
+        $var <: or {
+            `connection`,
+            `conn`,
+            `session`,
+            `sess`,
+            `c`,
+            `s`,
+        },
+        $param <: not `text($_)`,
+        $param => `text($param)`,
+        $text = `text`,
+        $text <: ensure_import_from(source=`sqlalchemy`),
+    }
+}
+
+pattern change_declarative_base() {
+    $body where {
+        $body <: contains `from sqlalchemy.ext.declarative import declarative_base` => . where {
+            $to_import = `declarative_base`,
+            $to_import <: ensure_import_from(source=`sqlalchemy.orm`),
+        },
+        $body <: contains `$var = declarative_base($params)` => `
+class Base:
+    __allow_unmapped__ = True
+
+$var = declarative_base(cls=Base,$params)
+`
+    }
+}
 
 file($body) where $body <: any {
     contains bulk_update(),
     contains convert_to_subquery(),
     contains c_to_selected_columns(),
     contains select_list_to_vargs(),
-    contains no_nested_with_expr()
+    contains no_nested_with_expr(),
+    contains get_directly_on_session(),
+    contains migrate_pre_1_4_select(),
+    contains migrate_post_1_4_create_legacy_select(),
+    contains migrate_executes(),
+    contains change_declarative_base(),
 }
 ```
 
@@ -117,6 +211,8 @@ s2 = select(User).options(with_expression(User.expr, literal("u2")))
 
 stmt = union_all(s1, s2)
 session.scalars(select(User).from_statement(stmt)).all()
+
+user_obj = session.query(User).get(5)
 ```
 
 ```python
@@ -143,4 +239,73 @@ session.scalars(
     .from_statement(stmt)
     .options(with_expression(User.expr, stmt.selected_columns.some_literal))
 ).all()
+
+user_obj = session.get(User, 5)
+```
+
+# Migrate pre 1.4 select and post 1.4 legacy select statements
+
+```python
+stmt = select([1], select_from=table, order_by=table.c.id)
+
+stmt = select([table.c.x], table.c.id == 5)
+
+stmt = table.select(table.c.id == 5)
+
+stmt = select([table.c.x, table.c.y])
+
+stmt = create_legacy_select([table.c.x, table.c.y])
+```
+
+```python
+stmt = select(1).select_from(table).order_by(table.c.id)
+
+stmt = select(table.c.x).where(table.c.id == 5)
+
+stmt = table.select().where(table.c.id == 5)
+
+stmt = select(table.c.x, table.c.y)
+
+stmt = select(table.c.x, table.c.y)
+```
+
+# Migrate SQL executions
+
+```python
+sess.execute("SELECT * FROM some_table")
+
+sess.execute(text("SELECT * FROM some_table"))
+
+conn.execute("SELECT * FROM some_table")
+```
+
+```python
+from sqlalchemy import text
+
+sess.execute(text("SELECT * FROM some_table"))
+
+sess.execute(text("SELECT * FROM some_table"))
+
+conn.execute(text("SELECT * FROM some_table"))
+```
+
+# Change declarative_base import
+
+```python
+from sqlalchemy.ext.declarative import declarative_base
+
+Base = declarative_base()
+```
+
+```python
+from sqlalchemy.orm import declarative_base
+
+
+
+
+class Base:
+    __allow_unmapped__ = True
+
+Base = declarative_base(cls=Base)
+
 ```
