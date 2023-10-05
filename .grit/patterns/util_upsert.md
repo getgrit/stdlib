@@ -31,7 +31,10 @@ pattern upsert($key, $value) {
 }
 
 // Test case
-`hello($obj)` where { $obj <: upsert(key=`hello`, value=`"world"`) }
+or {
+    `hello($obj)` where { $obj <: upsert(key=`hello`, value=`"world"`) },
+    `string_key($obj)` where { $obj <: upsert(key=`"hello-world"`, value=`"niceness"`)}
+}
 ```
 
 ## Simple test
@@ -58,4 +61,20 @@ hello({ hello: "world" });
 hello({ hello: "world" });
 
 hello({ king: 'old-string', hello: "world" });
+```
+
+## String key
+
+It handles cases where the key is a string.
+
+```js
+string_key({});
+
+string_key({ 'hello-world': 'boss' });
+```
+
+```js
+string_key({ "hello-world": "niceness" });
+
+string_key({ 'hello-world': "niceness" });
 ```
