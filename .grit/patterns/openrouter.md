@@ -12,7 +12,10 @@ pattern openrouter_fix_init() {
     `new OpenAI($params)` where {
         $params <: upsert(key=`"baseURL"`, value=`"https://openrouter.ai/api/v1"`),
         or {
-          $params <: contains `defaultHeaders: $headers`,
+          $params <: contains `defaultHeaders: $headers` where {
+            $headers <: upsert(key=`"HTTP-Referer"`, value=`YOUR_SITE_URL`),
+            $headers <: upsert(key=`"X-Title"`, value=`YOUR_SITE_NAME`)
+          },
           $params <: upsert(key=`"defaultHeaders"`, value=`{
             "HTTP-Referer": YOUR_SITE_URL,
             "X-Title": YOUR_SITE_NAME // Optional. Shows on openrouter.ai
@@ -137,12 +140,9 @@ const openai = new OpenAI({
   apiKey: OPENROUTER_API_KEY,
   defaultHeaders: {
     'X-Custom-Header': 'hello',
+    'X-Title': YOUR_SITE_NAME,
+    'HTTP-Referer': YOUR_SITE_URL,
   },
   baseURL: 'https://openrouter.ai/api/v1',
-  defaultHeaders: {
-    'X-Custom-Header': 'hello',
-    'HTTP-Referer': YOUR_SITE_URL,
-    'X-Title': YOUR_SITE_NAME, // Optional. Shows on openrouter.ai
-  },
 });
 ```
