@@ -4,6 +4,8 @@ The `upsert` pattern can be used to update a value in an object, or insert it if
 
 Warning: Only one `upsert` can be done per object. If you need to insert multiple keys, use `sequential` until the file converges.
 
+tags: #util, #upsert, #object
+
 ```grit
 pattern upsert($key, $value) {
     and {
