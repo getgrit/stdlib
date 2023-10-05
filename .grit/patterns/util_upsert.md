@@ -47,3 +47,15 @@ hello({ hello: 'old-string' });
 
 hello({ king: 'old-string' });
 ```
+
+```js
+hello({ hello: "world" });
+
+hello({ thing: 'two', hello: "world" });
+
+hello({ hello: "world" });
+
+hello({ hello: "world" });
+
+hello({ king: 'old-string', hello: "world" });
+```
