@@ -43,20 +43,6 @@ sequential {
 }
 ```
 
-        or {
-            $params <: contains `defaultHeaders: { $headers }` where {
-                $headers <: contains `"HTTP-Referer": $_` => $new_referer,
-                $headers <: contains `"X-Title": $_` => $new_title
-            },
-            $new_params += `, defaultHeaders: {
-                $new_referer,
-                $new_title
-            }`
-        },
-        if (!$new_params <: .) {
-            $params => `$params$new_params`
-        },
-
 ## Basic OpenAI Node SDK
 
 ```ts
