@@ -4,7 +4,7 @@ title: OpenAI migration openai version -> stainless-sdk version
 
 Convert OpenAI from openai version to the stainless-sdk version.
 
-tags: #python, #openai
+tags: #python, #openai, #migration
 
 ```grit
 engine marzano(0.1)
