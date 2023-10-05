@@ -23,8 +23,6 @@ pattern openrouter_fix_init() {
             "X-Title": YOUR_SITE_NAME // Optional. Shows on openrouter.ai
           }`)
         }
-        // $new_referer = `"HTTP-Referer": YOUR_SITE_URL`,
-        // $new_title = `"X-Title": YOUR_SITE_NAME, // Optional. Shows on openrouter.ai`,
     },
 }
 
