@@ -1,3 +1,9 @@
+---
+title: Adopt OpenRouter
+---
+
+Switch the OpenAI node SDK to using [OpenRouter](https://openrouter.ai/docs#format)
+
 ```grit
 engine marzano(0.1)
 language js
@@ -31,4 +37,35 @@ or {
         $model => `openai/$model`
     }
 }
+```
+
+## Basic OpenAI Node SDK
+
+```ts
+import OpenAI from 'openai';
+
+const openai = new OpenAI({
+  apiKey: OPENROUTER_API_KEY,
+});
+
+async function main() {
+  const completion = await openai.chat.completions.create({
+    messages: [{ role: 'user', content: 'Say this is a test' }],
+    model: 'gpt-3.5-turbo',
+  });
+
+  console.log(completion.choices);
+
+  // Streaming responses
+  const stream = await openai.chat.completions.create({
+    model: 'openai/gpt-4',
+    messages: [{ role: 'user', content: 'Say this is a test' }],
+    stream: true,
+  });
+  for await (const part of stream) {
+    process.stdout.write(part.choices[0]?.delta?.content || '');
+  }
+}
+
+main();
 ```
