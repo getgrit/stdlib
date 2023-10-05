@@ -58,7 +58,7 @@ async function main() {
 
   // Streaming responses
   const stream = await openai.chat.completions.create({
-    model: 'openai/gpt-4',
+    model: 'gpt-4',
     messages: [{ role: 'user', content: 'Say this is a test' }],
     stream: true,
   });
