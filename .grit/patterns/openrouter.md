@@ -33,11 +33,9 @@ pattern openrouter_completions() {
     }
 }
 
-sequential {
-  or { openrouter_fix_init(), openrouter_completions() },
-  // run until we converge
+or {
   openrouter_fix_init(),
-  openrouter_fix_init()
+  openrouter_completions()
 }
 ```
 
@@ -73,37 +71,38 @@ main();
 ```
 
 ```ts
-import OpenAI from 'openai';
+import OpenAI from "openai";
 
 const openai = new OpenAI({
   apiKey: OPENROUTER_API_KEY,
+  baseURL: "https://openrouter.ai/api/v1",
   defaultHeaders: {
-    'HTTP-Referer': YOUR_SITE_URL,
-    'X-Title': YOUR_SITE_NAME, // Optional. Shows on openrouter.ai
+    "HTTP-Referer": YOUR_SITE_URL,
+    "X-Title": YOUR_SITE_NAME, // Optional. Shows on openrouter.ai
   },
-  baseURL: 'https://openrouter.ai/api/v1',
 });
 
 async function main() {
   const completion = await openai.chat.completions.create({
-    messages: [{ role: 'user', content: 'Say this is a test' }],
-    model: 'openai/gpt-3.5-turbo',
+    messages: [{ role: "user", content: "Say this is a test" }],
+    model: "openai/gpt-3.5-turbo",
   });
 
   console.log(completion.choices);
 
   // Streaming responses
   const stream = await openai.chat.completions.create({
-    model: 'openai/gpt-4',
-    messages: [{ role: 'user', content: 'Say this is a test' }],
+    model: "openai/gpt-4",
+    messages: [{ role: "user", content: "Say this is a test" }],
     stream: true,
   });
   for await (const part of stream) {
-    process.stdout.write(part.choices[0]?.delta?.content || '');
+    process.stdout.write(part.choices[0]?.delta?.content || "");
   }
 }
 
 main();
+
 ```
 
 ## Merges headers
@@ -120,15 +119,16 @@ const openai = new OpenAI({
 ```
 
 ```ts
-import OpenAI from 'openai';
+import OpenAI from "openai";
 
 const openai = new OpenAI({
   apiKey: OPENROUTER_API_KEY,
   defaultHeaders: {
-    'X-Custom-Header': 'hello',
-    'X-Title': YOUR_SITE_NAME,
-    'HTTP-Referer': YOUR_SITE_URL,
+    "X-Custom-Header": "hello",
+    "HTTP-Referer": YOUR_SITE_URL,
+    "X-Title": YOUR_SITE_NAME,
   },
-  baseURL: 'https://openrouter.ai/api/v1',
+  baseURL: "https://openrouter.ai/api/v1",
 });
+
 ```

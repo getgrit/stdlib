@@ -55,23 +55,23 @@ pattern process_one_source($p, $all_imports) {
     }
 }
 
-pattern get_shebang($shebang) {
-    r"^#!(.*)"($sb) as $curr where {
-        $shebang = $curr
-    }
-}
-
 pattern insert_imports() {
     $p where {
         $all_imports = [],
-        $shebang = "",
         $GLOBAL_IMPORTED_SOURCES <: some process_one_source($p, $all_imports),
         if ($all_imports <: not []) {
-            $p <: maybe contains bubble($shebang) get_shebang($shebang),
-            if ($shebang <: not .) {
-                $shebang => `$shebang\n$all_imports`,
-            } else {
-                $p => `$all_imports\n$p`
+            or {
+              // Try to find a shebang and insert after that
+              $p <: program(hash_bang=$h) where {
+                $h <: hash_bang_line() += `\n$all_imports`
+              },
+              // Find an import statement to anchor on
+              $p <: program($statements) where {
+                $statements <: some $anchor where { $anchor <: import_statement() },
+                $anchor += `\n$all_imports`
+              },
+              // Fall back to inserting the whole program
+              $p => `$all_imports\n$p`
             }
         } else {
             true
@@ -80,7 +80,7 @@ pattern insert_imports() {
 }
 
 pattern after_each_file_handle_imports() {
-  file(body = $p) where $p <: maybe insert_imports()
+  file($body) where $body <: maybe insert_imports()
 }
 
 pattern remove_import($from) {

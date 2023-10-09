@@ -24,7 +24,7 @@ pattern upsert($key, $value) {
                         $old => $value
                     },
                     $obj where {
-                        $obj => `$obj, $key: $value`
+                        $obj += `, $key: $value`
                     }
                 }
             }

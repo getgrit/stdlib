@@ -36,6 +36,8 @@ contains or {
 ## Ensures, replaces and removes specified imports
 
 ```js
+import { keep } from 'keepable';
+
 import { orderBy } from 'underscore';
 import fetch from 'elsewhere';
 import { fetch } from 'node-fetch';
@@ -50,6 +52,7 @@ fetch();
 ```
 
 ```js
+import { keep } from 'keepable';
 import { orderBy } from 'lodash';
 import { v4 } from 'uuid';
 
@@ -65,6 +68,7 @@ fetch();
 ```
 
 ## Ignores Shebang
+
 ```js
 #!/usr/bin/env node
 
@@ -78,7 +82,7 @@ console.log(orderBy([1, 2, 3]));
 
 console.log(v4());
 
-fetch()
+fetch();
 ```
 
 ```js
@@ -94,7 +98,7 @@ console.log(orderBy([1, 2, 3]));
 
 console.log(v4());
 
-fetch()
+fetch();
 ```
 
 ## Ensures a React import
@@ -102,12 +106,15 @@ fetch()
 From https://docs.grit.io/guides/imports:
 
 ```typescript
+import _ from 'lodash';
+
 class Button extends Component {
   // ...
 }
 ```
 
 ```typescript
+import _ from 'lodash';
 import { Component } from 'React';
 
 class Button extends Component {
@@ -121,4 +128,24 @@ class Button extends Component {
 import { orderBy } from 'lodash';
 
 orderBy([1, 2, 3]);
+```
+
+## Inserts imports when none exist
+
+```typescript
+console.log('this is a test');
+
+class Button extends Component {
+  // ...
+}
+```
+
+```typescript
+import { Component } from 'React';
+
+console.log('this is a test');
+
+class Button extends Component {
+  // ...
+}
 ```
