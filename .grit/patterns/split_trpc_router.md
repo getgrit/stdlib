@@ -13,7 +13,7 @@ language js
 pattern process_route($imports, $refs, $dir, $main_file_imports) {
     pair($key, $value) where {
         $route_name = `$[key]Route`,
-        $value => `$route_name,`, // todo: drop comma after fixing bug
+        $value => `$route_name`,
         $file_name = `$dir/$key.route.ts`,
         $new_file_statements = [`import { proc } from "./middleware"`],
         $imports <: maybe some filter_used_imports(local_imports = $new_file_statements, content = $value),
