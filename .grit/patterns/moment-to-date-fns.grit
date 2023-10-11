@@ -1,0 +1,852 @@
+language js
+
+// A call to `add`/`sub` method of a `momentjs` date object.
+pattern moment_arith($date, $method, $count, $specifier) {
+  `$date.$method($count, $specifier)` as $arith_exp where {
+    $method <: or { `add` => `addDate`, `subtract` => `subDate` },
+    if ($method <: `add`) {
+      $method <: ensure_import_from(source=`"date-fns/add"`),
+    } else {
+      $sub = `sub`,
+      $sub <: ensure_import_from(source=`"date-fns/sub"`),
+    }
+  }
+}
+
+// A call to `add/sub` where the caller (`this`) is an identifier. eg: foo.add(bar);
+pattern moment_arith_lhs_identifier($date, $method, $count, $specifier) {
+  moment_arith($date, $method, $count, $specifier) where {
+    $date <: identifier()
+  }
+}
+
+// Any call expression that returns a moment.js date or duration object.
+pattern exp_returns_moment($exp) {
+  `$fn()` as $exp where {
+    $fn <: or {
+      `moment`,
+      `$_.duration`,
+      `$_.clone`,
+      `$_.add`,
+      `$_.subtract`,
+      `$_.startOf`,
+      `$_.endOf`,
+      `$m.$min_or_max` where {
+        !$m <: `Math`,
+        $min_or_max <: or { `min`, `max` }
+      },
+    } 
+  }
+}
+
+// A variable declarator that declares a moment.js Date or Duration object.
+pattern moment_var_decl($var_name) {
+  variable_declarator(name=$var_name, $value) where {
+    $value <: exp_returns_moment(),
+    $var_name <: identifier()
+  }
+}
+
+// collect all identifiers that are declared as a moment.js date or duration
+pattern collect_moment_identifier_decls($id_list) {
+  moment_var_decl(var_name=$name) where {
+    $id_list += $name
+  }
+}
+
+// A `const` variable declaration that initializes a moment date or duration object
+pattern moment_const_decl($declaration, $declarators) {
+  `$varName = $moment` where {
+    $moment <: exp_returns_moment(),
+    $varName <: within `$declaration` where { $declaration <: `const $declarators` },
+  }
+}
+// Matches calls like `moment.startOf('day')`, `moment.startOf('week')`
+pattern moment_set_to_start_or_end_literal($date, $func_type, $unit) {
+  `$date.$func_type($specifier)` where {
+    $func_type <: or { `startOf`, `endOf` },
+    $specifier<: string(fragment=$unit)
+  }
+}
+
+// moment.max(...) or moment.min(...)
+pattern moment_limit_to_max_or_min($date, $arg, $methodName) {
+  `$date.$methodName($arg)` where {
+    $methodName  <: or { `max`, `min` }
+  }
+}
+
+// Helper patterns to match format specifiers for different time units in moment js:
+pattern year() { string(fragment=r"\b(?:y|years?)\b") }
+pattern month() { string(fragment=r"\b(?:M|months?)\b") }
+pattern quarter() { string(fragment=r"\b(?:q|quarters?)\b") }
+pattern week() { string(fragment=r"\b(?:w|weeks?)\b") }
+pattern day() { string(fragment=r"\b(?:d|days?)\b") }
+pattern hour() { string(fragment=r"\b(?:h|hours?)\b") }
+pattern minute() { string(fragment=r"\b(?:m|minutes?)\b") }
+pattern second() { string(fragment=r"\b(?:s|seconds?)\b") }
+pattern millisecond() { string(fragment=r"\b(?:ms|milliseconds?)\b") }
+
+pattern regex_year() { r"\b(?:(?i)y|years?)\b" }
+pattern regex_quarter() { r"\b(?:(?i)q|quarters?)\b" }
+pattern regex_month() { r"\b(?:M|(?i)months?)\b" }
+pattern regex_week() { r"\b(?:(?i)w|weeks?)\b" }
+pattern regex_date() { r"\b(?:(?i)d|dates?)\b"  }
+pattern regex_day() { r"\b(?:(?i)d|days?)\b"  }
+pattern regex_hour() { r"\b(?:(?i)h|hours?)\b" }
+pattern regex_minute() { r"\b(?:(?i)m|minutes?)\b" }
+pattern regex_second() { r"\b(?:(?i)s|seconds?)\b" }
+pattern regex_ms() { r"\b(?:(?i)ms|milliseconds?)\b" }
+
+pattern moment_getter_or_setter() {
+  `$d.$accessor($arg)` as $exp where {
+    $accessor <: r"(year|month|week|day|hour|minute|second|millisecond)s?"($unit),
+    $duration_accessor = join(list=[$unit, "s"], separator=""),
+    if ($unit <: or { "hour", "minute", "second", "millisecond" } ) {
+      $unit = $duration_accessor
+    },
+    $cap_unit = capitalize(string=$unit),
+    $getfn = `get$cap_unit`,
+    $setfn = `set$cap_unit`,
+    $out = ``,
+    if ($arg <: .) {
+      // getter call
+      if ($d <: identifier()) {
+        $out = `(($d instanceof Date) ? datefns.$getfn($d) : ($d.$duration_accessor ?? 0))`,
+        if ($exp <: should_follow_semi()) {
+          $out = `;\n$out`
+        }
+      } else {
+        $out = `(d => (d instanceof Date) ? datefns.$getfn(d) : (d.$duration_accessor ?? 0))($d)`
+      }
+    } else {
+      // setter call
+      if ($d <: identifier()) {
+        if ($arg <: or { literal(), identifier() } ) {
+          $out = `(($d instanceof Date) ? ($d = $d.$setfn($arg)) : ($d.$duration_accessor = $arg))`
+        } else {
+          // the argument might be an expression with side effects, and hence must be evaluated only once using an IIFE
+          $out = `((() => ($d instanceof Date) ? ($d = $d.$setfn(val)) : ($d.$duration_accessor = val))(val))`
+        }
+      } else {
+        $out = `(((d, val) => (d instanceof Date) ? d.$setfn(val) : (d.$duration_accessor = val))($d, $arg))`,
+        if ($out <: should_follow_semi()) {
+          $out = `;\n$out`
+        }
+      },
+
+      if ($out <: should_follow_semi()) {
+        $out = `;\n$out`
+      }
+    }
+  } => `$out`,
+}
+
+// convert a moment.js unit specifier to its normal form ("y" -> "year")
+pattern normalize_unit_specifier($norm) {
+  `$specifier` where {
+    $return = ``,
+    if ($specifier <: regex_year()) {
+      $return = `year`
+    } else if ($specifier <: regex_quarter()) {
+      $return = `quarter`
+    } else if ($specifier <: regex_month()) {
+      $return = `month`
+    } else if ($specifier <: regex_week()) {
+      $return = `week`
+    } else if ($specifier <: regex_day()) {
+      $return = `day`
+    } else if ($specifier <: regex_hour()) {
+      $return = `hour`
+    } else if ($specifier <: regex_minute()) {
+      $return = `minute`
+    } else if ($specifier <: regex_second()) {
+      $return = `second`
+    } else if ($specifier <: regex_ms()) {
+      $return = `millisecond`
+    },
+    $norm = $return
+  }
+}
+
+// add/subtract: convert all momentjs arithmetic operations to date-fns operations.
+// eg: today.add(oneday) => add(today, oneday)
+pattern rewrite_moment_arithmetic() {
+  or {
+    // add/subtract: convert all momentjs arithmetic operations to date-fns operations.
+    // eg: today.add(oneday) => add(today, oneday)
+    moment_arith($date, $method, $count, $specifier) as $expression where {
+      $specifier <: and {
+        string(),
+        or {
+          year() => `years`,
+          quarter() => `quarters`,
+          month() => `months`,
+          week() => `weeks`,
+          day() => `days`,
+          hour() => `hours`,
+          minute() => `minutes`,
+          second() => `seconds`,
+          millisecond() => `milliseconds`
+        }
+      },
+
+      $out = `$method($date, { $specifier: $count })`,
+
+      if ($date <: identifier()) {
+        $out = `$date = $method($date, { $specifier: $count })`
+      },
+      // If the arithmetic expression is not an expression statement,
+      // wrap it in `()`, as `=` has very low precedence.
+      if ($date <: not within expression_statement($expression)) {
+        $out = `($out)`
+      }
+    } => `$out`,
+
+    moment_arith($date, $method, $count, $specifier) where {
+      !$specifier <: string(),
+      $out = `$method($date, { [normalizeMomentJSUnit($specifier) + 's']: $count })`,
+      if ($date <: identifier()) { $out = `$date = $out`},
+      if ($date <: not within expression_statement($expression)) {
+        $out = `($out)`
+      }
+    } => `$out`,
+
+    `$date_a.diff($date_b, $literal_unit)` where { $literal_unit <: string() }  => `datefns.differenceIn$literal_unit($date_a, $date_b)` where {
+      $literal_unit <: or {
+        year() => `Years`,
+        quarter() => `Quarters`,
+        month() => `Months`,
+        week() => `Weeks`,
+        day() => `Days`,
+        hour() => `Hours`,
+        minute() => `Minutes`,
+        second() => `Seconds`,
+        millisecond() => `Milliseconds`
+      }
+    },
+
+    // When no unit is specified, `diff` returns difference in ms.
+    `$date_a.diff($date_b)` where { $date_b <: [$_] /* exactly one argument */ } => `datefns.differenceInMilliseconds($date_a, $date_b)`,
+  }
+}
+
+pattern rewrite_moment_getters_and_setters() {
+  or {
+    `$date.daysInMonth()` => `datefns.getDaysInMonth($date)`,
+     moment_getter_or_setter(),
+
+    `$date.$func($arg)` as $exp where {
+      $func <: or {
+        or { `date`, `dates` }  => `Month`,
+        or { `day`, `days`, `weekday`, `weekdays` } => `Day`,
+        or { `isoWeek`, `isoWeeks` } => `ISOWeek`,
+        or { `week`, `weeks` }  => `Week`,
+        `isoWeekday` => `ISODay`,
+        `dayOfYear` => `DayOfYear`,
+        `weekOfYear` => `WeekOfYear`,
+      },
+
+      $comment = `/*TODO: date-fns objects are immutable, feed this value back through properly*/`,
+      $out = `datefns.set$func($date, $arg)`,
+
+      // no-args => it's a getter call
+      if ($arg <: .) {
+        $out = `datefns.get$func($date)`
+      } else if ($date <: identifier()) {
+        // Presence of arguments implies a setter call.
+        // Identifiers can be re-assigned to.
+        $out = `($date = datefns.set$func($date, $arg))`
+      } else if ($exp <: should_follow_semi()) {
+        $out = `$comment\n$out`
+      } else {
+        $out = `$comment $out`
+      }
+    }  => `$out`,
+
+    // There are no setters for the number of ISO Weeks in an year.
+    `$date.$method()` where { $method <: or { `weeksInYear`, `isoWeeksInYear` } } => `datefns.getISOWeeksInYear($date)`,
+
+    `$date.get($unit)` as $exp where {
+      $unit <: string(fragment=$unit_raw),
+      $unit_raw <: normalize_unit_specifier($norm),
+      $capitalized_unit = capitalize(string=$norm),
+      $duration_property = join(list=[$norm, "s"], separator=""),
+      $getfn = `get$capitalized_unit`,
+
+      if ($norm <: or { `millisecond`, `second`, `minute`, `hour` } ) {
+        $getfn = join(list=[$getfn, "s"], separator="")
+      },
+
+      $out = `((d => (d instanceof Date) ? datefns.$getfn(d) : (d.$duration_property ?? 0))($date))`,
+      if ($date <: identifier()) {
+        $out = `((d instanceof Date) ? datefns.$getfn(d) : (d.$duration_property ?? 0))`
+      },
+
+      if ($exp <: should_follow_semi()) {
+        $out = `;\n$out`
+      }
+    } => `$out`,
+
+    `$date.get($unit)` where { !$unit <: string() } => `getUnitFromDate($date, $unit)`,
+    `$date.set($unit, $value)` where { !$unit <: string() } => `setUnitOnDate($date, $unit, $value)`,
+
+    `$date.set($unit, $value)` as $exp where {
+      $unit <: string(fragment=$setter),
+      $setter <: or {
+        // units in a momentjs getter are case insensitive and allow plural forms
+        regex_year() => `setYear`,
+        regex_month() => `setMonth`,
+        regex_date() => `setDate`,
+        regex_hour() => `setHours`,
+        regex_minute() => `setMinutes`,
+        regex_second() => `setSeconds`,
+        regex_ms()  => `setMilliseconds`,
+      },
+      $comment = `/* TODO: date-fns objects are immutable, propagate this value appropriately */`,
+      $out = `datefns.$setter($date, $value)`,
+      if ($date <: identifier()) {
+        $out = `($date = datefns.$setter($date, $value))`
+      },
+      
+      if ($exp <: should_follow_semi()) {
+        $out = `;\n$out`
+      }
+    } => `$out`,
+  }
+}
+
+pattern rewrite_duration_set_and_get() {
+  `$duration.$getter()` where {
+    $getter <: or {
+      `asMilliseconds` => `toMilliseconds`,
+      `asSeconds` => `toSeconds`,
+      `asMinutes` => `toMinutes`,
+      `asHours` => `toHours`,
+      `asDays` => `toDays`,
+      `asWeeks` => `toWeeks`,
+      `asMonths` => `toMonths`,
+      `asYears` => `toYears`,
+    }
+  } => `durationfns.$getter($duration)`,
+}
+
+
+// Moment-js has some helpers that mutate the global locale, calendar format, etc.:
+// https://momentjs.com/docs/#/customization/
+// e.g: setting the global locale to 'en-us', or modifying the builtin month names in the `en` locale.
+// In date-fns, modifying month names in an existing locale is possible, but not encouraged;
+// and adding new locales is very different: 
+// 1. https://date-fns.org/v2.30.0/docs/setDefaultOptions
+// 2. https://date-fns.org/v2.30.0/docs/Locale
+// There is no 1:1 feature parity with moment.js, and thus a correct migration
+// is not straight-forward (or even possible without using implementation details of date-fns's locale representation).
+pattern remove_moment_global_customizations() {
+  or {
+    `$fn($_)` as $exp where {
+      $fn <: or {
+        `$_.updateLocale`,
+        `updateLocale`,
+        `$_.locale`,
+        `locale`,
+        `$_.lang`,
+        `lang`,
+        `$_.relativeTimeThreshold`,
+        `relativeTimeThreshold`,
+        `$_.relativeTimeRounding`
+      },
+      $noop = `/* localization in date-fns uses pure functions. ref : https://date-fns.org/v2.30.0/docs/Locale */ void 0`,
+      $out = $noop,
+    } => `$out`,
+    `$_.calendarFormat = $_` => `/* Use pure functions to set default calendar format in date-fns. ref: https://date-fns.org/v2.30.0/docs/Locale */ void 0`
+  }
+}
+
+// Some stateful features of moment-js are simply missing in date-fns.
+// For example, calling `date.utc(<boolean>)` will set a flag on `date`
+// to use UTC to display a moment instead of the original moment's time.
+// This only affects the way a date is displayed (PST vs UTC).
+// This could technically be migrated by maintaining a global map of flags and
+// turning every `utc()` call into `set`, and every `display` call into a custom
+// overload, but I think that would introduce too much unwanted noise into the user's program.
+pattern missing_datefns_features() {
+  or {
+    `$date.$method()` where {
+      $method <: or { `utc`, `local` }
+    } => `/* (Moment#$method) is not supported in date-fns. Prefer using local state when displaying dates */ $date`,
+    remove_moment_global_customizations()
+  }
+}
+
+// Rewrite .toJSON and .toArray calls
+pattern rewrite_to_json_or_array($moment_ids) {
+  or {
+    `$d.toJSON()` as $exp where {
+      $out = `/* if "$d" is a moment-js object, replace with date.toJSON() call */ $exp`,
+      if ($moment_ids <: contains $d) {
+        $out = `dateOrDuration2JSON($d)`
+      }
+    } => `$out`,
+
+    `$d.toArray()` as $exp where {
+      $out = `/* if "$d" is a moment-js object, convert it to an array */ $exp`,
+      if ($moment_ids <: contains $d) {
+        $out = `dateOrDuration2Array($d)`
+      }
+    } => `$out`
+  }
+}
+
+// rewrite `$d.toJSON()` to an appropriate JSON conversion call.
+pattern rewrite_conversion_calls() {
+  program($statements) where {
+    $id_list = [],
+    $statements <: maybe contains collect_moment_identifier_decls($id_list),
+    $statements <: maybe contains bubble($id_list) rewrite_to_json_or_array(moment_ids=$id_list),
+  } 
+}
+
+pattern rewrite_misc_methods() {
+  or {
+    `$d.clone()` as $exp where {
+      $out = `((d => (d instanceof Date) ? (new Date(d.getTime())) : structuredClone(d) )($d))`,
+      if ($d <: identifier()) {
+        $out = `(($d instanceof Date) ? new Date($d.getTime()) : structuredClone($d))`,
+      },
+      if ($exp <: should_follow_semi()) {
+        $out = `;\n$out`
+      }
+    } => `$out`,
+
+    `$d.humanize()` => `datefns.formatDuration($d)`,
+
+    missing_datefns_features(),
+
+    or {
+      `$_.normalizeUnits`,
+      `normalizeUnits`
+    } => `normalizeMomentJSUnit`,
+
+    or { `$_.isValid`, `isValid` } => `datefns.isValid`,
+
+    `$d.toObject()` as $exp where {
+      $out = `((d => ((d instanceof Date) ? {
+        years: d.getFullYear(),
+        months: d.getMonth(), 
+        date: d.getDate(),
+        hours: d.getHours(),
+        minutes: d.getMinutes(),
+        seconds: d.getSeconds(),
+        milliseconds: d.getMilliseconds()} : d.toObject()))($d))`,
+      if ($exp <: should_follow_semi()) {
+        $out = `;\n$out`
+      }
+    } => `$out`
+  }
+}
+
+pattern rewrite_moment_queries() {
+  or {
+    `$date_a.$compare($date_b)` where {
+      $compare <: or { `isBefore`, `isAfter` }
+    } => `datefns.$compare($date_a, $date_b)`,
+
+    `$date_a.$compare($date_b)` as $exp where {
+      $compare <: or {
+        `isSameOrBefore` => `isBefore`,
+        `isSameOrAfter` => `isAfter`,
+      },
+      $date_a <: identifier(),
+      $date_b <: identifier(),
+      // Since `a` and `b` are evaluated twice, it is safer to use an IIFE here for correctness.
+      $out = `(((a, b) => datefns.isEqual(a, b) || datefns.$compare(a, b))($date_a, $date_b))`,
+      $out = `(datefns.isEqual($date_a, $date_b) || datefns.$compare($date_a, $date_b))`,
+      if ($exp <: should_follow_semi()) {
+        $out = `;\n$out`
+      }
+    } => `$out`,
+
+    `$date_a.$compare($date_b)` as $exp where {
+      $compare <: or {
+        `isSameOrBefore` => `isBefore`,
+        `isSameOrAfter` => `isAfter`,
+      },
+      // Since `a` and `b` are evaluated twice, it is safer to use an IIFE here for correctness.
+      $out = `(((a, b) => datefns.isEqual(a, b) || datefns.$compare(a, b))($date_a, $date_b))`,
+      if ($exp <: should_follow_semi()) {
+        $out = `;\n$out`
+      }
+    } => `$out`,
+
+    `$date.isBetween($start_date, $end_date)` => `((date) => datefns.isAfter(date, $start_date) && datefns.isBefore(date, $end_date))($date)`,
+    `$date.isLeapYear()` => `datefns.isLeapYear($date)`,
+    `$isMoment($arg)` where { $isMoment <: or { `$_.isMoment`, `isMoment` }  } => `(($arg) instanceof Date)`,
+  }
+}
+
+pattern rewrite_moment_distance() {
+  `$date.toNow()` => `datefns.formatDistanceToNow($date)`,
+  `$date_a.from($date_b)` => `(datefns.formatDistance($date_a, $date_b) + " ago")`,
+  `$date_a.to($date_b)` => `datefns.formatDistance($date_a, $date_b)`,
+}
+
+pattern rewrite_duration_ctors() {
+  or {
+    // NOTE: date-fns only provides a `Duration` object ([docs](https://date-fns.org/v2.30.0/docs/Duration)).
+    // Curiously, it does not provide any helpers to manipulate these duration objects.
+    // For that, we use a third party package called [duration-fns](https://www.npmjs.com/package/duration-fns).
+    `$duration_ctor($count, $literal_unit)` where {
+      // could be moment.duration(...) (default import) or duration(..)
+      $duration_ctor <: or { `$_.duration`, `duration` },
+      $literal_unit <: or {
+        year() => `years`,
+        month() => `months`,
+        week() => `weeks`,
+        day() => `days`,
+        hour() => `hours`,
+        minute() => `minutes`,
+        second() => `seconds`,
+        millisecond() => `milliseconds`
+      },
+
+      // A duration in `date-fns` is a mapping from time units to values (e.g: { years: 1 }).
+      // NOTE: This is an implementation detail, and is not documented in the library itself,
+      // but date-fns does not expose any way to construct a duration by fiat.
+      // Complementary libraries like `duration-fns` also rely on this internal representation, though.
+      // So we should be good here.
+      // ([source](https://github.com/date-fns/date-fns/blob/817ce9fda6dc11336923f80b45d34bf7c5a57886/src/types.ts#L58))
+    } => `({ $literal_unit: $count })`,
+
+    `$duration_ctor($args)` where {
+      $duration_ctor <: or { `$_.duration`, `duration` },
+      $out = `({})`,
+      if ($args <: [$arg]) { // one argument => string or object
+        $out = `makeDuration($arg)`
+      } else if ($args <: [$count, $unit]) { // two args => value and unit
+        $out = `({ [normalizeMomentJSUnit($unit)]: $count })`
+      } else {
+        $out = `({})`
+      }
+    } => `$out`
+  }
+}
+
+pattern rewrite_const_to_let() {
+  moment_const_decl($declaration, $declarators) where { $declaration => `let $declarators` }
+}
+
+pattern moment_exp_to_datefns_exp() {
+  or {
+    rewrite_conversion_calls(),
+    moment_const_decl($declaration, $declarators) where { $declaration => `let $declarators` },
+
+    // parsing:
+    // date-fns v2 uses standard unicode tokens to parse dates, unlike moment-js that
+    // has it's own spec.
+    // https://github.com/date-fns/date-fns/blob/main/docs/unicodeTokens.md
+    // momentjs: https://momentjs.com/docs/#/parsing/string-format/
+    // However, date-fns v1 uses moment-js's format specification that allows interpolation,
+    `$d.format($fmt)` => `/* TODO: format specifiers aren't compatible between moment.js and date-fns. Re-write this.*/ moment($d).format($d, $fmt)`,
+    
+    // construction
+    `moment($arg)` as $exp where {
+      $out = `new Date($arg)`,
+      if ($exp <: should_follow_semi()) {
+        $out = `($out)`
+      }
+    } => `$out`,
+
+    // convert all .add/.sub calls to date-fns equivalent calls.
+    rewrite_moment_arithmetic(),
+
+    // start/end setters where the time unit is a literal (e.g: d.startOf("week"))
+    moment_set_to_start_or_end_literal($date, $func_type, $unit) as $expression where {
+      $unit_name = `Year`,
+      $setter_fn = `setYear`,
+
+      if ($unit <: regex_month()) {
+        $unit_name = `Month`,
+        $setter_fn = `setMonth`,
+      } else if ($unit <: regex_week()) {
+        $unit_name = `Week`,
+        $setter_fn = `setWeek`
+      } else if ($unit <: regex_day()) {
+        $unit_name = `Day`,
+        $setter_fn = `setDay`
+      } else if ($unit <: regex_hour()) {
+        $unit_name = `Hour`,
+        $setter_fn = `setHours`
+      } else if ($unit <: regex_minute()) {
+        $unit_name = `Minute`,
+        $setter_fn = `setMinutes`
+      } else if ($unit <: regex_second()) {
+        $unit_name = `Second`,
+        $setter_fn = `setSeconds`
+      },
+
+      $setter = `datefns.$setter_fn`,
+      $getter = `datefns.$func_type$unit_name`,
+      $comment = `/* TODO: date-fns objects are immutable, propagate this value appropriately */`,
+
+      $out = `((date => $setter(date, $getter(date)))($date))`,
+      if ($date <: identifier()) {
+        $out = `$date = $setter($date, $getter($date))`,
+        if ($date <: not within expression_statement($expression)) {
+          $out = `($out)`
+        }
+      } else if ($expression <: should_follow_semi()) {
+        $out = `;\n$comment\n$out;`
+      }
+    } => `$out`,
+
+    // date.max(other_date) -> (date = datefns.max(date, other_date))
+    moment_limit_to_max_or_min($date, $arg, $methodName) as $expression where {
+      $out = `datefns.$methodName([$date, $arg])`,
+      if ($date <: identifier()) {
+        $out = `$date = $out`,
+        if ($expression <: not should_follow_semi()) {
+          $out = `($out)`
+        }
+      }
+    } => `$out`,
+
+    // distance to/from a given date.
+    rewrite_moment_distance(),
+    
+    `$date.unix()` => `datefns.getUnixTime($date)`,
+    `$date.daysInMonth()` => `datefns.getDaysInMonth($date)`,
+    `$date.toDate()` => `$date`,
+    `$date.toISOString()` => `datefns.formatISO($date)`,
+
+    // Queries:
+    rewrite_moment_queries(),
+
+    // Durations API
+    rewrite_duration_ctors(),
+
+    rewrite_moment_getters_and_setters(),
+    rewrite_duration_set_and_get(),
+
+    // rewrite util functions that do not belong to any specific category.
+    rewrite_misc_methods(),
+  }
+}
+
+pattern add_datefns_imports() {
+  program() as $prog where {
+    $out = `$prog`,
+    if ($prog <: contains `datefns`) {
+      $out = `import datefns from "date-fns";\n$out`
+    },
+    
+    if ($prog <: contains `durationfns`) {
+      $out = `import durationfns from "duration-fns";\n$out`
+    },
+  } => `$out`
+}
+
+pattern add_helper_functions() {
+  program() as $prog where {
+    $dateOrDurationToJSON = `function dateOrDuration2JSON(d) {
+  if (d instanceof Date) {
+    return datefns.formatISO(d);
+  } else if (durationfns.UNITS.some((unit) => Object.hasOwnProperty.call(d, unit))) {
+    return durationfns.toJSON(d)
+  }
+
+  return d.toJSON()
+}`,
+  $makeDuration = `function makeDuration(duration) {
+  if (typeof duration === 'string') {
+    return durationfns.parse(duration)
+  } else if (typeof duration === 'number') {
+    return { milliseconds: duration }
+  } else if (typeof duration === 'object') {
+    return duration
+  }
+
+  throw new Error("Invalid argument to duration constructor: " + typeof duration)
+}`,
+
+  // Is there a better way to have blackslashes inside code snippets?
+  $rx_begin = "/\\b",
+  $rx_end = "\\b/",
+
+  $normalizeMomentJSUnit = `function normalizeMomentJSUnit(fmt) {
+  const unitRegexs = [
+    [$rx_begin(?:y|years?)$rx_end, 'year'],
+    [$rx_begin(?:q|quarters?)$rx_end, 'quarter'],
+    [$rx_begin(?:M|months?)$rx_end, 'month'],
+    [$rx_begin(?:w|weeks?)$rx_end, 'week'],
+    [$rx_begin(?:d|days?)$rx_end, 'day'],
+    [$rx_begin(?:h|hours?)$rx_end, 'hour'],
+    [$rx_begin(?:m|minutes?)$rx_end, 'minute'],
+    [$rx_begin(?:s|seconds?)$rx_end, 'second'],
+    [$rx_begin(?:ms|millisecond?)$rx_end, 'millisecond'],
+  ];
+
+
+  for (const [regex, normalized] of unitRegexs) {
+    if (regex.test(fmt)) {
+      return normalized;
+    }
+  }
+
+  return null;
+}`,
+
+  $addDate = `function addDate(dateOrDuration, duration) {
+  if (dateOrDuration instanceof Date) {
+    return add(dateOrDuration, duration)
+  }
+  return durationfns.sum(dateOrDuration, duration)
+}`,
+
+  $subDate = `function subDate(dateOrDuration, duration) {
+  if (dateOrDuration instanceof Date) {
+    return sub(dateOrDuration, duration)
+  }
+  return durationfns.subtract(dateOrDuration, duration)
+}`,
+
+  $setUnitOnDate = `function setUnitOnDate(date, unit, value) {
+  unit = normalizeMomentJSUnit(unit);
+  if (date instanceof Date) {
+    switch (unit) {
+      case 'year':
+        date.setFullYear(value);
+        break;
+      case 'quarter': {
+        const month = datefns.getMonth(datefns.setQuarter(date, value));
+        date.setMonth(month);
+        break;
+      }
+      case 'month':
+        date.setMonth(value);
+        break;
+      case 'week': {
+        const newDate = datefns.setWeek(date, value);
+        date.setDate(newDate.getDate());
+        date.setMonth(newDate.getMonth());
+        break;
+      }
+      case 'day':
+        date.setDate(value);
+        break;
+      case 'hour':
+        date.setHours(value);
+        break;
+      case 'minute':
+        date.setMinutes(value);
+        break;
+      case 'second':
+        date.setSeconds(value);
+        break;
+      case 'millisecond':
+        date.setMilliseconds(value);
+        break;
+      default:
+        return date;
+    }
+  } else {
+    // duration object
+    date[unit + "s"] = value
+  }
+
+  return date;
+}`,
+
+  $getUnitFromDate = `function getUnitFromDate(date, unit) {
+  unit = normalizeMomentJSUnit(unit);
+  if (date instanceof Date) {
+    switch (unit) {
+      case 'year':
+        return date.getFullYear();
+      case 'quarter':
+        return datefns.getQuarter(date);
+      case 'month':
+        return date.getMonth();
+      case 'week':
+        return datefns.getWeek(date);
+      case 'day':
+        return date.getDate();
+      case 'hour':
+        return date.getHours();
+      case 'minute':
+        return date.getMinutes();
+      case 'second':
+        return date.getSeconds();
+      case 'millisecond':
+        return date.getMilliseconds();
+      default:
+        return 0;
+    }
+  }
+
+  return date[unit + "s"]
+}`,
+
+    $dateOrDuration2Array = `function dateOrDuration2Array(d) {
+      if (d instanceof Date) {
+        return [
+          d.getFullYear(),
+          d.getMonth(), 
+          d.getDate(),
+          d.getHours(),
+          d.getMinutes(),
+          d.getSeconds(),
+          d.getMilliseconds()
+        ]
+      } else if (durationfns.UNITS.some(u => Object.hasOwnProperty.call(d, u))) {
+        return durationfns.UNITS.map(u => d[u] ?? 0)
+      }
+
+      return d.toArray()
+    }`,
+    $out = `$prog`,
+    // would use `false`, but `booleanConstant: not yet supported`.
+    $normalize_helper_exists = "no",
+    if ($prog <: contains `dateOrDuration2JSON($_)`) {
+      $out = `$out\n\n$dateOrDurationToJSON`
+    },
+
+    if ($prog <: contains `dateOrDuration2Array($_)`) {
+      $out = `$out\n\n$dateOrDuration2Array`
+    },
+    
+    
+    if ($prog <: contains `makeDuration($_)`) {
+      $out = `$out\n\n$makeDuration`
+    },
+
+    if ($prog <: contains `normalizeMomentJSUnit($_)`) {
+      $out = `$out\n\n$normalizeMomentJSUnit`,
+      $normalize_helper_exists = "yes"
+    },
+
+    if ($prog <: contains `addDate($_)`) {
+      $out = `$out\n\n$addDate`
+    },
+
+    if ($prog <: contains `subDate($_)`) {
+      $out = `$out\n\n$subDate`
+    },
+
+    if ($prog <: contains `setUnitOnDate($_)`) {
+      $out = `$out\n\n$setUnitOnDate`,
+      if ($normalize_helper_exists == "no") {
+        $out = `$out\n\n$normalizeMomentJSUnit`,
+        $normalize_helper_exists = "yes"
+      }
+    },
+
+    if ($prog <: contains `getUnitFromDate($_)`) {
+      $out = `$out\n\n$getUnitFromDate`,
+      if ($normalize_helper_exists == "no") {
+        $out = `$out\n\n$normalizeMomentJSUnit`,
+        $normalize_helper_exists = "yes"
+      }
+    },
+
+  } => `$out`
+}
