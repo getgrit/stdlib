@@ -192,7 +192,7 @@ const mux = new Mux({
 });
 ```
 
-# Replace destructured properties with field access
+## Replace destructured properties with field access
 
 ```js
 import Mux from '@mux/mux-node';
@@ -232,7 +232,7 @@ const breakdown = await mux.data.metrics.breakdown('aggregate_startup_time', {
 const usage = await mux.video.liveStreams.create({});
 ```
 
-# No import fixes
+## No import fixes
 
 ```js
 const { Video, Data } = new Mux();
@@ -242,7 +242,7 @@ const { Video, Data } = new Mux();
 const mux = new Mux();
 ```
 
-# Renamed `.get` to `.retrieve`
+## Renamed `.get` to `.retrieve`
 
 ```js
 const { Video, Data } = new Mux();
@@ -258,7 +258,7 @@ const asset = await mux.video.assets.retrieve(req.query.id as string);
 const upload = await mux.video.uploads.retrieve(req.query.id as string);
 ```
 
-# Replace verifyHeader with verifySignature
+## Replace verifyHeader with verifySignature
 
 ```ts
 Mux.Webhooks.verifyHeader(rawBody, req.headers['mux-signature'] as string, webhookSignatureSecret);
