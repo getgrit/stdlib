@@ -4,7 +4,9 @@ title: Enzyme to React Testing Library
 
 (Alpha) This pattern is a work in progress and is not yet ready for use.
 
-tags: #enzyme, #react-testing-library, #rtl, #alpha, #migration
+Note: the full migration is packaged as a workflow. This is just a subcomponent.
+
+tags: #enzyme, #react-testing-library, #rtl, #alpha, #migration, #hidden
 
 ```grit
 predicate rtl_import_render() {
