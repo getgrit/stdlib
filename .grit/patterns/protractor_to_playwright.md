@@ -221,7 +221,7 @@ pattern main_playwright_migration() {
             $test <: ensure_import_from($source),
             $expect = `expect`,
             $expect <: ensure_import_from($source)
-        }
+        } until Bottom
     }
 }
 

@@ -537,12 +537,12 @@ pattern second_step($handler_callback_suffix) {
                     $statements <: some or {
                         export_statement(
                             decorator = contains `@observer` => .,
-                            declaration = lexical_declaration(declarations = contains rewrite_accesses($hoisted_states, $hoisted_refs, $use_memos, $handler_callback_suffix))
+                            declaration = lexical_declaration(declarations = contains rewrite_accesses($hoisted_states, $hoisted_refs, $use_memos, $handler_callback_suffix) until Bottom)
                         ),
                         export_statement(
-                            declaration = lexical_declaration(declarations = contains rewrite_accesses($hoisted_states, $hoisted_refs, $use_memos, $handler_callback_suffix))
+                            declaration = lexical_declaration(declarations = contains rewrite_accesses($hoisted_states, $hoisted_refs, $use_memos, $handler_callback_suffix) until Bottom)
                         ),
-                        lexical_declaration(declarations = contains rewrite_accesses($hoisted_states, $hoisted_refs, $use_memos, $handler_callback_suffix))
+                        lexical_declaration(declarations = contains rewrite_accesses($hoisted_states, $hoisted_refs, $use_memos, $handler_callback_suffix) until Bottom)
                     }
                 }
             }
