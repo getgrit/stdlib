@@ -55,9 +55,7 @@ describe('test', () => {
   it('consolidates', async () => {
     const values = ['console.log($9o)', 'console.log($x)', 'PatternWithArgs($arg)'];
     const anotherValues = ['nine'];
-
     expect(anotherValues).toEqual(expect.arrayContaining([expect.stringContaining('nine')]));
-
     expect(values).toEqual(
       expect.arrayContaining([
         expect.stringContaining('console.log($9o)'),

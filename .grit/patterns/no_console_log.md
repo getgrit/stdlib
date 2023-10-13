@@ -10,7 +10,10 @@ tags: #good
 engine marzano(0.1)
 language js
 
-`console.log($arg)` => . where {
+or {
+  `console.log($arg);` => .,
+  `console.log($arg)` => .
+} where {
   $arg <: not within catch_clause()
 }
 ```
