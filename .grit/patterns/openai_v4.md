@@ -188,6 +188,7 @@ pattern change_imports() {
             },
         },
         `$old = require($src)` as $require where {
+            $src <: `"openai"`,
             $old <: object_pattern($properties) where {
                 if ($properties <: not contains $import_name where $import_name <: openai_v4_exports()) {
                     $old => js"OpenAI",
@@ -638,4 +639,41 @@ const myCompletion: OpenAI.Chat.CompletionCreateParams = 1;
 import OpenAI, { toFile } from 'openai';
 
 const myCompletion: OpenAI.Chat.ChatCompletionCreateParams = 1;
+```
+
+## Does not rewrite non-OpenAI imports
+
+```ts
+const {
+  ChatCompletionRequestMessage,
+  CreateChatCompletionRequest,
+  CreateChatCompletionResponse,
+  Configuration,
+  toFile,
+} = require('openai');
+
+const { ChatOpenAI } = require('langchain/chat_models/openai');
+const { BufferMemory } = require('langchain/memory');
+const { orderBy } = require('lodash');
+import { ChatOpenAI } from 'langchain/chat_models/openai';
+
+const chat = new ChatOpenAI({
+  openAIApiKey: apikey,
+  maxTokens: 120,
+});
+```
+
+```ts
+const OpenAI = require('openai');
+const { toFile } = require('openai');
+
+const { ChatOpenAI } = require('langchain/chat_models/openai');
+const { BufferMemory } = require('langchain/memory');
+const { orderBy } = require('lodash');
+import { ChatOpenAI } from 'langchain/chat_models/openai';
+
+const chat = new ChatOpenAI({
+  openAIApiKey: apikey,
+  maxTokens: 120,
+});
 ```
