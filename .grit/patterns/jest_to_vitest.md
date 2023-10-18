@@ -62,8 +62,8 @@ pattern main_jest_to_vitest_migration() {
         $mockImplementation <: or {
           arrow_function($body) where {
             // still waiting for default mock confirmation
-            $body <: literal_value() => `({ 
-              default: $body 
+            $body <: literal_value() => `({
+              default: $body
             })`
           },
           `function($_) { $body }` where {
@@ -87,7 +87,7 @@ pattern main_jest_to_vitest_migration() {
         $callback <: or {
           // For matching `xxx => { ... }` & `(xxx) => { ... }`
           `$parameter => { $_ }` where {
-            $parameter <: not "()"
+            $parameter <: not .
           },
           // For matching `function (xxx) { ... }`
           `function($parameters) { $_ }` where {
@@ -122,53 +122,59 @@ sequential {
 import { runCLI, mock, requireActual } from 'jest';
 
 jest.mock('./some-path', () => 'hello');
-jest.mock('./some-path', function() {
-  doSomeSetups()
-  return 'hello'
+jest.mock('./some-path', function () {
+  doSomeSetups();
+  return 'hello';
 });
 jest.mock('./some-path', () => ({ default: 'value' }));
-jest.mock('./some-path', () => function() { return 'hello'; });
+jest.mock(
+  './some-path',
+  () =>
+    function () {
+      return 'hello';
+    },
+);
 
 const { cloneDeep } = jest.requireActual('lodash/cloneDeep');
 const { map } = jest.requireActual('lodash/map');
 const { filter } = jest.requireActual('lodash/filter');
 const originalModule = {
   ...jest.requireActual('../foo-bar-baz'),
-  test: 1
+  test: 1,
 };
 const currentWorkerId = JEST_WORKER_ID;
 
-test.skip("test.skip should be processed", () => {
+test.skip('test.skip should be processed', () => {
   expect('value').toBe('value');
 });
-it("should complete asynchronously", done => {
+it('should complete asynchronously', (done) => {
   expect('value').toBe('value');
   done();
 });
-it("should complete asynchronously", finish => {
+it('should complete asynchronously', (finish) => {
   expect('value').toBe('value');
   finish();
 });
-it("should complete asynchronously", (done) => {
+it('should complete asynchronously', (done) => {
   expect('value').toBe('value');
   done();
 });
-it("should complete asynchronously", function(done) {
+it('should complete asynchronously', function (done) {
   expect('value').toBe('value');
   done();
 });
-it("should complete asynchronously", function(finish) {
+it('should complete asynchronously', function (finish) {
   expect('value').toBe('value');
   finish();
 });
-test.skip("test.skip with done should be processed", (done) => {
+test.skip('test.skip with done should be processed', (done) => {
   expect('value').toBe('value');
-  done()
+  done();
 });
-it("should be ignored", () => {
+it('should be ignored', () => {
   expect('value').toBe('value');
 });
-it("should be ignored", function() {
+it('should be ignored', function () {
   expect('value').toBe('value');
 });
 
@@ -184,7 +190,7 @@ beforeEach(() => {
   initializeApp();
   setDefaultUser();
 });
-afterEach(function() {
+afterEach(function () {
   initializeApp();
   setDefaultUser();
 });
@@ -193,63 +199,83 @@ afterEach(function() {
 ```javascript
 import { vi, test, expect, it, beforeAll, beforeEach, afterAll, afterEach } from 'vitest';
 
-vi.mock('./some-path', () => ({ 
-              default: 'hello' 
-            }))
-vi.mock('./some-path', function() {
-  doSomeSetups()
-  return { default: "hello" };
-})
+vi.mock('./some-path', () => ({
+  default: 'hello',
+}));
+vi.mock('./some-path', function () {
+  doSomeSetups();
+  return { default: 'hello' };
+});
 vi.mock('./some-path', () => ({ default: 'value' }));
-vi.mock('./some-path', () => function() { return 'hello'; });
+vi.mock(
+  './some-path',
+  () =>
+    function () {
+      return 'hello';
+    },
+);
 
 const { cloneDeep } = await vi.importActual('lodash/cloneDeep');
 const { map } = await vi.importActual('lodash/map');
 const { filter } = await vi.importActual('lodash/filter');
 const originalModule = {
   ...(await vi.importActual('../foo-bar-baz')),
-  test: 1
+  test: 1,
 };
 const currentWorkerId = VITEST_POOL_ID;
 
-test.skip("test.skip should be processed", () => {
+test.skip('test.skip should be processed', () => {
   expect('value').toBe('value');
 });
-it("should complete asynchronously", () => new Promise(done => {
-  expect('value').toBe('value');
-  done();
-}));
-it("should complete asynchronously", () => new Promise(finish => {
-  expect('value').toBe('value');
-  finish();
-}));
-it("should complete asynchronously", () => new Promise((done) => {
-  expect('value').toBe('value');
-  done();
-}));
-it("should complete asynchronously", () => new Promise(function(done) {
-  expect('value').toBe('value');
-  done();
-}));
-it("should complete asynchronously", () => new Promise(function(finish) {
-  expect('value').toBe('value');
-  finish();
-}));
-test.skip("test.skip with done should be processed", () => new Promise((done) => {
-  expect('value').toBe('value');
-  done()
-}));
-it("should be ignored", () => {
+it('should complete asynchronously', () =>
+  new Promise((done) => {
+    expect('value').toBe('value');
+    done();
+  }));
+it('should complete asynchronously', () =>
+  new Promise((finish) => {
+    expect('value').toBe('value');
+    finish();
+  }));
+it('should complete asynchronously', () =>
+  new Promise((done) => {
+    expect('value').toBe('value');
+    done();
+  }));
+it('should complete asynchronously', () =>
+  new Promise(function (done) {
+    expect('value').toBe('value');
+    done();
+  }));
+it('should complete asynchronously', () =>
+  new Promise(function (finish) {
+    expect('value').toBe('value');
+    finish();
+  }));
+test.skip('test.skip with done should be processed', () =>
+  new Promise((done) => {
+    expect('value').toBe('value');
+    done();
+  }));
+it('should be ignored', () => {
   expect('value').toBe('value');
 });
-it("should be ignored", function() {
+it('should be ignored', function () {
   expect('value').toBe('value');
 });
 
-beforeAll(() => { setActivePinia(createTestingPinia()) });
-beforeEach(() => { setActivePinia(createTestingPinia()) });
-afterAll(() => { setActivePinia(createTestingPinia()) });
-afterEach(() => { setActivePinia(createTestingPinia()) });
+beforeAll(() => {
+  setActivePinia(createTestingPinia());
+});
+beforeEach(() => {
+  setActivePinia(createTestingPinia());
+});
+afterAll(() => {
+  setActivePinia(createTestingPinia());
+});
+afterEach(() => {
+  setActivePinia(createTestingPinia());
+});
 beforeAll(async () => {
   await expect('1').toBe('1');
   await expect('2').toBe('2');
@@ -258,7 +284,7 @@ beforeEach(() => {
   initializeApp();
   setDefaultUser();
 });
-afterEach(function() {
+afterEach(function () {
   initializeApp();
   setDefaultUser();
 });
@@ -277,28 +303,29 @@ vi.mock('./some-path', () => ({ default: 'value' }));
 ```
 
 ## Do not import methods which are imported from mocha/expect
+
 ```javascript
-import expect from 'expect'
-import { describe, test, before, beforeEach, after } from 'mocha'
+import expect from 'expect';
+import { describe, test, before, beforeEach, after } from 'mocha';
 
 describe('Repository component', () => {
-  beforeEach(() => { })
-  it("should complete asynchronously", () => {
+  beforeEach(() => {});
+  it('should complete asynchronously', () => {
     expect('value').toBe('value');
-  })
-})
+  });
+});
 ```
 
 ```javascript
-import expect from 'expect'
+import expect from 'expect';
 import { it } from 'vitest';
 
-import { describe, test, before, beforeEach, after } from 'mocha'
+import { describe, test, before, beforeEach, after } from 'mocha';
 
 describe('Repository component', () => {
-  beforeEach(() => { })
-  it("should complete asynchronously", () => {
+  beforeEach(() => {});
+  it('should complete asynchronously', () => {
     expect('value').toBe('value');
-  })
-})
+  });
+});
 ```
