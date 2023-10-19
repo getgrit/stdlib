@@ -263,6 +263,7 @@ function dateOrDuration2JSON(d) {
 const a = moment()
 const b = moment()
 a.seconds(30).valueOf() === new Date().setSeconds(30);
+
 b.seconds() === new Date().getSeconds();
 
 moment().date(10)
@@ -270,6 +271,7 @@ moment().date(10)
 function f() {
   return moment()
 }
+
 f().days(a.days())
 ```
 
@@ -278,6 +280,7 @@ import datefns from "date-fns";
 let a = new Date()
 let b = new Date();
 (a instanceof Date ? (a = a.setSeconds(30)) : (a.seconds = 30)).valueOf() === new Date().setSeconds(30);
+
 (b instanceof Date ? datefns.getSeconds(b) : (b.seconds ?? 0)) === new Date().getSeconds()
 
 /*TODO: date-fns objects are immutable, feed this value back through properly*/
@@ -286,6 +289,7 @@ datefns.setMonth(new Date(), 10)
 function f() {
   return new Date()
 }
+
 ((d, val) => (d instanceof Date ? d.setDay(val) : (d.days = val)))
   (f(), (a instanceof Date ? datefns.getDay(a) : (a.days ?? 0)))
 ```
