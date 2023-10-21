@@ -11,7 +11,7 @@ language python
 `any($x == $val for $x in $arr)` => `$val in $arr`
 ```
 
-# Convert any to in
+## Convert any to in
 
 ```python
 if any(hat == "bowler" for hat in hats):

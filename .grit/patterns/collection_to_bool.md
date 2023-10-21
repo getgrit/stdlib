@@ -27,7 +27,7 @@ or {
 }
 ```
 
-# Collection to bool
+## Collection to bool
 
 ```python
 if ["foo", "boo"]:

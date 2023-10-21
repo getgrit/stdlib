@@ -23,7 +23,7 @@ else:
 
 ```
 
-# Replace if-else with dict.get()
+## Replace if-else with dict.get()
 
 ```python
 if "my_key" in example_dict:

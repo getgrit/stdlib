@@ -19,7 +19,7 @@ or {
 }
 ```
 
-# Binary operation identity
+## Binary operation identity
 
 ```python
 x | x

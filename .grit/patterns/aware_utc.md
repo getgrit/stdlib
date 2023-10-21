@@ -16,7 +16,7 @@ and {
 }
 ```
 
-# Aware date-time for UTC
+## Aware date-time for UTC
 
 ```python
 from datetime import datetime

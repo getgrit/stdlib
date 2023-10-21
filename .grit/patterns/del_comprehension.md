@@ -15,7 +15,7 @@ for $key in $dict.copy():
 ` => `$dict = {$key: value for $key, value in $dict.items() if $key in $collection}`
 ```
 
-# Delete comprehension
+## Delete comprehension
 
 ```python
 x1 = {"a": 1, "b": 2, "c": 3}

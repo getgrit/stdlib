@@ -219,7 +219,7 @@ file($body) where {
 }
 ```
 
-# Change openai import to Sync
+## Change openai import to Sync
 
 ```python
 import openai
@@ -237,7 +237,7 @@ completion = client.completions.create(model="davinci-002", prompt="Hello world"
 chat_completion = client.chat.completions.create(model="gpt-3.5-turbo", messages=[{"role": "user", "content": "Hello world"}])
 ```
 
-# Change openai import to Async
+## Change openai import to Async
 
 ```python
 import openai
@@ -255,7 +255,7 @@ completion = await aclient.completions.create(model="davinci-002", prompt="Hello
 chat_completion = await aclient.chat.completions.create(model="gpt-3.5-turbo", messages=[{"role": "user", "content": "Hello world"}])
 ```
 
-# Change openai import to Both
+## Change openai import to Both
 
 ```python
 import openai
@@ -280,7 +280,7 @@ a_completion = await aclient.completions.create(model="davinci-002", prompt="Hel
 a_chat_completion = await aclient.chat.completions.create(model="gpt-3.5-turbo", messages=[{"role": "user", "content": "Hello world"}])
 ```
 
-# Change different kinds of import
+## Change different kinds of import
 
 ```python
 import openai
@@ -301,7 +301,7 @@ completion = client.completions.create(model="davinci-002", prompt="Hello world"
 chat_completion = await aclient.chat.completions.create(model="gpt-3.5-turbo", messages=[{"role": "user", "content": "Hello world"}])
 ```
 
-# Manual config required
+## Manual config required
 
 ```python
 import openai
@@ -319,7 +319,7 @@ if openai_proxy:
     raise Exception("The 'openai.api_base' option isn't read in the client API. You will need to pass it when you instantiate the client, e.g. 'OpenAI(api_base=self.openai_api_base)'")
 ```
 
-# Remap errors
+## Remap errors
 
 ```python
 import openai
@@ -344,7 +344,7 @@ except openai.RateLimitError as err:
     pass
 ```
 
-# Mark deprecated api usage
+## Mark deprecated api usage
 
 ```python
 import openai
@@ -362,7 +362,7 @@ completion = openai.Customer.create(model="davinci-002", prompt="Hello world")
 chat_completion = openai.Deployment.create(model="gpt-3.5-turbo", messages=[{"role": "user", "content": "Hello world"}])
 ```
 
-# Migrate unittest
+## Migrate unittest
 
 ```python
 @patch('openai.Completion')
@@ -393,7 +393,7 @@ def test(MockClass1, MockClass2):
     pass
 ```
 
-# Migrate pytest
+## Migrate pytest
 
 ```python
 @pytest.fixture

@@ -14,7 +14,7 @@ for_statement(body=block(statements=[`$var[$key_expr] = $expr`]), left=$key, rig
 }
 ```
 
-# Dictionary comprehension
+## Dictionary comprehension
 
 ```python
 cubes = {}

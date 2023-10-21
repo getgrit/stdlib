@@ -20,7 +20,7 @@ else:
 }
 ```
 
-# Replace assign across if-else with ternary operator
+## Replace assign across if-else with ternary operator
 
 ```python
 if condition:

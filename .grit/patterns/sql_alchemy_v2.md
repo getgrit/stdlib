@@ -243,7 +243,7 @@ session.scalars(
 user_obj = session.get(User, 5)
 ```
 
-# Migrate pre 1.4 select and post 1.4 legacy select statements
+## Migrate pre 1.4 select and post 1.4 legacy select statements
 
 ```python
 stmt = select([1], select_from=table, order_by=table.c.id)
@@ -269,7 +269,7 @@ stmt = select(table.c.x, table.c.y)
 stmt = select(table.c.x, table.c.y)
 ```
 
-# Migrate SQL executions
+## Migrate SQL executions
 
 ```python
 sess.execute("SELECT * FROM some_table")
@@ -289,7 +289,7 @@ sess.execute(text("SELECT * FROM some_table"))
 conn.execute(text("SELECT * FROM some_table"))
 ```
 
-# Change declarative_base import
+## Change declarative_base import
 
 ```python
 from sqlalchemy.ext.declarative import declarative_base
@@ -306,6 +306,6 @@ from sqlalchemy.orm import declarative_base
 class Base:
     __allow_unmapped__ = True
 
-Base = declarative_base(cls=Base)
+Base = declarative_base(cls=Base,)
 
 ```

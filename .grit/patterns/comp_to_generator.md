@@ -29,7 +29,7 @@ pattern accept_generator() {
 }
 ```
 
-# Comprehension to generator
+## Comprehension to generator
 
 ```python
 hat_found = any([is_hat(item) for item in wardrobe])

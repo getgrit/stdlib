@@ -92,7 +92,7 @@ pattern builtin() {
 }
 ```
 
-# Rename builtin shadow variables
+## Rename builtin shadow variables
 
 ```python
 list = [1, 1, 2, 3, 5, 8]

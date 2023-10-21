@@ -15,7 +15,7 @@ or {
 }
 ```
 
-# Collection builtin to comprehension
+## Collection builtin to comprehension
 
 ```python
 squares = list(x * x for x in y)

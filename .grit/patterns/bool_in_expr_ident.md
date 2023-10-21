@@ -16,7 +16,7 @@ or {
 }
 ```
 
-# Boolean if expression identity
+## Boolean if expression identity
 
 ```python
 some_var = True if some_boolean_expression else False
