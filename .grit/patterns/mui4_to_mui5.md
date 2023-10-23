@@ -171,7 +171,6 @@ import { theme } from '@mui/styles/theme';
 ```
 
 ```ts
-
 import { ThemeProvider } from '@mui/material/styles';
 
 import { color } from '@mui/styles/color';
@@ -185,9 +184,8 @@ import { ThemeProvider, styles } from '@mui/styles';
 ```
 
 ```ts
-import { styles } from "@mui/styles";
-import { ThemeProvider } from "@mui/material/styles";
-
+import { styles } from '@mui/styles';
+import { ThemeProvider } from '@mui/material/styles';
 ```
 
 ## Test when ThemeProvider is already imported from `@mui/material/styles`
@@ -215,17 +213,17 @@ import {} from '@mui/material/styles';
 ```js
 object = {
   style: {
-    light: cyan[300];
-  }
-}
+    light: cyan[300],
+  },
+};
 ```
 
 ```ts
 object = {
   style: {
-    light: lightBlue[500];
-  }
-}
+    light: lightBlue[500],
+  },
+};
 ```
 
 ## Test when palette info color is `cyan[500]`
@@ -233,17 +231,17 @@ object = {
 ```js
 object = {
   style: {
-    main: cyan[500];
-  }
-}
+    main: cyan[500],
+  },
+};
 ```
 
 ```ts
 object = {
   style: {
-    main: lightBlue[700];
-  }
-}
+    main: lightBlue[700],
+  },
+};
 ```
 
 ## Test when palette info color is `cyan[700]`
@@ -251,17 +249,17 @@ object = {
 ```js
 object = {
   style: {
-    dark: cyan[700];
-  }
-}
+    dark: cyan[700],
+  },
+};
 ```
 
 ```ts
 object = {
   style: {
-    dark: lightBlue[900];
-  }
-}
+    dark: lightBlue[900],
+  },
+};
 ```
 
 ## Test when palette info color is `cyan[0]`
@@ -269,17 +267,17 @@ object = {
 ```js
 object = {
   style: {
-    main: cyan[0];
-  }
-}
+    main: cyan[0],
+  },
+};
 ```
 
 ```ts
 object = {
   style: {
-    main: cyan[0];
-  }
-}
+    main: cyan[0],
+  },
+};
 ```
 
 ## Test when palette info color is `cyan[710]`
@@ -287,17 +285,17 @@ object = {
 ```js
 object = {
   style: {
-    main: cyan[710];
-  }
-}
+    main: cyan[710],
+  },
+};
 ```
 
 ```ts
 object = {
   style: {
-    main: cyan[710];
-  }
-}
+    main: cyan[710],
+  },
+};
 ```
 
 ## Test when palette info color is empty: `cyan[]`
@@ -305,7 +303,7 @@ object = {
 ```js
 object = {
   style: {
-    main: cyan[];
+    main: cyan[],
   }
 }
 ```
@@ -313,7 +311,7 @@ object = {
 ```ts
 object = {
   style: {
-    main: cyan[];
+    main: cyan[],
   }
 }
 ```
@@ -323,17 +321,17 @@ object = {
 ```js
 object = {
   config: {
-    main: cyan[300];
-  }
-}
+    main: cyan[300],
+  },
+};
 ```
 
 ```ts
 object = {
   config: {
-    main: cyan[300];
-  }
-}
+    main: cyan[300],
+  },
+};
 ```
 
 ## Test when palette success color is `green[300]`
@@ -341,17 +339,17 @@ object = {
 ```js
 object = {
   style: {
-    light: green[300];
-  }
-}
+    light: green[300],
+  },
+};
 ```
 
 ```ts
 object = {
   style: {
-    light: green[500];
-  }
-}
+    light: green[500],
+  },
+};
 ```
 
 ## Test when palette success color is `green[500]`
@@ -359,17 +357,17 @@ object = {
 ```js
 object = {
   style: {
-    main: green[500];
-  }
-}
+    main: green[500],
+  },
+};
 ```
 
 ```ts
 object = {
   style: {
-    main: green[800];
-  }
-}
+    main: green[800],
+  },
+};
 ```
 
 ## Test when palette success color is `green[700]`
@@ -377,17 +375,17 @@ object = {
 ```js
 object = {
   style: {
-    dark: green[700];
-  }
-}
+    dark: green[700],
+  },
+};
 ```
 
 ```ts
 object = {
   style: {
-    dark: green[900];
-  }
-}
+    dark: green[900],
+  },
+};
 ```
 
 ## Test when palette success color is `green[0]`
@@ -395,17 +393,17 @@ object = {
 ```js
 object = {
   style: {
-    main: green[0];
-  }
-}
+    main: green[0],
+  },
+};
 ```
 
 ```ts
 object = {
   style: {
-    main: green[0];
-  }
-}
+    main: green[0],
+  },
+};
 ```
 
 ## Test when palette success color is `green[710]`
@@ -413,35 +411,17 @@ object = {
 ```js
 object = {
   style: {
-    main: green[710];
-  }
-}
+    main: green[710],
+  },
+};
 ```
 
 ```ts
 object = {
   style: {
-    main: green[710];
-  }
-}
-```
-
-## Test when palette success color is empty: `green[]`
-
-```js
-object = {
-  style: {
-    main: green[];
-  }
-}
-```
-
-```ts
-object = {
-  style: {
-    main: green[];
-  }
-}
+    main: green[710],
+  },
+};
 ```
 
 ## Test when palette success color is not in a style object
@@ -449,17 +429,17 @@ object = {
 ```js
 object = {
   config: {
-    main: green[300];
-  }
-}
+    main: green[300],
+  },
+};
 ```
 
 ```ts
 object = {
   config: {
-    main: green[300];
-  }
-}
+    main: green[300],
+  },
+};
 ```
 
 ## Test when palette warning color is `orange[300]`
@@ -467,17 +447,17 @@ object = {
 ```js
 object = {
   style: {
-    light: orange[300];
-  }
-}
+    light: orange[300],
+  },
+};
 ```
 
 ```ts
 object = {
   style: {
-    light: orange[500];
-  }
-}
+    light: orange[500],
+  },
+};
 ```
 
 ## Test when palette warning color is `orange[500]`
@@ -485,17 +465,17 @@ object = {
 ```js
 object = {
   style: {
-    main: orange[500];
-  }
-}
+    main: orange[500],
+  },
+};
 ```
 
 ```ts
 object = {
   style: {
-    main: '#ED6C02';
-  }
-}
+    main: '#ED6C02',
+  },
+};
 ```
 
 ## Test when palette warning color is `orange[700]`
@@ -503,17 +483,17 @@ object = {
 ```js
 object = {
   style: {
-    dark: orange[700];
-  }
-}
+    dark: orange[700],
+  },
+};
 ```
 
 ```ts
 object = {
   style: {
-    dark: orange[900];
-  }
-}
+    dark: orange[900],
+  },
+};
 ```
 
 ## Test when palette warning color is `orange[0]`
@@ -521,17 +501,17 @@ object = {
 ```js
 object = {
   style: {
-    main: orange[0];
-  }
-}
+    main: orange[0],
+  },
+};
 ```
 
 ```ts
 object = {
   style: {
-    main: orange[0];
-  }
-}
+    main: orange[0],
+  },
+};
 ```
 
 ## Test when palette warning color is `orange[710]`
@@ -539,35 +519,17 @@ object = {
 ```js
 object = {
   style: {
-    main: orange[710];
-  }
-}
+    main: orange[710],
+  },
+};
 ```
 
 ```ts
 object = {
   style: {
-    main: orange[710];
-  }
-}
-```
-
-## Test when palette warning color is empty: `orange[]`
-
-```js
-object = {
-  style: {
-    main: orange[];
-  }
-}
-```
-
-```ts
-object = {
-  style: {
-    main: orange[];
-  }
-}
+    main: orange[710],
+  },
+};
 ```
 
 ## Test when palette warning color is not in a style object
@@ -575,20 +537,36 @@ object = {
 ```js
 object = {
   config: {
-    main: orange[300];
-  }
-}
+    main: orange[300],
+  },
+};
 ```
 
 ```ts
 object = {
   config: {
-    main: orange[300];
-  }
-}
+    main: orange[300],
+  },
+};
 ```
 
-## Test when component definition is not valid
+## Test component definition when createTheme props is empty
+
+```js
+const theme = createTheme({
+  props: {},
+});
+```
+
+```ts
+const theme = createTheme({
+  props: {},
+});
+```
+
+<!-- Broken (outputs unparseable JavaScript) -->
+
+# Test when component definition is not valid
 
 ```js
 const theme = createTheme({
@@ -606,7 +584,7 @@ const theme = createTheme({
 });
 ```
 
-## Test component definition when createTheme has multiple properties
+# Test component definition when createTheme has multiple properties
 
 ```js
 const theme = createTheme({
@@ -632,7 +610,7 @@ const theme = createTheme({
 });
 ```
 
-## Test component definition when props has multiple properties
+# Test component definition when props has multiple properties
 
 ```js
 const theme = createTheme({
@@ -649,19 +627,5 @@ const theme = createTheme({
 const theme = createTheme({
   components: { MuiButton : defaultProps {disableRipple: true,
       dark: true,}, },
-});
-```
-
-## Test component definition when createTheme props is empty
-
-```js
-const theme = createTheme({
-  props: {},
-});
-```
-
-```ts
-const theme = createTheme({
-  props: {},
 });
 ```
