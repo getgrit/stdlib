@@ -171,6 +171,7 @@ import { theme } from '@mui/styles/theme';
 ```
 
 ```ts
+
 import { ThemeProvider } from '@mui/material/styles';
 
 import { color } from '@mui/styles/color';
@@ -184,9 +185,9 @@ import { ThemeProvider, styles } from '@mui/styles';
 ```
 
 ```ts
-import { ThemeProvider } from '@mui/material/styles';
+import { styles } from "@mui/styles";
+import { ThemeProvider } from "@mui/material/styles";
 
-import { styles } from '@mui/styles';
 ```
 
 ## Test when ThemeProvider is already imported from `@mui/material/styles`
@@ -601,7 +602,7 @@ const theme = createTheme({
 
 ```ts
 const theme = createTheme({
-  components: { MuiButton : defaultProps {disableRipple: true} },
+  components: { MuiButton : defaultProps {disableRipple: true,}, },
 });
 ```
 
@@ -627,7 +628,7 @@ const theme = createTheme({
     white: true,
   },
   isDark: true,
-  components: { MuiButton : defaultProps {disableRipple: true} },
+  components: { MuiButton : defaultProps {disableRipple: true,}, },
 });
 ```
 
@@ -647,7 +648,7 @@ const theme = createTheme({
 ```ts
 const theme = createTheme({
   components: { MuiButton : defaultProps {disableRipple: true,
-      dark: true} },
+      dark: true,}, },
 });
 ```
 
