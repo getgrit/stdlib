@@ -2,9 +2,9 @@
 title: Upgrade Mux SDK to v8
 ---
 
-Upgrade the Mux SDK to v8
+Upgrade the [Mux SDK](https://github.com/muxinc/mux-node-sdk) to [v8 with Stainless](https://github.com/stainless-sdks/mux-node)
 
-tags: #js, #ts, #npm, #upgrade, #mux, #migration
+tags: #js, #ts, #npm, #upgrade, #mux, #migration, #stainless
 
 ```grit
 engine marzano(0.1)
