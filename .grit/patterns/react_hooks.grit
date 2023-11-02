@@ -58,7 +58,13 @@ pattern handle_one_statement($class_name, $statements, $states_statements, $stat
                     $statement <: prepend_comment($statements),
                     $name <: or { `componentDidUpdate`, `componentDidMount` },
                     $body <: change_this($states_statements, is_constructor=false),
-                    $statements += `useEffect(() => $body, []);`
+                    or {
+                        {
+                            $async <: `async`,
+                            $statements += `useEffect(() => {(async () => $body)()}, []);`
+                        },
+                        $statements += `useEffect(() => $body, []);`
+                    },
                 },
                 and {
                     $statement <: prepend_comment($statements),
@@ -472,17 +478,28 @@ pattern rewrite_accesses($hoisted_states, $hoisted_refs, $use_memos, $handler_ca
                 $assignment => `set$[capitalized]($right)`
             },
         },
-        `this.setState($x)` as $set_state where {
+        `this.setState($setter)` as $set_state where {
             $statements = [],
-            $x <: contains bubble($statements) or {
-                pair(key = $key, value = $value) where {
-                    $capitalized = capitalize(string = $key),
-                    $statements += `set$capitalized($value)`
+            $setter <: or {
+                `{ $x }` where $x <: some bubble($statements) or {
+                    pair(key = $key, value = $value) where {
+                        $capitalized = capitalize(string = $key),
+                        $statements += `set$capitalized($value)`
+                    },
+                    shorthand_property_identifier() as $identifier where {
+                        $capitalized = capitalize(string = $identifier),
+                        $statements += `set$capitalized($identifier)`
+                    },
                 },
-                shorthand_property_identifier() as $identifier where {
-                    $capitalized = capitalize(string = $identifier),
-                    $statements += `set$capitalized($identifier)`
-                }
+                `({ $prev }) => $x` where {
+                    $prev <: some bubble($statements, $x) $prop where {
+                        $x <: contains pair(key = $key, value = $value) where {
+                            $key <: $prop,
+                            $capitalized = capitalize(string = $key),
+                            $statements += `set$capitalized($prop => $value)`,
+                        },
+                    },
+                },
             },
             $separator = `\n    `,
             $statements = join(list = $statements, $separator),
