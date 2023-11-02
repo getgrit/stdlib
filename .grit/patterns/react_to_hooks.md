@@ -99,11 +99,12 @@ import { useState, useEffect, useCallback } from 'react';
 const App = () => {
   const [name, setName] = useState('');
   const [another, setAnother] = useState(3);
+  const [count, setCount] = useState();
   const [isOpen, setIsOpen] = useState();
 
   useEffect(() => {
     document.title = `You clicked ${count} times`;
-  }, []);
+  }, [count]);
   useEffect(() => {
     // alert("This component was mounted");
     document.title = `You clicked ${count} times`;
@@ -111,7 +112,7 @@ const App = () => {
     if (isOpen && !prevProps.isOpen) {
       alert('You just opened the modal!');
     }
-  }, [isOpen]);
+  }, [count, isOpen]);
   const alertNameHandler = useCallback(() => {
     alert(name);
   }, [name]);
@@ -836,4 +837,167 @@ const MyComponent = () => {
 };
 
 export default MyComponent;
+```
+
+## Does not remove existing react imports
+
+```js
+import React, { ReactNode } from 'react';
+
+export type Props = {
+  children: ReactNode,
+};
+
+type State = {
+  open: boolean,
+};
+
+export default class Expandable extends React.Component<Props, State> {
+  constructor(props: Props) {
+    super(props);
+    this.state = { open: false };
+  }
+
+  handleToggle() {
+    this.setState(({ open }) => ({ open: !open }));
+  }
+
+  render() {
+    return null;
+  }
+}
+```
+
+```ts
+import React, { ReactNode, useState, useCallback } from 'react';
+
+export type Props = {
+  children: ReactNode;
+};
+
+type State = {
+  open: boolean;
+};
+
+const Expandable = () => {
+  const [open, setOpen] = useState(false);
+
+  const handleToggleHandler = useCallback(() => {
+    setOpen(!open);
+  }, [open]);
+
+  return null;
+};
+
+export default Expandable;
+```
+
+## Identifies state which is accessed but not initialized
+
+```js
+import React, { ReactNode } from 'react';
+
+export type Props = {
+  children: ReactNode,
+};
+
+type State = {
+  error: Error,
+  show: boolean,
+};
+
+export default class Expandable extends React.Component<Props, State> {
+  componentDidUpdate(prevProps: Props) {
+    if (this.state.error) {
+      console.error(this.state.error);
+    }
+  }
+
+  handleVerify() {
+    sendRequest().catch((error) => this.setState({ error }));
+  }
+
+  render() {
+    const { show } = this.state;
+    return show ? <></> : null;
+  }
+}
+```
+
+```ts
+import React, { ReactNode, useState, useEffect, useCallback } from 'react';
+
+export type Props = {
+  children: ReactNode;
+};
+
+type State = {
+  error: Error;
+  show: boolean;
+};
+
+const Expandable = () => {
+  const [error, setError] = useState();
+  const [show, setShow] = useState();
+
+  useEffect(() => {
+    if (error) {
+      console.error(error);
+    }
+  }, [error]);
+  const handleVerifyHandler = useCallback(() => {
+    sendRequest().catch((error) => {
+      setError(error);
+    });
+  }, [error]);
+
+  return show ? <></> : null;
+};
+
+export default Expandable;
+```
+
+## Handles implicit return
+
+```js
+import React from 'react';
+
+export default class Expandable extends React.Component {
+  constructor(value) {
+    this.state = { value, error: undefined };
+  }
+
+  handleVerify() {
+    sendRequest()
+      .then((res) => this.setState({ value: res, error: undefined }))
+      .catch((error) => this.setState({ error }));
+  }
+
+  render() {
+    return null;
+  }
+}
+```
+
+```ts
+import React, { useState, useCallback } from 'react';
+
+const Expandable = () => {
+  const [error, setError] = useState(undefined);
+
+  const handleVerifyHandler = useCallback(() => {
+    sendRequest()
+      .then((res) => {
+        setValue(res);
+        setError(undefined);
+      })
+      .catch((error) => {
+        setError(error);
+      });
+  }, [error]);
+
+  return null;
+};
+
+export default Expandable;
 ```
