@@ -477,7 +477,7 @@ try {
 }
 ```
 
-## Does not match an sample without OpenAI
+## Does not match a sample without OpenAI
 
 ```
 var increment = function (i) {
