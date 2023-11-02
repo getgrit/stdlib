@@ -124,7 +124,15 @@ pattern handle_one_statement($class_name, $statements, $states_statements, $stat
             and {
                 $value <: object($properties),
                 $name <: `defaultProps`,
-                $statements += `const props = { \n    $properties,\n    ...inputProps,\n  };`
+                $props = [],
+                $properties <: some bubble($props) $prop where or {
+                    $prop <: method_definition($name, $body) where {
+                        $props += `$name: function() $body`,
+                    },
+                    $props += `$prop`,
+                },
+                $props = join(list=$props, separator=`,\n`),
+                $statements += `const props = { \n    $props,\n    ...inputProps,\n  };`
             },
             and {
                 $static <: `static`,
@@ -351,7 +359,7 @@ pattern first_step($use_ref_from, $handler_callback_suffix) {
 
         // Set an alternative callback suffix, or remove it entirely
 
-        $body <: contains handle_one_statement($class_name, $statements, $states_statements, $static_statements, $render_statements, $constructor_statements, $handler_callback_suffix, $use_ref_from),
+        $body <: contains handle_one_statement($class_name, $statements, $states_statements, $static_statements, $render_statements, $constructor_statements, $handler_callback_suffix, $use_ref_from) until `defaultProps = { $_ }`,
         $program <: maybe contains interface_declaration(body=$interface, name=$interface_name) where {
             $state_type <: $interface_name,
             $interface <: contains bubble($states_statements, $body) {
