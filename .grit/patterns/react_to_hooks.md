@@ -1111,3 +1111,46 @@ export const Nice = (inputProps) => {
   return null;
 };
 ```
+
+## Converts aliased default props
+
+```js
+import React from 'react';
+
+const defaultProps = {
+  compact: false,
+  title: null,
+  renderContent() {},
+};
+
+export class Nice extends React.Component {
+  static defaultProps = defaultProps;
+
+  constructor(props) {
+    super(props);
+  }
+
+  render() {
+    return null;
+  }
+}
+```
+
+```ts
+import React from 'react';
+
+const defaultProps = {
+  compact: false,
+  title: null,
+  renderContent() {},
+};
+
+export const Nice = (inputProps) => {
+  const props = {
+    ...defaultProps,
+    ...inputProps,
+  };
+
+  return null;
+};
+```

@@ -122,6 +122,10 @@ pattern handle_one_statement($class_name, $statements, $states_statements, $stat
                 $statements += `useEffect(() => $effect, []);`
             },
             and {
+                $value <: identifier(),
+                $statements += `const props = { \n    ...$value,\n    ...inputProps,\n  };`
+            },
+            and {
                 $value <: object($properties),
                 $name <: `defaultProps`,
                 $props = [],
@@ -412,8 +416,6 @@ pattern first_step($use_ref_from, $handler_callback_suffix) {
         },
 
         $separator = `\n    `,
-        // a bit of hack because we cannot use a code snippet as an argument to a builtin function yet
-        $separator += "",
         $states_statements = distinct(list=$states_statements),
         $states_statements = join(list = $states_statements, $separator),
         $statements = join(list = $statements, $separator),
