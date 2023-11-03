@@ -70,6 +70,10 @@ pattern rename_func($has_sync, $has_async, $res, $stmt, $params) {
         } else {
             $has_sync = `true`,
             $stmt => `client.$res.$func($params)`,
+        },
+        // Fix function renames
+        if ($res <: `Image`) {
+          $func => `generate`
         }
     }
 }
@@ -432,4 +436,22 @@ def mocked_GET_raises(monkeypatch, other):
     monkeypatch.setattr(openai.Engine.list, 'GET', raise_)
     # TODO: The resource 'Engine' has been deprecated
     monkeypatch.delattr(openai.Engine.list, 'PUT', lambda: True)
+```
+
+## Image creation has been renamed
+
+The `Image.create` method has been renamed to `image.generate`.
+
+```python
+import openai
+
+openai.Image.create(file=file)
+```
+
+```python
+from openai import OpenAI
+
+client = OpenAI()
+
+client.images.generate(file=file)
 ```
