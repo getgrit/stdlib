@@ -1,8 +1,8 @@
 ---
-title: OpenAI migration openai version -> stainless-sdk version
+title: Upgrade to OpenAI Python SDK v1.X
 ---
 
-Convert OpenAI from openai version to the stainless-sdk version.
+Convert OpenAI from openai version to the v1 version.
 
 tags: #python, #openai, #migration
 
