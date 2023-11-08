@@ -1,5 +1,9 @@
 # Upgrade Hathora to Dedicated TS SDK
 
+Migrate from the [legacy Hathora Cloud SDK](https://github.com/hathora/hathora-cloud-sdks/tree/main/typescript) to the [TypeScript SDK](https://github.com/hathora/cloud-sdk-typescript).
+
+tags: #migration, #sdk, #typescript, #hathora, #speakeasy
+
 ```grit
 engine marzano(0.1)
 language js
@@ -146,7 +150,7 @@ pattern rewrite_args() {
     `$x.updateApp($args)` where or {
       $args <: [$a, $b] => `$b, $a`,
       $args <: [$a, $b, $c] => `$b, $a, $c`
-    } 
+    }
   }
 }
 
@@ -203,11 +207,10 @@ function new_resource_name($old_name) {
 }
 
 any {
-  $old=`"@hathora/hathora-cloud-sdk"`,
   $new = `"@hathora/cloud-sdk-typescript"`,
   // update constructors
-  bubble($old, $new) `new $class($_)` as $constructor where {
-    $class <: remove_import(from=$old),
+  `new $class($_)` as $constructor where {
+    $class <: remove_import(from=`"@hathora/hathora-cloud-sdk"`),
     $class <: sdk_member(),
     $cloud = `HathoraCloud`,
     $cloud <: ensure_import_from(source=$new),
@@ -215,10 +218,10 @@ any {
   },
   bubble($old, $new) $x where {
     $x <: and {
-      imported_from(from=$old),
+      imported_from(from=`"@hathora/hathora-cloud-sdk"`),
       not within `new $_`,
       not within `import $_`,
-      remove_import(from=$old)
+      remove_import(from=`"@hathora/hathora-cloud-sdk"`)
     },
     $replacement_import = new_resource_name(old_name=$x),
     $x => $replacement_import,
@@ -232,15 +235,15 @@ any {
 }
 ```
 
-## Instantiates API Resources 
+## Instantiates API Resources
 
 ```js
-import { AuthV1Api } from "@hathora/hathora-cloud-sdk";
+import { AuthV1Api } from '@hathora/hathora-cloud-sdk';
 const authClient = new AuthV1Api();
 ```
 
 ```js
-import { HathoraCloud } from "@hathora/cloud-sdk-typescript";
+import { HathoraCloud } from '@hathora/cloud-sdk-typescript';
 
 const authClient = new HathoraCloud().authV1;
 ```
@@ -248,29 +251,29 @@ const authClient = new HathoraCloud().authV1;
 ## Reorders method arguments
 
 ```js
-import { LobbyV2Api } from "@hathora/hathora-cloud-sdk";
+import { LobbyV2Api } from '@hathora/hathora-cloud-sdk';
 const lobbyClient = new LobbyV2Api();
-lobbyClient.setLobbyState("my-app", "my-room", {some: "data"}, {request: "ops"});
+lobbyClient.setLobbyState('my-app', 'my-room', { some: 'data' }, { request: 'ops' });
 ```
 
 ```js
-import { HathoraCloud } from "@hathora/cloud-sdk-typescript";
+import { HathoraCloud } from '@hathora/cloud-sdk-typescript';
 
 const lobbyClient = new HathoraCloud().lobbyV2;
-lobbyClient.setLobbyState({ some: "data" }, "my-app", "my-room",{ 
-  request: "ops" 
+lobbyClient.setLobbyState({ some: 'data' }, 'my-app', 'my-room', {
+  request: 'ops',
 });
 ```
 
 ## Renames types
 
 ```js
-import { LobbyV2Api } from "@hathora/hathora-cloud-sdk";
+import { LobbyV2Api } from '@hathora/hathora-cloud-sdk';
 const lobbyClient: LobbyV2Api = new LobbyV2Api();
 ```
 
 ```js
-import { LobbyV2, HathoraCloud } from "@hathora/cloud-sdk-typescript";
+import { LobbyV2, HathoraCloud } from '@hathora/cloud-sdk-typescript';
 
 const lobbyClient: LobbyV2 = new HathoraCloud().lobbyV2;
 ```
@@ -321,18 +324,23 @@ lobbyV1Client.createPrivateLobbyDeprecated(appId);
 Responses often have a new intervening wrapper key for the response data. For instance, `setLobbyState` returns data under `.lobby`.
 
 ```js
-import { LobbyV2Api } from "@hathora/hathora-cloud-sdk";
+import { LobbyV2Api } from '@hathora/hathora-cloud-sdk';
 const lobbyClient = new LobbyV2Api();
-const {state} = await lobbyClient.setLobbyState("my-app", "my-room", {some: "data"}, {request: "ops"});
+const { state } = await lobbyClient.setLobbyState(
+  'my-app',
+  'my-room',
+  { some: 'data' },
+  { request: 'ops' },
+);
 ```
 
 ```js
-import { HathoraCloud } from "@hathora/cloud-sdk-typescript";
+import { HathoraCloud } from '@hathora/cloud-sdk-typescript';
 
 const lobbyClient = new HathoraCloud().lobbyV2;
 const { state } = (
-  await lobbyClient.setLobbyState({ some: "data" }, "my-app", "my-room", {
-    request: "ops",
+  await lobbyClient.setLobbyState({ some: 'data' }, 'my-app', 'my-room', {
+    request: 'ops',
   })
 ).lobby;
 ```
