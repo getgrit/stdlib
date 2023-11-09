@@ -61,15 +61,23 @@ pattern deprecated_resource_cls() {
 }
 
 
-pattern rename_func($has_sync, $has_async, $res, $stmt, $params) {
+pattern rename_func($has_sync, $has_async, $res, $stmt, $params, $client) {
     $func where {
         if ($func <: r"a([a-zA-Z0-9]+)"($func_rest)) {
             $has_async = `true`,
             $func => $func_rest,
-            $stmt => `aclient.$res.$func($params)`,
+            if ($client <: undefined) {
+                $stmt => `aclient.$res.$func($params)`,
+            } else {
+                $stmt => `$client.$res.$func($params)`,
+            }
         } else {
             $has_sync = `true`,
-            $stmt => `client.$res.$func($params)`,
+            if ($client <: undefined) {
+                $stmt => `client.$res.$func($params)`,
+            } else {
+                $stmt => `$client.$res.$func($params)`,
+            }
         },
         // Fix function renames
         if ($res <: `Image`) {
@@ -107,11 +115,11 @@ pattern change_import($has_sync, $has_async, $need_openai_import) {
     }
 }
 
-pattern rewrite_whole_fn_call($import, $has_sync, $has_async, $res, $func, $params, $stmt, $body) {
+pattern rewrite_whole_fn_call($import, $has_sync, $has_async, $res, $func, $params, $stmt, $body, $client) {
     or {
         rename_resource() where {
             $import = `true`,
-            $func <: rename_func($has_sync, $has_async, $res, $stmt, $params),
+            $func <: rename_func($has_sync, $has_async, $res, $stmt, $params, $client),
         },
         deprecated_resource() as $dep_res where {
             $stmt_whole = $stmt,
@@ -178,48 +186,65 @@ pattern pytest_patch() {
     },
 }
 
+pattern openai_main($client) {
+    $body where {
+        if ($client <: undefined) {
+            $need_openai_import = `false`,
+            $create_client = true,
+        } else {
+            $need_openai_import = `true`,
+            $create_client = false,
+        },
+        $has_openai_import = `false`,
+        $has_partial_import = `false`,
+        $has_sync = `false`,
+        $has_async = `false`,
+
+        // Remap errors
+        $body <: maybe contains `openai.error.$exp` => `openai.$exp` where {
+            $need_openai_import = `true`,
+        },
+
+        if ($client <: undefined) {
+          // Mark all the places where we they configure openai as something that requires manual intervention
+          $body <: maybe contains bubble($need_openai_import) `openai.$field = $val` => `raise Exception("The 'openai.$field' option isn't read in the client API. You will need to pass it when you instantiate the client, e.g. 'OpenAI($field=$val)'")` where {
+              $need_openai_import = `true`,
+          },
+        },
+
+        $body <: maybe contains `import openai` as $import_stmt where {
+            $body <: contains bubble($has_sync, $has_async, $has_openai_import, $body, $client) `openai.$res.$func($params)` as $stmt where {
+                $res <: rewrite_whole_fn_call(import = $has_openai_import, $has_sync, $has_async, $res, $func, $params, $stmt, $body, $client),
+            },
+        },
+
+        $body <: maybe contains `from openai import $resources` as $partial_import_stmt where {
+            $has_partial_import = `true`,
+            $body <: contains bubble($has_sync, $has_async, $resources, $client) `$res.$func($params)` as $stmt where {
+                $resources <: contains $res,
+                $res <: rewrite_whole_fn_call($import, $has_sync, $has_async, $res, $func, $params, $stmt, $body, $client),
+            }
+        },
+
+        if ($create_client <: true) {
+            if ($has_openai_import <: `true`) {
+                $import_stmt <: change_import($has_sync, $has_async, $need_openai_import),
+                if ($has_partial_import <: `true`) {
+                    $partial_import_stmt => .,
+                },
+            } else if ($has_partial_import <: `true`) {
+                $partial_import_stmt <: change_import($has_sync, $has_async, $need_openai_import),
+            },
+        },
+
+        $body <: maybe contains unittest_patch(),
+        $body <: maybe contains pytest_patch(),
+    }
+}
+
 file($body) where {
-    $need_openai_import = `false`,
-    $has_openai_import = `false`,
-    $has_partial_import = `false`,
-    $has_sync = `false`,
-    $has_async = `false`,
-
-    // Remap errors
-    $body <: maybe contains `openai.error.$exp` => `openai.$exp` where {
-        $need_openai_import = `true`,
-    },
-
-    // Mark all the places where we they configure openai as something that requires manual intervention
-    $body <: maybe contains bubble($need_openai_import) `openai.$field = $val` => `raise Exception("The 'openai.$field' option isn't read in the client API. You will need to pass it when you instantiate the client, e.g. 'OpenAI($field=$val)'")` where {
-        $need_openai_import = `true`,
-    },
-
-    $body <: maybe contains `import openai` as $import_stmt where {
-        $body <: contains bubble($has_sync, $has_async, $has_openai_import, $body) `openai.$res.$func($params)` as $stmt where {
-            $res <: rewrite_whole_fn_call(import = $has_openai_import, $has_sync, $has_async, $res, $func, $params, $stmt, $body),
-        },
-    },
-
-    $body <: maybe contains `from openai import $resources` as $partial_import_stmt where {
-        $has_partial_import = `true`,
-        $body <: contains bubble($has_sync, $has_async, $resources) `$res.$func($params)` as $stmt where {
-            $resources <: contains $res,
-            $res <: rewrite_whole_fn_call($import, $has_sync, $has_async, $res, $func, $params, $stmt, $body),
-        }
-    },
-
-    if ($has_openai_import <: `true`) {
-        $import_stmt <: change_import($has_sync, $has_async, $need_openai_import),
-        if ($has_partial_import <: `true`) {
-            $partial_import_stmt => .,
-        },
-    } else if ($has_partial_import <: `true`) {
-        $partial_import_stmt <: change_import($has_sync, $has_async, $need_openai_import),
-    },
-
-    $body <: maybe contains unittest_patch(),
-    $body <: maybe contains pytest_patch(),
+  // No client means instantiate one per file
+  $body <: openai_main()
 }
 ```
 
