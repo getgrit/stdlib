@@ -86,7 +86,7 @@ pattern rename_func($has_sync, $has_async, $res, $stmt, $params, $client) {
     }
 }
 
-pattern change_import($has_sync, $has_async, $need_openai_import) {
+pattern change_import($has_sync, $has_async, $need_openai_import, $azure, $client_params) {
     $stmt where {
         $imports_and_defs = [],
 
@@ -94,32 +94,44 @@ pattern change_import($has_sync, $has_async, $need_openai_import) {
             $imports_and_defs += `import openai`,
         },
 
-        if (and { $has_sync <: `true`, $has_async <: `true` }) {
-            $imports_and_defs += `from openai import OpenAI, AsyncOpenAI`,
-            $imports_and_defs += ``, // Blank line
-            $imports_and_defs += `client = OpenAI()`,
-            $imports_and_defs += `aclient = AsyncOpenAI()`,
-        } else if ($has_sync <: `true`) {
-            $imports_and_defs += `from openai import OpenAI`,
-            $imports_and_defs += ``, // Blank line
-            $imports_and_defs += `client = OpenAI()`,
-        } else if ($has_async <: `true`) {
-            $imports_and_defs += `from openai import AsyncOpenAI`,
-            $imports_and_defs += ``, // Blank line
-            $imports_and_defs += `aclient = AsyncOpenAI()`,
+        if ($azure <: true) {
+          $client = `AzureOpenAI`,
+          $aclient = `AsyncAzureOpenAI`,
+        } else {
+          $client = `OpenAI`,
+          $aclient = `AsyncOpenAI`,
         },
 
-        $separator = `\n`,
-        $formatted = join(list = $imports_and_defs, $separator),
+        $formatted_params = join(list = $client_params, separator = `,\n`),
+
+        if (and { $has_sync <: `true`, $has_async <: `true` }) {
+            $imports_and_defs += `from openai import $client, $aclient`,
+            $imports_and_defs += ``, // Blank line
+            $imports_and_defs += `client = $client($formatted_params)`,
+            $imports_and_defs += `aclient = $aclient($formatted_params)`,
+        } else if ($has_sync <: `true`) {
+            $imports_and_defs += `from openai import $client`,
+            $imports_and_defs += ``, // Blank line
+            $imports_and_defs += `client = $client($formatted_params)`,
+        } else if ($has_async <: `true`) {
+            $imports_and_defs += `from openai import $aclient`,
+            $imports_and_defs += ``, // Blank line
+            $imports_and_defs += `aclient = $aclient($formatted_params)`,
+        },
+
+        $formatted = join(list = $imports_and_defs, separator=`\n`),
         $stmt => `$formatted`,
     }
 }
 
-pattern rewrite_whole_fn_call($import, $has_sync, $has_async, $res, $func, $params, $stmt, $body, $client) {
+pattern rewrite_whole_fn_call($import, $has_sync, $has_async, $res, $func, $params, $stmt, $body, $client, $azure) {
     or {
         rename_resource() where {
             $import = `true`,
             $func <: rename_func($has_sync, $has_async, $res, $stmt, $params, $client),
+            if ($azure <: true) {
+              $params <: maybe contains bubble `engine` => `model`
+            }
         },
         deprecated_resource() as $dep_res where {
             $stmt_whole = $stmt,
@@ -186,7 +198,7 @@ pattern pytest_patch() {
     },
 }
 
-pattern openai_main($client) {
+pattern openai_main($client, $azure) {
     $body where {
         if ($client <: undefined) {
             $need_openai_import = `false`,
@@ -194,6 +206,9 @@ pattern openai_main($client) {
         } else {
             $need_openai_import = `true`,
             $create_client = false,
+        },
+        if ($azure <: undefined) {
+          $azure = false,
         },
         $has_openai_import = `false`,
         $has_partial_import = `false`,
@@ -205,35 +220,55 @@ pattern openai_main($client) {
             $need_openai_import = `true`,
         },
 
-        if ($client <: undefined) {
-          // Mark all the places where we they configure openai as something that requires manual intervention
-          $body <: maybe contains bubble($need_openai_import) `openai.$field = $val` => `raise Exception("The 'openai.$field' option isn't read in the client API. You will need to pass it when you instantiate the client, e.g. 'OpenAI($field=$val)'")` where {
-              $need_openai_import = `true`,
-          },
+        $body <: maybe contains `import openai` as $import_stmt where {
+            $body <: contains bubble($has_sync, $has_async, $has_openai_import, $body, $client, $azure) `openai.$res.$func($params)` as $stmt where {
+                $res <: rewrite_whole_fn_call(import = $has_openai_import, $has_sync, $has_async, $res, $func, $params, $stmt, $body, $client, $azure),
+            },
         },
 
-        $body <: maybe contains `import openai` as $import_stmt where {
-            $body <: contains bubble($has_sync, $has_async, $has_openai_import, $body, $client) `openai.$res.$func($params)` as $stmt where {
-                $res <: rewrite_whole_fn_call(import = $has_openai_import, $has_sync, $has_async, $res, $func, $params, $stmt, $body, $client),
-            },
+        $client_params = [],
+        if ($client <: undefined) {
+          // Mark all the places where we they configure openai as something that requires manual intervention
+          $body <: maybe contains bubble($need_openai_import, $azure, $client_params) `openai.$field = $val` where {
+            $field <: or {
+              `api_type` where $res = .,
+              `api_base` where {
+                $azure <: true,
+                $client_params += `azure_endpoint=$val`,
+                $res = .,
+              },
+              `api_key` where {
+                $res = .,
+                $client_params += `api_key=$val`,
+              },
+              `api_version` where {
+                $res = .,
+                $client_params += `api_version=$val`,
+              },
+              $_ where {
+                $res = `raise Exception("The 'openai.$field' option isn't read in the client API. You will need to pass it when you instantiate the client, e.g. 'OpenAI($field=$val)'")`,
+                $need_openai_import = `true`,
+              }
+            }
+          } => $res
         },
 
         $body <: maybe contains `from openai import $resources` as $partial_import_stmt where {
             $has_partial_import = `true`,
-            $body <: contains bubble($has_sync, $has_async, $resources, $client) `$res.$func($params)` as $stmt where {
+            $body <: contains bubble($has_sync, $has_async, $resources, $client, $azure) `$res.$func($params)` as $stmt where {
                 $resources <: contains $res,
-                $res <: rewrite_whole_fn_call($import, $has_sync, $has_async, $res, $func, $params, $stmt, $body, $client),
+                $res <: rewrite_whole_fn_call($import, $has_sync, $has_async, $res, $func, $params, $stmt, $body, $client, $azure),
             }
         },
 
         if ($create_client <: true) {
             if ($has_openai_import <: `true`) {
-                $import_stmt <: change_import($has_sync, $has_async, $need_openai_import),
+                $import_stmt <: change_import($has_sync, $has_async, $need_openai_import, $azure, $client_params),
                 if ($has_partial_import <: `true`) {
                     $partial_import_stmt => .,
                 },
             } else if ($has_partial_import <: `true`) {
-                $partial_import_stmt <: change_import($has_sync, $has_async, $need_openai_import),
+                $partial_import_stmt <: change_import($has_sync, $has_async, $need_openai_import, $azure, $client_params),
             },
         },
 

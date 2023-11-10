@@ -1,7 +1,7 @@
 name: Run grit patterns test
 
 env:
-  GRIT_TELEMETRY_DISABLED: 'true'
+  GRIT_TELEMETRY_DISABLED: "true"
 
 on:
   push:
@@ -25,6 +25,10 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: ${{ matrix.node-version }}
+
+      - name: install-ruff
+        run: |
+          pip install ruff
 
       - name: Install @getgrit/launcher
         run: npm install -g @getgrit/launcher
