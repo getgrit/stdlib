@@ -215,23 +215,17 @@ pattern openai_main($client, $azure) {
         $has_sync = `false`,
         $has_async = `false`,
 
-        // Remap errors
-        $body <: maybe contains `openai.error.$exp` => `openai.$exp` where {
-            $need_openai_import = `true`,
-        },
-
-        $body <: maybe contains `import openai` as $import_stmt where {
-            $body <: contains bubble($has_sync, $has_async, $has_openai_import, $body, $client, $azure) `openai.$res.$func($params)` as $stmt where {
-                $res <: rewrite_whole_fn_call(import = $has_openai_import, $has_sync, $has_async, $res, $func, $params, $stmt, $body, $client, $azure),
-            },
-        },
-
         $client_params = [],
         if ($client <: undefined) {
           // Mark all the places where we they configure openai as something that requires manual intervention
           $body <: maybe contains bubble($need_openai_import, $azure, $client_params) `openai.$field = $val` where {
             $field <: or {
-              `api_type` where $res = .,
+              `api_type` where {
+                $res = .,
+                if ($val <: `"azure"`) {
+                  $azure = true
+                },
+              },
               `api_base` where {
                 $azure <: true,
                 $client_params += `azure_endpoint=$val`,
@@ -251,6 +245,17 @@ pattern openai_main($client, $azure) {
               }
             }
           } => $res
+        },
+
+        // Remap errors
+        $body <: maybe contains `openai.error.$exp` => `openai.$exp` where {
+            $need_openai_import = `true`,
+        },
+
+        $body <: maybe contains `import openai` as $import_stmt where {
+            $body <: contains bubble($has_sync, $has_async, $has_openai_import, $body, $client, $azure) `openai.$res.$func($params)` as $stmt where {
+                $res <: rewrite_whole_fn_call(import = $has_openai_import, $has_sync, $has_async, $res, $func, $params, $stmt, $body, $client, $azure),
+            },
         },
 
         $body <: maybe contains `from openai import $resources` as $partial_import_stmt where {
@@ -514,4 +519,44 @@ from openai import OpenAI
 client = OpenAI()
 
 client.images.generate(file=file)
+```
+
+## Use Azure OpenAI
+
+If api_type is set to Azure before, you should now use the `AzureOpenAI` client.
+
+```python
+import os
+import openai
+
+openai.api_type = "azure"
+openai.api_base = os.getenv("AZURE_OPENAI_ENDPOINT")
+openai.api_key = os.getenv("AZURE_OPENAI_KEY")
+openai.api_version = "2023-05-15"
+
+response = openai.ChatCompletion.create(
+    engine="gpt-35-turbo",
+    messages=[
+        {"role": "system", "content": "You are a helpful assistant."},
+    ]
+)
+```
+
+```python
+import os
+from openai import AzureOpenAI
+
+client = AzureOpenAI(
+  azure_endpoint=os.getenv("AZURE_OPENAI_ENDPOINT"),
+  api_key=os.getenv("AZURE_OPENAI_KEY"),
+  api_version="2023-05-15"
+)
+
+
+response = client.chat.completions.create(
+  model="gpt-35-turbo",
+  messages=[
+    {"role": "system", "content": "You are a helpful assistant."},
+  ]
+)
 ```
