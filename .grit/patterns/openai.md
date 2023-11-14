@@ -138,7 +138,7 @@ pattern rewrite_whole_fn_call($import, $has_sync, $has_async, $res, $func, $para
             if ($body <: contains `$_ = $stmt` as $line) {
                 $stmt_whole = $line,
             },
-            $stmt_whole => `# TODO: The resource '$dep_res' has been deprecated\n$stmt_whole`,
+            $stmt_whole => todo(message=`The resource '$dep_res' has been deprecated`, target=$stmt_whole),
         }
     }
 }
@@ -150,7 +150,7 @@ pattern unittest_patch() {
                 $cls_path <: contains r"openai\.([a-zA-Z0-9]+)(?:.[^,]+)?"($res),
                 if ($res <: rename_resource_cls()) {} else {
                     $res <: deprecated_resource_cls(),
-                    $stmt => `# TODO: The resource '$res' has been deprecated\n$stmt`,
+                    $stmt => todo(message=`The resource '$res' has been deprecated`, target=$stmt),
                 }
             }
         },
@@ -167,7 +167,7 @@ pattern unittest_patch() {
                         if ($body <: contains or { `with $stmt:`, `with $stmt as $_:` } as $l) {
                             $line = $l,
                         },
-                        $line => `# TODO: The resource '$res' has been deprecated\n$line`,
+                        $line => todo(message=`The resource '$res' has been deprecated`, target=$line),
                     }
                 }
             },
@@ -184,13 +184,13 @@ pattern pytest_patch() {
                 `$monkeypatch.setattr($params)` as $stmt where {
                     $params <: contains bubble($stmt) r"openai\.([a-zA-Z0-9]+)(?:.[^,]+)?"($res) where or {
                         $res <: rename_resource_cls(),
-                        $stmt => `# TODO: The resource '$res' has been deprecated\n$stmt`,
+                        $stmt => todo(message=`The resource '$res' has been deprecated`, target=$stmt),
                     }
                 },
                 `monkeypatch.delattr($params)` as $stmt where {
                     $params <: contains bubble($stmt) r"openai\.([a-zA-Z0-9]+)(?:.[^,]+)?"($res) where or {
                         $res <: rename_resource_cls(),
-                        $stmt => `# TODO: The resource '$res' has been deprecated\n$stmt`,
+                        $stmt => todo(message=`The resource '$res' has been deprecated`, target=$stmt),
                     }
                 },
             }
@@ -218,7 +218,7 @@ pattern openai_main($client, $azure) {
         $client_params = [],
         if ($client <: undefined) {
           // Mark all the places where we they configure openai as something that requires manual intervention
-          $body <: maybe contains bubble($need_openai_import, $azure, $client_params) `openai.$field = $val` where {
+          $body <: maybe contains bubble($need_openai_import, $azure, $client_params) `openai.$field = $val` as $setter where {
             $field <: or {
               `api_type` where {
                 $res = .,
@@ -242,7 +242,7 @@ pattern openai_main($client, $azure) {
                 $client_params += `api_version=$val`,
               },
               $_ where {
-                $res = `raise Exception("The 'openai.$field' option isn't read in the client API. You will need to pass it when you instantiate the client, e.g. 'OpenAI($field=$val)'")`,
+                $res = todo(message=`The 'openai.$field' option isn't read in the client API. You will need to pass it when you instantiate the client, e.g. 'OpenAI($field=$val)'`, target=$setter),
                 $need_openai_import = `true`,
               }
             }
@@ -386,8 +386,10 @@ if openai_proxy:
 import openai
 
 if openai_proxy:
-    raise Exception("The 'openai.proxy' option isn't read in the client API. You will need to pass it when you instantiate the client, e.g. 'OpenAI(proxy=openai_proxy)'")
-    raise Exception("The 'openai.api_base' option isn't read in the client API. You will need to pass it when you instantiate the client, e.g. 'OpenAI(api_base=self.openai_api_base)'")
+    # TODO: The 'openai.proxy' option isn't read in the client API. You will need to pass it when you instantiate the client, e.g. 'OpenAI(proxy=openai_proxy)'
+    # openai.proxy = openai_proxy
+    # TODO: The 'openai.api_base' option isn't read in the client API. You will need to pass it when you instantiate the client, e.g. 'OpenAI(api_base=self.openai_api_base)'
+    # openai.api_base = self.openai_api_base
 ```
 
 ## Remap errors
@@ -428,9 +430,9 @@ chat_completion = openai.Deployment.create(model="gpt-3.5-turbo", messages=[{"ro
 import openai
 
 # TODO: The resource 'Customer' has been deprecated
-completion = openai.Customer.create(model="davinci-002", prompt="Hello world")
+# completion = openai.Customer.create(model="davinci-002", prompt="Hello world")
 # TODO: The resource 'Deployment' has been deprecated
-chat_completion = openai.Deployment.create(model="gpt-3.5-turbo", messages=[{"role": "user", "content": "Hello world"}])
+# chat_completion = openai.Deployment.create(model="gpt-3.5-turbo", messages=[{"role": "user", "content": "Hello world"}])
 ```
 
 ## Migrate unittest
@@ -451,16 +453,16 @@ def test(MockClass1, MockClass2):
 ```python
 @patch('openai.resources.Completions')
 # TODO: The resource 'Customer' has been deprecated
-@patch('openai.Customer')
+# @patch('openai.Customer')
 def test(MockClass1, MockClass2):
     with patch.object(openai.resources.Completions, 'method', return_value=None):
         pass
     # TODO: The resource 'Customer' has been deprecated
-    with patch.object(openai.Customer, 'method', return_value=None):
-        pass
+    # with patch.object(openai.Customer, 'method', return_value=None):
+    #         pass
     # TODO: The resource 'Engine' has been deprecated
-    with patch("openai.Engine.list"):
-        pass
+    # with patch("openai.Engine.list"):
+    #         pass
     pass
 ```
 
@@ -493,16 +495,16 @@ def mocked_GET_pos(monkeypatch):
 @pytest.fixture
 def mocked_GET_neg(monkeypatch):
     # TODO: The resource 'Customer' has been deprecated
-    monkeypatch.setattr(openai.Customer, 'GET', lambda: False)
+    # monkeypatch.setattr(openai.Customer, 'GET', lambda: False)
 
 @pytest.fixture
 def mocked_GET_raises(monkeypatch, other):
     def raise_():
         raise Exception()
     # TODO: The resource 'Engine' has been deprecated
-    monkeypatch.setattr(openai.Engine.list, 'GET', raise_)
+    # monkeypatch.setattr(openai.Engine.list, 'GET', raise_)
     # TODO: The resource 'Engine' has been deprecated
-    monkeypatch.delattr(openai.Engine.list, 'PUT', lambda: True)
+    # monkeypatch.delattr(openai.Engine.list, 'PUT', lambda: True)
 ```
 
 ## Image creation has been renamed
