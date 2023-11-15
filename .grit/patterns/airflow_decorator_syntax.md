@@ -158,9 +158,9 @@ pattern rewrite_chaining() {
 
 
 sequential {
-  add_dag_decorator(),
-  maybe replace_task_refs(),
-  maybe rewrite_chaining(),
+  contains add_dag_decorator(),
+  maybe contains replace_task_refs(),
+  maybe contains rewrite_chaining(),
 }
 
 ```
