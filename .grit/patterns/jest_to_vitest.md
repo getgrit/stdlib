@@ -112,7 +112,7 @@ pattern main_jest_to_vitest_migration() {
 
 sequential {
   maybe main_jest_to_vitest_migration(),
-  maybe adjust_imports_vitest(),
+  maybe contains adjust_imports_vitest(),
 }
 ```
 

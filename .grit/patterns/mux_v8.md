@@ -125,8 +125,8 @@ pattern replace_verify_headers() {
 }
 
 sequential {
-    maybe change_constructors(),
-    maybe replace_verify_headers(),
+    maybe contains change_constructors(),
+    maybe contains replace_verify_headers(),
 }
 
 ```
