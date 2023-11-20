@@ -17,6 +17,8 @@ language python
              $result += `\n# $x`
          }
     },
+    $log_message = `TODO: $message`,
+    log(message=$log_message, variable=$target),
     $lines = lines(string = $target),
     $lines <: some bubble($result) $x where { $result += `\n# $x` },
     return $result,
