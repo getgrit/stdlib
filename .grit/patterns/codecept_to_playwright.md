@@ -16,6 +16,14 @@ pattern convert_test() {
             $function <: contains $scenario,
             $tagger => $scenario,
         },
+        $body <: maybe contains bubble or {
+            `I.say($log)` => `console.log($log)`,
+            expression_statement($expression) where {
+                $expression <: call_expression(),
+                $expression => `await $expression`,
+            },
+            `I.haveWithCachePing($client)` => `factory.create($client)`,
+        },
         $pages = [],
         $body <: maybe contains bubble($pages) r"[a-zA-Z]*Page" as $page where {
             $page <: identifier(),
@@ -43,7 +51,7 @@ pattern convert_base_page() {
                 $async <: false,
                 $method => `async $method`,
             },
-            `I.waitInUrl($url)` => `await this.page.waitForUrl(new RegExp($url))`,
+            `I.waitInUrl($url)` => `await this.page.waitForURL(new RegExp($url))`,
             `I.waitForLoader()` => `await this.waitForLoader()`,
             `I.waitForText($text, $timeout, $target)` => `await expect($target).toHaveText($text, {
                 timeout: $timeout * 1000,
@@ -55,6 +63,7 @@ pattern convert_base_page() {
             `I.waitForInvisible($target, $timeout)` => `await $target.waitFor({ state: 'hidden', timeout: $timeout * 1000 })`,
             `I.waitForInvisible($target)` => `await $target.waitFor({ state: 'hidden' })`,
             `$locator.withText($text)` => `$locator.and(this.page.getByText($text))`,
+            `I.click($target, $context)` => `await $context.locator($target).click()`,
             `I.click($target)` => `await $target.click()`,
         },
         $filename <: r".*?/?([^/]+)\.[a-zA-Z]*"($base_name),
@@ -140,7 +149,7 @@ export default class Test extends BasePage {
   }
 
   async waitForGrit() {
-    await this.page.waitForUrl(new RegExp(this.url));
+    await this.page.waitForURL(new RegExp(this.url));
     await expect(this.heading).toHaveText('Studio', {
       timeout: 10 * 1000,
       ignoreCase: true,
@@ -164,6 +173,7 @@ export default {
 
   waitForGrit() {
     I.waitForVisible(this.studio.withText(this.message), 5);
+    I.click('.grit-button', this.studio);
   },
 };
 ```
@@ -183,6 +193,7 @@ export default class Test extends BasePage {
     await this.studio
       .and(this.page.getByText(this.message))
       .waitFor({ state: 'visible', timeout: 5 * 1000 });
+    await this.studio.locator('.grit-button').click();
   }
 }
 ```
@@ -203,8 +214,8 @@ Scenario('Trivial test', async ({ I }) => {
 ```js
 test('Trivial test', async ({ page, factory, context }) => {
   var projectPage = new ProjectPage(page, context);
-  projectPage.open();
-  expect(true).toBe(true);
-  projectPage.close();
+  await projectPage.open();
+  await expect(true).toBe(true);
+  await projectPage.close();
 });
 ```
