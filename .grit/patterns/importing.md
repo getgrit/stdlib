@@ -43,6 +43,7 @@ import fetch from 'elsewhere';
 import { fetch } from 'node-fetch';
 import { fetch, more } from 'node-fetch';
 import fetch from 'node-fetch';
+import defaultNotNamedFetch, { fetch } from 'node-fetch';
 
 console.log(orderBy([1, 2, 3]));
 
@@ -59,6 +60,8 @@ import { v4 } from 'uuid';
 import fetch from 'elsewhere';
 
 import { more } from 'node-fetch';
+
+import defaultNotNamedFetch from 'node-fetch';
 
 console.log(orderBy([1, 2, 3]));
 
