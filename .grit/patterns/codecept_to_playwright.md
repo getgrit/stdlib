@@ -23,6 +23,7 @@ pattern convert_test() {
                 $expression => `await $expression`,
             },
             `I.haveWithCachePing($client)` => `factory.create($client)`,
+            convert_locators(page=`page`),
         },
         $pages = [],
         $body <: maybe contains bubble($pages) r"[a-zA-Z]*Page" as $page where {
@@ -38,33 +39,50 @@ pattern convert_test() {
     })`
 }
 
+pattern convert_locators($page) {
+    or {
+        `locate($locator).as($_)` => `$page.locator($locator)`,
+        `locate($locator).find($sub)` => `$page.locator($locator).locator($sub)`,
+        `locate($locator)` => `$page.locator($locator)`,
+        `I.waitInUrl($url)` => `await $page.waitForURL(new RegExp($url))`,
+        `I.waitForLoader()` => `await this.waitForLoader()`,
+        `I.waitForText($text, $timeout, $target)` => `await expect($target).toHaveText($text, {
+            timeout: $timeout * 1000,
+            ignoreCase: true,
+        })`,
+        `I.see($text, $target)` => `await expect($target).toContainText($text)`,
+        `I.waitForElement($target, $timeout)` => `await $target.waitFor({ state: 'attached', timeout: $timeout * 1000 })`,
+        `I.waitForElement($target)` => `await $target.waitFor({ state: 'attached' })`,
+        `I.waitForVisible($target, $timeout)` => `await $target.waitFor({ state: 'visible', timeout: $timeout * 1000 })`,
+        `I.waitForVisible($target)` => `await $target.waitFor({ state: 'visible' })`,
+        `I.waitForInvisible($target, $timeout)` => `await $target.waitFor({ state: 'hidden', timeout: $timeout * 1000 })`,
+        `I.waitForInvisible($target)` => `await $target.waitFor({ state: 'hidden' })`,
+        `$locator.withText($text)` => `$locator.and($page.getByText($text))`,
+        `I.click($target, $context)` => `await $context.locator($target).click()`,
+        `I.click($target)` => `await $target.click()`,
+        `I.pressKey($key)` => `await $page.keyboard.press($key)`,
+        `I.refreshPage()` => `await $page.reload()`,
+    }
+}
+
 pattern convert_base_page() {
     `export default { $properties }` where {
         $program <: contains `const { I } = inject();` => .,
         $properties <: maybe contains bubble or {
-            pair($key, $value) as $pair where {
+            pair($key, $value) as $pair where or {
+                $value <: `($params) => { $body }` where {
+                    $pair => `$key($params) { $body }`,
+                },
+                $value <: `($params) => $exp` where {
+                    $pair => `$key($params) { return $exp }`,
+                },
                 $pair => `get $key() { return $value }`
             },
-            `locate($locator).as($_)` => `this.page.locator($locator)`,
-            `locate($locator)` => `this.page.locator($locator)`,
             method_definition($async, $static) as $method where {
                 $async <: false,
                 $method => `async $method`,
             },
-            `I.waitInUrl($url)` => `await this.page.waitForURL(new RegExp($url))`,
-            `I.waitForLoader()` => `await this.waitForLoader()`,
-            `I.waitForText($text, $timeout, $target)` => `await expect($target).toHaveText($text, {
-                timeout: $timeout * 1000,
-                ignoreCase: true,
-            })`,
-            `I.see($text, $target)` => `await expect($target).toContainText($text)`,
-            `I.waitForVisible($target, $timeout)` => `await $target.waitFor({ state: 'visible', timeout: $timeout * 1000 })`,
-            `I.waitForVisible($target)` => `await $target.waitFor({ state: 'visible' })`,
-            `I.waitForInvisible($target, $timeout)` => `await $target.waitFor({ state: 'hidden', timeout: $timeout * 1000 })`,
-            `I.waitForInvisible($target)` => `await $target.waitFor({ state: 'hidden' })`,
-            `$locator.withText($text)` => `$locator.and(this.page.getByText($text))`,
-            `I.click($target, $context)` => `await $context.locator($target).click()`,
-            `I.click($target)` => `await $target.click()`,
+            convert_locators(page=`this.page`),
         },
         $filename <: r".*?/?([^/]+)\.[a-zA-Z]*"($base_name),
         $base_name = capitalize(string=$base_name),
@@ -78,6 +96,9 @@ pattern remove_commas() {
         r"(?s)(get\s+\w+\s*\(\s*\)\s*\{[^}]*\})\s*,"($getter) => $getter,
         // Hack to remove the incorrect trailing comma
         `async $method($params) { $body }` => `async $method($params) {
+    $body
+}`,
+        `$method($params) { $body }` => `$method($params) {
     $body
 }`,
     }
@@ -170,10 +191,11 @@ const { I } = inject();
 export default {
   studio: locate('.studio'),
   message: 'Hello world',
+  button: (name) => locate(`//button[contains(text(), "${name}")]`).as(name),
 
   waitForGrit() {
     I.waitForVisible(this.studio.withText(this.message), 5);
-    I.click('.grit-button', this.studio);
+    I.click(this.button('grit'), this.studio);
   },
 };
 ```
@@ -188,12 +210,15 @@ export default class Test extends BasePage {
   get message() {
     return 'Hello world';
   }
+  button(name) {
+    return this.page.locator(`//button[contains(text(), "${name}")]`);
+  }
 
   async waitForGrit() {
     await this.studio
       .and(this.page.getByText(this.message))
       .waitFor({ state: 'visible', timeout: 5 * 1000 });
-    await this.studio.locator('.grit-button').click();
+    await this.studio.locator(this.button('grit')).click();
   }
 }
 ```
@@ -203,6 +228,9 @@ export default class Test extends BasePage {
 ```js
 Scenario('Trivial test', async ({ I }) => {
   projectPage.open();
+  I.waitForVisible(projectPage.list);
+  I.refreshPage();
+  I.see(projectPage.demo, projectPage.list);
   expect(true).toBe(true);
   projectPage.close();
 })
@@ -215,6 +243,9 @@ Scenario('Trivial test', async ({ I }) => {
 test('Trivial test', async ({ page, factory, context }) => {
   var projectPage = new ProjectPage(page, context);
   await projectPage.open();
+  await projectPage.list.waitFor({ state: 'visible' });
+  await page.reload();
+  await expect(projectPage.list).toContainText(projectPage.demo);
   await expect(true).toBe(true);
   await projectPage.close();
 });
