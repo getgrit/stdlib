@@ -27,6 +27,12 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
+      - name: setup auth
+        run: ./ops/set_access_token.sh
+        env:
+          API_CLIENT_ID: ${{ secrets.API_CLIENT_ID }}
+          API_CLIENT_SECRET: ${{ secrets.API_CLIENT_SECRET }}
+
       - name: Install prettier
         run: |
           curl -L https://github.com/prettier/prettier/releases/download/3.0.1/prettier -o prettier

@@ -1,0 +1,35 @@
+language js
+
+// Given a question and a list of choices,
+function ai_ask($question, $choices) {
+  $messages = [
+    `{
+      "role": "system",
+      "content": "Answer all questions with a single word. Choices: $choices"
+    }`,
+    `{
+      "role": "user",
+      "content": "$question"
+    }`
+  ],
+  $answer = llm_choice($messages, $choices),
+  return $answer
+}
+
+// Given a question and a list of choices,
+pattern ai_is($condition) {
+  $item_to_check where {
+    $messages = [
+      `{
+        "role": "system",
+        "content": "Classify whether the input code should match this condition: $condition. Answer with yes or no."
+      }`,
+      `{
+        "role": "user",
+        "content": "$item_to_check"
+      }`
+    ],
+    $answer = llm_choice($messages, choices=["yes", "no"]),
+    $answer <: "yes"
+  }
+}
