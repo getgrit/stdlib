@@ -50,17 +50,26 @@ pattern convert_locators($page) {
             timeout: $timeout * 1000,
             ignoreCase: true,
         })`,
+        `I.wait($timeout)` => `await $page.waitForTimeout($timeout * 1000)`,
+        `I.seeElement($element)` => `await expect($element).toBeVisible()`,
+        `I.dontSeeElement($element)` => `await expect($element).toBeHidden()`,
         `I.see($text, $target)` => `await expect($target).toContainText($text)`,
+        `I.dontSee($text, $target)` => `await expect($target).not.toContainText($text)`,
+        `I.seeInField($value, $target)` => `await expect($target).toHaveValue($value)`,
+        `I.seeTextEquals($text, $target)` => `await expect($target).toHaveText($text)`,
         `I.waitForElement($target, $timeout)` => `await $target.waitFor({ state: 'attached', timeout: $timeout * 1000 })`,
         `I.waitForElement($target)` => `await $target.waitFor({ state: 'attached' })`,
         `I.waitForVisible($target, $timeout)` => `await $target.waitFor({ state: 'visible', timeout: $timeout * 1000 })`,
         `I.waitForVisible($target)` => `await $target.waitFor({ state: 'visible' })`,
         `I.waitForInvisible($target, $timeout)` => `await $target.waitFor({ state: 'hidden', timeout: $timeout * 1000 })`,
         `I.waitForInvisible($target)` => `await $target.waitFor({ state: 'hidden' })`,
-        `$locator.withText($text)` => `$locator.and($page.getByText($text))`,
+        `$locator.withText($text)` => `$locator.and($page.locator(':has-text("$text")'))`,
+        `I.forceClick($target, $context)` => `await $context.locator($target).click({ force: true })`,
+        `I.forceClick($target)` => `await $target.click({ force: true })`,
         `I.click($target, $context)` => `await $context.locator($target).click()`,
         `I.click($target)` => `await $target.click()`,
         `I.pressKey($key)` => `await $page.keyboard.press($key)`,
+        `I.type($keys)` => `await $page.keyboard.type($keys)`,
         `I.refreshPage()` => `await $page.reload()`,
     }
 }
@@ -216,7 +225,7 @@ export default class Test extends BasePage {
 
   async waitForGrit() {
     await this.studio
-      .and(this.page.getByText(this.message))
+      .and(this.page.locator(':has-text("this.message")'))
       .waitFor({ state: 'visible', timeout: 5 * 1000 });
     await this.studio.locator(this.button('grit')).click();
   }
