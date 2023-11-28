@@ -120,25 +120,9 @@ pattern convert_base_page() {
     }`
 }
 
-pattern remove_commas() {
-    or {
-        r"(?s)(get\s+\w+\s*\(\s*\)\s*\{.*\})\s*,"($getter) => $getter,
-        // Hack to remove the incorrect trailing comma
-        `async $method($params) { $body }` => `async $method($params) {
-    $body
-}`,
-        `$method($params) { $body }` => `$method($params) {
-    $body
-}`,
-    }
-}
-
-sequential {
-    contains bubble or {
-        convert_test(),
-        convert_base_page(),
-    },
-    maybe contains bubble remove_commas(),
+or {
+    convert_test(),
+    convert_base_page(),
 }
 ```
 
