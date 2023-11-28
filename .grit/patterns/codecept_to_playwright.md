@@ -11,7 +11,8 @@ engine marzano(0.1)
 language js
 
 pattern convert_test() {
-    `Scenario($description, async ({ I }) => { $body })` as $scenario where {
+    `Scenario($description, async ({ $params }) => { $body })` as $scenario where {
+        $params <: contains `I`,
         $program <: maybe contains call_expression($function) as $tagger where {
             $function <: contains $scenario,
             $tagger => $scenario,
@@ -30,6 +31,11 @@ pattern convert_test() {
             $page <: identifier(),
             $page_class = capitalize(string=$page),
             $pages += `var $page = new $page_class(page, context)`,
+        },
+        $body <: maybe contains bubble($pages) r"[a-zA-Z]*Modal" as $modal where {
+            $modal <: identifier(),
+            $modal_class = capitalize(string=$modal),
+            $pages += `var $modal = new $modal_class(page, context)`,
         },
         $pages = distinct(list=$pages),
         $pages = join(list=$pages, separator=`;\n`),
@@ -54,6 +60,7 @@ pattern convert_locators($page) {
         `I.seeElement($element)` => `await expect($element).toBeVisible()`,
         `I.dontSeeElement($element)` => `await expect($element).toBeHidden()`,
         `I.see($text, $target)` => `await expect($target).toContainText($text)`,
+        `I.see($text)` => `await expect($page.getByText($text)).toBeVisible()`,
         `I.dontSee($text, $target)` => `await expect($target).not.toContainText($text)`,
         `I.seeCssPropertiesOnElements($target, { $css })` as $orig where {
             $css_assertions = [],
@@ -70,7 +77,7 @@ pattern convert_locators($page) {
             $css_assertions = join(list=$css_assertions, separator=`;\n`),
             $orig => $css_assertions,
         },
-        `I.seeInField($value, $target)` => `await expect($target).toHaveValue($value)`,
+        `I.seeInField($target, $value)` => `await expect($target).toHaveValue($value)`,
         `I.seeTextEquals($text, $target)` => `await expect($target).toHaveText($text)`,
         `I.waitForElement($target, $timeout)` => `await $target.waitFor({ state: 'attached', timeout: $timeout * 1000 })`,
         `I.waitForElement($target)` => `await $target.waitFor({ state: 'attached' })`,
@@ -86,6 +93,7 @@ pattern convert_locators($page) {
         `I.pressKey($key)` => `await $page.keyboard.press($key)`,
         `I.type($keys)` => `await $page.keyboard.type($keys)`,
         `I.refreshPage()` => `await $page.reload()`,
+        `I.scrollTo($target)` => `await $target.scrollIntoViewIfNeeded()`,
     }
 }
 
@@ -315,4 +323,27 @@ export default class Test extends BasePage {
     };
   }
 }
+```
+
+## Converts Codecept scenario with multiple args
+
+```js
+Scenario('Trivial test', async ({ I, loginAs }) => {
+  projectPage.open();
+  listModal.open();
+  I.waitForVisible(projectPage.list);
+})
+  .tag('Email')
+  .tag('Studio')
+  .tag('Projects');
+```
+
+```js
+test('Trivial test', async ({ page, factory, context }) => {
+  var projectPage = new ProjectPage(page, context);
+  var listModal = new ListModal(page, context);
+  await projectPage.open();
+  await listModal.open();
+  await projectPage.list.waitFor({ state: 'visible' });
+});
 ```
