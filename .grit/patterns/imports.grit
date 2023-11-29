@@ -8,7 +8,7 @@ pattern before_each_file_prep_imports() {
     }
 }
 
-pattern the_import_statement($imports, $source) {
+private pattern the_import_statement($imports, $source) {
     import_statement(import = import_clause(name = named_imports($imports)), $source)
 }
 
@@ -40,7 +40,7 @@ pattern ensure_import_from($source) {
     }
 }
 
-pattern process_one_source($p, $all_imports) {
+private pattern process_one_source($p, $all_imports) {
     [$p, $source] where {
         $imported_names = [],
         $GLOBAL_IMPORTED_NAMES <: some bubble($p, $source, $imported_names, $all_imports) [$p, $name, $source] where {
@@ -55,7 +55,7 @@ pattern process_one_source($p, $all_imports) {
     }
 }
 
-pattern insert_imports() {
+private pattern insert_imports() {
     $p where {
         $all_imports = [],
         $GLOBAL_IMPORTED_SOURCES <: some process_one_source($p, $all_imports),

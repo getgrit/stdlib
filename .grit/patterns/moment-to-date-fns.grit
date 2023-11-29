@@ -1,7 +1,7 @@
 language js
 
 // A call to `add`/`sub` method of a `momentjs` date object.
-pattern moment_arith($date, $method, $count, $specifier) {
+private pattern moment_arith($date, $method, $count, $specifier) {
   `$date.$method($count, $specifier)` as $arith_exp where {
     $method <: or { `add` => `addDate`, `subtract` => `subDate` },
     if ($method <: `add`) {
@@ -14,14 +14,14 @@ pattern moment_arith($date, $method, $count, $specifier) {
 }
 
 // A call to `add/sub` where the caller (`this`) is an identifier. eg: foo.add(bar);
-pattern moment_arith_lhs_identifier($date, $method, $count, $specifier) {
+private pattern moment_arith_lhs_identifier($date, $method, $count, $specifier) {
   moment_arith($date, $method, $count, $specifier) where {
     $date <: identifier()
   }
 }
 
 // Any call expression that returns a moment.js date or duration object.
-pattern exp_returns_moment($exp) {
+private pattern exp_returns_moment($exp) {
   `$fn()` as $exp where {
     $fn <: or {
       `moment`,
@@ -40,7 +40,7 @@ pattern exp_returns_moment($exp) {
 }
 
 // A variable declarator that declares a moment.js Date or Duration object.
-pattern moment_var_decl($var_name) {
+private pattern moment_var_decl($var_name) {
   variable_declarator(name=$var_name, $value) where {
     $value <: exp_returns_moment(),
     $var_name <: identifier()
@@ -48,21 +48,21 @@ pattern moment_var_decl($var_name) {
 }
 
 // collect all identifiers that are declared as a moment.js date or duration
-pattern collect_moment_identifier_decls($id_list) {
+private pattern collect_moment_identifier_decls($id_list) {
   moment_var_decl(var_name=$name) where {
     $id_list += $name
   }
 }
 
 // A `const` variable declaration that initializes a moment date or duration object
-pattern moment_const_decl($declaration, $declarators) {
+private pattern moment_const_decl($declaration, $declarators) {
   `$varName = $moment` where {
     $moment <: exp_returns_moment(),
     $varName <: within `$declaration` where { $declaration <: `const $declarators` },
   }
 }
 // Matches calls like `moment.startOf('day')`, `moment.startOf('week')`
-pattern moment_set_to_start_or_end_literal($date, $func_type, $unit) {
+private pattern moment_set_to_start_or_end_literal($date, $func_type, $unit) {
   `$date.$func_type($specifier)` where {
     $func_type <: or { `startOf`, `endOf` },
     $specifier<: string(fragment=$unit)
@@ -70,35 +70,35 @@ pattern moment_set_to_start_or_end_literal($date, $func_type, $unit) {
 }
 
 // moment.max(...) or moment.min(...)
-pattern moment_limit_to_max_or_min($date, $arg, $methodName) {
+private pattern moment_limit_to_max_or_min($date, $arg, $methodName) {
   `$date.$methodName($arg)` where {
     $methodName  <: or { `max`, `min` }
   }
 }
 
 // Helper patterns to match format specifiers for different time units in moment js:
-pattern year() { string(fragment=r"\b(?:y|years?)\b") }
-pattern month() { string(fragment=r"\b(?:M|months?)\b") }
-pattern quarter() { string(fragment=r"\b(?:q|quarters?)\b") }
-pattern week() { string(fragment=r"\b(?:w|weeks?)\b") }
-pattern day() { string(fragment=r"\b(?:d|days?)\b") }
-pattern hour() { string(fragment=r"\b(?:h|hours?)\b") }
-pattern minute() { string(fragment=r"\b(?:m|minutes?)\b") }
-pattern second() { string(fragment=r"\b(?:s|seconds?)\b") }
-pattern millisecond() { string(fragment=r"\b(?:ms|milliseconds?)\b") }
+private pattern year() { string(fragment=r"\b(?:y|years?)\b") }
+private pattern month() { string(fragment=r"\b(?:M|months?)\b") }
+private pattern quarter() { string(fragment=r"\b(?:q|quarters?)\b") }
+private pattern week() { string(fragment=r"\b(?:w|weeks?)\b") }
+private pattern day() { string(fragment=r"\b(?:d|days?)\b") }
+private pattern hour() { string(fragment=r"\b(?:h|hours?)\b") }
+private pattern minute() { string(fragment=r"\b(?:m|minutes?)\b") }
+private pattern second() { string(fragment=r"\b(?:s|seconds?)\b") }
+private pattern millisecond() { string(fragment=r"\b(?:ms|milliseconds?)\b") }
 
-pattern regex_year() { r"\b(?:(?i)y|years?)\b" }
-pattern regex_quarter() { r"\b(?:(?i)q|quarters?)\b" }
-pattern regex_month() { r"\b(?:M|(?i)months?)\b" }
-pattern regex_week() { r"\b(?:(?i)w|weeks?)\b" }
-pattern regex_date() { r"\b(?:(?i)d|dates?)\b"  }
-pattern regex_day() { r"\b(?:(?i)d|days?)\b"  }
-pattern regex_hour() { r"\b(?:(?i)h|hours?)\b" }
-pattern regex_minute() { r"\b(?:(?i)m|minutes?)\b" }
-pattern regex_second() { r"\b(?:(?i)s|seconds?)\b" }
-pattern regex_ms() { r"\b(?:(?i)ms|milliseconds?)\b" }
+private pattern regex_year() { r"\b(?:(?i)y|years?)\b" }
+private pattern regex_quarter() { r"\b(?:(?i)q|quarters?)\b" }
+private pattern regex_month() { r"\b(?:M|(?i)months?)\b" }
+private pattern regex_week() { r"\b(?:(?i)w|weeks?)\b" }
+private pattern regex_date() { r"\b(?:(?i)d|dates?)\b"  }
+private pattern regex_day() { r"\b(?:(?i)d|days?)\b"  }
+private pattern regex_hour() { r"\b(?:(?i)h|hours?)\b" }
+private pattern regex_minute() { r"\b(?:(?i)m|minutes?)\b" }
+private pattern regex_second() { r"\b(?:(?i)s|seconds?)\b" }
+private pattern regex_ms() { r"\b(?:(?i)ms|milliseconds?)\b" }
 
-pattern moment_getter_or_setter() {
+private pattern moment_getter_or_setter() {
   `$d.$accessor($arg)` as $exp where {
     $accessor <: r"(year|month|week|day|hour|minute|second|millisecond)s?"($unit),
     $duration_accessor = join(list=[$unit, "s"], separator=""),
@@ -143,7 +143,7 @@ pattern moment_getter_or_setter() {
 }
 
 // convert a moment.js unit specifier to its normal form ("y" -> "year")
-pattern normalize_unit_specifier($norm) {
+private pattern normalize_unit_specifier($norm) {
   `$specifier` where {
     $return = ``,
     if ($specifier <: regex_year()) {
@@ -171,7 +171,7 @@ pattern normalize_unit_specifier($norm) {
 
 // add/subtract: convert all momentjs arithmetic operations to date-fns operations.
 // eg: today.add(oneday) => add(today, oneday)
-pattern rewrite_moment_arithmetic() {
+private pattern rewrite_moment_arithmetic() {
   or {
     // add/subtract: convert all momentjs arithmetic operations to date-fns operations.
     // eg: today.add(oneday) => add(today, oneday)
@@ -231,7 +231,7 @@ pattern rewrite_moment_arithmetic() {
   }
 }
 
-pattern rewrite_moment_getters_and_setters() {
+private pattern rewrite_moment_getters_and_setters() {
   or {
     `$date.daysInMonth()` => `datefns.getDaysInMonth($date)`,
      moment_getter_or_setter(),
@@ -316,7 +316,7 @@ pattern rewrite_moment_getters_and_setters() {
   }
 }
 
-pattern rewrite_duration_set_and_get() {
+private pattern rewrite_duration_set_and_get() {
   `$duration.$getter()` where {
     $getter <: or {
       `asMilliseconds` => `toMilliseconds`,
@@ -341,7 +341,7 @@ pattern rewrite_duration_set_and_get() {
 // 2. https://date-fns.org/v2.30.0/docs/Locale
 // There is no 1:1 feature parity with moment.js, and thus a correct migration
 // is not straight-forward (or even possible without using implementation details of date-fns's locale representation).
-pattern remove_moment_global_customizations() {
+private pattern remove_moment_global_customizations() {
   or {
     `$fn($_)` as $exp where {
       $fn <: or {
@@ -369,7 +369,7 @@ pattern remove_moment_global_customizations() {
 // This could technically be migrated by maintaining a global map of flags and
 // turning every `utc()` call into `set`, and every `display` call into a custom
 // overload, but I think that would introduce too much unwanted noise into the user's program.
-pattern missing_datefns_features() {
+private pattern missing_datefns_features() {
   or {
     `$date.$method()` where {
       $method <: or { `utc`, `local` }
@@ -379,7 +379,7 @@ pattern missing_datefns_features() {
 }
 
 // Rewrite .toJSON and .toArray calls
-pattern rewrite_to_json_or_array($moment_ids) {
+private pattern rewrite_to_json_or_array($moment_ids) {
   or {
     `$d.toJSON()` as $exp where {
       $out = `/* if "$d" is a moment-js object, replace with date.toJSON() call */ $exp`,
@@ -398,7 +398,7 @@ pattern rewrite_to_json_or_array($moment_ids) {
 }
 
 // rewrite `$d.toJSON()` to an appropriate JSON conversion call.
-pattern rewrite_conversion_calls() {
+private pattern rewrite_conversion_calls() {
   program($statements) where {
     $id_list = [],
     $statements <: maybe contains collect_moment_identifier_decls($id_list),
@@ -406,7 +406,7 @@ pattern rewrite_conversion_calls() {
   } 
 }
 
-pattern rewrite_misc_methods() {
+private pattern rewrite_misc_methods() {
   or {
     `$d.clone()` as $exp where {
       $out = `((d => (d instanceof Date) ? (new Date(d.getTime())) : structuredClone(d) )($d))`,
@@ -445,7 +445,7 @@ pattern rewrite_misc_methods() {
   }
 }
 
-pattern rewrite_moment_queries() {
+private pattern rewrite_moment_queries() {
   or {
     `$date_a.$compare($date_b)` where {
       $compare <: or { `isBefore`, `isAfter` }
@@ -484,13 +484,13 @@ pattern rewrite_moment_queries() {
   }
 }
 
-pattern rewrite_moment_distance() {
+private pattern rewrite_moment_distance() {
   `$date.toNow()` => `datefns.formatDistanceToNow($date)`,
   `$date_a.from($date_b)` => `(datefns.formatDistance($date_a, $date_b) + " ago")`,
   `$date_a.to($date_b)` => `datefns.formatDistance($date_a, $date_b)`,
 }
 
-pattern rewrite_duration_ctors() {
+private pattern rewrite_duration_ctors() {
   or {
     // NOTE: date-fns only provides a `Duration` object ([docs](https://date-fns.org/v2.30.0/docs/Duration)).
     // Curiously, it does not provide any helpers to manipulate these duration objects.

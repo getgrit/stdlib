@@ -1,7 +1,7 @@
 engine marzano(0.1)
 language js
 
-pattern handle_ref($statements, $statement, $name, $type) {
+private pattern handle_ref($statements, $statement, $name, $type) {
   $value where {
     or {
       and {
@@ -38,7 +38,7 @@ pattern handle_ref($statements, $statement, $name, $type) {
   }
 }
 
-pattern handle_one_statement($class_name, $statements, $states_statements, $static_statements, $render_statements, $constructor_statements, $handler_callback_suffix, $use_ref_from) {
+private pattern handle_one_statement($class_name, $statements, $states_statements, $static_statements, $render_statements, $constructor_statements, $handler_callback_suffix, $use_ref_from) {
     or {
         method_definition($static, $async, $name, $body, $parameters) as $statement where {
             or {
@@ -218,12 +218,12 @@ pattern handle_one_statement($class_name, $statements, $states_statements, $stat
         },
     }
 }
-pattern prepend_comment($statements) {
+private pattern prepend_comment($statements) {
     maybe after comment() as $comment where {
         $statements += js"$comment"
     }
 }
-pattern change_this($states_statements, $is_constructor) {
+private pattern change_this($states_statements, $is_constructor) {
     maybe contains bubble($states_statements, $is_constructor) or {
         assignment_expression(
             left = `this.state`,
@@ -255,7 +255,7 @@ pattern change_this($states_statements, $is_constructor) {
     }
 }
 
-pattern find_miscellaneous_state($states_statements) {
+private pattern find_miscellaneous_state($states_statements) {
     maybe contains `this.state.$name` where {
         $capitalized = capitalize(string = $name),
         $program <: not contains `constructor ($_) { $body }` where {
@@ -266,7 +266,7 @@ pattern find_miscellaneous_state($states_statements) {
 }
 
 
-pattern gather_hooks($hooks) {
+private pattern gather_hooks($hooks) {
     contains or {
         `useEffect` where {
             $hooks <: not some `useEffect`,
@@ -327,7 +327,7 @@ pattern adjust_imports() {
     }
 }
 
-pattern maybe_wrapped_class_declaration($class_name, $body, $class) {
+private pattern maybe_wrapped_class_declaration($class_name, $body, $class) {
     or {
         export_statement(declaration = class_declaration(name = $class_name, $body, $heritage) as $class),
         class_declaration(name = $class_name, $body, $heritage) as $class
@@ -438,7 +438,7 @@ export const $original_name = observer($base_name);`,
     }
 }
 
-pattern find_dependencies($hoisted_states, $dependencies) {
+private pattern find_dependencies($hoisted_states, $dependencies) {
     contains bubble($hoisted_states, $dependencies) identifier() as $i where {
         $i <: not `props`,
         $hoisted_states <: some $i,
@@ -447,7 +447,7 @@ pattern find_dependencies($hoisted_states, $dependencies) {
     }
 }
 
-pattern rewrite_accesses($hoisted_states, $hoisted_refs, $use_memos, $handler_callback_suffix) {
+private pattern rewrite_accesses($hoisted_states, $hoisted_refs, $use_memos, $handler_callback_suffix) {
     or {
         `this.state.$x` => `$x`,
         `this.$property` as $p where {
@@ -544,7 +544,7 @@ pattern rewrite_accesses($hoisted_states, $hoisted_refs, $use_memos, $handler_ca
 }
 
 // Find places we're accessing state, refs, or memos
-pattern gather_accesses($hoisted_states, $hoisted_refs, $use_memos) {
+private pattern gather_accesses($hoisted_states, $hoisted_refs, $use_memos) {
     contains bubble($hoisted_states, $hoisted_refs, $use_memos) variable_declarator($name, $value) where {
         or {
             and {
@@ -614,7 +614,7 @@ pattern second_step($handler_callback_suffix) {
     }
 }
 
-pattern fix_react_default_export() {
+private pattern fix_react_default_export() {
     $default_export as $default_export where { 
         $default_export <: r"(?s)(export default const)(.+?)=.+"($target, $name) where {
             $target => js"const",

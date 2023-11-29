@@ -14,11 +14,11 @@ pattern function_like($name, $args, $statements) {
 }
 
 // All core stdlib functions can be done here
-pattern before_each_file_stdlib() {
+private pattern before_each_file_stdlib() {
   before_each_file_prep_imports()
 }
 
-pattern after_each_file_stdlib() {
+private pattern after_each_file_stdlib() {
   after_each_file_handle_imports()
 }
 
