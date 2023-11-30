@@ -101,7 +101,7 @@ private pattern regex_ms() { r"\b(?:(?i)ms|milliseconds?)\b" }
 private pattern moment_getter_or_setter() {
   `$d.$accessor($arg)` as $exp where {
     $accessor <: r"(year|month|week|day|hour|minute|second|millisecond)s?"($unit),
-    $duration_accessor = join(list=[$unit, "s"], separator=""),
+    $duration_accessor = `$[unit]s`,
     if ($unit <: or { "hour", "minute", "second", "millisecond" } ) {
       $unit = $duration_accessor
     },
@@ -271,11 +271,11 @@ private pattern rewrite_moment_getters_and_setters() {
       $unit <: string(fragment=$unit_raw),
       $unit_raw <: normalize_unit_specifier($norm),
       $capitalized_unit = capitalize(string=$norm),
-      $duration_property = join(list=[$norm, "s"], separator=""),
+      $duration_property = `$[norm]s`,
       $getfn = `get$capitalized_unit`,
 
       if ($norm <: or { `millisecond`, `second`, `minute`, `hour` } ) {
-        $getfn = join(list=[$getfn, "s"], separator="")
+        $getfn = `$[getfn]s`
       },
 
       $out = `((d => (d instanceof Date) ? datefns.$getfn(d) : (d.$duration_property ?? 0))($date))`,

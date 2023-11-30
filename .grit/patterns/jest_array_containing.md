@@ -26,7 +26,7 @@ sequential {
 
         // Make the last one contain all of them
         $separator = `,\n        `,
-        $containing_joined = join(list = $containing, $separator),
+        $containing_joined = text(join(list = $containing, $separator)),
         $last => `expect($value).toEqual(expect.arrayContaining([$containing_joined]));`
     },
     maybe contains `expect($value).toEqual(expect.arrayContaining([DELETE]))` => .

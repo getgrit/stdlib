@@ -46,7 +46,7 @@ private pattern process_one_source($p, $all_imports) {
         $GLOBAL_IMPORTED_NAMES <: some bubble($p, $source, $imported_names, $all_imports) [$p, $name, $source] where {
             $imported_names += $name,
         },
-        $joined_imported_names = join(list = $imported_names, separator = ", "),
+        $joined_imported_names = text(string=join(list = $imported_names, separator = ", ")),
         if ($p <: program(statements = some the_import_statement($imports, $source))) {
             $imports => `$imports, $joined_imported_names`
         } else {
