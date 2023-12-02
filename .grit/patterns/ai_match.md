@@ -21,3 +21,15 @@ console.log('We are now processing the user. Their name is:', user.name);
 console.log('This is the system. It is fine.');
 // REDACTED: 'We are now processing the user. Their name is:', user.name;
 ```
+
+## With double quotes
+
+```js
+console.log('This is the system. It is fine.');
+console.log('We are now processing "the user". Their name is:', user.name);
+```
+
+```ts
+console.log('This is the system. It is fine.');
+// REDACTED: 'We are now processing "the user". Their name is:', user.name;
+```
