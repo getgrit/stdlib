@@ -23,12 +23,9 @@ contains or {
       $fetch <: remove_import($from)
   },
   `class $_ extends $comp { $_ }` where {
-    $comp <: `Component`,
+    $comp <: "Component",
     $source = `"React"`,
     $comp <: ensure_import_from($source),
-    // This is just a test of bindings
-    $thing = `Button`,
-    $thing <: `Button`
   }
 }
 ```
