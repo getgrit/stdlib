@@ -11,7 +11,10 @@ engine marzano(0.1)
 language js
 
 pattern convert_test() {
-    `Scenario($description, async ({ $params }) => { $body })` as $scenario where {
+    or {
+        `Scenario($description, async ({ $params }) => { $body })`,
+        `Scenario($description, $_, async ({ $params }) => { $body })`,
+    } as $scenario where {
         $params <: contains `I`,
         $program <: maybe contains call_expression($function) as $tagger where {
             $function <: contains $scenario,
@@ -43,6 +46,50 @@ pattern convert_test() {
     } => `test($description, async ({ page, factory, context }) => {
         $body
     })`
+}
+
+pattern convert_parameterized_test() {
+    `Data($params).Scenario($scenario)` as $data_scenario where {
+        $program <: maybe contains call_expression($function) as $tagger where {
+            $function <: contains $data_scenario,
+            $tagger => $data_scenario,
+        },
+        $data_scenario => `for (const current of $params) {
+        Scenario($scenario)
+    }`,
+    },
+}
+
+pattern convert_data_table() {
+    variable_declarator($name, $value) where {
+        $data_objects = [],
+        $value <: or {
+            `new DataTable([$first, $second])`,
+            `new DataTable([$first, $second, $third])`,
+            `new DataTable([$first, $second, $third, $fourth])`,
+        } where {
+            $program <: contains bubble($name, $data_objects, $first, $second, $third, $fourth) `$name.add([$element])` as $adder where {
+                $data_object = [],
+                $first_val = $element[0],
+                $data_object += `$first: $first_val`,
+                $second_val = $element[1],
+                $data_object += `$second: $second_val`,
+                $third_val = $element[2],
+                if (! $third_val <: undefined) {
+                    $data_object += `$third: $third_val`,
+                },
+                $fourth_val = $element[3],
+                if (! $fourth_val <: undefined) {
+                    $data_object += `$fourth: $fourth_val`,
+                },
+                $data_object = join($data_object, `, `),
+                $data_objects += `{ $data_object }`,
+                $adder => .,
+            },
+            $data_objects = join($data_objects, `,\n`),
+            $value => `[$data_objects]`,
+        },
+    },
 }
 
 pattern convert_locators($page) {
@@ -88,12 +135,15 @@ pattern convert_locators($page) {
         `$locator.withText($text)` => `$locator.and($page.locator(\`:has-text("\${$text}")\`))`,
         `I.forceClick($target, $context)` => `await $context.locator($target).click({ force: true })`,
         `I.forceClick($target)` => `await $target.click({ force: true })`,
+        `I.clickAtPoint($target, $x, $y)` => `await $target.click({ position: { x: $x, y: $y }})`,
         `I.click($target, $context)` => `await $context.locator($target).click()`,
         `I.click($target)` => `await $target.click()`,
         `I.pressKey($key)` => `await $page.keyboard.press($key)`,
         `I.type($keys)` => `await $page.keyboard.type($keys)`,
         `I.refreshPage()` => `await $page.reload()`,
         `I.scrollTo($target)` => `await $target.scrollIntoViewIfNeeded()`,
+        `I.attachFile($target, $file)` => `await $target.setInputFiles($file)`,
+        `I.clearFieldValue($field)` => `await $field.clear()`,
     }
 }
 
@@ -128,9 +178,14 @@ pattern convert_base_page() {
     }`
 }
 
-or {
-    convert_test(),
-    convert_base_page(),
+sequential {
+    contains or {
+        convert_test(),
+        convert_parameterized_test(),
+        convert_data_table(),
+        convert_base_page(),
+    },
+    maybe contains convert_test(),
 }
 ```
 
@@ -346,4 +401,37 @@ test('Trivial test', async ({ page, factory, context }) => {
   await listModal.open();
   await projectPage.list.waitFor({ state: 'visible' });
 });
+```
+
+## Converts parameterized tests
+
+```js
+let myData = new DataTable(['id', 'name', 'capital']);
+myData.add([1, 'England', 'London']);
+myData.add([2, 'France', 'Paris']);
+myData.add([3, 'Germany', 'Berlin']);
+myData.add([4, 'Italy', 'Rome']);
+
+Data(myData)
+  .Scenario('Trivial test', { myData }, async ({ I, current }) => {
+    I.say(current.capital);
+  })
+  .tag('Email')
+  .tag('Studio')
+  .tag('Projects');
+```
+
+```js
+let myData = [
+  { id: 1, name: 'England', capital: 'London' },
+  { id: 2, name: 'France', capital: 'Paris' },
+  { id: 3, name: 'Germany', capital: 'Berlin' },
+  { id: 4, name: 'Italy', capital: 'Rome' },
+];
+
+for (const current of myData) {
+  test('Trivial test', async ({ page, factory, context }) => {
+    console.log(current.capital);
+  });
+}
 ```
