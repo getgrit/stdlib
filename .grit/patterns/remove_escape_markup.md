@@ -25,6 +25,5 @@ object.escapeMarkup = false;
 
 ```typescript
 something;
-
 something(els);
 ```

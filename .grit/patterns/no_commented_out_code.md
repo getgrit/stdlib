@@ -58,8 +58,6 @@ var times = (x, y) => {
 ```js
 var increment = function (i) {
   console.log("hi")
-  
-  
   const answer = 42;
   return i + 1;
 };
