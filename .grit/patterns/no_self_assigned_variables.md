@@ -61,7 +61,6 @@ class Watermelon {
 ```java
 class Watermelon {
     public void setName(String name) {
-        
         void method = oranges.map((n) -> {  });
     }
 }

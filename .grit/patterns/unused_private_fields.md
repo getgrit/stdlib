@@ -48,7 +48,6 @@ public class MyClass {
 
 ```java
 public class MyClass {
-  
   private int bar = 24;
   public String baz = "papaya";
 

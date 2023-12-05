@@ -18,7 +18,7 @@ class_body($declarations) where {
             $modifiers <: not contains or {
                 marker_annotation(),
                 `native`,
-            },            
+            },
             $unused_method <: not or {
                 `writeObject`,
                 `readObject`,
@@ -70,9 +70,7 @@ public class Foo implements Serializable
 
   private void usedPrivateMethod() { }
 
-  
 
-  
 }
 ```
 
@@ -82,10 +80,10 @@ public class Foo implements Serializable
 public class Foo implements Serializable
 {
   @Annotation
-  private void annotatedMethod(){ 
+  private void annotatedMethod(){
     this.usedPrivateMethod();
   }
-  private void writeObject(ObjectOutputStream s){ } 
-  private void readObject(ObjectInputStream in){ } 
+  private void writeObject(ObjectOutputStream s){ }
+  private void readObject(ObjectInputStream in){ }
 }
 ```
