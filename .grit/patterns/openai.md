@@ -366,7 +366,6 @@ from openai import OpenAI, AsyncOpenAI
 client = OpenAI()
 aclient = AsyncOpenAI()
 
-
 completion = client.completions.create(model="davinci-002", prompt="Hello world")
 chat_completion = await aclient.chat.completions.create(model="gpt-3.5-turbo", messages=[{"role": "user", "content": "Hello world"}])
 ```

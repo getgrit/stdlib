@@ -4,7 +4,6 @@ title: Use `math.prod` instead of multiplying in a loop
 
 This pattern transforms a loop that computes the product of a list of numbers into a call to `math.prod` (introduced in Python 3.8).
 
-
 ```grit
 engine marzano(0.1)
 language python
@@ -33,7 +32,6 @@ for_statement(body=block(statements=[prod_accum(accum = $var, factor = $left)]),
 ```
 
 ## Transforms for loop to `math.prod`
-
 
 ```python
 from math import log
@@ -75,15 +73,11 @@ import math
 
 from math import log
 
+math.prod(range(10))
 
 math.prod(range(10))
 
-
 math.prod(range(10))
-
-
-math.prod(range(10))
-
 
 math.prod([4, 5, 6])
 

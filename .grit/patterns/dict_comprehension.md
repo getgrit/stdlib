@@ -31,7 +31,6 @@ for i in range(100):
 ```python
 
 cubes = {i: i**3 for i in range(100)}
-
 cubes = {i*2: i**3 for i in range(100)}
 cubes = {1: 2}
 for i in range(100):

@@ -5,9 +5,9 @@ title: Walrus operator for match in if
 Use the walrus operator for snippets with a match followed by an if.
 
 Limitations:
-* If the match function is imported with an alias (e.g. `from re import match as m`), it will not be transformed.
-* When `re.match` is used, we do not check that `re` comes from `import re`.
 
+- If the match function is imported with an alias (e.g. `from re import match as m`), it will not be transformed.
+- When `re.match` is used, we do not check that `re` comes from `import re`.
 
 ```grit
 engine marzano(0.1)
@@ -96,7 +96,6 @@ if match:
 
 if match := re.fullmatch("hello"):
     pass
-
 
 if match := re.search("hello"):
     pass
