@@ -112,6 +112,7 @@ pattern convert_locators($page) {
         `locate($locator).as($_)` => `$page.locator($locator)`,
         `locate($locator).find($sub)` => `$page.locator($locator).locator($sub)`,
         `locate($locator)` => `$page.locator($locator)`,
+        `$locator.withDescendant($descendant)` => `$locator.filter({ has: $page.locator($descendant) })`,
         `I.waitInUrl($url)` => `await $page.waitForURL(new RegExp($url))`,
         `I.waitForLoader()` => `await this.waitForLoader()`,
         `I.waitForText($text, $timeout, $target)` => `await expect($target).toHaveText($text, {
@@ -166,6 +167,8 @@ pattern convert_locators($page) {
         `I.scrollTo($target)` => `await $target.scrollIntoViewIfNeeded()`,
         `I.attachFile($target, $file)` => `await $target.setInputFiles($file)`,
         `I.clearFieldValue($field)` => `await $field.clear()`,
+        `I.grabNumberOfVisibleElements($target)` => `await $target.count()`,
+        `I.seeNumberOfVisibleElements($locator, $count)` => `expect(await $locator.count()).toEqual($count)`,
     }
 }
 
@@ -302,6 +305,8 @@ export default {
       open: true,
       'grit-label': 'nice',
     });
+    let lines = I.grabNumberOfVisibleElements(locate('div').withDescendant('p'));
+    I.seeNumberOfVisibleElements(locate('div').withDescendant('p'), lines);
   },
 };
 ```
@@ -329,6 +334,16 @@ export default class Test extends BasePage {
     await expect(this.studio).toHaveCSS('display', 'flex');
     await expect(this.studio).toHaveAttribute('open', 'true');
     await expect(this.studio).toHaveAttribute('grit-label', 'nice');
+    let lines = await this.page
+      .locator('div')
+      .filter({ has: this.page.locator('p') })
+      .count();
+    expect(
+      await this.page
+        .locator('div')
+        .filter({ has: this.page.locator('p') })
+        .count(),
+    ).toEqual(lines);
   }
 }
 ```
