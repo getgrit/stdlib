@@ -766,6 +766,8 @@ class MyComponent extends Component<PropsWithChildren> {
 ```
 
 ```ts
+import { useRef } from 'react';
+
 const MyComponent = () => {
   /**
    * Comment on a private class property
@@ -1153,4 +1155,37 @@ export const Nice = (inputProps) => {
 
   return null;
 };
+```
+
+## Adds import from React when Component imported from elsewhere
+
+```js
+import { Component } from 'base';
+
+export default class Loader extends Component {
+  async componentDidMount() {
+    await loadSomething();
+  }
+
+  render() {
+    return null;
+  }
+}
+```
+
+```ts
+import { Component } from 'base';
+import { useEffect } from 'react';
+
+const Loader = () => {
+  useEffect(() => {
+    (async () => {
+      await loadSomething();
+    })();
+  }, []);
+
+  return null;
+};
+
+export default Loader;
 ```

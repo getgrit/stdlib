@@ -314,7 +314,12 @@ pattern adjust_imports() {
         $hooks = join(list = $hooks, separator = ", "),
         or {
             // ugly dealing with imports
-            contains import_specifier(name = `Component`) => `$hooks`,
+            contains import_specifier(name = `Component`) as $specifier where {
+                $specifier <: within import_statement($source) where {
+                    $source <: `"react"`,
+                },
+                $specifier => $hooks,
+            },
             contains `import React, { $x } from "react"` => `import React, { $x, $hooks } from "react"`,
             contains `import React from "react"` as $i where {
                 if ($i <: not contains namespace_import()) {
@@ -322,7 +327,8 @@ pattern adjust_imports() {
                 } else {
                     $i => `$i\nimport { $hooks } from 'react';`
                 }
-            }
+            },
+            true where $hooks <: ensure_import_from(`'react'`),
         }
     }
 }
