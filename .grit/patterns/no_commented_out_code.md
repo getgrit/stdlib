@@ -15,11 +15,8 @@ file($body) where {
     },
     $blocks = group_blocks(target=$comments),
     $blocks <: some bubble $block where {
-        // TODO: insert smarter context here
-        // $condition = after $block,
-        $block <: ai_is(condition="commented out code that is valid JavaScript, not a descriptive comment"),
+        $block <: ai_is("commented out code that is valid JavaScript, not a descriptive comment"),
         // Remove the block
-        // TODO: support $block => .
         $block <: some bubble $comment => .
     }
 }
@@ -88,8 +85,6 @@ var times = (x, y) => {
 if (name === 'grpc.google.logging.v2.LoggingServiceV2/WriteLogEntries') return RATE_DROP;
 ```
 
-# Disabled tests
-
 ## Handles block comments too
 
 Block comments don't currently parse correctly, see https://github.com/getgrit/rewriter/issues/7731.
@@ -100,6 +95,13 @@ export const createSdkActivities = () => {
   /**
    * const stdlib = new Proxy({}, {});
    */
+  return new Proxy(stdlib, {});
+};
+```
+
+```js
+/** See sdk_proxy for how stdlib calls are intercepted and the workflow ID is injected. */
+export const createSdkActivities = () => {
   return new Proxy(stdlib, {});
 };
 ```

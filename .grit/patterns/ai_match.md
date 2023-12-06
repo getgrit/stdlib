@@ -1,4 +1,4 @@
-# Ask an AI
+# AI conditions.
 
 GritQL can use an AI for fuzzy matching. Just match the node you wish to analyze against the `ai_is` pattern.
 
@@ -6,7 +6,7 @@ tags: #ai, #sample, #util, #hidden
 
 ```grit
 `console.log($msg)` => `// REDACTED: $msg` where {
-  $msg <: ai_is(condition="references personally identifiable information")
+  $msg <: ai_is("references personally identifiable information")
 }
 ```
 
