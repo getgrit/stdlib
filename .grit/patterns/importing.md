@@ -104,7 +104,7 @@ pattern ensure_bare_import() {
 and {
     before_each_file(),
     contains or {
-        import_from(source=`pydantic`) => .,
+        import_from(source="pydantic") => .,
         `$testlib.TestCase` where {
             $newtest = `newtest`,
             $testlib <: `unittest` => `$newtest`,
