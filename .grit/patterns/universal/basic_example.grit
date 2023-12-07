@@ -1,0 +1,6 @@
+engine marzano(0.1)
+language universal
+
+pattern foo_to_bar() {
+    contains `foo` => `bar`
+}
