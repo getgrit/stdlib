@@ -1,6 +1,6 @@
 # AI conditions.
 
-GritQL can use an AI for fuzzy matching. Just match the node you wish to analyze against the `ai_is` pattern.
+Test `ai_is` with no counter-examples.
 
 tags: #ai, #sample, #util, #hidden
 
