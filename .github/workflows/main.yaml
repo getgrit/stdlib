@@ -1,7 +1,11 @@
 name: Run grit patterns test
 
 env:
+<<<<<<< HEAD
   GRIT_TELEMETRY_DISABLED: 'true'
+=======
+  GRIT_TELEMETRY_DISABLED: "true"
+>>>>>>> hcl/main
 
 on:
   push:
