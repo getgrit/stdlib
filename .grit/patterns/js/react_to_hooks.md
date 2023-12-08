@@ -684,9 +684,14 @@ import { Component } from 'react';
 class MyComponent extends Component {
   constructor(props: Props) {
     const five = 2 + 3;
+    this.saySomething();
     this.state = {
       secret: five,
     };
+  }
+
+  saySomething() {
+    console.log('hi');
   }
 
   render() {
@@ -696,12 +701,17 @@ class MyComponent extends Component {
 ```
 
 ```ts
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 
 const MyComponent = () => {
-  const five = 2 + 3;
-
   const [secret, setSecret] = useState(five);
+
+  const saySomethingHandler = useCallback(() => {
+    console.log('hi');
+  }, []);
+
+  const five = 2 + 3;
+  saySomethingHandler();
 
   return <></>;
 };
@@ -1184,6 +1194,43 @@ const Loader = () => {
     })();
   }, []);
 
+  return null;
+};
+
+export default Loader;
+```
+
+## Preserves non-return render statements
+
+```js
+import { Component } from 'base';
+
+export default class Loader extends Component {
+  async componentDidMount() {
+    await loadSomething();
+  }
+
+  render() {
+    console.log('hi');
+    console.info('hello');
+    return null;
+  }
+}
+```
+
+```ts
+import { Component } from 'base';
+import { useEffect } from 'react';
+
+const Loader = () => {
+  useEffect(() => {
+    (async () => {
+      await loadSomething();
+    })();
+  }, []);
+
+  console.log('hi');
+  console.info('hello');
   return null;
 };
 
