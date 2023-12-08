@@ -42,6 +42,10 @@ jobs:
           chmod +x prettier
           sudo mv prettier /usr/local/bin
 
+      - name: install-ruff
+        run: |
+          pip install ruff
+
       - name: Install @getgrit/launcher
         run: npm install -g @getgrit/launcher
 
