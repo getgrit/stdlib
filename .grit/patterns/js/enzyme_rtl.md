@@ -9,6 +9,8 @@ Note: the full migration is packaged as a workflow. This is just a subcomponent.
 tags: #enzyme, #react-testing-library, #rtl, #alpha, #migration, #hidden
 
 ```grit
+language js
+
 predicate rtl_import_render() {
     $render = `render`,
     $render <: ensure_import_from(source=`"@testing-library/react"`)
