@@ -3,32 +3,7 @@
 The `group_blocks` function takes a `target` list and returns a list of lists, where each sublist is a block of items that are adjacent to each other in the original program.
 
 ```grit
-// Implementation
-function group_blocks($target) {
-  $blocks = [],
-  $target <: some bubble($blocks, $block, $block_tail) $current where {
-        if ($block <: undefined) {
-            $block = [$current],
-            $block_tail = $current,
-        } else {
-            // Are we right after the same block?
-            if ($current <: after $block_tail) {
-                $block += $current,
-                $block_tail = $current
-            } else {
-                // Insert the previous block into the list
-                $blocks += $block,
-                $block = [$current],
-                $block_tail = $current
-            }
-        }
-    },
-    // Insert final block
-    if (not $block <: undefined) {
-        $blocks += $block
-    },
-    return $blocks
-}
+language js
 
 // Usage example
 file($body) where {
