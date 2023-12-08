@@ -1,0 +1,9 @@
+language js
+
+// Concat two lists together
+function concat($list_a, $list_b) {
+  $new_list = [],
+  $list_a <: some bubble($new_list) $item where $new_list += $item,
+  $list_b <: some bubble($new_list) $item where $new_list += $item,
+  return $new_list
+}
