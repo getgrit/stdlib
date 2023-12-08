@@ -1,4 +1,4 @@
-language universal
+language js
 
 // Concat two lists together
 function concat($list_a, $list_b) {
