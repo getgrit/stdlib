@@ -3,6 +3,8 @@
 The `group_blocks` function takes a `target` list and returns a list of lists, where each sublist is a block of items that are adjacent to each other in the original program.
 
 ```grit
+language universal
+
 // Implementation
 function group_blocks($target) {
   $blocks = [],
