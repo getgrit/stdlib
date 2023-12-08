@@ -1,0 +1,17 @@
+{
+  "trailingComma": "all",
+  "endOfLine": "auto",
+  "singleQuote": true,
+  "jsxSingleQuote": true,
+  "tabWidth": 2,
+  "printWidth": 100,
+  "bracketSpacing": true,
+  "overrides": [
+    {
+      "files": "*.mdoc",
+      "options": {
+        "parser": "markdown"
+      }
+    }
+  ]
+}

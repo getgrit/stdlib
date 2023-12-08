@@ -1,0 +1,22 @@
+engine marzano(0.1)
+language js
+
+// Matches any statement that should end in a semi-colon to avoid possible ambiguity.
+// For example, in the following snippet:
+// ```
+// let a = foo()
+// (x => print(x))("hello")
+// ```
+// The second "statement" is actually a call expression that is chained to the `foo` call:
+// ```
+// let a = foo()(x => print(x))("hello")
+// ```
+// Hence, the first statement should end in a semi colon to avoid ambiguity.
+pattern should_follow_semi() {
+  `$exp` where {
+    $exp <: after or {
+      expression_statement(),
+      lexical_declaration()
+    }
+  }
+}
