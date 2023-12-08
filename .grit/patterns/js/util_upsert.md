@@ -7,6 +7,8 @@ Warning: Only one `upsert` can be done per object. If you need to insert multipl
 tags: #util, #upsert, #object
 
 ```grit
+language js
+
 pattern upsert($key, $value) {
     and {
         or {
