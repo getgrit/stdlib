@@ -50,10 +50,10 @@ jobs:
         run: npm install -g @getgrit/launcher
 
       - name: Run doctor
-        run: npx grit doctor
+        run: grit doctor
 
       - name: Remove grit modules
         run: rm -rf .grit/.gritmodules
 
       - name: Run grit patterns test
-        run: npx grit patterns test
+        run: grit patterns test
