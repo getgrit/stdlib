@@ -5,6 +5,8 @@ GritQL can use an AI for fuzzy matching. Just match the node you wish to analyze
 tags: #ai, #sample, #util, #hidden
 
 ```grit
+language js
+
 `console.log($msg)` => `// REDACTED: $msg` where {
   $msg <: ai_is("it references personally identifiable information")
 }

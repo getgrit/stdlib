@@ -7,6 +7,8 @@ For example, you can use the `ai_choose` function to choose a name for a functio
 tags: #ai, #sample, #util, #hidden
 
 ```grit
+language js
+
 `function ($args) { $body }` as $func where {
   $name = ai_ask(choices=["adder", "remover", "divider"], question=`What should I name the function? $func`)
 } => `// This function: $name
