@@ -20,7 +20,7 @@ jobs:
       fail-fast: false
       matrix:
         runner: [nscloud-ubuntu-22.04-amd64-4x16, macos-latest, ubuntu-latest]
-        node-version: [18.x]
+        node-version: [20.x]
 
     steps:
       - uses: actions/checkout@v2
@@ -41,6 +41,10 @@ jobs:
           curl -L https://github.com/prettier/prettier/releases/download/3.0.1/prettier -o prettier
           chmod +x prettier
           sudo mv prettier /usr/local/bin
+
+      - name: install-ruff
+        run: |
+          pip install ruff
 
       - name: Install @getgrit/launcher
         run: npm install -g @getgrit/launcher
