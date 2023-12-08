@@ -45,12 +45,18 @@ private pattern handle_one_statement($class_name, $statements, $states_statement
                 and {
                     $name <: js"constructor",
                     $body <: maybe contains bubble($constructor_statements) {
-                        lexical_declaration($declarations) as $decl where $declarations <:
-                            variable_declarator($name, $value) where {
-                                $name <: not contains js"this.state",
-                                $value <: not contains js"this.state",
-                                $constructor_statements += $decl
-                            }
+                        or {
+                            lexical_declaration($declarations) as $decl where $declarations <:
+                                variable_declarator($name, $value) where {
+                                    $name <: not contains js"this.state",
+                                    $value <: not contains js"this.state",
+                                    $constructor_statements += $decl
+                                },
+                            expression_statement() as $decl where {
+                                $decl <: not contains `super($props)`,
+                                $constructor_statements += $decl,
+                            },
+                        }
                     },
                     $body <: change_this($states_statements, is_constructor=true),
                 },
@@ -87,9 +93,9 @@ private pattern handle_one_statement($class_name, $statements, $states_statement
                     $statement <: prepend_comment($statements),
                     $async <: `async`,
                     if ($handler_callback_suffix <: .) {
-                    $statements += `const $name = async ($parameters) => $body;`
+                        $statements += `const $name = async ($parameters) => $body;`
                     } else {
-                    $statements += `const $[name]$[handler_callback_suffix] = useCallback(async ($parameters) => $body, []);`
+                        $statements += `const $[name]$[handler_callback_suffix] = useCallback(async ($parameters) => $body, []);`
                     }
                 },
                 and {
@@ -105,9 +111,9 @@ private pattern handle_one_statement($class_name, $statements, $states_statement
                 and {
                     $statement <: prepend_comment($statements),
                     if ($handler_callback_suffix <: .) {
-                    $statements += `const $name = ($parameters) => $body;`
+                        $statements += `const $name = ($parameters) => $body;`
                     } else {
-                    $statements += `const $[name]$[handler_callback_suffix] = useCallback(($parameters) => $body, []);`
+                        $statements += `const $[name]$[handler_callback_suffix] = useCallback(($parameters) => $body, []);`
                     }
                 }
             },
@@ -426,7 +432,7 @@ pattern first_step($use_ref_from, $handler_callback_suffix) {
         $states_statements = join(list = $states_statements, $separator),
         $statements = join(list = $statements, $separator),
         $constructor_statements = join(list = $constructor_statements, $separator),
-        $the_function = `($args) => {\n$constructor_statements\n\n    $states_statements\n\n    $statements\n\n    $render_statements \n}`,
+        $the_function = `($args) => {\n    $states_statements\n\n    $statements\n\n    $constructor_statements\n\n    $render_statements \n}`,
 
         // Construct the final class name
         $original_name = $class_name,
