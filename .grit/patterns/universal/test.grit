@@ -1,0 +1,6 @@
+language js
+
+// Just for testing transitive
+pattern fix_match_test() {
+  `testMatch` => `testRegex`
+}
