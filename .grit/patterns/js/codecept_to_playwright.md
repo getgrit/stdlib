@@ -158,7 +158,8 @@ pattern convert_locators($page) {
         `I.forceClick($target, $context)` => `await $context.locator($target).click({ force: true })`,
         `I.forceClick($target)` => `await $target.click({ force: true })`,
         `I.clickAtPoint($target, $x, $y)` => `await $target.click({ position: { x: $x, y: $y }})`,
-        `I.doubleClick($target)` => `await $target.doubleClick()`,
+        `I.doubleClick($target, $context)` => `await $context.locator($target).dblclick()`,
+        `I.doubleClick($target)` => `await $target.dblclick()`,
         `I.click($target, $context)` => `await $context.locator($target).click()`,
         `I.click($target)` => `await $target.click()`,
         `I.pressKey($key)` => `await $page.keyboard.press($key)`,
@@ -169,6 +170,8 @@ pattern convert_locators($page) {
         `I.clearFieldValue($field)` => `await $field.clear()`,
         `I.grabNumberOfVisibleElements($target)` => `await $target.count()`,
         `I.seeNumberOfVisibleElements($locator, $count)` => `expect(await $locator.count()).toEqual($count)`,
+        `I.checkOption($target)` => `await $target.check()`,
+        `I.uncheckOption($target)` => `await $target.uncheck()`,
     }
 }
 
