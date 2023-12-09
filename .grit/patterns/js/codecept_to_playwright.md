@@ -119,6 +119,9 @@ pattern convert_locators($page) {
             timeout: $timeout * 1000,
             ignoreCase: true,
         })`,
+        `I.waitForText($text, $target)` => `await expect($target).toHaveText($text, {
+            ignoreCase: true,
+        })`,
         `I.wait($timeout)` => `await $page.waitForTimeout($timeout * 1000)`,
         `I.seeElement($element)` => `await expect($element).toBeVisible()`,
         `I.dontSeeElement($element)` => `await expect($element).toBeHidden()`,
@@ -158,7 +161,8 @@ pattern convert_locators($page) {
         `I.forceClick($target, $context)` => `await $context.locator($target).click({ force: true })`,
         `I.forceClick($target)` => `await $target.click({ force: true })`,
         `I.clickAtPoint($target, $x, $y)` => `await $target.click({ position: { x: $x, y: $y }})`,
-        `I.doubleClick($target)` => `await $target.doubleClick()`,
+        `I.doubleClick($target, $context)` => `await $context.locator($target).dblclick()`,
+        `I.doubleClick($target)` => `await $target.dblclick()`,
         `I.click($target, $context)` => `await $context.locator($target).click()`,
         `I.click($target)` => `await $target.click()`,
         `I.pressKey($key)` => `await $page.keyboard.press($key)`,
@@ -169,6 +173,8 @@ pattern convert_locators($page) {
         `I.clearFieldValue($field)` => `await $field.clear()`,
         `I.grabNumberOfVisibleElements($target)` => `await $target.count()`,
         `I.seeNumberOfVisibleElements($locator, $count)` => `expect(await $locator.count()).toEqual($count)`,
+        `I.checkOption($target)` => `await $target.check()`,
+        `I.uncheckOption($target)` => `await $target.uncheck()`,
     }
 }
 
@@ -203,14 +209,41 @@ pattern convert_base_page() {
     }`
 }
 
+pattern wrap_describe() {
+    program($statements) where {
+        $statements <: maybe contains `Before(async ({ loginAs }) => {
+   await loginAs('admin');
+ });` => .,
+        $statements <: contains `Feature($describer)` as $feature where {
+            $feature => .,
+            $to_wrap = ``,
+            $imports = ``,
+            $statements <: some bubble($to_wrap, $imports) {$statement where {
+                $statement <: or {
+                    import_statement() where $imports += `$statement\n`,
+                    $_ where $to_wrap += `$statement\n\n`
+                },
+            } },
+            $statements => `$imports
+test.describe($describer, () => {
+    $to_wrap
+})`
+        }
+    }
+}
+
 sequential {
     contains or {
         convert_test(),
         convert_parameterized_test(),
         convert_data_table(),
         convert_base_page(),
+    } where {
+        $expect = `expect`,
+        $expect <: ensure_import_from(source=`"@playwright/test"`),
     },
     maybe contains convert_test(),
+    file($body) where { $body <: maybe wrap_describe() }
 }
 ```
 
@@ -229,6 +262,7 @@ export default {
 
 ```js
 // @file test.js
+import { expect } from '@playwright/test';
 
 export default class Test extends BasePage {
   get url() {
@@ -264,6 +298,7 @@ export default {
 
 ```js
 // @file someFolder/test.js
+import { expect } from '@playwright/test';
 
 export default class Test extends BasePage {
   get url() {
@@ -313,6 +348,7 @@ export default {
 
 ```js
 // @file someFolder/test.js
+import { expect } from '@playwright/test';
 
 export default class Test extends BasePage {
   get studio() {
@@ -365,6 +401,8 @@ Scenario('Trivial test', async ({ I }) => {
 ```
 
 ```js
+import { expect } from '@playwright/test';
+
 test('Trivial test', async ({ page, factory, context }) => {
   var projectPage = new ProjectPage(page, context);
   await projectPage.open();
@@ -400,6 +438,7 @@ export default {
 
 ```js
 // @file someFolder/test.js
+import { expect } from '@playwright/test';
 
 export default class Test extends BasePage {
   get studio() {
@@ -437,6 +476,8 @@ Scenario('Trivial test', async ({ I, loginAs }) => {
 ```
 
 ```js
+import { expect } from '@playwright/test';
+
 test('Trivial test', async ({ page, factory, context }) => {
   var projectPage = new ProjectPage(page, context);
   var listModal = new ListModal(page, context);
@@ -465,6 +506,8 @@ Data(myData)
 ```
 
 ```js
+import { expect } from '@playwright/test';
+
 let myData = [
   { id: 1, name: 'England', capital: 'London' },
   { id: 2, name: 'France', capital: 'Paris' },
@@ -477,4 +520,46 @@ for (const current of myData) {
     console.log(current.capital);
   });
 }
+```
+
+## Wraps tests in describe block
+
+```js
+Feature('Test capitals');
+
+import { Capitals } from '../data/capitals';
+
+let myData = new DataTable(['id', 'name', 'capital']);
+myData.add([1, 'England', Capitals.London]);
+myData.add([2, 'France', Capitals.Paris]);
+myData.add([3, 'Germany', Capitals.Berlin]);
+myData.add([4, 'Italy', Capitals.Rome]);
+
+Data(myData)
+  .Scenario('Trivial test', { myData }, async ({ I, current }) => {
+    I.say(current.capital);
+  })
+  .tag('Email')
+  .tag('Studio')
+  .tag('Projects');
+```
+
+```js
+import { Capitals } from '../data/capitals';
+import { expect } from '@playwright/test';
+
+test.describe('Test capitals', () => {
+  let myData = [
+    { id: 1, name: 'England', capital: Capitals.London },
+    { id: 2, name: 'France', capital: Capitals.Paris },
+    { id: 3, name: 'Germany', capital: Capitals.Berlin },
+    { id: 4, name: 'Italy', capital: Capitals.Rome },
+  ];
+
+  for (const current of myData) {
+    test('Trivial test', async ({ page, factory, context }) => {
+      console.log(current.capital);
+    });
+  }
+});
 ```
