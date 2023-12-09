@@ -176,6 +176,8 @@ pattern convert_locators($page) {
         `I.waitNumberOfVisibleElements($locator, $count)` => `await expect($locator).toHaveCount($count)`,
         `I.checkOption($target)` => `await $target.check()`,
         `I.uncheckOption($target)` => `await $target.uncheck()`,
+        `I.assertEqual($actual, $expected)` => `expect($actual).toEqual($expected)`,
+        `I.assertNotEqual($actual, $expected)` => `expect($actual).not.toEqual($expected)`,
     }
 }
 
