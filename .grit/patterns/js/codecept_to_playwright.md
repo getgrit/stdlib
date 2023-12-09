@@ -128,6 +128,10 @@ pattern convert_locators($page) {
         `I.see($text, $target)` => `await expect($target).toContainText($text)`,
         `I.see($text)` => `await expect($page.getByText($text)).toBeVisible()`,
         `I.dontSee($text, $target)` => `await expect($target).not.toContainText($text)`,
+        `I.dontSee($text)` => `await expect($page.getByText($text)).toBeHidden()`,
+        `I.grabCSSPropertyFrom($locator, $property)` => `await $locator.evaluate((el) => {
+          return window.getComputedStyle(el).getPropertyValue($property);
+        })`,
         `I.seeCssPropertiesOnElements($target, { $css })` as $orig where {
             $css_assertions = [],
             $css <: some bubble($target, $css_assertions) pair($key, $value) where {
@@ -173,8 +177,13 @@ pattern convert_locators($page) {
         `I.clearFieldValue($field)` => `await $field.clear()`,
         `I.grabNumberOfVisibleElements($target)` => `await $target.count()`,
         `I.seeNumberOfVisibleElements($locator, $count)` => `expect(await $locator.count()).toEqual($count)`,
+        `I.waitNumberOfVisibleElements($locator, $count)` => `await expect($locator).toHaveCount($count)`,
         `I.checkOption($target)` => `await $target.check()`,
         `I.uncheckOption($target)` => `await $target.uncheck()`,
+        `I.assertEqual($actual, $expected)` => `expect($actual).toEqual($expected)`,
+        `I.assertNotEqual($actual, $expected)` => `expect($actual).not.toEqual($expected)`,
+        `I.backToPreviousPage()` => `await $page.goBack()`,
+        `I.seeCheckboxIsChecked($target)` => `await expect($target).toBeChecked()`,
     }
 }
 
