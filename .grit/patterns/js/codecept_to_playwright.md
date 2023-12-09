@@ -178,6 +178,7 @@ pattern convert_locators($page) {
         `I.uncheckOption($target)` => `await $target.uncheck()`,
         `I.assertEqual($actual, $expected)` => `expect($actual).toEqual($expected)`,
         `I.assertNotEqual($actual, $expected)` => `expect($actual).not.toEqual($expected)`,
+        `I.backToPreviousPage()` => `await $page.goBack()`,
     }
 }
 
