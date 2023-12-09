@@ -183,6 +183,7 @@ pattern convert_locators($page) {
         `I.assertEqual($actual, $expected)` => `expect($actual).toEqual($expected)`,
         `I.assertNotEqual($actual, $expected)` => `expect($actual).not.toEqual($expected)`,
         `I.backToPreviousPage()` => `await $page.goBack()`,
+        `I.seeCheckboxIsChecked($target)` => `await expect($target).toBeChecked()`,
     }
 }
 
