@@ -209,6 +209,29 @@ pattern convert_base_page() {
     }`
 }
 
+pattern wrap_describe() {
+    program($statements) where {
+        $statements <: maybe contains `Before(async ({ loginAs }) => {
+   await loginAs('admin');
+ });` => .,
+        $statements <: contains `Feature($describer)` as $feature where {
+            $feature => .,
+            $to_wrap = ``,
+            $imports = ``,
+            $statements <: some bubble($to_wrap, $imports) {$statement where {
+                $statement <: or {
+                    import_statement() where $imports += `$statement\n`,
+                    $_ where $to_wrap += `$statement\n\n`
+                },
+            } },
+            $statements => `$imports
+test.describe($describer, () => {
+    $to_wrap
+})`
+        }
+    }
+}
+
 sequential {
     contains or {
         convert_test(),
@@ -217,6 +240,7 @@ sequential {
         convert_base_page(),
     },
     maybe contains convert_test(),
+    file($body) where { $body <: maybe wrap_describe() }
 }
 ```
 
@@ -483,4 +507,45 @@ for (const current of myData) {
     console.log(current.capital);
   });
 }
+```
+
+## Wraps tests in describe block
+
+```js
+Feature('Test capitals');
+
+import { Capitals } from '../data/capitals';
+
+let myData = new DataTable(['id', 'name', 'capital']);
+myData.add([1, 'England', Capitals.London]);
+myData.add([2, 'France', Capitals.Paris]);
+myData.add([3, 'Germany', Capitals.Berlin]);
+myData.add([4, 'Italy', Capitals.Rome]);
+
+Data(myData)
+  .Scenario('Trivial test', { myData }, async ({ I, current }) => {
+    I.say(current.capital);
+  })
+  .tag('Email')
+  .tag('Studio')
+  .tag('Projects');
+```
+
+```js
+import { Capitals } from '../data/capitals';
+
+test.describe('Test capitals', () => {
+  let myData = [
+    { id: 1, name: 'England', capital: Capitals.London },
+    { id: 2, name: 'France', capital: Capitals.Paris },
+    { id: 3, name: 'Germany', capital: Capitals.Berlin },
+    { id: 4, name: 'Italy', capital: Capitals.Rome },
+  ];
+
+  for (const current of myData) {
+    test('Trivial test', async ({ page, factory, context }) => {
+      console.log(current.capital);
+    });
+  }
+});
 ```
