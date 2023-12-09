@@ -119,6 +119,9 @@ pattern convert_locators($page) {
             timeout: $timeout * 1000,
             ignoreCase: true,
         })`,
+        `I.waitForText($text, $target)` => `await expect($target).toHaveText($text, {
+            ignoreCase: true,
+        })`,
         `I.wait($timeout)` => `await $page.waitForTimeout($timeout * 1000)`,
         `I.seeElement($element)` => `await expect($element).toBeVisible()`,
         `I.dontSeeElement($element)` => `await expect($element).toBeHidden()`,
