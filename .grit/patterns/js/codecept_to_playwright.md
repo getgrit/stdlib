@@ -128,9 +128,10 @@ pattern convert_locators($page) {
         `I.see($text, $target)` => `await expect($target).toContainText($text)`,
         `I.see($text)` => `await expect($page.getByText($text)).toBeVisible()`,
         `I.dontSee($text, $target)` => `await expect($target).not.toContainText($text)`,
+        `I.dontSee($text)` => `await expect($page.getByText($text)).toBeHidden()`,
         `I.grabCSSPropertyFrom($locator, $property)` => `await $locator.evaluate((el) => {
           return window.getComputedStyle(el).getPropertyValue($property);
-        })`
+        })`,
         `I.seeCssPropertiesOnElements($target, { $css })` as $orig where {
             $css_assertions = [],
             $css <: some bubble($target, $css_assertions) pair($key, $value) where {
