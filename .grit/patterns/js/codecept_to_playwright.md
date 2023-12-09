@@ -238,6 +238,9 @@ sequential {
         convert_parameterized_test(),
         convert_data_table(),
         convert_base_page(),
+    } where {
+        $expect = `expect`,
+        $expect <: ensure_import_from(source=`"@playwright/test"`),
     },
     maybe contains convert_test(),
     file($body) where { $body <: maybe wrap_describe() }
@@ -259,6 +262,7 @@ export default {
 
 ```js
 // @file test.js
+import { expect } from '@playwright/test';
 
 export default class Test extends BasePage {
   get url() {
@@ -294,6 +298,7 @@ export default {
 
 ```js
 // @file someFolder/test.js
+import { expect } from '@playwright/test';
 
 export default class Test extends BasePage {
   get url() {
@@ -343,6 +348,7 @@ export default {
 
 ```js
 // @file someFolder/test.js
+import { expect } from '@playwright/test';
 
 export default class Test extends BasePage {
   get studio() {
@@ -395,6 +401,8 @@ Scenario('Trivial test', async ({ I }) => {
 ```
 
 ```js
+import { expect } from '@playwright/test';
+
 test('Trivial test', async ({ page, factory, context }) => {
   var projectPage = new ProjectPage(page, context);
   await projectPage.open();
@@ -430,6 +438,7 @@ export default {
 
 ```js
 // @file someFolder/test.js
+import { expect } from '@playwright/test';
 
 export default class Test extends BasePage {
   get studio() {
@@ -467,6 +476,8 @@ Scenario('Trivial test', async ({ I, loginAs }) => {
 ```
 
 ```js
+import { expect } from '@playwright/test';
+
 test('Trivial test', async ({ page, factory, context }) => {
   var projectPage = new ProjectPage(page, context);
   var listModal = new ListModal(page, context);
@@ -495,6 +506,8 @@ Data(myData)
 ```
 
 ```js
+import { expect } from '@playwright/test';
+
 let myData = [
   { id: 1, name: 'England', capital: 'London' },
   { id: 2, name: 'France', capital: 'Paris' },
@@ -533,6 +546,7 @@ Data(myData)
 
 ```js
 import { Capitals } from '../data/capitals';
+import { expect } from '@playwright/test';
 
 test.describe('Test capitals', () => {
   let myData = [
