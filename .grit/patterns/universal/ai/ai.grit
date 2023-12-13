@@ -1,4 +1,4 @@
-language js
+language universal
 
 // Given a question and a list of choices,
 function ai_ask($question, $choices) {
@@ -65,4 +65,22 @@ pattern ai_is($condition, $examples, $counter_examples) {
     $answer = llm_choice($messages, choices=["yes", "no"]),
     $answer <: "yes"
   }
+}
+
+
+// Transform the provided code to match the given instructions
+function ai_transform($match, $instruct) {
+  $messages = [
+    {
+      role: "system",
+      content: `Transform the provided code using this instruction: $instruct. Respond with a code snippet, do not provide any other text.`
+    },
+    {
+      role: "user",
+      content: $match
+    }
+  ],
+
+  $answer = llm_chat($messages),
+  return `$answer`
 }
