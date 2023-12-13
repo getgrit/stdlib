@@ -10,16 +10,26 @@ tags: #hidden
 engine marzano(0.1)
 language js
 
+predicate convert_tags($scenario, $description) {
+    $tags = [],
+    $program <: maybe contains bubble($tags, $scenario) call_expression($function, $arguments) as $tagger where {
+        $function <: contains $scenario,
+        $tagger => $scenario,
+        $arguments <: string($fragment) where {
+            $tags += $fragment,
+        },
+    },
+    $tags = join($tags, ` `),
+    $description => trim(`$description $tags`, " "),
+}
+
 pattern convert_test() {
     or {
-        `Scenario($description, async ({ $params }) => { $body })`,
-        `Scenario($description, $_, async ({ $params }) => { $body })`,
+        `Scenario('$description', async ({ $params }) => { $body })`,
+        `Scenario('$description', $_, async ({ $params }) => { $body })`,
     } as $scenario where {
         $params <: contains `I`,
-        $program <: maybe contains call_expression($function) as $tagger where {
-            $function <: contains $scenario,
-            $tagger => $scenario,
-        },
+        convert_tags($scenario, $description),
         $body <: maybe contains bubble or {
             `I.say($log)` => `console.log($log)`,
             expression_statement($expression) where {
@@ -43,19 +53,19 @@ pattern convert_test() {
         $pages = distinct(list=$pages),
         $pages = join(list=$pages, separator=`;\n`),
         $body => `$pages\n$body`,
-    } => `test($description, async ({ page, factory, context }) => {
+    } => `test('$description', async ({ page, factory, context }) => {
         $body
     })`
 }
 
 pattern convert_parameterized_test() {
-    `Data($params).Scenario($scenario)` as $data_scenario where {
-        $program <: maybe contains call_expression($function) as $tagger where {
-            $function <: contains $data_scenario,
-            $tagger => $data_scenario,
-        },
+    or {
+      `Data($params).Scenario('$description', $func)`,
+      `Data($params).Scenario('$description', $_, $func)`,
+    } as $data_scenario where {
+        convert_tags($data_scenario, $description),
         $data_scenario => `for (const current of $params) {
-        Scenario($scenario)
+        Scenario('$description', $func)
     }`,
     },
 }
@@ -412,7 +422,7 @@ Scenario('Trivial test', async ({ I }) => {
 ```js
 import { expect } from '@playwright/test';
 
-test('Trivial test', async ({ page, factory, context }) => {
+test('Trivial test Projects Studio Email', async ({ page, factory, context }) => {
   var projectPage = new ProjectPage(page, context);
   await projectPage.open();
   await projectPage.list.waitFor({ state: 'visible' });
@@ -487,7 +497,7 @@ Scenario('Trivial test', async ({ I, loginAs }) => {
 ```js
 import { expect } from '@playwright/test';
 
-test('Trivial test', async ({ page, factory, context }) => {
+test('Trivial test Projects Studio Email', async ({ page, factory, context }) => {
   var projectPage = new ProjectPage(page, context);
   var listModal = new ListModal(page, context);
   await projectPage.open();
@@ -525,7 +535,7 @@ let myData = [
 ];
 
 for (const current of myData) {
-  test('Trivial test', async ({ page, factory, context }) => {
+  test('Trivial test Projects Studio Email', async ({ page, factory, context }) => {
     console.log(current.capital);
   });
 }
@@ -566,7 +576,7 @@ test.describe('Test capitals', () => {
   ];
 
   for (const current of myData) {
-    test('Trivial test', async ({ page, factory, context }) => {
+    test('Trivial test Projects Studio Email', async ({ page, factory, context }) => {
       console.log(current.capital);
     });
   }
