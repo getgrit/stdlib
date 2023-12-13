@@ -20,7 +20,7 @@ predicate convert_tags($scenario, $description) {
         },
     },
     $tags = join($tags, ` `),
-    $description => `$description $tags`,
+    $description => trim(`$description $tags`, " "),
 }
 
 pattern convert_test() {
@@ -30,16 +30,6 @@ pattern convert_test() {
     } as $scenario where {
         $params <: contains `I`,
         convert_tags($scenario, $description),
-        // $tags = [],
-        // $program <: maybe contains bubble($tags, $scenario) call_expression($function, $arguments) as $tagger where {
-        //     $function <: contains $scenario,
-        //     $tagger => $scenario,
-        //     $arguments <: string($fragment) where {
-        //         $tags += $fragment,
-        //     },
-        // },
-        // $tags = join($tags, ` `),
-        // $description => `$description $tags`,
         $body <: maybe contains bubble or {
             `I.say($log)` => `console.log($log)`,
             expression_statement($expression) where {
