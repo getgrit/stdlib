@@ -496,6 +496,7 @@ export default class Test extends BasePage {
 Scenario('Trivial test', async ({ I, loginAs }) => {
   projectPage.open();
   listModal.open();
+  patternsList.open();
   I.waitForVisible(projectPage.list);
 })
   .tag('Email')
@@ -509,8 +510,10 @@ import { expect } from '@playwright/test';
 test('Trivial test Projects Studio Email', async ({ page, factory, context }) => {
   var projectPage = new ProjectPage(page, context);
   var listModal = new ListModal(page, context);
+  var patternsList = new PatternsList(page, context);
   await projectPage.open();
   await listModal.open();
+  await patternsList.open();
   await projectPage.list.waitFor({ state: 'visible' });
 });
 ```
