@@ -14,7 +14,7 @@ predicate convert_tags($scenario, $description) {
         $function <: contains $scenario,
         $tagger => $scenario,
         $arguments <: string($fragment) where {
-            $tags += $fragment,
+            $tags += `@$fragment`,
         },
     },
     $tags = join($tags, ` `),
@@ -429,7 +429,7 @@ Scenario('Trivial test', async ({ I }) => {
 ```js
 import { expect } from '@playwright/test';
 
-test('Trivial test Projects Studio Email', async ({ page, factory, context }) => {
+test('Trivial test @Projects @Studio @Email', async ({ page, factory, context }) => {
   var projectPage = new ProjectPage(page, context);
   await projectPage.open();
   await projectPage.list.waitFor({ state: 'visible' });
@@ -499,13 +499,14 @@ Scenario('Trivial test', async ({ I, loginAs }) => {
 })
   .tag('Email')
   .tag('Studio')
-  .tag('Projects');
+  .tag('Projects')
+  .tag('Multiword tag');
 ```
 
 ```js
 import { expect } from '@playwright/test';
 
-test('Trivial test Projects Studio Email', async ({ page, factory, context }) => {
+test('Trivial test @Multiword tag @Projects @Studio @Email', async ({ page, factory, context }) => {
   var projectPage = new ProjectPage(page, context);
   var listModal = new ListModal(page, context);
   var patternsList = new PatternsList(page, context);
@@ -545,7 +546,7 @@ let myData = [
 ];
 
 for (const current of myData) {
-  test('Trivial test Projects Studio Email', async ({ page, factory, context }) => {
+  test('Trivial test @Projects @Studio @Email', async ({ page, factory, context }) => {
     console.log(current.capital);
   });
 }
@@ -586,7 +587,7 @@ test.describe('Test capitals', () => {
   ];
 
   for (const current of myData) {
-    test('Trivial test Projects Studio Email', async ({ page, factory, context }) => {
+    test('Trivial test @Projects @Studio @Email', async ({ page, factory, context }) => {
       console.log(current.capital);
     });
   }
