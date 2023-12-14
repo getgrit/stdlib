@@ -2,18 +2,17 @@ language universal
 
 // Given a question and a list of choices,
 function ai_ask($question, $choices) {
-  $choice_text = join($choices, `, `),
   $messages = [
     {
       role: "system",
-      content: `Answer all questions with a single word. Choices: $choice_text`
+      content: `Answer all questions with a single word.`
     },
     {
       role: "user",
       content: $question
     }
   ],
-  $answer = llm_choice($messages, $choices),
+  $answer = llm_chat($messages, pattern=$choices),
   return $answer
 }
 
@@ -62,8 +61,8 @@ pattern ai_is($condition, $examples, $counter_examples) {
       role: "user",
       content: $item_to_check
     },
-    $answer = llm_choice($messages, choices=["yes", "no"]),
-    $answer <: "yes"
+    $answer = llm_chat($messages, pattern=or {`yes`, `no`}),
+    $answer <: `yes`
   }
 }
 
