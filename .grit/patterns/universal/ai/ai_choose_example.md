@@ -23,7 +23,7 @@ function (x) { return x + 1; }
 ```
 
 ```ts
-// This function: adder
+// This function: Adder
 function (x) { return x + 1; }
 ```
 
@@ -34,7 +34,7 @@ function (x) { return x / 2; }
 ```
 
 ```ts
-// This function: divider
+// This function: Divider
 function (x) { return x / 2; }
 ```
 
@@ -45,6 +45,6 @@ function (x) { return x + ""; }
 ```
 
 ```ts
-// This function: adder
+// This function: Adder
 function (x) { return x + ""; }
 ```
