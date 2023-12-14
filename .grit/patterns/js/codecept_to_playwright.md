@@ -53,6 +53,11 @@ pattern convert_test() {
             $modal_class = capitalize(string=$modal),
             $pages += `var $modal = new $modal_class(page, context)`,
         },
+         $body <: maybe contains bubble($pages) r"[a-zA-Z]*List" as $list where {
+            $list <: identifier(),
+            $list_class = capitalize(string=$list),
+            $pages += `var $list = new $list_class(page, context)`,
+        },
         $pages = distinct(list=$pages),
         $pages = join(list=$pages, separator=`;\n`),
         $body => `$pages\n$body`,
