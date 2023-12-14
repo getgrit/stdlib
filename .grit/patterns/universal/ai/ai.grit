@@ -2,7 +2,6 @@ language universal
 
 // Given a question and a list of choices,
 function ai_ask($question, $choices) {
-  // $choice_text = join($choices, `, `),
   $messages = [
     {
       role: "system",
