@@ -126,3 +126,18 @@ export const createSdkActivities = () => {
   return new Proxy(stdlib, {});
 };
 ```
+
+## Doesn't remove eslint or typescript ignores
+
+```js
+// const foo = 9;
+if (name === 'grpc.google.logging.v2.LoggingServiceV2/WriteLogEntries') return RATE_DROP;
+// @ts-expect-error This is not useful
+const foo: string = 9;
+// @ts-ignore This is not useful
+const foo: string = 9;
+// eslint-disable-next-line no-use-before-define
+const foo = 9;
+```
+
+```js
