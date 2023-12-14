@@ -2,18 +2,18 @@ language universal
 
 // Given a question and a list of choices,
 function ai_ask($question, $choices) {
-  $choice_text = join($choices, `, `),
+  // $choice_text = join($choices, `, `),
   $messages = [
     {
       role: "system",
-      content: `Answer all questions with a single word. Choices: $choice_text`
+      content: `Answer all questions with a single word.`
     },
     {
       role: "user",
       content: $question
     }
   ],
-  $answer = llm_choice($messages, $choices),
+  $answer = llm_chat($messages, pattern=$choices),
   return $answer
 }
 
