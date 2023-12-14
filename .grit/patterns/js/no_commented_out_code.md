@@ -16,6 +16,15 @@ file($body) where {
     $blocks = group_blocks(target=$comments),
     $blocks <: some bubble $block where {
         $joined = join($block, `\n`),
+        $joined <: not or {
+          includes "@ts-ignore",
+          includes "@ts-expect-error",
+          includes "eslint-disable",
+          includes "eslint-disable-next-line",
+          includes "eslint-disable-line",
+          includes "biome-ignore",
+          r"(.+)-ignore"
+        },
         $joined <: ai_is(
           "commented out code that is valid JavaScript, not a descriptive comment",
           examples=[
@@ -125,4 +134,27 @@ export const createSdkActivities = () => {
 export const createSdkActivities = () => {
   return new Proxy(stdlib, {});
 };
+```
+
+## Doesn't remove eslint or typescript ignores
+
+```js
+// const foo = 9;
+if (name === 'grpc.google.logging.v2.LoggingServiceV2/WriteLogEntries') return RATE_DROP;
+// @ts-expect-error This is not useful
+const foo: string = 9;
+// @ts-ignore This is not useful
+const foo: string = 9;
+// eslint-disable-next-line no-use-before-define
+const foo = 9;
+```
+
+```js
+if (name === 'grpc.google.logging.v2.LoggingServiceV2/WriteLogEntries') return RATE_DROP;
+// @ts-expect-error This is not useful
+const foo: string = 9;
+// @ts-ignore This is not useful
+const foo: string = 9;
+// eslint-disable-next-line no-use-before-define
+const foo = 9;
 ```
