@@ -4,8 +4,6 @@ title: Convert CodeceptJS to Playwright
 
 Migrate from CodeceptJS to Playwright.
 
-tags: #hidden
-
 ```grit
 engine marzano(0.1)
 language js
