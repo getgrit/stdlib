@@ -62,8 +62,8 @@ pattern ai_is($condition, $examples, $counter_examples) {
       role: "user",
       content: $item_to_check
     },
-    $answer = llm_choice($messages, choices=["yes", "no"]),
-    $answer <: "yes"
+    $answer = llm_chat($messages, pattern=or {`yes`, `no`}),
+    $answer <: `yes`
   }
 }
 
