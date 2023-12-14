@@ -32,6 +32,9 @@ pattern convert_test() {
         convert_tags($scenario, $description),
         $body <: maybe contains bubble or {
             `I.say($log)` => `console.log($log)`,
+            `I.updateField` => `this.updateField`,
+            `I.selectInDropdownByLocators` => `this.selectInDropdownByLocators`,
+            `I.selectInDropdown` => `this.selectInDropdown`,
             expression_statement($expression) where {
                 $expression <: call_expression(),
                 $expression => `await $expression`,
