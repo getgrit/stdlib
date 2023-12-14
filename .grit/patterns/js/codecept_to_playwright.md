@@ -32,6 +32,9 @@ pattern convert_test() {
         convert_tags($scenario, $description),
         $body <: maybe contains bubble or {
             `I.say($log)` => `console.log($log)`,
+            `I.updateField` => `this.updateField`,
+            `I.selectInDropdownByLocators` => `this.selectInDropdownByLocators`,
+            `I.selectInDropdown` => `this.selectInDropdown`,
             expression_statement($expression) where {
                 $expression <: call_expression(),
                 $expression => `await $expression`,
@@ -49,6 +52,11 @@ pattern convert_test() {
             $modal <: identifier(),
             $modal_class = capitalize(string=$modal),
             $pages += `var $modal = new $modal_class(page, context)`,
+        },
+         $body <: maybe contains bubble($pages) r"[a-zA-Z]*List" as $list where {
+            $list <: identifier(),
+            $list_class = capitalize(string=$list),
+            $pages += `var $list = new $list_class(page, context)`,
         },
         $pages = distinct(list=$pages),
         $pages = join(list=$pages, separator=`;\n`),
@@ -194,6 +202,7 @@ pattern convert_locators($page) {
         `I.assertNotEqual($actual, $expected)` => `expect($actual).not.toEqual($expected)`,
         `I.backToPreviousPage()` => `await $page.goBack()`,
         `I.seeCheckboxIsChecked($target)` => `await expect($target).toBeChecked()`,
+        `I.grabTextFrom($target)` => `page.locator($target).allInnerTexts()`,
     }
 }
 
@@ -487,6 +496,7 @@ export default class Test extends BasePage {
 Scenario('Trivial test', async ({ I, loginAs }) => {
   projectPage.open();
   listModal.open();
+  patternsList.open();
   I.waitForVisible(projectPage.list);
 })
   .tag('Email')
@@ -500,8 +510,10 @@ import { expect } from '@playwright/test';
 test('Trivial test Projects Studio Email', async ({ page, factory, context }) => {
   var projectPage = new ProjectPage(page, context);
   var listModal = new ListModal(page, context);
+  var patternsList = new PatternsList(page, context);
   await projectPage.open();
   await listModal.open();
+  await patternsList.open();
   await projectPage.list.waitFor({ state: 'visible' });
 });
 ```
