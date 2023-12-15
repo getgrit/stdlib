@@ -170,6 +170,7 @@ pattern convert_locators($page) {
         },
         `I.seeInField($target, $value)` => `await expect($target).toHaveValue($value)`,
         `I.dontSeeInField($target, $value)` => `await expect($target).not.toHaveValue($value)`,
+        `I.seeInCurrentUrl($url)` => `await expect($page).toHaveURL(new RegExp($url))`,
         `I.seeTextEquals($text, $target)` => `await expect($target).toHaveText($text)`,
         `I.waitForElement($target, $timeout)` => `await $target.waitFor({ state: 'attached', timeout: $timeout * 1000 })`,
         `I.waitForElement($target)` => `await $target.waitFor({ state: 'attached' })`,
