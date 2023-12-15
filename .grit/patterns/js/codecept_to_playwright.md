@@ -21,11 +21,25 @@ predicate convert_tags($scenario, $description) {
     $description => trim(`$description $tags`, " "),
 }
 
+function extract_quote_kind($scenario, $description) {
+    if ($scenario <: contains or {
+        r`'$description'`,
+        r`"$description"`,
+    }) {
+        return `'`,
+    } else {
+        return js"`",
+    }
+}
+
 pattern convert_test() {
     or {
         `Scenario('$description', async ({ $params }) => { $body })`,
         `Scenario('$description', $_, async ({ $params }) => { $body })`,
+        js"Scenario(`$description`, async ({ $params }) => { $body })",
+        js"Scenario(`$description`, $_, async ({ $params }) => { $body })",
     } as $scenario where {
+        $quote = extract_quote_kind($scenario, $description),
         $params <: contains `I`,
         convert_tags($scenario, $description),
         $body <: maybe contains bubble or {
@@ -59,19 +73,22 @@ pattern convert_test() {
         $pages = distinct(list=$pages),
         $pages = join(list=$pages, separator=`;\n`),
         $body => `$pages\n$body`,
-    } => `test('$description', async ({ page, factory, context }) => {
+    } => `test($quote$description$quote, async ({ page, factory, context }) => {
         $body
     })`
 }
 
 pattern convert_parameterized_test() {
     or {
-      `Data($params).Scenario('$description', $func)`,
-      `Data($params).Scenario('$description', $_, $func)`,
+        `Data($params).Scenario('$description', $func)`,
+        `Data($params).Scenario('$description', $_, $func)`,
+        js"Data($params).Scenario(`$description`, $func)",
+        js"Data($params).Scenario(`$description`, $_, $func)",
     } as $data_scenario where {
+        $quote = extract_quote_kind($data_scenario, $description),
         convert_tags($data_scenario, $description),
         $data_scenario => `for (const current of $params) {
-        Scenario('$description', $func)
+        Scenario($quote$description$quote, $func)
     }`,
     },
 }
@@ -170,6 +187,8 @@ pattern convert_locators($page) {
         },
         `I.seeInField($target, $value)` => `await expect($target).toHaveValue($value)`,
         `I.dontSeeInField($target, $value)` => `await expect($target).not.toHaveValue($value)`,
+        `I.seeInCurrentUrl($url)` => `await expect($page).toHaveURL(new RegExp($url))`,
+        `I.closeCurrentTab()` => `await $page.close()`,
         `I.seeTextEquals($text, $target)` => `await expect($target).toHaveText($text)`,
         `I.waitForElement($target, $timeout)` => `await $target.waitFor({ state: 'attached', timeout: $timeout * 1000 })`,
         `I.waitForElement($target)` => `await $target.waitFor({ state: 'attached' })`,
@@ -592,4 +611,39 @@ test.describe('Test capitals', () => {
     });
   }
 });
+```
+
+## Converts tests with backtick descriptions
+
+```js
+let myData = new DataTable(['id', 'name', 'capital']);
+myData.add([1, 'England', 'London']);
+myData.add([2, 'France', 'Paris']);
+myData.add([3, 'Germany', 'Berlin']);
+myData.add([4, 'Italy', 'Rome']);
+
+Data(myData)
+  .Scenario(`Trivial test`, { myData }, async ({ I, current }) => {
+    I.say(current.capital);
+  })
+  .tag('Email')
+  .tag('Studio')
+  .tag('Projects');
+```
+
+```js
+import { expect } from '@playwright/test';
+
+let myData = [
+  { id: 1, name: 'England', capital: 'London' },
+  { id: 2, name: 'France', capital: 'Paris' },
+  { id: 3, name: 'Germany', capital: 'Berlin' },
+  { id: 4, name: 'Italy', capital: 'Rome' },
+];
+
+for (const current of myData) {
+  test(`Trivial test @Projects @Studio @Email`, async ({ page, factory, context }) => {
+    console.log(current.capital);
+  });
+}
 ```
