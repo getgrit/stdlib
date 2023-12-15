@@ -21,6 +21,17 @@ predicate convert_tags($scenario, $description) {
     $description => trim(`$description $tags`, " "),
 }
 
+function extract_quote_kind($scenario, $description) {
+    if ($scenario <: contains or {
+        r`'$description'`,
+        r`"$description"`,
+    }) {
+        return `'`,
+    } else {
+        return js"`",
+    }
+}
+
 pattern convert_test() {
     or {
         `Scenario('$description', async ({ $params }) => { $body })`,
@@ -28,6 +39,7 @@ pattern convert_test() {
         js"Scenario(`$description`, async ({ $params }) => { $body })",
         js"Scenario(`$description`, $_, async ({ $params }) => { $body })",
     } as $scenario where {
+        $quote = extract_quote_kind($scenario, $description),
         $params <: contains `I`,
         convert_tags($scenario, $description),
         $body <: maybe contains bubble or {
@@ -61,7 +73,7 @@ pattern convert_test() {
         $pages = distinct(list=$pages),
         $pages = join(list=$pages, separator=`;\n`),
         $body => `$pages\n$body`,
-    } => `test('$description', async ({ page, factory, context }) => {
+    } => `test($quote$description$quote, async ({ page, factory, context }) => {
         $body
     })`
 }
@@ -73,9 +85,10 @@ pattern convert_parameterized_test() {
         js"Data($params).Scenario(`$description`, $func)",
         js"Data($params).Scenario(`$description`, $_, $func)",
     } as $data_scenario where {
+        $quote = extract_quote_kind($data_scenario, $description),
         convert_tags($data_scenario, $description),
         $data_scenario => `for (const current of $params) {
-        Scenario('$description', $func)
+        Scenario($quote$description$quote, $func)
     }`,
     },
 }
