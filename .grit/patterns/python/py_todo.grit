@@ -1,11 +1,11 @@
 engine marzano(0.1)
 language python
 
- function lines($string) {
-     return split($string, separator=`\n`)
- }
+function lines($string) {
+    return split($string, separator=`\n`)
+}
 
- function todo($target, $message) {
+function todo($target, $message) {
     if($message <: undefined) {
         $message = "This requires manual intervention."
     },
@@ -22,4 +22,4 @@ language python
     $lines = lines(string = $target),
     $lines <: some bubble($result) $x where { $result += `\n# $x` },
     return $result,
- }
+}
