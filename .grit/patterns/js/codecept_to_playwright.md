@@ -289,7 +289,7 @@ sequential {
 ## Converts Codecept property
 
 ```js
-// @file test.js
+// @filename: test.js
 const { I } = inject();
 
 export default {
@@ -300,7 +300,7 @@ export default {
 ```
 
 ```js
-// @file test.js
+// @filename: test.js
 import { expect } from '@playwright/test';
 
 export default class Test extends BasePage {
@@ -319,7 +319,7 @@ export default class Test extends BasePage {
 ## Converts waiters
 
 ```js
-// @file someFolder/test.js
+// @filename: someFolder/test.js
 const { I } = inject();
 
 export default {
@@ -336,7 +336,7 @@ export default {
 ```
 
 ```js
-// @file someFolder/test.js
+// @filename: someFolder/test.js
 import { expect } from '@playwright/test';
 
 export default class Test extends BasePage {
@@ -360,7 +360,7 @@ export default class Test extends BasePage {
 ## Converts complex locators
 
 ```js
-// @file someFolder/test.js
+// @filename: someFolder/test.js
 const { I } = inject();
 
 export default {
@@ -386,7 +386,7 @@ export default {
 ```
 
 ```js
-// @file someFolder/test.js
+// @filename: someFolder/test.js
 import { expect } from '@playwright/test';
 
 export default class Test extends BasePage {
@@ -456,7 +456,7 @@ test('Trivial test @Projects @Studio @Email', async ({ page, factory, context })
 ## Does not convert inner object properties to getters
 
 ```js
-// @file someFolder/test.js
+// @filename: someFolder/test.js
 const { I } = inject();
 
 export default {
@@ -476,7 +476,7 @@ export default {
 ```
 
 ```js
-// @file someFolder/test.js
+// @filename: someFolder/test.js
 import { expect } from '@playwright/test';
 
 export default class Test extends BasePage {
