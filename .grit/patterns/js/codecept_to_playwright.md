@@ -139,7 +139,7 @@ pattern convert_locators($page) {
         `locate($locator).as($_)` => `$page.locator($locator)`,
         `locate($locator).find($sub)` => `$page.locator($locator).locator($sub)`,
         `locate($locator)` => `$page.locator($locator)`,
-        `$locator.withDescendant($descendant)` => `$locator.filter({ has: $page.locator($descendant) })`,
+        `$target.withDescendant($descendant)` => `$target.filter({ has: $page.locator($descendant) })`,
         `I.waitInUrl($url)` => `await $page.waitForURL(new RegExp($url))`,
         `I.waitForLoader()` => `await this.waitForLoader()`,
         `I.waitForText($text, $timeout, $target)` => `await expect($target).toHaveText($text, {
@@ -150,13 +150,13 @@ pattern convert_locators($page) {
             ignoreCase: true,
         })`,
         `I.wait($timeout)` => `await $page.waitForTimeout($timeout * 1000)`,
-        `I.seeElement($element)` => `await expect($element).toBeVisible()`,
-        `I.dontSeeElement($element)` => `await expect($element).toBeHidden()`,
+        `I.seeElement($target)` => `await expect($target).toBeVisible()`,
+        `I.dontSeeElement($target)` => `await expect($target).toBeHidden()`,
         `I.see($text, $target)` => `await expect($target).toContainText($text)`,
         `I.see($text)` => `await expect($page.getByText($text)).toBeVisible()`,
         `I.dontSee($text, $target)` => `await expect($target).not.toContainText($text)`,
         `I.dontSee($text)` => `await expect($page.getByText($text)).toBeHidden()`,
-        `I.grabCSSPropertyFrom($locator, $property)` => `await $locator.evaluate((el) => {
+        `I.grabCSSPropertyFrom($target, $property)` => `await $target.evaluate((el) => {
           return window.getComputedStyle(el).getPropertyValue($property);
         })`,
         `I.seeCssPropertiesOnElements($target, { $css })` as $orig where {
@@ -205,8 +205,8 @@ pattern convert_locators($page) {
         `I.attachFile($target, $file)` => `await $target.setInputFiles($file)`,
         `I.clearFieldValue($field)` => `await $field.clear()`,
         `I.grabNumberOfVisibleElements($target)` => `await $target.count()`,
-        `I.seeNumberOfVisibleElements($locator, $count)` => `expect(await $locator.count()).toEqual($count)`,
-        `I.waitNumberOfVisibleElements($locator, $count)` => `await expect($locator).toHaveCount($count)`,
+        `I.seeNumberOfVisibleElements($target, $count)` => `expect(await $target.count()).toEqual($count)`,
+        `I.waitNumberOfVisibleElements($target, $count)` => `await expect($target).toHaveCount($count)`,
         `I.checkOption($target)` => `await $target.check()`,
         `I.uncheckOption($target)` => `await $target.uncheck()`,
         `I.assertEqual($actual, $expected)` => `expect($actual).toEqual($expected)`,
@@ -214,7 +214,17 @@ pattern convert_locators($page) {
         `I.backToPreviousPage()` => `await $page.goBack()`,
         `I.seeCheckboxIsChecked($target)` => `await expect($target).toBeChecked()`,
         `I.grabTextFrom($target)` => `page.locator($target).allInnerTexts()`,
-    }
+    } where {
+        if (! $target <: undefined) {
+            $target <: maybe or {
+                binary_expression(),
+                string(),
+                template_string()
+            } where {
+                $target => `$page.locator($target)`,
+            },
+        }
+    },
 }
 
 pattern convert_base_page() {
@@ -644,4 +654,30 @@ for (const current of myData) {
     console.log(current.capital);
   });
 }
+```
+
+## Intelligently converts stringlike locators
+
+```js
+Scenario('Trivial test', async ({ I }) => {
+  projectPage.open();
+  I.waitForVisible('.list' + ' ' + className);
+  I.waitNumberOfVisibleElements('.grit-sample', 3);
+  I.seeInField(`input[name="${username}"]`, 'admin');
+})
+  .tag('Email')
+  .tag('Studio')
+  .tag('Projects');
+```
+
+```js
+import { expect } from '@playwright/test';
+
+test('Trivial test @Projects @Studio @Email', async ({ page, factory, context }) => {
+  var projectPage = new ProjectPage(page, context);
+  await projectPage.open();
+  await page.locator('.list' + ' ' + className).waitFor({ state: 'visible' });
+  await expect(page.locator('.grit-sample')).toHaveCount(3);
+  await expect(page.locator(`input[name="${username}"]`)).toHaveValue('admin');
+});
 ```
