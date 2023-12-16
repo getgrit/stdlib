@@ -146,7 +146,7 @@ const Button = (props) => (
 ```
 
 ```javascript
-// @file test.js
+// @filename: test.js
 import { default as button } from 'Button.module.css';
 import { default as cn } from 'classnames';
 const Button = (props) => (
@@ -155,7 +155,7 @@ const Button = (props) => (
 
   </button>
 );
-// @file Button.module.css
+// @filename: Button.module.css
 
       .cta {
         padding: 20px;
@@ -186,14 +186,14 @@ export default () => (
 ```
 
 ```javascript
-// @file test.js
+// @filename: test.js
 import { default as styles } from 'test.module.css';
 export default () => (
   <div className="container">
 
   </div>
 );
-// @file test.module.css
+// @filename: test.module.css
 :global{
 
       body {
@@ -219,13 +219,13 @@ export const button = css`
 ```
 
 ```javascript
-// @file test.js
+// @filename: test.js
 import css from "styled-jsx/css";
 
 import { default as buttonStyles } from 'button.module.css';
 
 export const button = buttonStyles;
-// @file button.module.css
+// @filename: button.module.css
 
   .button {
     color: hotpink;
@@ -266,7 +266,7 @@ const AppContainer = (props) => (
 ```
 
 ```javascript
-// @file test.js
+// @filename: test.js
 import { default as ctabutton } from 'CTAButton.module.css';
 import { default as cn } from 'classnames';
 import { default as appcontainer } from 'AppContainer.module.css';
@@ -283,15 +283,15 @@ const AppContainer = (props) => (
 
   </div>
 );
-// @file AppContainer.module.css
+// @filename: AppContainer.module.css
 
       .main {
         padding: 20px;
         background: #eee;
         color: #999;
       }
-    
-// @file CTAButton.module.css
+
+// @filename: CTAButton.module.css
 
       .button {
         padding: 20px;
