@@ -21,15 +21,9 @@ predicate convert_tags($scenario, $description) {
     $description => trim(`$description $tags`, " "),
 }
 
-function extract_quote_kind($scenario, $description) {
-    if ($scenario <: contains or {
-        r`'$description'`,
-        r`"$description"`,
-    }) {
-        return `'`,
-    } else {
-        return js"`",
-    }
+function extract_quote_kind($scenario, $description) js {
+    const escapedRegex = new RegExp(`\`${$description.text}\``);
+    return escapedRegex.test($scenario.text) ? '`' : "'";
 }
 
 pattern convert_test() {
@@ -507,10 +501,10 @@ export default class Test extends BasePage {
 }
 ```
 
-## Converts Codecept scenario with multiple args
+## Converts Codecept scenario with multiple args and parentheses in description
 
 ```js
-Scenario('Trivial test', async ({ I, loginAs }) => {
+Scenario('Trivial test (good)', async ({ I, loginAs }) => {
   projectPage.open();
   listModal.open();
   patternsList.open();
@@ -525,7 +519,11 @@ Scenario('Trivial test', async ({ I, loginAs }) => {
 ```js
 import { expect } from '@playwright/test';
 
-test('Trivial test @Multiword tag @Projects @Studio @Email', async ({ page, factory, context }) => {
+test('Trivial test (good) @Multiword tag @Projects @Studio @Email', async ({
+  page,
+  factory,
+  context,
+}) => {
   var projectPage = new ProjectPage(page, context);
   var listModal = new ListModal(page, context);
   var patternsList = new PatternsList(page, context);
