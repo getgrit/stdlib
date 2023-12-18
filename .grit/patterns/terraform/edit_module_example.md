@@ -64,11 +64,12 @@ multifile {
   bubble($var_names) file($name, $body) where {
     // $name <: r"\./variables/.*", // Path to get variables from
     // $body <: contains collect_variables($var_names),
+    $body => $name
   },
-  bubble($var_names) file($name, $body) where {
-    // $body <: contains fix_module($old_source, $new_source, allow_variables=$var_names)
-    $body => .
-  }
+  // bubble($var_names) file($name, $body) where {
+  //   // $body <: contains fix_module($old_source, $new_source, allow_variables=$var_names)
+  //   $body => .
+  // }
 }
 
 // files(files = edit_module(old_source=`"old_source"`, new_source=`"new_source"`, module_path=""))
@@ -77,6 +78,18 @@ multifile {
 ## Sample
 
 ```tf
+// @filename: variables/variables.tf
+variable "variable1" {}
+variable "variable2" {
+  description = "description"
+}
+
+// @filename: variables_not_to_use/variables.tf
+variable "variable3" {}
+variable "variable4" {
+  description = "description"
+}
+
 // @filename: input/main.tf
 module "test_module1" {
   source    = "old_source"
@@ -100,47 +113,10 @@ module "test_module3" {
   variable2 = "variable2"
   variable3 = "variable3"
   variable4 = "variable4"
-}
-
-// @filename: variables/variables.tf
-variable "variable1" {}
-variable "variable2" {
-  description = "description"
-}
-
-// @filename: variables_not_to_use/variables.tf
-variable "variable3" {}
-variable "variable4" {
-  description = "description"
 }
 ```
 
 ```tf
-// @filename: input/main.tf
-module "test_module1" {
-  source = "new_source"
-  variable1 = "variable1"
-  variable2 = "variable2"
-
-
-}
-
-module "test_module2" {
-  source = "new_source"
-  variable1 = "variable1"
-  variable2 = "variable2"
-
-
-}
-
-module "test_module3" {
-  source    = "another_source"
-  variable1 = "variable1"
-  variable2 = "variable2"
-  variable3 = "variable3"
-  variable4 = "variable4"
-}
-
 // @filename: variables/variables.tf
 variable "variable1" {}
 variable "variable2" {
@@ -152,4 +128,26 @@ variable "variable3" {}
 variable "variable4" {
   description = "description"
 }
+
+// @filename: input/main.tf
+module "test_module1" {
+  source = "new_source"
+  variable1 = "variable1"
+  variable2 = "variable2"
+}
+
+module "test_module2" {
+  source = "new_source"
+  variable1 = "variable1"
+  variable2 = "variable2"
+}
+
+module "test_module3" {
+  source    = "another_source"
+  variable1 = "variable1"
+  variable2 = "variable2"
+  variable3 = "variable3"
+  variable4 = "variable4"
+}
+
 ```
