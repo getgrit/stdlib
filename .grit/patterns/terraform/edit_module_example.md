@@ -121,12 +121,16 @@ module "test_module1" {
   source = "new_source"
   variable1 = "variable1"
   variable2 = "variable2"
+
+
 }
 
 module "test_module2" {
   source = "new_source"
   variable1 = "variable1"
   variable2 = "variable2"
+
+
 }
 
 module "test_module3" {
@@ -135,5 +139,17 @@ module "test_module3" {
   variable2 = "variable2"
   variable3 = "variable3"
   variable4 = "variable4"
+}
+
+// @filename: variables/variables.tf
+variable "variable1" {}
+variable "variable2" {
+  description = "description"
+}
+
+// @filename: variables_not_to_use/variables.tf
+variable "variable3" {}
+variable "variable4" {
+  description = "description"
 }
 ```
