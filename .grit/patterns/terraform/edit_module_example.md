@@ -62,12 +62,13 @@ pattern collect_variables($var_names) {
 multifile {
   $var_names = [],
   bubble($var_names) file($name, $body) where {
-    $name <: r"\./variables/.*", // Path to get variables from
-    $body <: contains collect_variables($var_names),
+    // $name <: r"\./variables/.*", // Path to get variables from
+    // $body <: contains collect_variables($var_names),
   },
   bubble($var_names) file($name, $body) where {
-        $body <: contains fix_module($old_source, $new_source, allow_variables=$var_names)
-    }
+    // $body <: contains fix_module($old_source, $new_source, allow_variables=$var_names)
+    $body => .
+  }
 }
 
 // files(files = edit_module(old_source=`"old_source"`, new_source=`"new_source"`, module_path=""))
@@ -115,6 +116,7 @@ variable "variable4" {
 ```
 
 ```tf
+// @filename: input/main.tf
 module "test_module1" {
   source = "new_source"
   variable1 = "variable1"
