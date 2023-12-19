@@ -28,7 +28,7 @@ pattern replace_wildcard_import() {
     } else {
       // Found both kinds, leave the import and add named exports
       // This is required, because they cannot be on the same line.
-      $import += `import { $joined_refs } from $src`
+      $import += `\nimport { $joined_refs } from $src`
     }
   }
 }
