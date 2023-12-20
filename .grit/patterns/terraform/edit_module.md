@@ -33,16 +33,8 @@ pattern fix_module($old_source, $new_source, $allow_variables) {
                 $_ where {
                     $allow_variables <: some bubble($key) $candidate where { $candidate <: $key }
                 },
-                // Finally, delete others we don't recognize
                 $_ where { $attr => .}
             }
-
-            // Remove others
-            // or {
-            //     `version = $_`,
-            //     `storage_encrypted = $_`,
-            //     `apply_immediately = $_`
-            // } => .
         } until attribute()
     }
 }
@@ -59,16 +51,80 @@ pattern collect_variables($var_names) {
     }
 }
 
-pattern edit_module($old_source, $new_source, $module_path) {
+multifile {
     $var_names = [],
-    some bubble($var_names) file($name, $body) where {
-      $name <: r"\./variables/.*", // Path to get variables from
-      $body <: contains collect_variables($var_names),
+    $old_source = `"old_source"`,
+    $new_source = `"new_source"`,
+    bubble($var_names) file($name, $body) where {
+        $name <: r".*variables\..*", // Path to get variables from
+        $body <: contains collect_variables($var_names),
     },
-    some bubble($old_source, $new_source, $var_names) file($name, $body) where {
+    bubble($old_source, $new_source, $var_names) file($name, $body) where {
         $body <: contains fix_module($old_source, $new_source, allow_variables=$var_names)
     }
 }
+```
 
-files(files = edit_module(old_source=`"old_source"`, new_source=`"new_source"`, module_path=""))
+## Rewrites as expected
+
+```hcl
+// @filename: main.tf
+module "test_module1" {
+  source    = "old_source"
+  variable1 = "variable1"
+  variable2 = "variable2"
+  variable3 = "variable3"
+  variable4 = "variable4"
+}
+
+module "test_module2" {
+  source    = "old_source"
+  variable1 = "variable1"
+  variable2 = "variable2"
+  variable3 = "variable3"
+  variable4 = "variable4"
+}
+
+module "test_module3" {
+  source    = "another_source"
+  variable1 = "variable1"
+  variable2 = "variable2"
+  variable3 = "variable3"
+  variable4 = "variable4"
+}
+
+// @filename: variables.tf
+variable "variable1" {}
+variable "variable2" {
+  description = "description"
+}
+```
+
+```hcl
+// @filename: main.tf
+module "test_module1" {
+  source = "new_source"
+  variable1 = "variable1"
+  variable2 = "variable2"
+}
+
+module "test_module2" {
+  source = "new_source"
+  variable1 = "variable1"
+  variable2 = "variable2"
+}
+
+module "test_module3" {
+  source    = "another_source"
+  variable1 = "variable1"
+  variable2 = "variable2"
+  variable3 = "variable3"
+  variable4 = "variable4"
+}
+
+// @filename: variables.tf
+variable "variable1" {}
+variable "variable2" {
+  description = "description"
+}
 ```
