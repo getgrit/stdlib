@@ -9,10 +9,7 @@ language js
 pattern used_alias($alias, $refs, $kept_refs) {
     or {
         `$alias.$name` as $call ,
-        or {
-          `<$call $...>$...</$call>`,
-          `<$call $.../>`
-        } where {
+        ReactNode(name=$call) where {
             $call <: nested_identifier(base=$alias, terminal=$name),
         }
     } where {
