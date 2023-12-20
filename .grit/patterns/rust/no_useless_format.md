@@ -9,15 +9,44 @@ tags: #clippy
 ```grit
 language rust
 
-`$hello.bytes().count()` => `$hello.len()`
+or {
+    `format!($content)` where {
+        $content <: string_literal(),
+    } => `$content.to_string()`,
+    `format!("{}", $arg)` => `$arg.to_string()`,
+}
 ```
 
-## Replaces a simple `str::bytes().count()`
+## Replaces a string literal with no argument
 
 ```rust
-let my_len = "hello".bytes().count();
+let hi = format!("hello");
 ```
 
 ```rust
-let my_len = "hello".len();
+let hi = "hello".to_string();
+```
+
+## Replaces with one string literal argument
+
+```rust
+let greeting = "hello";
+let hi = format!("{}", greeting);
+```
+
+```rust
+let greeting = "hello";
+let hi = greeting.to_string();
+```
+
+## Does not replace necessary formats
+
+```rust
+let hi = format!("hello {}", "world");
+let another = format!("{:?}", strawberry);
+```
+
+```rust
+let hi = format!("hello {}", "world");
+let another = format!("{:?}", strawberry);
 ```
