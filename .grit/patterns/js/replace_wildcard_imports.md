@@ -120,3 +120,33 @@ const log = (msg) => {
 log();
 
 ```
+
+## Handle JSX
+
+Component names should also be analyzed for identifiers.
+
+```js
+import * as Foo from 'abc';
+import * as Sam from 'abc';
+
+const Component = () => {
+  return (
+    <Sam.King>
+      <Foo.Nice />
+    </Sam.King>
+  );
+};
+```
+
+```js
+import { Nice } from 'abc';
+import { King } from 'abc';
+
+const Component = () => {
+  return (
+    <King>
+      <Nice />
+    </King>
+  );
+};
+```
