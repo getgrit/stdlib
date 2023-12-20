@@ -6,18 +6,31 @@ Replace wildcard imports with explicit imports.
 engine marzano(0.1)
 language js
 
-pattern replace_wildcard_import() {
-  `import * as $alias from $src` as $import where {
-    $refs = [],
-    $kept_refs = [],
-    $program <: contains bubble($refs, $alias, $kept_refs) `$alias.$name` as $call where {
-      if ($program <: contains identifier() as $i where $i <: $name) {
+pattern used_alias($alias, $refs, $kept_refs) {
+    or {
+        `$alias.$name` as $call ,
+        or {
+          `<$call $...>$...</$call>`,
+          `<$call $.../>`
+        } where {
+            $call <: nested_identifier(base=$alias, terminal=$name),
+        }
+    } where {
+      if ($program <: contains identifier() as $i where {$i <: $name, $i <: not within $call }) {
         $kept_refs += $name,
       } else {
         $refs += $name,
         $call => `$name`
       }
     },
+}
+
+
+pattern replace_wildcard_import() {
+  `import * as $alias from $src` as $import where {
+    $refs = [],
+    $kept_refs = [],
+    $program <: contains used_alias($alias, $refs, $kept_refs),
     $joined_refs = join($refs, `, `),
     // Try the different scenarios
     if ($refs <: []) {
@@ -109,4 +122,34 @@ const log = (msg) => {
 };
 log();
 
+```
+
+## Handle JSX
+
+Component names should also be analyzed for identifiers.
+
+```js
+import * as Foo from 'abc';
+import * as Sam from 'abc';
+
+const Component = () => {
+  return (
+    <Sam.King>
+      <Foo.Nice />
+    </Sam.King>
+  );
+};
+```
+
+```js
+import { Nice } from 'abc';
+import { King } from 'abc';
+
+const Component = () => {
+  return (
+    <King>
+      <Nice />
+    </King>
+  );
+};
 ```
