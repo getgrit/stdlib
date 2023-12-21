@@ -62,7 +62,7 @@ or {
     `$langfuse.create_dataset(CreateDatasetRequest($params))` => `$langfuse.create_dataset($params)`,
     `usage=Usage($params)` where {
         $props = [],
-        $params <: some bubble keyword_argument($name, $value) where {
+        $params <: some bubble($props) keyword_argument($name, $value) where {
             $props += `"$name": $value`,
         },
         $params => join($props, `, `),
@@ -171,12 +171,10 @@ model.event(
 )
 ```
 
-# Needs CLI deploy
-
 ## Rewrites nested Pydantic interface
 
 ```python
- generation = lf.generation(
+generation = lf.generation(
     InitialGeneration(
         name="chatgpt-completion",
         startTime=generationStartTime,
