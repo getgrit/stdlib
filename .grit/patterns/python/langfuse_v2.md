@@ -26,9 +26,15 @@ pattern convert_snake_case() {
 
 or {
     `$langfuse.generation(InitialGeneration($params))` => `$langfuse.generation($params)`,
-    `$langfuse.generation(CreateGeneration($params))` => `$langfuse.generation($params)`,
-    `$langfuse.trace(CreateTrace($params))` => `$langfuse.trace($params)`,
+    `$langfuse.score(InitialScore($params))` => `$langfuse.score($params)`,
     `$langfuse.span(InitialSpan($params))` => `$langfuse.span($params)`,
+    `$langfuse.score(CreateScore($params))` => `$langfuse.score($params)`,
+    `$langfuse.trace(CreateTrace($params))` => `$langfuse.trace($params)`,
+    `$langfuse.generation(CreateGeneration($params))` => `$langfuse.generation($params)`,
+    `$langfuse.span(CreateSpan($params))`=> `$langfuse.span($params)`,
+    `$langfuse.event(CreateEvent($params))` => `$langfuse.event($params)`,
+    `$generation.update(UpdateGeneration($params))` => `$generation.update($params)`,
+    `$span.update(UpdateSpan($params))` => `$span.update($params)`,
     `usage=Usage($params)` where {
         $props = [],
         $params <: some bubble keyword_argument($name, $value) where {
@@ -72,6 +78,18 @@ langfuse.span(
     end_time=timestamp,
     input={"key": "value"},
     output={"key": "value"},
+)
+```
+
+## Does nothing without langfuse import
+
+```python
+model.event(
+    CreateEvent(
+        name="span",
+        startTime=timestamp,
+        endTime=timestamp,
+    )
 )
 ```
 
