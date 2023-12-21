@@ -33,6 +33,10 @@ pattern convert_snake_case() {
     }
 }
 
+pattern convert_pydantic_enum() {
+    maybe some `level=ObservationLevel.$level` => `level="$level"`,
+}
+
 pattern rename_generation_params() {
     maybe some bubble keyword_argument($name) where {
         $name <: or {
@@ -60,12 +64,13 @@ or {
     `$span.update(UpdateSpan($params))` => `$span.update($params)`,
     `$langfuse.create_dataset_item(CreateDatasetItemRequest($params))` => `$langfuse.create_dataset_item($params)`,
     `$langfuse.create_dataset(CreateDatasetRequest($params))` => `$langfuse.create_dataset($params)`,
-    `usage=Usage($params)` where {
+    `usage=Usage($params)` as $usage where {
         $props = [],
-        $params <: some bubble keyword_argument($name, $value) where {
+        $params <: some bubble($props) keyword_argument($name, $value) where {
             $props += `"$name": $value`,
         },
-        $params => join($props, `, `),
+        $props = join($props, `, `),
+        $usage => `usage={ $props }`,
     },
     `$langfuse.score($params)`,
     `$langfuse.span($params)`,
@@ -76,6 +81,7 @@ or {
     `$langfuse.create_dataset($params)`,
 } where {
     $params <: convert_snake_case(),
+    $params <: convert_pydantic_enum(),
     imports_langfuse(),
 }
 ```
@@ -159,24 +165,28 @@ generation = observation.generation(
 )
 ```
 
-## Does nothing without langfuse import
+## Converts Pydantic enum
 
 ```python
-model.event(
-    CreateEvent(
-        name="span",
-        startTime=timestamp,
-        endTime=timestamp,
-    )
-)
+from langfuse.model import InitialGeneration
+from langfuse.api.resources.commons.types.observation_level import ObservationLevel
+
+langfuse.generation(InitialGeneration(level=ObservationLevel.ERROR))
 ```
 
-# Needs CLI deploy
+```python
+from langfuse.model import InitialGeneration
+from langfuse.api.resources.commons.types.observation_level import ObservationLevel
+
+langfuse.generation(level="ERROR")
+```
 
 ## Rewrites nested Pydantic interface
 
 ```python
- generation = lf.generation(
+from langfuse.model import InitialGeneration, Usage
+
+generation = lf.generation(
     InitialGeneration(
         name="chatgpt-completion",
         startTime=generationStartTime,
@@ -194,13 +204,27 @@ model.event(
 ```
 
 ```python
-generation = self.langfuse.generation(name="chatgpt-completion",
+from langfuse.model import InitialGeneration, Usage
+
+generation = lf.generation(name="chatgpt-completion",
     start_time=generationStartTime,
     end_time=datetime.now(),
     model=self.model,
     model_parameters={"temperature": str(temperature)},
-    prompt=history,
-    completion=response["choices"][0]["message"]["content"],
+    input=history,
+    output=response["choices"][0]["message"]["content"],
     usage={"promptTokens": 50, "completionTokens": 50},
+)
+```
+
+## Does nothing without langfuse import
+
+```python
+model.event(
+    CreateEvent(
+        name="span",
+        startTime=timestamp,
+        endTime=timestamp,
+    )
 )
 ```
