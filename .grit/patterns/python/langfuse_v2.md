@@ -41,7 +41,13 @@ or {
             $props += `"$name": $value`,
         },
         $params => join($props, `, `),
-    }
+    },
+    `$langfuse.generation($params)`,
+    `$langfuse.score($params)`,
+    `$langfuse.span($params)`,
+    `$langfuse.trace($params)`,
+    `$langfuse.event($params)`,
+    `$generation.update($params)`,
 } where {
     $params <: convert_snake_case(),
     $program <: contains or {
@@ -56,7 +62,7 @@ or {
 ## Rewrites Pydantic interface argument
 
 ```python
-import langfuse
+from langfuse.model import InitialSpan
 
 langfuse.span(
     InitialSpan(
@@ -70,7 +76,7 @@ langfuse.span(
 ```
 
 ```python
-import langfuse
+from langfuse.model import InitialSpan
 
 langfuse.span(
     name="span",
@@ -78,6 +84,28 @@ langfuse.span(
     end_time=timestamp,
     input={"key": "value"},
     output={"key": "value"},
+)
+```
+
+## Snake cases parameters without Pydantic
+
+```python
+import langfuse
+
+generation = observation.generation(
+    name='name',
+    prompt=kwargs['messages'],
+    startTime=dt.datetime.utcnow(),
+)
+```
+
+```python
+import langfuse
+
+generation = observation.generation(
+    name='name',
+    prompt=kwargs['messages'],
+    start_time=dt.datetime.utcnow(),
 )
 ```
 
