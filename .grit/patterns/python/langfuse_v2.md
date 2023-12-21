@@ -44,6 +44,8 @@ or {
     `$langfuse.event(CreateEvent($params))` => `$langfuse.event($params)`,
     `$generation.update(UpdateGeneration($params))` => `$generation.update($params)`,
     `$span.update(UpdateSpan($params))` => `$span.update($params)`,
+    `$langfuse.create_dataset_item(CreateDatasetItemRequest($params))` => `$langfuse.create_dataset_item($params)`,
+    `$langfuse.create_dataset(CreateDatasetRequest($params))` => `$langfuse.create_dataset($params)`,
     `usage=Usage($params)` where {
         $props = [],
         $params <: some bubble keyword_argument($name, $value) where {
@@ -57,6 +59,8 @@ or {
     `$langfuse.trace($params)`,
     `$langfuse.event($params)`,
     `$generation.update($params)`,
+    `$langfuse.create_dataset_item($params)`,
+    `$langfuse.create_dataset($params)`,
 } where {
     $params <: convert_snake_case(),
     imports_langfuse(),
