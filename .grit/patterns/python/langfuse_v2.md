@@ -60,12 +60,13 @@ or {
     `$span.update(UpdateSpan($params))` => `$span.update($params)`,
     `$langfuse.create_dataset_item(CreateDatasetItemRequest($params))` => `$langfuse.create_dataset_item($params)`,
     `$langfuse.create_dataset(CreateDatasetRequest($params))` => `$langfuse.create_dataset($params)`,
-    `usage=Usage($params)` where {
+    `usage=Usage($params)` as $usage where {
         $props = [],
         $params <: some bubble($props) keyword_argument($name, $value) where {
             $props += `"$name": $value`,
         },
-        $params => join($props, `, `),
+        $props = join($props, `, `),
+        $usage => `usage={ $props }`,
     },
     `$langfuse.score($params)`,
     `$langfuse.span($params)`,
@@ -174,6 +175,8 @@ model.event(
 ## Rewrites nested Pydantic interface
 
 ```python
+from langfuse.model import InitialGeneration, Usage
+
 generation = lf.generation(
     InitialGeneration(
         name="chatgpt-completion",
@@ -192,13 +195,15 @@ generation = lf.generation(
 ```
 
 ```python
-generation = self.langfuse.generation(name="chatgpt-completion",
+from langfuse.model import InitialGeneration, Usage
+
+generation = lf.generation(name="chatgpt-completion",
     start_time=generationStartTime,
     end_time=datetime.now(),
     model=self.model,
     model_parameters={"temperature": str(temperature)},
-    prompt=history,
-    completion=response["choices"][0]["message"]["content"],
+    input=history,
+    output=response["choices"][0]["message"]["content"],
     usage={"promptTokens": 50, "completionTokens": 50},
 )
 ```
