@@ -33,13 +33,27 @@ pattern convert_snake_case() {
     }
 }
 
+pattern rename_generation_params() {
+    maybe some bubble keyword_argument($name) where {
+        $name <: or {
+            `prompt` => `input`,
+            `completion` => `output`,
+        }
+    },
+}
+
 or {
-    `$langfuse.generation(InitialGeneration($params))` => `$langfuse.generation($params)`,
+    or {
+        `$langfuse.generation(InitialGeneration($params))` => `$langfuse.generation($params)`,
+        `$langfuse.generation(CreateGeneration($params))` => `$langfuse.generation($params)`,
+        `$langfuse.generation($params)`,
+    } where {
+        $params <: rename_generation_params(),
+    },
     `$langfuse.score(InitialScore($params))` => `$langfuse.score($params)`,
     `$langfuse.span(InitialSpan($params))` => `$langfuse.span($params)`,
     `$langfuse.score(CreateScore($params))` => `$langfuse.score($params)`,
     `$langfuse.trace(CreateTrace($params))` => `$langfuse.trace($params)`,
-    `$langfuse.generation(CreateGeneration($params))` => `$langfuse.generation($params)`,
     `$langfuse.span(CreateSpan($params))`=> `$langfuse.span($params)`,
     `$langfuse.event(CreateEvent($params))` => `$langfuse.event($params)`,
     `$generation.update(UpdateGeneration($params))` => `$generation.update($params)`,
@@ -53,7 +67,6 @@ or {
         },
         $params => join($props, `, `),
     },
-    `$langfuse.generation($params)`,
     `$langfuse.score($params)`,
     `$langfuse.span($params)`,
     `$langfuse.trace($params)`,
@@ -95,6 +108,35 @@ langfuse.span(
 )
 ```
 
+## Renames `prompt` and `completion` to `input` and `output`
+
+```python
+from langfuse import *
+
+client.generation(InitialGeneration(
+        name="some_generation",
+        startTime=start_time,
+        endTime=end_time,
+        prompt=prompt,
+        completion=completion,
+        metadata=metadata
+    )
+)
+```
+
+```python
+from langfuse import *
+
+client.generation(
+    name="some_generation",
+    start_time=start_time,
+    end_time=end_time,
+    input=prompt,
+    output=completion,
+    metadata=metadata
+)
+```
+
 ## Snake cases parameters without Pydantic
 
 ```python
@@ -112,7 +154,7 @@ import langfuse
 
 generation = observation.generation(
     name='name',
-    prompt=kwargs['messages'],
+    input=kwargs['messages'],
     start_time=dt.datetime.utcnow(),
 )
 ```
