@@ -153,3 +153,21 @@ const Component = () => {
   );
 };
 ```
+
+## Avoid duplicate imports
+
+```js
+import * as foo from 'abc';
+
+foo.thing();
+foo.other();
+foo.thing();
+```
+
+```js
+import { thing, other } from 'abc';
+
+thing();
+other();
+thing();
+```
