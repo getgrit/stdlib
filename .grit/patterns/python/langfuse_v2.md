@@ -10,6 +10,15 @@ tags: #python, #upgrade, #langfuse, #migration
 engine marzano(0.1)
 language python
 
+predicate imports_langfuse() {
+    $program <: contains or {
+        import_from_statement(),
+        import_statement()
+    } as $import where {
+        $import <: contains `langfuse`,
+    },
+}
+
 pattern convert_snake_case() {
     maybe contains any {
         `traceId` => `trace_id`,
@@ -50,12 +59,7 @@ or {
     `$generation.update($params)`,
 } where {
     $params <: convert_snake_case(),
-    $program <: contains or {
-        import_from_statement(),
-        import_statement()
-    } as $import where {
-        $import <: contains `langfuse`,
-    },
+    imports_langfuse(),
 }
 ```
 
