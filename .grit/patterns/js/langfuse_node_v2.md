@@ -1,0 +1,49 @@
+---
+title: Upgrade Langfuse to v2
+---
+
+Upgrade the Langfuse SDK to v2 following [this guide](https://langfuse.com/docs/sdk/typescript#upgrade1to2).
+
+tags: #js, #ts, #npm, #upgrade, #langfuse, #migration
+
+```grit
+engine marzano(0.1)
+language js
+
+`$_.generation({ $params })` where {
+    $params <: contains bubble pair($key) where {
+        $key <: or {
+            `prompt` => `input`,
+            `completion` => `output`,
+        }
+    },
+}
+```
+
+## Rewrites generation parameters
+
+```js
+const generation = trace.generation({
+  name: 'chat-completion',
+  model: 'gpt-3.5-turbo',
+  modelParameters: {
+    temperature: 0.9,
+    maxTokens: 2000,
+  },
+  prompt: messages,
+  completion: 'completion',
+});
+```
+
+```ts
+const generation = trace.generation({
+  name: 'chat-completion',
+  model: 'gpt-3.5-turbo',
+  modelParameters: {
+    temperature: 0.9,
+    maxTokens: 2000,
+  },
+  input: messages,
+  output: 'completion',
+});
+```
