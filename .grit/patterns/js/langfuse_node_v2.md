@@ -2,7 +2,7 @@
 title: Upgrade Langfuse to v2
 ---
 
-Upgrade the Langfuse SDK to v4 following [this guide](https://langfuse.com/docs/sdk/typescript#upgrade1to2).
+Upgrade the Langfuse SDK to v2 following [this guide](https://langfuse.com/docs/sdk/typescript#upgrade1to2).
 
 tags: #js, #ts, #npm, #upgrade, #langfuse, #migration
 
@@ -10,7 +10,14 @@ tags: #js, #ts, #npm, #upgrade, #langfuse, #migration
 engine marzano(0.1)
 language js
 
-transform_langfuse_generation()
+`$_.generation({ $params })` where {
+    $params <: contains bubble pair($key) where {
+        $key <: or {
+            `prompt` => `input`,
+            `completion` => `output`,
+        }
+    },
+}
 ```
 
 ## Rewrites generation parameters
