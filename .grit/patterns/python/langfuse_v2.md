@@ -47,7 +47,7 @@ or {
 }
 ```
 
-## Rewrites Pydantic interfaces
+## Rewrites Pydantic interface argument
 
 ```python
 import langfuse
@@ -72,5 +72,39 @@ langfuse.span(
     end_time=timestamp,
     input={"key": "value"},
     output={"key": "value"},
+)
+```
+
+# Needs CLI deploy
+
+## Rewrites nested Pydantic interface
+
+```python
+ generation = lf.generation(
+    InitialGeneration(
+        name="chatgpt-completion",
+        startTime=generationStartTime,
+        endTime=datetime.now(),
+        model=self.model,
+        modelParameters={"temperature": str(temperature)},
+        prompt=history,
+        completion=response["choices"][0]["message"]["content"],
+        usage=Usage(
+            promptTokens=50,
+            completionTokens=50,
+        ),
+    )
+)
+```
+
+```python
+generation = self.langfuse.generation(name="chatgpt-completion",
+    start_time=generationStartTime,
+    end_time=datetime.now(),
+    model=self.model,
+    model_parameters={"temperature": str(temperature)},
+    prompt=history,
+    completion=response["choices"][0]["message"]["content"],
+    usage={"promptTokens": 50, "completionTokens": 50},
 )
 ```
