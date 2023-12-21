@@ -7,3 +7,13 @@ function concat($list_a, $list_b) {
   $list_b <: some bubble($new_list) $item where $new_list += $item,
   return $new_list
 }
+
+// Deduplicate a list
+function deduplicate($list) {
+  $new_list = [],
+  $list <: some bubble($new_list) $item where {
+    !$new_list <: some bubble($item) $item,
+    $new_list += $item
+  },
+  return $new_list
+}
