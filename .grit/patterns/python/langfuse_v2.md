@@ -38,12 +38,20 @@ or {
     }
 } where {
     $params <: convert_snake_case(),
+    $program <: contains or {
+        import_from_statement(),
+        import_statement()
+    } as $import where {
+        $import <: contains `langfuse`,
+    },
 }
 ```
 
 ## Rewrites Pydantic interfaces
 
 ```python
+import langfuse
+
 langfuse.span(
     InitialSpan(
         name="span",
@@ -56,6 +64,8 @@ langfuse.span(
 ```
 
 ```python
+import langfuse
+
 langfuse.span(
     name="span",
     start_time=timestamp,
