@@ -33,6 +33,10 @@ pattern convert_snake_case() {
     }
 }
 
+pattern convert_pydantic_enum() {
+    maybe some `level=ObservationLevel.$level` => `level="$level"`,
+}
+
 pattern rename_generation_params() {
     maybe some bubble keyword_argument($name) where {
         $name <: or {
@@ -77,6 +81,7 @@ or {
     `$langfuse.create_dataset($params)`,
 } where {
     $params <: convert_snake_case(),
+    $params <: convert_pydantic_enum(),
     imports_langfuse(),
 }
 ```
@@ -160,16 +165,20 @@ generation = observation.generation(
 )
 ```
 
-## Does nothing without langfuse import
+## Converts Pydantic enum
 
 ```python
-model.event(
-    CreateEvent(
-        name="span",
-        startTime=timestamp,
-        endTime=timestamp,
-    )
-)
+from langfuse.model import InitialGeneration
+from langfuse.api.resources.commons.types.observation_level import ObservationLevel
+
+langfuse.generation(InitialGeneration(level=ObservationLevel.ERROR))
+```
+
+```python
+from langfuse.model import InitialGeneration
+from langfuse.api.resources.commons.types.observation_level import ObservationLevel
+
+langfuse.generation(level="ERROR")
 ```
 
 ## Rewrites nested Pydantic interface
@@ -205,5 +214,17 @@ generation = lf.generation(name="chatgpt-completion",
     input=history,
     output=response["choices"][0]["message"]["content"],
     usage={"promptTokens": 50, "completionTokens": 50},
+)
+```
+
+## Does nothing without langfuse import
+
+```python
+model.event(
+    CreateEvent(
+        name="span",
+        startTime=timestamp,
+        endTime=timestamp,
+    )
 )
 ```
