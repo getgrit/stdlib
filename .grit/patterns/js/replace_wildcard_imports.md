@@ -31,6 +31,7 @@ pattern replace_wildcard_import() {
     $refs = [],
     $kept_refs = [],
     $program <: contains used_alias($alias, $refs, $kept_refs),
+    $refs = distinct($refs),
     $joined_refs = join($refs, `, `),
     // Try the different scenarios
     if ($refs <: []) {
@@ -152,4 +153,22 @@ const Component = () => {
     </King>
   );
 };
+```
+
+## Avoid duplicate imports
+
+```js
+import * as foo from 'abc';
+
+foo.thing();
+foo.other();
+foo.thing();
+```
+
+```js
+import { thing, other } from 'abc';
+
+thing();
+other();
+thing();
 ```
