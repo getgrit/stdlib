@@ -56,10 +56,9 @@ pattern remove_import() {
           $full_import => .
         }
       },
-      // `import $mod` as $import where {
-      //   $mod <: $name,
-      //   $import => .
-      // }
+      `import $mod` where {
+        $mod <: $name
+      } => .
     }
   }
 }
