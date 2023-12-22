@@ -130,3 +130,25 @@ useCallback((shadowed) => {
   console.log(shadowed); // 20
 });
 ```
+
+## Catch clause
+
+```js
+var e = 'global';
+try {
+  throw new Error();
+} catch (e) {
+  console.log(e);
+}
+console.log(e); // "global"
+```
+
+```js
+var e = 'global';
+try {
+  throw new Error();
+} catch (shadowed) {
+  console.log(shadowed);
+}
+console.log(e); // "global"
+```
