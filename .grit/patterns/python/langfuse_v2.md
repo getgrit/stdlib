@@ -34,7 +34,10 @@ pattern convert_snake_case() {
 }
 
 pattern convert_pydantic_enum() {
-    maybe some `level=ObservationLevel.$level` => `level="$level"`,
+    maybe some `level=ObservationLevel.$level` => `level="$level"` where {
+        $obs_level = `ObservationLevel`,
+        $obs_level <: remove_import()
+    }
 }
 
 pattern rename_generation_params() {
