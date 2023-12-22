@@ -207,6 +207,7 @@ langfuse.generation(level="ERROR")
 
 ```python
 from langfuse.model import InitialGeneration, Usage
+import langfuse as lf
 
 generation = lf.generation(
     InitialGeneration(
@@ -226,6 +227,8 @@ generation = lf.generation(
 ```
 
 ```python
+import langfuse as lf
+
 generation = lf.generation(name="chatgpt-completion",
     start_time=generationStartTime,
     end_time=datetime.now(),
