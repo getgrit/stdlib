@@ -23,7 +23,9 @@ contains or {
     $bob <: `thingbob` => `$newbob`,
     $newbob <: ensure_import_from(source=`ourlib.goodlib`),
   },
-  `` where {}
+  `$badimport.remove_parent()` where {
+    $badimport <: remove_import()
+  }
 }
 ```
 
@@ -134,13 +136,13 @@ othermodule.TestCase()
 Grit can handle removing single imports from packages, and the entire package if no imports are left.
 
 ```python
-import somelib from somewhere
-import foolib, keeplib from elsewhere
+from somewhere import somelib
+from elsewhere import foolib, keeplib
 
 somelib.remove_parent()
 foolib.remove_parent()
 ```
 
 ```python
-import keeplib from elsewhere
+from elsewhere import keeplib
 ```
