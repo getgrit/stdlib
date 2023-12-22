@@ -690,3 +690,43 @@ test('Trivial test @Projects @Studio @Email', async ({ page, factory, context })
   await expect(page.locator(`input[name="${username}"]`)).toHaveValue('admin');
 });
 ```
+
+## Converts Before and After hooks
+
+```js
+Feature('Project page');
+
+BeforeSuite(({ I }) => {
+  I.say('Ensure that you have access to the project');
+});
+
+Scenario('Trivial test', async ({ I }) => {
+  projectPage.open();
+})
+  .tag('Email')
+  .tag('Studio')
+  .tag('Projects');
+
+After(async ({ I }) => {
+  await resetProjectSettings();
+});
+```
+
+```js
+import { expect } from "@playwright/test";
+
+test.describe('Project page', () => {
+  test.beforeAll(async ({ page, request })) => {
+    console.log('Ensure that you have access to the project');
+  }
+
+  test.afterEach(async ({ page, request })) => {
+    await resetProjectSettings();
+  }
+
+  test('Trivial test @Projects @Studio @Email', async ({ page, factory, context }) => {
+    var projectPage = new ProjectPage(page, context);
+    await projectPage.open();
+  });
+});
+```
