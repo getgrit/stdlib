@@ -131,35 +131,49 @@ import othermodule
 othermodule.TestCase()
 ```
 
-## Remove imports
+## Remove imports - base case
 
 Grit can handle removing single imports from packages, and the entire package if no imports are left.
 
 ```python
 from somewhere import somelib
 from elsewhere import foolib, keeplib
+
+somelib.remove_parent()
+foolib.remove_parent()
+
+```
+
+```python
+from elsewhere import keeplib
+
+somelib.remove_parent()
+foolib.remove_parent()
+```
+
+## Remove imports - complex cases
+
+```python
 import entirelib
 import secretlib as aliasedlib
 from complicated_alias import coolstuff as badlib
 # Keep this, even though it *looks* like it could be related
 from confusing_lib import somelib as otherlib
 
-somelib.remove_parent()
-foolib.remove_parent()
-# entirelib.remove_parent()
-# aliasedlib.remove_parent()
-# badlib.remove_parent()
+entirelib.remove_parent()
+aliasedlib.remove_parent()
+badlib.remove_parent()
 
 ```
 
 ```python
-from elsewhere import keeplib
+import entirelib
+import secretlib as aliasedlib
+from complicated_alias import coolstuff as badlib
 # Keep this, even though it *looks* like it could be related
 from confusing_lib import somelib as otherlib
 
-somelib.remove_parent()
-foolib.remove_parent()
-# entirelib.remove_parent()
-# aliasedlib.remove_parent()
-# badlib.remove_parent()
+entirelib.remove_parent()
+aliasedlib.remove_parent()
+badlib.remove_parent()
 ```
