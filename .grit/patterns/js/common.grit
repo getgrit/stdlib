@@ -20,3 +20,11 @@ pattern should_follow_semi() {
     }
   }
 }
+
+// Common alias for var, let, and const declarations.
+pattern variable($declarations) {
+  or {
+    variable_declaration($declarations),
+    lexical_declaration($declarations)
+  }
+}

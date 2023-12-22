@@ -30,7 +30,7 @@ pattern replace_wildcard_import() {
   `import * as $alias from $src` as $import where {
     $refs = [],
     $kept_refs = [],
-    $program <: contains used_alias($alias, $refs, $kept_refs),
+    $program <: contains used_alias($alias, $refs, $kept_refs) until scope_shadows_var(name=$alias),
     $refs = distinct($refs),
     $joined_refs = join($refs, `, `),
     // Try the different scenarios
@@ -171,4 +171,28 @@ import { thing, other } from 'abc';
 thing();
 other();
 thing();
+```
+
+## Avoid shadowed imports
+
+```js
+import * as foo from 'abc';
+
+console.log(foo.bar);
+
+const log = (foo) => {
+  foo.log('nice stuff');
+  foo.other();
+};
+```
+
+```js
+import { bar } from 'abc';
+
+console.log(bar);
+
+const log = (foo) => {
+  foo.log('nice stuff');
+  foo.other();
+};
 ```
