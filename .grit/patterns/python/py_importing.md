@@ -138,9 +138,13 @@ Grit can handle removing single imports from packages, and the entire package if
 ```python
 from somewhere import somelib
 from elsewhere import foolib, keeplib
+import entirelib
+import secretlib as aliasedlib
 
 somelib.remove_parent()
 foolib.remove_parent()
+entirelib.remove_parent()
+aliasedlib.remove_parent()
 ```
 
 ```python
