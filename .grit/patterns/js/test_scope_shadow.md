@@ -10,7 +10,7 @@ language js
 // Implementation
 pattern scope_shadows_var($variable_name) {
   statement_block($statements) where {
-    $statements <: some variable_declaration($declarations) where {
+    $statements <: some variable($declarations) where {
       $declarations <: contains variable_declarator(name=`x`)
     }
   }
@@ -61,7 +61,7 @@ if (true) {
   let shadowed = 40;
   console.log(shadowed);
 }
-console.log(x); // 30
+console.log(x);
 ```
 
 ## For loop
