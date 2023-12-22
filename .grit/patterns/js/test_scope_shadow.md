@@ -81,3 +81,37 @@ useCallback((x) => {
   console.log(x); // 20
 });
 ```
+
+## Function params
+
+```js
+function shadowingExample(x) {
+  console.log(x);
+}
+x = 30;
+shadowingExample(20);
+```
+
+```js
+function shadowingExample(shadowed) {
+  console.log(shadowed);
+}
+x = 30;
+shadowingExample(20);
+```
+
+## Arrow function params
+
+```js
+var x = 10;
+useCallback((x) => {
+  console.log(x); // 20
+});
+```
+
+```js
+var x = 10;
+useCallback((shadowed) => {
+  console.log(shadowed); // 20
+});
+```
