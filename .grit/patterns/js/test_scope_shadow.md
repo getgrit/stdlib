@@ -21,6 +21,9 @@ pattern scope_shadows_var($name) {
     function_declaration($parameters) where {
       $parameters <: contains $name
     },
+    `try { $_ } catch($catch) { $_ }` where {
+      $catch <: contains $name
+    },
   }
 }
 
@@ -134,21 +137,21 @@ useCallback((shadowed) => {
 ## Catch clause
 
 ```js
-var e = 'global';
+var x = 'global';
 try {
   throw new Error();
-} catch (e) {
-  console.log(e);
+} catch (x) {
+  console.log(x);
 }
-console.log(e); // "global"
+console.log(x); // "global"
 ```
 
 ```js
-var e = 'global';
+var x = 'global';
 try {
   throw new Error();
 } catch (shadowed) {
   console.log(shadowed);
 }
-console.log(e); // "global"
+console.log(x); // "global"
 ```
