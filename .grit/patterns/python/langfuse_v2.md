@@ -192,11 +192,14 @@ generation = observation.generation(
 ```python
 from langfuse.model import InitialGeneration
 from langfuse.api.resources.commons.types.observation_level import ObservationLevel
+import langfuse
 
 langfuse.generation(InitialGeneration(level=ObservationLevel.ERROR))
 ```
 
 ```python
+import langfuse
+
 langfuse.generation(level="ERROR")
 ```
 
