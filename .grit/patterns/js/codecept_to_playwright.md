@@ -202,7 +202,7 @@ pattern convert_locators($page) {
         `I.dragAndDrop($target, $destination, $opts)` => `await $target.dragTo($destination, $opts)`,
         `I.dragAndDrop($target, $destination)` => `await $target.dragTo($destination)`,
         `I.dragSlider($target, $x_offset)` => `await $target.dragTo($target, { targetPosition: { x: $x_offset, y: 0 } })`,
-        `I.dragToPoint($target, $x, $y)` => `await $target.dragTo({ targetPosition: { x: $x, y: $y } })`,
+        `I.dragToPoint($target, $x, $y)` => `await $target.dragTo($target, { targetPosition: { x: $x, y: $y } })`,
         `I.pressKey($key)` => `await $page.keyboard.press($key)`,
         `I.type($keys)` => `await $page.keyboard.type($keys)`,
         `I.refreshPage()` => `await $page.reload()`,
