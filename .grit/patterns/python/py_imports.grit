@@ -42,8 +42,8 @@ pattern process_one_source($p, $all_imports) {
 pattern remove_import() {
   // $name represents the AST node we imported from a package that should be removed
   $name where {
-    $program <: maybe contains `from $src import $name` where {
-      $mods <: contains $name
+    $program <: maybe contains `from $src import $mods` where {
+      $mods <: contains $name => .
     }
   }
 }

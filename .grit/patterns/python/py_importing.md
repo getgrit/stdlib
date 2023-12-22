@@ -8,7 +8,7 @@ Grit includes standard patterns for declaratively adding and updating imports.
 engine marzano(0.1)
 language python
 
-contains or {
+contains bubble or {
   import_from(source="pydantic") => .,
   `$testlib.TestCase` where {
       $newtest = `newtest`,
