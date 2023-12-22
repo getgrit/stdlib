@@ -87,6 +87,13 @@ useCallback((x) => {
 });
 ```
 
+```js
+var x = 10;
+useCallback((shadowed) => {
+  console.log(shadowed); // 20
+});
+```
+
 ## Function params
 
 ```js
