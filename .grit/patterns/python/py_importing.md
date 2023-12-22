@@ -8,25 +8,22 @@ Grit includes standard patterns for declaratively adding and updating imports.
 engine marzano(0.1)
 language python
 
-and {
-    before_each_file(),
-    contains or {
-        import_from(source="pydantic") => .,
-        `$testlib.TestCase` where {
-            $newtest = `newtest`,
-            $testlib <: `unittest` => `$newtest`,
-            $newtest <: ensure_import_from(source=`testing`),
-        },
-        `othermodule` as $other where {
-            $other <: ensure_bare_import()
-        },
-        `$bob.caller` where {
-          $newbob = `newbob`,
-          $bob <: `thingbob` => `$newbob`,
-          $newbob <: ensure_import_from(source=`ourlib.goodlib`),
-        }
-    },
-    after_each_file()
+contains or {
+  import_from(source="pydantic") => .,
+  `$testlib.TestCase` where {
+      $newtest = `newtest`,
+      $testlib <: `unittest` => `$newtest`,
+      $newtest <: ensure_import_from(source=`testing`),
+  },
+  `othermodule` as $other where {
+      $other <: ensure_bare_import()
+  },
+  `$bob.caller` where {
+    $newbob = `newbob`,
+    $bob <: `thingbob` => `$newbob`,
+    $newbob <: ensure_import_from(source=`ourlib.goodlib`),
+  },
+  `` where {}
 }
 ```
 
@@ -130,4 +127,20 @@ othermodule.TestCase()
 import othermodule
 
 othermodule.TestCase()
+```
+
+## Remove imports
+
+Grit can handle removing single imports from packages, and the entire package if no imports are left.
+
+```python
+import somelib from somewhere
+import foolib, keeplib from elsewhere
+
+somelib.remove_parent()
+foolib.remove_parent()
+```
+
+```python
+import keeplib from elsewhere
 ```
