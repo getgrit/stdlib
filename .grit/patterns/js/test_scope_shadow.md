@@ -18,6 +18,9 @@ pattern scope_shadows_var($name) {
     arrow_function($parameters) where {
       $parameters <: contains $name
     },
+    function_declaration($parameters) where {
+      $parameters <: contains $name
+    },
   }
 }
 
