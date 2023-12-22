@@ -11,11 +11,15 @@ pattern before_each_file_prep_imports() {
         $GLOBAL_NEW_BARE_IMPORT_NAMES = [],
         $GLOBAL_NEW_FROM_IMPORT_SOURCES = [],
         $GLOBAL_NEW_FROM_IMPORT_NAMES = [],
+        $GLOBAL_IMPORTS_TO_REMOVE = [],
     }
 }
 
 pattern after_each_file_handle_imports() {
-  file($body) where $body <: maybe insert_imports()
+  file($body) where {
+    $body <: maybe insert_imports(),
+    $body <: maybe handle_remove_imports()
+  }
 }
 
 pattern process_one_source($p, $all_imports) {
@@ -39,29 +43,65 @@ pattern process_one_source($p, $all_imports) {
     }
 }
 
-pattern remove_import() {
+// TODO: remove imports from the global list as we remove them
+pattern handle_one_removal_candidate() {
   // $name represents the AST node we imported from a package that should be removed
-  $name where {
-    $program <: maybe contains bubble($name) or {
-      `from $src import $mods` as $full_import where {
-        $keep_some = false,
-        $mods <: some or {
-          aliased_import(alias=$name) => .,
-          `$name` => .,
-          $other where {
-            $keep_some = true
-          }
-        },
-        if ($keep_some <: false) {
-          $full_import => .
+  or {
+    `from $src import $mods` as $full_import where {
+      $keep_some = false,
+      // $full_import => $GLOBAL_IMPORTS_TO_REMOVE,
+      $mods <: some bubble($keep_some) or {
+        aliased_import(alias=$name) where {
+          $GLOBAL_IMPORTS_TO_REMOVE <: some bubble($name) $name
+        } => .,
+        `$name` where {
+          $GLOBAL_IMPORTS_TO_REMOVE <: some bubble($name) $name
+        } => .,
+        $other where {
+          $keep_some = true
         }
       },
-      `import $mod` where {
-        $mod <: $name
-      } => .,
-      `import $mod as $alias` where {
-        $alias <: $name
-      } => .,
+      if ($keep_some <: false) {
+        $full_import => .
+      }
+    },
+    }
+  }
+  // $name where {
+  //   $program <: maybe contains bubble($name) or {
+  //     `from $src import $mods` as $full_import where {
+  //       $keep_some = false,
+  //       $mods <: some or {
+  //         aliased_import(alias=$name) => .,
+  //         `$name` => .,
+  //         $other where {
+  //           $keep_some = true
+  //         }
+  //       },
+  //       if ($keep_some <: false) {
+  //         $full_import => .
+  //       }
+  //     },
+  //     `import $mod` where {
+  //       $mod <: $name
+  //     } => .,
+  //     `import $mod as $alias` where {
+  //       $alias <: $name
+  //     } => .,
+  //   }
+  // }
+}
+
+pattern handle_remove_imports() {
+  $body where {
+    $body <: contains handle_one_removal_candidate()
+  }
+}
+
+pattern remove_import() {
+  $name where {
+    if ($GLOBAL_IMPORTS_TO_REMOVE <: not some $name) {
+      $GLOBAL_IMPORTS_TO_REMOVE += [$name]
     }
   }
 }
