@@ -138,6 +138,7 @@ Grit can handle removing single imports from packages, and the entire package if
 ```python
 from somewhere import somelib
 from elsewhere import foolib, keeplib
+from otherlib import keepthis
 
 somelib.remove_parent()
 foolib.remove_parent()
@@ -146,6 +147,7 @@ foolib.remove_parent()
 
 ```python
 from elsewhere import keeplib
+from otherlib import keepthis
 
 somelib.remove_parent()
 foolib.remove_parent()
