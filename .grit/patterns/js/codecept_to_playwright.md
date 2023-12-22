@@ -201,7 +201,8 @@ pattern convert_locators($page) {
         `I.moveCursorTo($target)` => `await $target.hover()`,
         `I.dragAndDrop($target, $destination, $opts)` => `await $target.dragTo($destination, $opts)`,
         `I.dragAndDrop($target, $destination)` => `await $target.dragTo($destination)`,
-        `I.dragSlider($target, $x_offset)` => `await $target.dragTo($target, { $position: { x: $x_offset, y: 0 } })`,
+        `I.dragSlider($target, $x_offset)` => `await $target.dragTo($target, { targetPosition: { x: $x_offset, y: 0 } })`,
+        `I.dragToPoint($target, $x, $y)` => `await $target.dragTo($target, { targetPosition: { x: $x, y: $y } })`,
         `I.pressKey($key)` => `await $page.keyboard.press($key)`,
         `I.type($keys)` => `await $page.keyboard.type($keys)`,
         `I.refreshPage()` => `await $page.reload()`,
@@ -560,6 +561,8 @@ myData.add([4, 'Italy', 'Rome']);
 Data(myData)
   .Scenario('Trivial test', { myData }, async ({ I, current }) => {
     I.say(current.capital);
+    I.dragAndDrop(data.label, data.map);
+    I.dragToPoint(data.label, 400, 0);
   })
   .tag('Email')
   .tag('Studio')
@@ -579,6 +582,8 @@ let myData = [
 for (const current of myData) {
   test('Trivial test @Projects @Studio @Email', async ({ page, factory, context }) => {
     console.log(current.capital);
+    await data.label.dragTo(data.map);
+    await data.label.dragTo(data.label, { targetPosition: { x: 400, y: 0 } });
   });
 }
 ```
