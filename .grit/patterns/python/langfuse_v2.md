@@ -34,7 +34,10 @@ pattern convert_snake_case() {
 }
 
 pattern convert_pydantic_enum() {
-    maybe some `level=ObservationLevel.$level` => `level="$level"`,
+    maybe some `level=$obs_level.$level` => `level="$level"` where {
+        $obs_level <: `ObservationLevel`,
+        $obs_level <: remove_import()
+    }
 }
 
 pattern rename_generation_params() {
@@ -44,6 +47,26 @@ pattern rename_generation_params() {
             `completion` => `output`,
         }
     },
+}
+
+pattern prune_langfuse_imports() {
+    maybe contains bubble or {
+        `InitialGeneration`,
+        `CreateGeneration`,
+        `InitialScore`,
+        `InitialSpan`,
+        `CreateScore`,
+        `CreateTrace`,
+        `CreateSpan`,
+        `CreateEvent`,
+        `UpdateGeneration`,
+        `UpdateSpan`,
+        `CreateDatasetItemRequest`,
+        `CreateDatasetRequest`,
+        `Usage`,
+    } as $deprecated where {
+        $deprecated <: remove_import()
+    }
 }
 
 or {
@@ -79,7 +102,8 @@ or {
     `$generation.update($params)`,
     `$langfuse.create_dataset_item($params)`,
     `$langfuse.create_dataset($params)`,
-} where {
+} as $lf_func where {
+    $lf_func <: prune_langfuse_imports(),
     $params <: convert_snake_case(),
     $params <: convert_pydantic_enum(),
     imports_langfuse(),
@@ -103,8 +127,6 @@ langfuse.span(
 ```
 
 ```python
-from langfuse.model import InitialSpan
-
 langfuse.span(
     name="span",
     start_time=timestamp,
@@ -170,13 +192,13 @@ generation = observation.generation(
 ```python
 from langfuse.model import InitialGeneration
 from langfuse.api.resources.commons.types.observation_level import ObservationLevel
+import langfuse
 
 langfuse.generation(InitialGeneration(level=ObservationLevel.ERROR))
 ```
 
 ```python
-from langfuse.model import InitialGeneration
-from langfuse.api.resources.commons.types.observation_level import ObservationLevel
+import langfuse
 
 langfuse.generation(level="ERROR")
 ```
@@ -185,6 +207,7 @@ langfuse.generation(level="ERROR")
 
 ```python
 from langfuse.model import InitialGeneration, Usage
+import langfuse as lf
 
 generation = lf.generation(
     InitialGeneration(
@@ -204,7 +227,7 @@ generation = lf.generation(
 ```
 
 ```python
-from langfuse.model import InitialGeneration, Usage
+import langfuse as lf
 
 generation = lf.generation(name="chatgpt-completion",
     start_time=generationStartTime,
