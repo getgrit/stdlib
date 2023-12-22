@@ -8,25 +8,24 @@ Grit includes standard patterns for declaratively adding and updating imports.
 engine marzano(0.1)
 language python
 
-and {
-    before_each_file(),
-    contains or {
-        import_from(source="pydantic") => .,
-        `$testlib.TestCase` where {
-            $newtest = `newtest`,
-            $testlib <: `unittest` => `$newtest`,
-            $newtest <: ensure_import_from(source=`testing`),
-        },
-        `othermodule` as $other where {
-            $other <: ensure_bare_import()
-        },
-        `$bob.caller` where {
-          $newbob = `newbob`,
-          $bob <: `thingbob` => `$newbob`,
-          $newbob <: ensure_import_from(source=`ourlib.goodlib`),
-        }
-    },
-    after_each_file()
+contains bubble or {
+  import_from(source="pydantic") => .,
+  `$testlib.TestCase` where {
+      $newtest = `newtest`,
+      $testlib <: `unittest` => `$newtest`,
+      $newtest <: ensure_import_from(source=`testing`),
+  },
+  `othermodule` as $other where {
+      $other <: ensure_bare_import()
+  },
+  `$bob.caller` where {
+    $newbob = `newbob`,
+    $bob <: `thingbob` => `$newbob`,
+    $newbob <: ensure_import_from(source=`ourlib.goodlib`),
+  },
+  `$badimport.remove_parent()` where {
+    $badimport <: remove_import()
+  }
 }
 ```
 
@@ -130,4 +129,55 @@ othermodule.TestCase()
 import othermodule
 
 othermodule.TestCase()
+```
+
+## Remove imports - base case
+
+Grit can handle removing single imports from packages, and the entire package if no imports are left.
+
+```python
+from somewhere import somelib
+from elsewhere import foolib, keeplib
+from otherlib import keepthis
+
+somelib.remove_parent()
+foolib.remove_parent()
+
+```
+
+```python
+from elsewhere import keeplib
+from otherlib import keepthis
+
+somelib.remove_parent()
+foolib.remove_parent()
+```
+
+## Remove imports - complex cases
+
+```python
+import entirelib
+import elselib as hiddenlib
+import secretlib as aliasedlib
+from complicated_alias import coolstuff as badlib
+# Keep this, even though it *looks* like it could be related
+from confusing_lib import somelib as otherlib
+
+entirelib.remove_parent()
+aliasedlib.remove_parent()
+badlib.remove_parent()
+hiddenlib.keep_parent()
+
+```
+
+```python
+import elselib as hiddenlib
+# Keep this, even though it *looks* like it could be related
+from confusing_lib import somelib as otherlib
+
+entirelib.remove_parent()
+aliasedlib.remove_parent()
+badlib.remove_parent()
+hiddenlib.keep_parent()
+
 ```

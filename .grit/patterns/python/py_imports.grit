@@ -39,6 +39,33 @@ pattern process_one_source($p, $all_imports) {
     }
 }
 
+pattern remove_import() {
+  // $name represents the AST node we imported from a package that should be removed
+  $name where {
+    $program <: maybe contains bubble($name) or {
+      `from $src import $mods` as $full_import where {
+        $keep_some = false,
+        $mods <: some or {
+          aliased_import(alias=$name) => .,
+          `$name` => .,
+          $other where {
+            $keep_some = true
+          }
+        },
+        if ($keep_some <: false) {
+          $full_import => .
+        }
+      },
+      `import $mod` where {
+        $mod <: $name
+      } => .,
+      `import $mod as $alias` where {
+        $alias <: $name
+      } => .,
+    }
+  }
+}
+
 pattern insert_imports() {
     $body where {
         $all_imports = "",
