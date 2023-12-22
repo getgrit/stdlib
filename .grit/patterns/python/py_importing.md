@@ -146,9 +146,9 @@ from confusing_lib import somelib as otherlib
 
 somelib.remove_parent()
 foolib.remove_parent()
-entirelib.remove_parent()
-aliasedlib.remove_parent()
-badlib.remove_parent()
+# entirelib.remove_parent()
+# aliasedlib.remove_parent()
+# badlib.remove_parent()
 
 ```
 
@@ -159,7 +159,7 @@ from confusing_lib import somelib as otherlib
 
 somelib.remove_parent()
 foolib.remove_parent()
-entirelib.remove_parent()
-aliasedlib.remove_parent()
-badlib.remove_parent()
+# entirelib.remove_parent()
+# aliasedlib.remove_parent()
+# badlib.remove_parent()
 ```

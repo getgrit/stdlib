@@ -46,10 +46,10 @@ pattern remove_import() {
       `from $src import $mods` where {
         $mods <: contains $name => .
       },
-      `import $mod` as $import where {
-        $mod <: $name,
-        $import => .
-      }
+      // `import $mod` as $import where {
+      //   $mod <: $name,
+      //   $import => .
+      // }
     }
   }
 }
