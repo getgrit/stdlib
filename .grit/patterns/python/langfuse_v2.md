@@ -103,8 +103,6 @@ langfuse.span(
 ```
 
 ```python
-from langfuse.model import InitialSpan
-
 langfuse.span(
     name="span",
     start_time=timestamp,
@@ -175,9 +173,6 @@ langfuse.generation(InitialGeneration(level=ObservationLevel.ERROR))
 ```
 
 ```python
-from langfuse.model import InitialGeneration
-from langfuse.api.resources.commons.types.observation_level import ObservationLevel
-
 langfuse.generation(level="ERROR")
 ```
 
@@ -204,8 +199,6 @@ generation = lf.generation(
 ```
 
 ```python
-from langfuse.model import InitialGeneration, Usage
-
 generation = lf.generation(name="chatgpt-completion",
     start_time=generationStartTime,
     end_time=datetime.now(),
