@@ -49,7 +49,6 @@ pattern handle_one_removal_candidate() {
   or {
     `from $src import $mods` as $full_import where {
       $keep_some = false,
-      // $full_import => $GLOBAL_IMPORTS_TO_REMOVE,
       $mods <: some bubble($keep_some) or {
         aliased_import(alias=$name) where {
           $GLOBAL_IMPORTS_TO_REMOVE <: some bubble($name) $name
@@ -65,31 +64,13 @@ pattern handle_one_removal_candidate() {
         $full_import => .
       }
     },
-    }
+    `import $mod` where {
+      $GLOBAL_IMPORTS_TO_REMOVE <: some bubble($mod) $mod
+    } => .,
+    `import $mod as $alias` where {
+      $GLOBAL_IMPORTS_TO_REMOVE <: some bubble($alias) $alias
+    } => .,
   }
-  // $name where {
-  //   $program <: maybe contains bubble($name) or {
-  //     `from $src import $mods` as $full_import where {
-  //       $keep_some = false,
-  //       $mods <: some or {
-  //         aliased_import(alias=$name) => .,
-  //         `$name` => .,
-  //         $other where {
-  //           $keep_some = true
-  //         }
-  //       },
-  //       if ($keep_some <: false) {
-  //         $full_import => .
-  //       }
-  //     },
-  //     `import $mod` where {
-  //       $mod <: $name
-  //     } => .,
-  //     `import $mod as $alias` where {
-  //       $alias <: $name
-  //     } => .,
-  //   }
-  // }
 }
 
 pattern handle_remove_imports() {
