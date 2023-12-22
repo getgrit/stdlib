@@ -8,11 +8,16 @@ tags: #utility, #test
 language js
 
 // Implementation
-pattern scope_shadows_var($variable_name) {
-  statement_block($statements) where {
-    $statements <: some variable($declarations) where {
-      $declarations <: contains variable_declarator(name=`x`)
-    }
+pattern scope_shadows_var($name) {
+  or {
+    statement_block($statements) where {
+      $statements <: some variable($declarations) where {
+        $declarations <: contains variable_declarator(name=$name)
+      }
+    },
+    arrow_function($parameters) where {
+      $parameters <: contains $name
+    },
   }
 }
 
