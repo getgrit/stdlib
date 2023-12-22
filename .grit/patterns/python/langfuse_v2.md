@@ -46,6 +46,26 @@ pattern rename_generation_params() {
     },
 }
 
+pattern prune_langfuse_imports() {
+    maybe contains bubble or {
+        `InitialGeneration`,
+        `CreateGeneration`,
+        `InitialScore`,
+        `InitialSpan`,
+        `CreateScore`,
+        `CreateTrace`,
+        `CreateSpan`,
+        `CreateEvent`,
+        `UpdateGeneration`,
+        `UpdateSpan`,
+        `CreateDatasetItemRequest`,
+        `CreateDatasetRequest`,
+        `Usage`,
+    } as $deprecated where {
+        $deprecated <: remove_import()
+    }
+}
+
 or {
     or {
         `$langfuse.generation(InitialGeneration($params))` => `$langfuse.generation($params)`,
@@ -79,7 +99,8 @@ or {
     `$generation.update($params)`,
     `$langfuse.create_dataset_item($params)`,
     `$langfuse.create_dataset($params)`,
-} where {
+} as $lf_func where {
+    $lf_func <: prune_langfuse_imports(),
     $params <: convert_snake_case(),
     $params <: convert_pydantic_enum(),
     imports_langfuse(),
