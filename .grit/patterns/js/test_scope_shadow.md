@@ -1,6 +1,6 @@
 ## Test shadow scope
 
-This tests the `shadows_variable` pattern by finding all cases where a variable is shadowed.
+This tests the `shadows_identifier` pattern by finding all cases where a variable is shadowed.
 
 tags: #utility, #test
 
@@ -8,7 +8,7 @@ tags: #utility, #test
 language js
 
 // Implementation
-pattern scope_shadows_identifier($name) {
+pattern shadows_identifier($name) {
   or {
     statement_block($statements) where {
       $statements <: some variable($declarations) where {
@@ -28,7 +28,7 @@ pattern scope_shadows_identifier($name) {
 }
 
 // Test case
-scope_shadows_identifier(`x`) as $scope where {
+shadows_identifier(`x`) as $scope where {
   $scope <: contains `x` => `shadowed`
 }
 ```
