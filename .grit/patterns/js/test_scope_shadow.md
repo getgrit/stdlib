@@ -10,7 +10,9 @@ language js
 // Implementation
 pattern scope_shadows_var($variable_name) {
   statement_block($statements) where {
-    $statements <: contains variable_declarator(name=`x`)
+    $statements <: some variable_declaration($declarations) where {
+      $declarations <: contains variable_declarator(name=`x`)
+    }
   }
 }
 
@@ -24,7 +26,7 @@ scope_shadows_var(`x`) as $scope where {
 
 ```js
 function shadowingExample() {
-  var x = 20; // This 'x' shadows the outer 'x'
+  var x = 20;
   console.log(x);
 }
 function notShadowingVar() {
@@ -35,8 +37,8 @@ shadowingExample();
 
 ```js
 function shadowingExample() {
-  var x = 20; // This 'x' shadows the outer 'x'
-  console.log(x);
+  var shadowed = 20;
+  console.log(shadowed);
 }
 function notShadowingVar() {
   console.log(x);
