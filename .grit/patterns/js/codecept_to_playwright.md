@@ -37,7 +37,6 @@ pattern convert_test() {
         $params <: contains `I`,
         convert_tags($scenario, $description),
         $body <: maybe contains bubble or {
-            `I.say($log)` => `console.log($log)`,
             `I.updateField` => `this.updateField`,
             `I.selectInDropdownByLocators` => `this.selectInDropdownByLocators`,
             `I.selectInDropdown` => `this.selectInDropdown`,
@@ -219,6 +218,7 @@ pattern convert_locators($page) {
         `I.backToPreviousPage()` => `await $page.goBack()`,
         `I.seeCheckboxIsChecked($target)` => `await expect($target).toBeChecked()`,
         `I.grabTextFrom($target)` => `page.locator($target).allInnerTexts()`,
+        `I.say($log)` => `console.log($log)`,
     } where {
         if (! $target <: undefined) {
             $target <: maybe or {
@@ -230,6 +230,17 @@ pattern convert_locators($page) {
             },
         }
     },
+}
+
+pattern convert_hooks() {
+    or {
+        `BeforeSuite(({ $params }) => { $body })` => `test.beforeAll(async ({ page, request }) => { $body })`,
+        `Before(({ $params }) => { $body })` => `test.beforeEach(async ({ page, request }) => { $body })`,
+        `After(({ $params }) => { $body })` => `test.afterEach(async ({ page, request }) => { $body })`,
+        `AfterSuite(({ $params }) => { $body })` => `test.afterAll(async ({ page, request }) => { $body })`,
+    } where {
+        $body <: maybe contains bubble convert_locators(page=`page`),
+    }
 }
 
 pattern convert_base_page() {
@@ -291,6 +302,7 @@ sequential {
         convert_test(),
         convert_parameterized_test(),
         convert_data_table(),
+        convert_hooks(),
         convert_base_page(),
     } where {
         $expect = `expect`,
@@ -688,5 +700,45 @@ test('Trivial test @Projects @Studio @Email', async ({ page, factory, context })
   await page.locator('.list' + ' ' + className).waitFor({ state: 'visible' });
   await expect(page.locator('.grit-sample')).toHaveCount(3);
   await expect(page.locator(`input[name="${username}"]`)).toHaveValue('admin');
+});
+```
+
+## Converts Before and After hooks
+
+```js
+Feature('Project page');
+
+BeforeSuite(({ I }) => {
+  I.say('Ensure that you have access to the project');
+});
+
+Scenario('Trivial test', async ({ I }) => {
+  projectPage.open();
+})
+  .tag('Email')
+  .tag('Studio')
+  .tag('Projects');
+
+After(async ({ I }) => {
+  await resetProjectSettings();
+});
+```
+
+```js
+import { expect } from '@playwright/test';
+
+test.describe('Project page', () => {
+  test.beforeAll(async ({ page, request }) => {
+    console.log('Ensure that you have access to the project');
+  });
+
+  test('Trivial test @Projects @Studio @Email', async ({ page, factory, context }) => {
+    var projectPage = new ProjectPage(page, context);
+    await projectPage.open();
+  });
+
+  test.afterEach(async ({ page, request }) => {
+    await resetProjectSettings();
+  });
 });
 ```
