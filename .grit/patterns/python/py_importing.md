@@ -157,6 +157,7 @@ foolib.remove_parent()
 
 ```python
 import entirelib
+import elselib as hiddenlib
 import secretlib as aliasedlib
 from complicated_alias import coolstuff as badlib
 # Keep this, even though it *looks* like it could be related
@@ -165,14 +166,18 @@ from confusing_lib import somelib as otherlib
 entirelib.remove_parent()
 aliasedlib.remove_parent()
 badlib.remove_parent()
+hiddenlib.keep_parent()
 
 ```
 
 ```python
+import elselib as hiddenlib
 # Keep this, even though it *looks* like it could be related
 from confusing_lib import somelib as otherlib
 
 entirelib.remove_parent()
 aliasedlib.remove_parent()
 badlib.remove_parent()
+hiddenlib.keep_parent()
+
 ```
