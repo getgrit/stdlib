@@ -561,6 +561,8 @@ myData.add([4, 'Italy', 'Rome']);
 Data(myData)
   .Scenario('Trivial test', { myData }, async ({ I, current }) => {
     I.say(current.capital);
+    I.dragAndDrop(data.label, data.map);
+    I.dragToPoint(data.label, 400, 0);
   })
   .tag('Email')
   .tag('Studio')
@@ -580,6 +582,8 @@ let myData = [
 for (const current of myData) {
   test('Trivial test @Projects @Studio @Email', async ({ page, factory, context }) => {
     console.log(current.capital);
+    await data.label.dragTo(data.map);
+    await data.label.dragTo(data.label, { targetPosition: { x: 400, y: 0 } });
   });
 }
 ```
