@@ -45,3 +45,37 @@ function notShadowingVar() {
 }
 shadowingExample();
 ```
+
+## If statement
+
+```js
+var y = 30;
+if (true) {
+  let y = 40; // This 'y' shadows the outer 'y'
+  console.log(y); // 40
+}
+console.log(y); // 30
+```
+
+```
+
+```
+
+## For loop
+
+```js
+var x = 10;
+for (var x = 0; x < 5; x++) {
+  console.log(x); // 0, 1, 2, 3, 4
+}
+console.log(x); // 5
+```
+
+## Arrow function
+
+```js
+var x = 10;
+useCallback((x) => {
+  console.log(x); // 20
+});
+```
