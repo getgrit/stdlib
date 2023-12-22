@@ -172,3 +172,27 @@ thing();
 other();
 thing();
 ```
+
+## Avoid shadowed imports
+
+```js
+import * as foo from 'abc';
+
+console.log(foo.bar);
+
+const log = (foo) => {
+  foo.log('nice stuff');
+  foo.other();
+};
+```
+
+```js
+import { bar } from 'abc';
+
+console.log(bar);
+
+const log = (foo) => {
+  foo.log('nice stuff');
+  foo.other();
+};
+```
