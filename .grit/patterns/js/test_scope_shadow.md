@@ -50,14 +50,18 @@ shadowingExample();
 
 ```js
 if (true) {
-  let x = 40; // This 'y' shadows the outer 'y'
-  console.log(x); // 40
+  let x = 40;
+  console.log(x);
+}
+console.log(x);
+```
+
+```
+if (true) {
+  let shadowed = 40;
+  console.log(shadowed);
 }
 console.log(x); // 30
-```
-
-```
-
 ```
 
 ## For loop
