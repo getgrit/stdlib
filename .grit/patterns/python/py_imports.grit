@@ -101,8 +101,6 @@ pattern ensure_import_from($source) {
     }
 }
 
-
-
 pattern is_bare_imported() {
     $name where {
         $program <: module($statements),
