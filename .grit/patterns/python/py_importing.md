@@ -181,3 +181,17 @@ badlib.remove_parent()
 hiddenlib.keep_parent()
 
 ```
+
+## Remove multiple imports from the same package
+
+```python
+from elsewhere import foolib, badlib
+
+foolib.remove_parent()
+badlib.remove_parent()
+```
+
+```python
+foolib.remove_parent()
+badlib.remove_parent()
+```
