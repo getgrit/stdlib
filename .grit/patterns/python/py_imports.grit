@@ -47,7 +47,7 @@ pattern remove_import() {
         $mods <: contains or {
           aliased_import(alias=$name) => .,
           `$name` => .
-        }
+        } until aliased_import()
       },
       // `import $mod` as $import where {
       //   $mod <: $name,
