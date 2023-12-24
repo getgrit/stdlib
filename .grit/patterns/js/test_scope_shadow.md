@@ -83,15 +83,6 @@ if (true) {
 console.log(x);
 ```
 
-## For loop
-
-```js
-for (var x = 0; x < 5; x++) {
-  console.log(x); // 0, 1, 2, 3, 4
-}
-console.log(x); // 5
-```
-
 ## Arrow function
 
 ```js
