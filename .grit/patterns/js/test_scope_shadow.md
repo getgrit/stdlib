@@ -166,6 +166,10 @@ for (var x = 0; x < 5; x++) {
 for (const x of []) {
   console.log(x.baz);
 }
+// async loop
+for await (const x of []) {
+  console.log(x.baz);
+}
 console.log(x);
 ```
 
@@ -175,6 +179,10 @@ for (var shadowed = 0; shadowed < 5; shadowed++) {
   console.log(shadowed);
 }
 for (const shadowed of []) {
+  console.log(shadowed.baz);
+}
+// async loop
+for await (const shadowed of []) {
   console.log(shadowed.baz);
 }
 console.log(x);
