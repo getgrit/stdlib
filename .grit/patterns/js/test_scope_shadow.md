@@ -75,7 +75,7 @@ if (true) {
 console.log(x);
 ```
 
-```
+```js
 if (true) {
   let shadowed = 40;
   console.log(shadowed);
