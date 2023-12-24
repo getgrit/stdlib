@@ -208,6 +208,7 @@ pattern convert_locators($page) {
         `I.scrollTo($target)` => `await $target.scrollIntoViewIfNeeded()`,
         `I.attachFile($target, $file)` => `await $target.setInputFiles($file)`,
         `I.clearFieldValue($field)` => `await $field.clear()`,
+        `I.fillFieldViaPressKeys($target, $value)` => `await $target.fill($value)`,
         `I.grabNumberOfVisibleElements($target)` => `await $target.count()`,
         `I.seeNumberOfVisibleElements($target, $count)` => `expect(await $target.count()).toEqual($count)`,
         `I.waitNumberOfVisibleElements($target, $count)` => `await expect($target).toHaveCount($count)`,
