@@ -240,6 +240,7 @@ pattern convert_hooks() {
         `After(({ $params }) => { $body })` => `test.afterEach(async ({ page, request }) => { $body })`,
         `AfterSuite(({ $params }) => { $body })` => `test.afterAll(async ({ page, request }) => { $body })`,
     } where {
+        $body <: not contains `loginAs('admin')`,
         $body <: maybe contains bubble convert_locators(page=`page`),
     }
 }
