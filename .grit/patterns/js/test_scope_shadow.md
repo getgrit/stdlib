@@ -21,6 +21,12 @@ pattern shadows_identifier($name) {
     function_declaration($parameters) where {
       $parameters <: contains $name
     },
+    for_in_statement() as $statement where {
+      $statement <: contains $name
+    },
+    for_statement() as $statement where {
+      $statement <: contains $name
+    },
     `try { $_ } catch($catch) { $_ }` where {
       $catch <: contains $name
     },
@@ -28,8 +34,10 @@ pattern shadows_identifier($name) {
 }
 
 // Test case
-shadows_identifier(`x`) as $scope where {
-  $scope <: contains `x` => `shadowed`
+file($body) where {
+  $body <: contains bubble shadows_identifier(`x`) as $scope where {
+    $scope <: contains `x` => `shadowed`
+  }
 }
 ```
 
