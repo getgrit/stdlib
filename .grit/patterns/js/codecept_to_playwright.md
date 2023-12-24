@@ -151,6 +151,7 @@ pattern convert_locators($page) {
         `I.wait($timeout)` => `await $page.waitForTimeout($timeout * 1000)`,
         `I.seeElement($target)` => `await expect($target).toBeVisible()`,
         `I.dontSeeElement($target)` => `await expect($target).toBeHidden()`,
+        `I.seeElementInDOM($target)` => `await expect($target).toBeAttached()`,
         `I.see($text, $target)` => `await expect($target).toContainText($text)`,
         `I.see($text)` => `await expect($page.getByText($text)).toBeVisible()`,
         `I.dontSee($text, $target)` => `await expect($target).not.toContainText($text)`,
