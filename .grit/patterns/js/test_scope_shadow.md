@@ -171,6 +171,21 @@ var x = 'global';
 for (var x = 0; x < 5; x++) {
   console.log(x);
 }
+console.log(x);
+```
+
+```js
+var x = 'global';
+for (var shadowed = 0; shadowed < 5; shadowed++) {
+  console.log(shadowed);
+}
+console.log(x);
+```
+
+## For of clause
+
+```js
+var x = 'global';
 for (const x of []) {
   console.log(x.baz);
 }
@@ -183,9 +198,6 @@ console.log(x);
 
 ```js
 var x = 'global';
-for (var shadowed = 0; shadowed < 5; shadowed++) {
-  console.log(shadowed);
-}
 for (const shadowed of []) {
   console.log(shadowed.baz);
 }
