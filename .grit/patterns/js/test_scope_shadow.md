@@ -21,6 +21,12 @@ pattern shadows_identifier($name) {
     function_declaration($parameters) where {
       $parameters <: contains $name
     },
+    for_in_statement() as $statement where {
+      $statement <: contains $name
+    },
+    for_statement() as $statement where {
+      $statement <: contains $name
+    },
     `try { $_ } catch($catch) { $_ }` where {
       $catch <: contains $name
     },
@@ -28,8 +34,10 @@ pattern shadows_identifier($name) {
 }
 
 // Test case
-shadows_identifier(`x`) as $scope where {
-  $scope <: contains `x` => `shadowed`
+file($body) where {
+  $body <: contains bubble shadows_identifier(`x`) as $scope where {
+    $scope <: contains `x` => `shadowed`
+  }
 }
 ```
 
@@ -67,21 +75,12 @@ if (true) {
 console.log(x);
 ```
 
-```
+```js
 if (true) {
   let shadowed = 40;
   console.log(shadowed);
 }
 console.log(x);
-```
-
-## For loop
-
-```js
-for (var x = 0; x < 5; x++) {
-  console.log(x); // 0, 1, 2, 3, 4
-}
-console.log(x); // 5
 ```
 
 ## Arrow function
@@ -154,4 +153,48 @@ try {
   console.log(shadowed);
 }
 console.log(x); // "global"
+```
+
+## For loop clause
+
+```js
+var x = 'global';
+for (var x = 0; x < 5; x++) {
+  console.log(x);
+}
+console.log(x);
+```
+
+```js
+var x = 'global';
+for (var shadowed = 0; shadowed < 5; shadowed++) {
+  console.log(shadowed);
+}
+console.log(x);
+```
+
+## For of clause
+
+```js
+var x = 'global';
+for (const x of []) {
+  console.log(x.baz);
+}
+// async loop
+for await (const x of []) {
+  console.log(x.baz);
+}
+console.log(x);
+```
+
+```js
+var x = 'global';
+for (const shadowed of []) {
+  console.log(shadowed.baz);
+}
+// async loop
+for await (const shadowed of []) {
+  console.log(shadowed.baz);
+}
+console.log(x);
 ```
