@@ -151,6 +151,7 @@ pattern convert_locators($page) {
         `I.wait($timeout)` => `await $page.waitForTimeout($timeout * 1000)`,
         `I.seeElement($target)` => `await expect($target).toBeVisible()`,
         `I.dontSeeElement($target)` => `await expect($target).toBeHidden()`,
+        `I.seeElementInDOM($target)` => `await expect($target).toBeAttached()`,
         `I.see($text, $target)` => `await expect($target).toContainText($text)`,
         `I.see($text)` => `await expect($page.getByText($text)).toBeVisible()`,
         `I.dontSee($text, $target)` => `await expect($target).not.toContainText($text)`,
@@ -208,6 +209,7 @@ pattern convert_locators($page) {
         `I.scrollTo($target)` => `await $target.scrollIntoViewIfNeeded()`,
         `I.attachFile($target, $file)` => `await $target.setInputFiles($file)`,
         `I.clearFieldValue($field)` => `await $field.clear()`,
+        `I.fillFieldViaPressKeys($target, $value)` => `await $target.fill($value)`,
         `I.grabNumberOfVisibleElements($target)` => `await $target.count()`,
         `I.seeNumberOfVisibleElements($target, $count)` => `expect(await $target.count()).toEqual($count)`,
         `I.waitNumberOfVisibleElements($target, $count)` => `await expect($target).toHaveCount($count)`,
@@ -239,6 +241,7 @@ pattern convert_hooks() {
         `After(({ $params }) => { $body })` => `test.afterEach(async ({ page, request }) => { $body })`,
         `AfterSuite(({ $params }) => { $body })` => `test.afterAll(async ({ page, request }) => { $body })`,
     } where {
+        $body <: not contains `loginAs('admin')`,
         $body <: maybe contains bubble convert_locators(page=`page`),
     }
 }
