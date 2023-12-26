@@ -11,8 +11,6 @@ language rust
 
 if_expression($condition, $consequence) where {
     $consequence <: block($content) where {
-        $length = length($content),
-        $length <: 1,
         $content <: [$inner],
         $inner <: expression_statement(expression=if_expression(condition=$inner_condition, consequence=block(content=$inner_content)) as $inner_if) where {
             $condition += ` && $inner_condition`,
@@ -49,6 +47,18 @@ if x > 3 {
     if x < 10 {
         println!("Hello");
     }
+}
+```
+
+## Does not combine if statements with following side effects
+
+```rust
+let x = 6;
+if x > 3 {
+    if x < 10 {
+        println!("Hello");
+    }
+    println!("Wow!");
 }
 ```
 
