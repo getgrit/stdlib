@@ -28,7 +28,7 @@ fn func(opt: Option<Result<u64, String>>) {
     let n = match opt {
         Some(n) => match n {
             Ok(n) => n,
-            _ => return,
+            Err => return,
         }
         None => return,
     };
@@ -40,6 +40,20 @@ fn func(opt: Option<Result<u64, String>>) {
     let n = match opt {
         Some(Ok(n)) => n,
         _ => return,
+    };
+}
+```
+
+## Does not combine arms with different expressions
+
+```rust
+fn func(opt: Option<Result<u64, String>>) {
+    let n = match opt {
+        Some(n) => match n {
+            Ok(n) => n,
+            Err => 5,
+        }
+        None => return,
     };
 }
 ```
