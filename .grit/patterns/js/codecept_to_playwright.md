@@ -157,6 +157,7 @@ pattern convert_locators($page) {
         `I.see($text)` => `await expect($page.getByText($text)).toBeVisible()`,
         `I.dontSee($text, $target)` => `await expect($target).not.toContainText($text)`,
         `I.dontSee($text)` => `await expect($page.getByText($text)).toBeHidden()`,
+        `await I.grabValueFrom($target)` => `await $target.value()`,
         `I.grabCSSPropertyFrom($target, $property)` => `await $target.evaluate((el) => {
           return window.getComputedStyle(el).getPropertyValue($property);
         })`,
