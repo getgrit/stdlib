@@ -138,6 +138,7 @@ pattern convert_locators($page) {
         `locate($locator).as($_)` => `$page.locator($locator)`,
         `locate($locator).find($sub)` => `$page.locator($locator).locator($sub)`,
         `locate($locator)` => `$page.locator($locator)`,
+        `$target.withChild($descendant)` => `$target.filter({ has: $page.locator($descendant) })`,
         `$target.withDescendant($descendant)` => `$target.filter({ has: $page.locator($descendant) })`,
         `I.waitInUrl($url)` => `await $page.waitForURL(new RegExp($url))`,
         `I.waitForLoader()` => `await this.waitForLoader()`,
