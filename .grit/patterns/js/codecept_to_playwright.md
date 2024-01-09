@@ -138,6 +138,7 @@ pattern convert_locators($page) {
         `locate($locator).as($_)` => `$page.locator($locator)`,
         `locate($locator).find($sub)` => `$page.locator($locator).locator($sub)`,
         `locate($locator)` => `$page.locator($locator)`,
+        `$target.withChild($descendant)` => `$target.filter({ has: $page.locator($descendant) })`,
         `$target.withDescendant($descendant)` => `$target.filter({ has: $page.locator($descendant) })`,
         `I.waitInUrl($url)` => `await $page.waitForURL(new RegExp($url))`,
         `I.waitForLoader()` => `await this.waitForLoader()`,
@@ -156,6 +157,7 @@ pattern convert_locators($page) {
         `I.see($text)` => `await expect($page.getByText($text)).toBeVisible()`,
         `I.dontSee($text, $target)` => `await expect($target).not.toContainText($text)`,
         `I.dontSee($text)` => `await expect($page.getByText($text)).toBeHidden()`,
+        `await I.grabValueFrom($target)` => `await $target.value()`,
         `I.grabCSSPropertyFrom($target, $property)` => `await $target.evaluate((el) => {
           return window.getComputedStyle(el).getPropertyValue($property);
         })`,
@@ -188,6 +190,7 @@ pattern convert_locators($page) {
         `I.waitForElement($target)` => `await $target.waitFor({ state: 'attached' })`,
         `I.waitForVisible($target, $timeout)` => `await $target.waitFor({ state: 'visible', timeout: $timeout * 1000 })`,
         `I.waitForVisible($target)` => `await $target.waitFor({ state: 'visible' })`,
+        `I.waitForEnabled($target)` => `await expect($target).toBeEnabled()`,
         `I.waitForInvisible($target, $timeout)` => `await $target.waitFor({ state: 'hidden', timeout: $timeout * 1000 })`,
         `I.waitForInvisible($target)` => `await $target.waitFor({ state: 'hidden' })`,
         `$locator.withText($text)` => `$locator.and($page.locator(\`:has-text("\${$text}")\`))`,
@@ -221,6 +224,11 @@ pattern convert_locators($page) {
         `I.seeCheckboxIsChecked($target)` => `await expect($target).toBeChecked()`,
         `I.grabTextFrom($target)` => `page.locator($target).allInnerTexts()`,
         `I.say($log)` => `console.log($log)`,
+        `$target.at($nth)` as $at where {
+            $nth <: number(),
+            $zero_indexed = $nth - 1,
+            $at => `$target.nth($zero_indexed)`,
+        },
     } where {
         if (! $target <: undefined) {
             $target <: maybe or {
@@ -400,7 +408,7 @@ export default {
 
   waitForGrit() {
     I.waitForVisible(this.studio.withText(this.message), 5);
-    I.click(this.button('grit'), this.studio);
+    I.click(this.button('grit').at(2), this.studio);
     I.seeCssPropertiesOnElements(this.studio, {
       'background-color': '#3570b6',
       display: 'flex',
@@ -434,7 +442,7 @@ export default class Test extends BasePage {
     await this.studio
       .and(this.page.locator(`:has-text("${this.message}")`))
       .waitFor({ state: 'visible', timeout: 5 * 1000 });
-    await this.studio.locator(this.button('grit')).click();
+    await this.studio.locator(this.button('grit').nth(1)).click();
     await expect(this.studio).toHaveCSS('background-color', '#3570b6');
     await expect(this.studio).toHaveCSS('display', 'flex');
     await expect(this.studio).toHaveAttribute('open', 'true');
