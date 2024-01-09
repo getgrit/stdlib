@@ -224,6 +224,11 @@ pattern convert_locators($page) {
         `I.seeCheckboxIsChecked($target)` => `await expect($target).toBeChecked()`,
         `I.grabTextFrom($target)` => `page.locator($target).allInnerTexts()`,
         `I.say($log)` => `console.log($log)`,
+        `$target.at($nth)` as $at where {
+            $nth <: number(),
+            $zero_indexed = $nth - 1,
+            $at => `$target.nth($zero_indexed)`,
+        },
     } where {
         if (! $target <: undefined) {
             $target <: maybe or {
@@ -403,7 +408,7 @@ export default {
 
   waitForGrit() {
     I.waitForVisible(this.studio.withText(this.message), 5);
-    I.click(this.button('grit'), this.studio);
+    I.click(this.button('grit').at(2), this.studio);
     I.seeCssPropertiesOnElements(this.studio, {
       'background-color': '#3570b6',
       display: 'flex',
@@ -437,7 +442,7 @@ export default class Test extends BasePage {
     await this.studio
       .and(this.page.locator(`:has-text("${this.message}")`))
       .waitFor({ state: 'visible', timeout: 5 * 1000 });
-    await this.studio.locator(this.button('grit')).click();
+    await this.studio.locator(this.button('grit').nth(1)).click();
     await expect(this.studio).toHaveCSS('background-color', '#3570b6');
     await expect(this.studio).toHaveCSS('display', 'flex');
     await expect(this.studio).toHaveAttribute('open', 'true');
