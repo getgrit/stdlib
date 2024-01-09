@@ -190,6 +190,7 @@ pattern convert_locators($page) {
         `I.waitForElement($target)` => `await $target.waitFor({ state: 'attached' })`,
         `I.waitForVisible($target, $timeout)` => `await $target.waitFor({ state: 'visible', timeout: $timeout * 1000 })`,
         `I.waitForVisible($target)` => `await $target.waitFor({ state: 'visible' })`,
+        `I.waitForEnabled($target)` => `await expect($target).toBeEnabled()`,
         `I.waitForInvisible($target, $timeout)` => `await $target.waitFor({ state: 'hidden', timeout: $timeout * 1000 })`,
         `I.waitForInvisible($target)` => `await $target.waitFor({ state: 'hidden' })`,
         `$locator.withText($text)` => `$locator.and($page.locator(\`:has-text("\${$text}")\`))`,
