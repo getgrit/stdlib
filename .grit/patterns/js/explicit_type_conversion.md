@@ -12,7 +12,8 @@ language js
 
 or {
   or {`+$value`, `1 * $value`} => `Number($value)`,
-  or { `"" + $value`, `$value + ""`, `'' + $value`, `$value + ''` } => `String($value)`
+  or { `"" + $value`, `$value + ""`, `'' + $value`, `$value + ''` } => `String($value)`,
+  or {`!!$value`} => `Boolean($value)`
 }
 ```
 
@@ -68,4 +69,14 @@ var x = 1 * foo;
 
 ```typescript
 var x = Number(foo);
+```
+
+## Handles boolean conversion using !!
+
+```javascript
+var x = !!"123";
+```
+
+```typescript
+var y = Boolean("123");
 ```
