@@ -38,9 +38,9 @@ fn func(opt: Option<Result<u64, String>>) {
 ```rust
 fn func(opt: Option<Result<u64, String>>) {
     let n = match opt {
-        Some(Ok(n)) => n,
-        _ => return,
-    };
+    Some(Ok(n)) => n,
+    _ => return,
+};
 }
 ```
 
