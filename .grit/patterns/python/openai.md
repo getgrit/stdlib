@@ -585,3 +585,25 @@ output = completion['choices'][0]['message']['content']
 prom = completion['usage']['prompt_tokens']
 comp = completion['usage']['completion_tokens']
 ```
+
+```python
+from openai import OpenAI
+
+client = OpenAI()
+
+model, token_limit, prompt_cost, comp_cost = 'gpt-4-32k', 32_768, 0.06, 0.12
+
+completion = client.chat.completions.create(
+    model=model,
+    messages=[
+        {"role": "system", "content": system},
+        {"role": "user", "content":
+         user + text},
+    ]
+)
+
+output = completion.choices[0].message.content
+
+prom = completion.usage.prompt_tokens
+comp = completion.usage.completion_tokens
+```
