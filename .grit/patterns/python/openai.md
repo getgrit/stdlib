@@ -198,6 +198,21 @@ pattern pytest_patch() {
     },
 }
 
+
+
+// When there is a variable used by an openai call, make sure it isn't subscripted
+pattern fix_downstream_openai_usage() {
+    $var where {
+        $program <: maybe contains bubble or {
+            `$var['choices'][$n]` => `$var.choices[$n]`,
+            `$var['choices'][$n]['$x']` => `$var.choices[$n].$x`,
+            `$var['choices'][$n]['$x']['$y']` => `$var.choices[$n].$.$y`,
+            `$var['$x']['$y']` => `$var.$x.$y`,
+            `$var['$x']` => `$var.$x`,
+        }
+    }
+}
+
 pattern openai_main($client, $azure) {
     $body where {
         if ($client <: undefined) {
@@ -257,6 +272,9 @@ pattern openai_main($client, $azure) {
           contains `import openai` as $import_stmt where {
               $body <: contains bubble($has_sync, $has_async, $has_openai_import, $body, $client, $azure) `openai.$res.$func($params)` as $stmt where {
                   $res <: rewrite_whole_fn_call(import = $has_openai_import, $has_sync, $has_async, $res, $func, $params, $stmt, $body, $client, $azure),
+                  $stmt <: maybe within bubble($stmt) `$var = $stmt` where {
+                      $var <: fix_downstream_openai_usage()
+                  }
               },
           },
           contains `from openai import $resources` as $partial_import_stmt where {
@@ -548,19 +566,15 @@ response = openai.ChatCompletion.create(
 import os
 from openai import AzureOpenAI
 
-client = AzureOpenAI(
-  azure_endpoint=os.getenv("AZURE_OPENAI_ENDPOINT"),
-  api_key=os.getenv("AZURE_OPENAI_KEY"),
-  api_version="2023-05-15"
-)
+client = AzureOpenAI(azure_endpoint=os.getenv("AZURE_OPENAI_ENDPOINT"),
+api_key=os.getenv("AZURE_OPENAI_KEY"),
+api_version="2023-05-15")
 
 
-response = client.chat.completions.create(
-  model="gpt-35-turbo",
-  messages=[
+response = client.chat.completions.create(model="gpt-35-turbo",
+messages=[
     {"role": "system", "content": "You are a helpful assistant."},
-  ]
-)
+])
 ```
 
 ## Fix subscripting
@@ -593,15 +607,12 @@ client = OpenAI()
 
 model, token_limit, prompt_cost, comp_cost = 'gpt-4-32k', 32_768, 0.06, 0.12
 
-completion = client.chat.completions.create(
-    model=model,
-    messages=[
-        {"role": "system", "content": system},
-        {"role": "user", "content":
-         user + text},
-    ]
-)
-
+completion = client.chat.completions.create(model=model,
+messages=[
+    {"role": "system", "content": system},
+    {"role": "user", "content":
+     user + text},
+])
 output = completion.choices[0].message.content
 
 prom = completion.usage.prompt_tokens
