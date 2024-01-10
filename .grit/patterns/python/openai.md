@@ -203,12 +203,8 @@ pattern pytest_patch() {
 // When there is a variable used by an openai call, make sure it isn't subscripted
 pattern fix_downstream_openai_usage() {
     $var where {
-        $program <: maybe contains bubble or {
-            `$var['choices'][$n]` => `$var.choices[$n]`,
-            `$var['choices'][$n]['$x']` => `$var.choices[$n].$x`,
-            `$var['choices'][$n]['$x']['$y']` => `$var.choices[$n].$.$y`,
-            `$var['$x']['$y']` => `$var.$x.$y`,
-            `$var['$x']` => `$var.$x`,
+        $program <: maybe contains bubble($var) `$x['$y']` as $sub => `$x.$y` where {
+          $sub <: contains $var
         }
     }
 }
