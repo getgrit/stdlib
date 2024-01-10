@@ -1,5 +1,5 @@
 ---
-tags: angularjs, angular, upgrade, wip, hidden
+tags: angularjs, angular, upgrade, wip, hidden, ai
 ---
 
 # Upgrade from AngularJS to Angular
@@ -45,7 +45,7 @@ import { Phone } from './phone.model';
 
 @Component({
   selector: 'app-phone-list',
-  templateUrl: 'phone-list/phone-list.template.html'
+  templateUrl: 'phone-list/phone-list.template.html',
 })
 export class PhoneListController {
   phones: Phone[];
