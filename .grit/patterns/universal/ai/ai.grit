@@ -68,7 +68,7 @@ pattern ai_is($condition, $examples, $counter_examples) {
 
 
 // Transform the provided code to match the given instructions
-function ai_transform($match, $instruct) {
+function ai_transform($match, $instruct, $pattern) {
   $messages = [
     {
       role: "system",
@@ -80,6 +80,6 @@ function ai_transform($match, $instruct) {
     }
   ],
 
-  $answer = llm_chat($messages),
+  $answer = llm_chat($messages, $pattern),
   return `$answer`
 }
