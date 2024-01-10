@@ -1,5 +1,5 @@
 ---
-title: Remove `alert`, `confirm` and `prompt` statement
+title: Remove `confirm` statement
 ---
 
 JavaScript’s confirm function is widely considered to be obtrusive as UI elements and should be replaced by a more appropriate custom UI implementation.
