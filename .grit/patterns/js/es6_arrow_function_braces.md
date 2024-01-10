@@ -12,9 +12,7 @@ language js
 
 arrow_function(parameters=$params, body=$body) => `($params) => {
     return $body
-}` where {
-  $body <: not contains return_statement()
-}
+}` where $body <: not contains return_statement()
 ```
 
 ## Transform function expressions
