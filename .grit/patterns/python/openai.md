@@ -566,15 +566,19 @@ response = openai.ChatCompletion.create(
 import os
 from openai import AzureOpenAI
 
-client = AzureOpenAI(azure_endpoint=os.getenv("AZURE_OPENAI_ENDPOINT"),
-api_key=os.getenv("AZURE_OPENAI_KEY"),
-api_version="2023-05-15")
+client = AzureOpenAI(
+  azure_endpoint=os.getenv("AZURE_OPENAI_ENDPOINT"),
+  api_key=os.getenv("AZURE_OPENAI_KEY"),
+  api_version="2023-05-15"
+)
 
 
-response = client.chat.completions.create(model="gpt-35-turbo",
-messages=[
+response = client.chat.completions.create(
+  model="gpt-35-turbo",
+  messages=[
     {"role": "system", "content": "You are a helpful assistant."},
-])
+  ]
+)
 ```
 
 ## Fix subscripting
