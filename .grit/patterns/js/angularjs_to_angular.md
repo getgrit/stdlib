@@ -1,10 +1,8 @@
----
-tags: angularjs, angular, upgrade, wip, hidden, ai
----
-
 # Upgrade from AngularJS to Angular
 
 [WIP] This pattern provides a basic build configuration for upgrading from AngularJS to Angular. It is still a work in progress.
+
+tags: #angularjs, #angular, #upgrade, #wip, #hidden, #ai
 
 ```grit
 language js
