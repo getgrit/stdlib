@@ -602,6 +602,9 @@ output = completion['choices'][0]['message']['content']
 
 prom = completion['usage']['prompt_tokens']
 comp = completion['usage']['completion_tokens']
+
+# unrelated variable
+foo = something['else']
 ```
 
 ```python
@@ -621,4 +624,7 @@ output = completion.choices[0].message.content
 
 prom = completion.usage.prompt_tokens
 comp = completion.usage.completion_tokens
+
+# unrelated variable
+foo = something['else']
 ```
