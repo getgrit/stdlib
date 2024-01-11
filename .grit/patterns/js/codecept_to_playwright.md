@@ -50,10 +50,16 @@ pattern convert_test() {
         $pages = [],
         $body <: maybe contains bubble($pages) or {
           r"[a-zA-Z]*Page",
-          r"[a-zA-Z]_page",
+          r"[a-zA-Z]*_page",
         } as $page where {
             $page <: identifier(),
-            $page_class = capitalize(string=$page),
+            or {
+              and {
+                $page <: r"([a-zA-Z]*)_page"($orig_name),
+                $page_class = capitalize(string=`$[orig_name]Page`),
+              },
+              $page_class = capitalize(string=$page),
+            },
             $pages += `var $page = new $page_class(page, context)`,
         },
         $body <: maybe contains bubble($pages) r"[a-zA-Z]*Modal" as $modal where {
@@ -695,7 +701,7 @@ for (const current of myData) {
 
 ```js
 Scenario('Trivial test', async ({ I }) => {
-  projectPage.open();
+  project_page.open();
   I.waitForVisible('.list' + ' ' + className);
   I.waitNumberOfVisibleElements('.grit-sample', 3);
   I.seeInField(`input[name="${username}"]`, 'admin');
@@ -709,8 +715,8 @@ Scenario('Trivial test', async ({ I }) => {
 import { expect } from '@playwright/test';
 
 test('Trivial test @Projects @Studio @Email', async ({ page, factory, context }) => {
-  var projectPage = new ProjectPage(page, context);
-  await projectPage.open();
+  var project_page = new ProjectPage(page, context);
+  await project_page.open();
   await page.locator('.list' + ' ' + className).waitFor({ state: 'visible' });
   await expect(page.locator('.grit-sample')).toHaveCount(3);
   await expect(page.locator(`input[name="${username}"]`)).toHaveValue('admin');
