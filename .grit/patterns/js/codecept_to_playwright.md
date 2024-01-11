@@ -48,7 +48,10 @@ pattern convert_test() {
             convert_locators(page=`page`),
         },
         $pages = [],
-        $body <: maybe contains bubble($pages) r"[a-zA-Z]*Page" as $page where {
+        $body <: maybe contains bubble($pages) or {
+          r"[a-zA-Z]*Page",
+          r"[a-zA-Z]_page",
+        } as $page where {
             $page <: identifier(),
             $page_class = capitalize(string=$page),
             $pages += `var $page = new $page_class(page, context)`,
