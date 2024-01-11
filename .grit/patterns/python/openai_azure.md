@@ -64,7 +64,7 @@ response = client.chat.completions.create(
   ]
 )
 
-print(response['choices'][0]['message']['content'])
+print(response.choices[0].message.content)
 ```
 
 ## Embeddings
@@ -99,7 +99,7 @@ response = client.embeddings.create(
   input="Your text string goes here",
   model="YOUR_DEPLOYMENT_NAME"
 )
-embeddings = response['data'][0]['embedding']
+embeddings = response.data[0].embedding
 print(embeddings)
 ```
 

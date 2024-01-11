@@ -56,4 +56,9 @@ jobs:
         run: rm -rf .grit/.gritmodules
 
       - name: Run grit patterns test
-        run: grit patterns test
+        run: |
+          if [ -n "${{ secrets.API_CLIENT_ID }}" ] && [ -n "${{ secrets.API_CLIENT_SECRET }}" ]; then
+              grit patterns test
+          else
+              grit patterns test --exclude ai
+          fi

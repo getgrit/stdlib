@@ -7,7 +7,7 @@ CLIENT_SECRET=$(printenv API_CLIENT_SECRET)
 # Check if CLIENT_ID and CLIENT_SECRET are set
 if [ -z "$CLIENT_ID" ] || [ -z "$CLIENT_SECRET" ]; then
     echo "API_CLIENT_ID or API_CLIENT_SECRET is not set."
-    exit 1
+    exit 0
 fi
 
 # Set the Auth0 Tenant Domain and API Audience
