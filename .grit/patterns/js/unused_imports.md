@@ -1,4 +1,4 @@
-#.grit/patterns/js/remove_unused_imports.md Rmove unused imports
+#Remove unused imports
 
 This pattern removes unused imports of top level modules like `import React from "react"` or `import * as lodash from "lodash"`.
 
