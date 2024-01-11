@@ -1,23 +1,10 @@
-# Rmove unused imports
+#.grit/patterns/js/remove_unused_imports.md Rmove unused imports
 
 This pattern removes unused imports of top level modules like `import React from "react"` or `import * as lodash from "lodash"`.
 
 ```grit
 engine marzano(0.1)
 language js
-
-pattern calls_thing($alias) {
-    or {
-        `$alias.$name` as $call ,
-        or {
-          `<$call $...>$...</$call>`,
-          `<$call $.../>`
-        } where {
-            $call <: nested_identifier(base=$alias, terminal=$name),
-        }
-    }
-}
-
 
 pattern remove_unused_imports($src) {
 or {
@@ -29,7 +16,7 @@ or {
     },
     `import $module_name from $src` where { $module_name <: not contains `{$_}`},
     } as $import where {
-    $program <: not contains calls_thing($module_name),
+    $program <: not contains $module_name until `import $_`
   } => .
 }
 
