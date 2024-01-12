@@ -12,12 +12,18 @@ or {
     `import $module_name, { $imports } from $src` where {
         !$imports <: some bubble $our_import where {
             $program <: contains `$our_import` until `import $_`
-        }
+        },
+        $side_default = true
     },
     `import $module_name from $src` where { $module_name <: not contains `{$_}`},
     } as $import where {
-    $program <: not contains $module_name until `import $_`
-  } => .
+        $program <: not contains $module_name until `import $_`,
+        if (!$side_default <: undefined) {
+            $import => `import { $imports } from $src`
+        } else {
+            $import => .
+        }
+    }
 }
 
 remove_unused_imports()
