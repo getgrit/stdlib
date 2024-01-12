@@ -78,5 +78,5 @@ var x = !!"123";
 ```
 
 ```typescript
-var y = Boolean("123");
+var x = Boolean("123");
 ```
