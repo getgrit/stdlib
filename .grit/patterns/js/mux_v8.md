@@ -87,7 +87,10 @@ pattern change_destructured_property_call() {
                 $field <: `TranscriptionVocabularies`,
                 $field <: `Uploads`,
               },
-              $action <: `get` => `retrieve`
+              $action <: or {
+                `get` => `retrieve`,
+                `del` => `delete`,
+              }
             },
             $prop <: maybe `Video` where {
                 $field <: or {
@@ -256,6 +259,20 @@ const mux = new Mux();
 
 const asset = await mux.video.assets.retrieve(req.query.id as string);
 const upload = await mux.video.uploads.retrieve(req.query.id as string);
+```
+
+## Renamed `.del` to `.delete`
+
+```js
+const { Video, Data } = new Mux();
+
+await Video.Assets.del(req.query.id as string);
+```
+
+```ts
+const mux = new Mux();
+
+await mux.video.assets.delete(req.query.id as string);
 ```
 
 ## Replace verifyHeader with verifySignature
