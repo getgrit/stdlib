@@ -8,16 +8,26 @@ language js
 
 pattern remove_unused_imports($src) {
 or {
-    `import * as $module_name from $src`,
-    `import $module_name, { $imports } from $src` where {
-        !$imports <: some bubble $our_import where {
-            $program <: contains `$our_import` until `import $_`
+    `import * as $import_clause from $src`,
+    `import $import_clause, { $named_imports } from $src` where {
+        $named_imports <: maybe some bubble($keep_named_import_list) or {`type $import`, `$import`} as $full where {
+            if($program <: contains `$import` until `import $_`) {
+                $keep_named_import_list = true
+             } else {
+                $full => .
+            }
         }
     },
-    `import $module_name from $src` where { $module_name <: not contains `{$_}`},
-    } as $import where {
-    $program <: not contains $module_name until `import $_`
-  } => .
+    `import $import_clause from $src` where { $import_clause <: not contains `{$_}`},
+} as $import_line where {
+    $import_clause <: or {`type $module_name`, `$module_name`},
+    $program <: not contains $module_name until `import $_`,
+    if($keep_named_import_list <: undefined) {
+        $import_line => .
+    } else {
+        $import_clause => .
+    }
+  } 
 }
 
 remove_unused_imports()
@@ -82,12 +92,18 @@ useState();
 ```
 
 ## Test case: default-and-multiple-specifiers-import
-todo: would like this one to simply remove the default import later instead of keeping the whole line
 
 ```javascript
 import React, { type Element, createElement, useState } from "react";
 
-useState();
+const element: Element = createElement();
+<div>Hi</div>;
+```
+
+```javascript
+import { type Element, createElement } from "react";
+
+const element: Element = createElement();
 <div>Hi</div>;
 ```
 
