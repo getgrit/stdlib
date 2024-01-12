@@ -13,7 +13,7 @@ language js
 `<>$body</>` => `<React.Fragment>$body</React.Fragment>`
 ```
 
-## Remove alert, confirm and prompt
+## `<></>` ⇒ `React.Fragment`
 
 ```javascript
 const Cat = props => {
@@ -25,7 +25,7 @@ const Cat = props => {
        <p>{props.color}</p>
        <>{props.day}</>
       </div>
-    </>;
+    </>
   );
 };
 ```
@@ -40,7 +40,7 @@ const Cat = props => {
        <p>{props.color}</p>
        <React.Fragment>{props.day}</React.Fragment>
       </div>
-    </React.Fragment>;
+    </React.Fragment>
   );
 };
 ```
