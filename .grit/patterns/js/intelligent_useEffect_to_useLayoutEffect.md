@@ -12,43 +12,14 @@ language js
 
 
 or {
-
- `useEffect(() => {
-    $body 
-    },[$conditions])` as $effectHook where {
-    $body <: contains `current`,
-    $effectHook => `useLayoutEffect(() => {
-    $body
-},[$conditions])`
- },
- 
- `React.useEffect(() => {
-    $body 
-    },[$conditions])` as $effectHook where {
-    $body <: contains `current`,
-    $effectHook => `React.useLayoutEffect(() => {
-    $body
-  },[$conditions])`
- },
-
- `useEffect(() => {
-    $body 
-    })` as $effectHook where {
-    $body <: contains `current`,
-    $effectHook => `useLayoutEffect(() => {
-    $body
-})`
- },
- 
- `React.useEffect(() => {
-  $body 
-  })` as $effectHook where {
-  $body <: contains `current`,
-  $effectHook => `React.useLayoutEffect(() => {
-  $body
-})`
-},
-
+ `useEffect($body)` as $effectHook where {
+    $body <: contains `document.$method`,
+    $effectHook => `useLayoutEffect($body)`
+  },
+ `React.useEffect($body)` as $effectHook where {
+  $body <: contains `document.$method`,
+  $effectHook => `React.useLayoutEffect($body)`
+ }
 }
 ```
 
@@ -56,27 +27,67 @@ or {
 
 ```javascript
 useEffect(() => {
-  ref.current = 'some value'
+    // DOM Query Methods:
+    // 1. getElementById
+    const elementById = document.getElementById('myElementId');
+    console.log('Element by ID:', elementById);
+   
+    // 2. getElementsByClassName
+    const elementsByClass = document.getElementsByClassName('myClass');
+    console.log('Elements by Class:', elementsByClass);
+
+    // 3. querySelector
+    const elementBySelector = document.querySelector('.mySelector');
+    console.log('Element by Selector:', elementBySelector);
+}, []); 
+
+useEffect(() => {
+    ref.current = 'some value'
 },[])
+
+useEffect(() => {
+    console.log("useEffect")
+},[]);
 ```
 
 ```javascript
 useLayoutEffect(() => {
-  ref.current = 'some value'
+    // DOM Query Methods:
+    // 1. getElementById
+    const elementById = document.getElementById('myElementId');
+    console.log('Element by ID:', elementById);
+   
+    // 2. getElementsByClassName
+    const elementsByClass = document.getElementsByClassName('myClass');
+    console.log('Elements by Class:', elementsByClass);
+
+    // 3. querySelector
+    const elementBySelector = document.querySelector('.mySelector');
+    console.log('Element by Selector:', elementBySelector);
+}, []); 
+
+useEffect(() => {
+    ref.current = 'some value'
 },[])
+
+useEffect(() => {
+    console.log("useEffect")
+},[]);
 ```
 
 ## React.useEffect with conditions
 
 ```javascript
 React.useEffect(() => {
-  ref.current = 'some value'
+    const elementById = document.querySelector('myElementId');
+    console.log('Element by ID:', elementById);
 },[])
 ```
 
 ```javascript
 React.useLayoutEffect(() => {
-  ref.current = 'some value'
+    const elementById = document.querySelector('myElementId');
+    console.log('Element by ID:', elementById);
 },[])
 ```
 
@@ -84,13 +95,15 @@ React.useLayoutEffect(() => {
 
 ```javascript
 useEffect(() => {
-  ref.current = 'some value'
+    const elementById = document.getElementById('myElementId');
+    console.log('Element by ID:', elementById);
 })
 ```
 
 ```javascript
 useLayoutEffect(() => {
-  ref.current = 'some value'
+    const elementById = document.getElementById('myElementId');
+    console.log('Element by ID:', elementById);
 })
 ```
 
@@ -98,12 +111,14 @@ useLayoutEffect(() => {
 
 ```javascript
 React.useEffect(() => {
-  ref.current = 'some value'
+    const elementById = document.getElementsByClassName('myElementId');
+    console.log('Element by ID:', elementById);
 })
 ```
 
 ```javascript
 React.useLayoutEffect(() => {
-  ref.current = 'some value'
+    const elementById = document.getElementsByClassName('myElementId');
+    console.log('Element by ID:', elementById);
 })
 ```
