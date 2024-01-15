@@ -158,6 +158,7 @@ pattern convert_locators($page) {
         `I.waitForText($text, $target)` => `await expect($target).toHaveText($text, {
             ignoreCase: true,
         })`,
+        `I.waitForText($text)` => `await $page.getByText($text).waitFor({ state: 'visible' })`,
         `I.wait($timeout)` => `await $page.waitForTimeout($timeout * 1000)`,
         `I.seeElement($target)` => `await expect($target).toBeVisible()`,
         `I.dontSeeElement($target)` => `await expect($target).toBeHidden()`,
@@ -222,6 +223,7 @@ pattern convert_locators($page) {
         `I.attachFile($target, $file)` => `await $target.setInputFiles($file)`,
         `I.clearFieldValue($field)` => `await $field.clear()`,
         `I.fillFieldViaPressKeys($target, $value)` => `await $target.fill($value)`,
+        `I.fillField($target, $value)` => `await $target.fill($value)`,
         `I.grabNumberOfVisibleElements($target)` => `await $target.count()`,
         `I.seeNumberOfVisibleElements($target, $count)` => `expect(await $target.count()).toEqual($count)`,
         `I.waitNumberOfVisibleElements($target, $count)` => `await expect($target).toHaveCount($count)`,
