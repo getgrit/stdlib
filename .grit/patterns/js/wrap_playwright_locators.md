@@ -21,7 +21,7 @@ or {
         $page = `this.page`,
     },
     $bare <: not within `$page.$_($_)`,
-    $bare => `this.page.locator($bare)`,
+    $bare => `$page.locator($bare)`,
 }
 ```
 
