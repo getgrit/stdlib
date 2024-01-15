@@ -12,19 +12,23 @@ language js
 
 `import * as $alias from "io-ts"` => `import z from 'zod'` where {
     $program <: contains bubble($alias) or {
-        `$alias.nullType` => `z.null()`,
-        `$alias.type($val)` => `z.object($val)` where {
-            $val <: contains bubble `$alias.$typeName` => `z.$typeName()`,
-        },
-        `$alias.partial($val)` => `z.object($val)` where {
-            $val <: contains bubble`$alias.$typeName` => `z.$typeName().optional()`,    
-        },
-        `$alias.$typeName($val)` => `z.$typeName($val)`,
+        `$alias.partial($val)` => `z.object($val).partial()`,
+        `$alias.type($val)` => `z.object($val)`,
+        `$alias.$typeName($val)` => `z.$typeName($val)`,   
+        `$alias.$typeName` => `z.$typeName` where $typeName <: bubble or {
+            contains `nullType` => `null()`,
+            contains `Function` => `function()`,
+            contains `voidType` => `void()`,
+            contains `UnknownArray` => `array(z.unknown())`,
+            contains `UnknownRecord` => `unknown()`,
+            contains `$typeName($val)` => `elo`,
+            $typeName => `$typeName()` where $typeName <: not or {`array`, `union`} // TODO:  rethink this part @luke
+        }
    }
 }
 ```
 
-## Remove alert, confirm and prompt
+## Full test - TODO: @luke split into smaller one if this makes more sense 
 
 ```typescript
 import * as t from 'io-ts';
@@ -34,7 +38,10 @@ const PartialObject = t.partial({
     age: t.number,
     tags: t.array(t.string),
     deep: t.partial({
-        username: t.nullType
+        username: t.nullType,
+        testFun: t.Function,
+        permissions: t.UnknownArray,
+        map: t.UnknownRecord
     })
 })
 
@@ -46,7 +53,7 @@ const User = t.type({
 
 const Comment = t.type({
   username: t.string,
-  content: t.string,
+  content: t.number,
 });
 
 const BlogPost = t.type({
@@ -73,13 +80,16 @@ sayHello(userObj.name)
 import z from 'zod'
 
 const PartialObject = z.object({
-    hello: z.string().optional(),
-    age: z.number().optional(),
-    tags: z.array(z.string().optional()),
+    hello: z.string(),
+    age: z.number(),
+    tags: z.array(z.string()),
     deep: z.object({
-        username: z.null()
-    })
-})
+        username: z.null(),
+        testFun: z.function(),
+        permissions: z.array(z.unknown()),
+        map: z.unknown()
+    }).partial()
+}).partial()
 
 const User = z.object({
   name: z.string(),
@@ -89,7 +99,7 @@ const User = z.object({
 
 const Comment = z.object({
   username: z.string(),
-  content: z.string(),
+  content: z.number(),
 });
 
 const BlogPost = z.object({
@@ -110,4 +120,34 @@ function sayHello(name: string){
 }
 
 sayHello(userObj.name)
+```
+
+## Object transformation
+
+```typescript
+import * as t from 'io-ts';
+
+const User = t.type({
+  name: t.string,
+  age: t.number,
+  isAdmin: t.boolean,
+  permissions: t.array(t.string),
+  access: t.type({
+    top: t.union([t.null, t.boolean])
+  })
+});
+```
+
+```typescript
+import z from 'zod'
+
+const User = z.object({
+  name: z.string(),
+  age: z.number(),
+  isAdmin: z.boolean(),
+  permissions: z.array(z.string()),
+  access: z.object({
+    top: z.union([z.null(), z.boolean()])
+  })
+});
 ```
