@@ -14,54 +14,66 @@ language js
     $program <: contains bubble($alias) or {
         `$alias.partial($val)` => `z.object($val).partial()`,
         `$alias.type($val)` => `z.object($val)`,
+        `$alias.readonly($val)` => `$val.readonly()`,
+        `$alias.readonlyArray($val)` => `z.array($val).readonly()`,
+        `$alias.keyof($val)` => `$val.keyof()`,
         `$alias.$typeName($val)` => `z.$typeName($val)`,   
-        `$alias.$typeName` => `z.$typeName` where $typeName <: bubble or {
-            contains `nullType` => `null()`,
-            contains `Function` => `function()`,
-            contains `voidType` => `void()`,
-            contains `UnknownArray` => `array(z.unknown())`,
-            contains `UnknownRecord` => `unknown()`,
-            contains `$typeName($val)` => `elo`,
-            $typeName => `$typeName()` where $typeName <: not or {`array`, `union`} // TODO:  rethink this part @luke
+        `$alias.$typeName` => `z.$typeName` where $typeName <: bubble or {            
+                contains `nullType` => `null()`,
+                contains `Int` => `number()`,
+                contains `voidType` => `void()`,
+                contains `Function` => `function()`,
+                contains `UnknownArray` => `array(z.unknown())`,                                
+                contains `UnknownRecord` => `unknown()`,                
+                // not sure this one 
+                $typeName => `$typeName()` where $typeName <: not or {
+                    `array`, `union`, `literal`, `readonly`
+                } 
         }
+        
    }
 }
 ```
 
-## Full test - TODO: @luke split into smaller one if this makes more sense 
-
 ```typescript
 import * as t from 'io-ts';
 
-const PartialObject = t.partial({
-    hello: t.string,
+const BaseUser = t.type({
+    name: t.string,
     age: t.number,
+    nothing: t.null,
+    nothingType: t.nullType,
+    undef: t.undefined,
+    v: t.void,
+    vType: t.voidType,
+    hidden: t.unknown,
     tags: t.array(t.string),
-    deep: t.partial({
-        username: t.nullType,
-        testFun: t.Function,
-        permissions: t.UnknownArray,
-        map: t.UnknownRecord
-    })
-})
-
-const User = t.type({
-  name: t.string,
-  age: t.number,
-  isAdmin: t.boolean,
-});
+    hiddenArray: t.UnknownArray,
+    hiddenMap: t.UnknownRecord,
+    status: t.union([
+      t.literal("Active"),
+      t.literal("Deleted"),
+    ]),
+    readOnlyString: t.readonly(t.string),
+    readOnlyType: t.readonly(
+        t.type({
+            id: t.number,
+            uid: t.string,
+        })
+    ),
+    readonlyArr: t.readonlyArray(t.string)
+  })
 
 const Comment = t.type({
   username: t.string,
   content: t.number,
 });
 
-const BlogPost = t.type({
-  title: t.string,
-  content: t.string,
-  comments: t.array(Comment),
-  author: t.union([t.null, User]),
-});
+const Blog = t.partial({
+    title: t.string,
+    comments: t.array(Comment),
+    fields: t.keyof(Comment)
+})
 
 const userObj = {
     name: "John",
@@ -79,35 +91,40 @@ sayHello(userObj.name)
 ```typescript
 import z from 'zod'
 
-const PartialObject = z.object({
-    hello: z.string(),
+const BaseUser = z.object({
+    name: z.string(),
     age: z.number(),
+    nothing: z.null(),
+    nothingType: z.null(),
+    undef: z.undefined(),
+    v: z.void(),
+    vType: z.void(),
+    hidden: z.unknown(),
     tags: z.array(z.string()),
-    deep: z.object({
-        username: z.null(),
-        testFun: z.function(),
-        permissions: z.array(z.unknown()),
-        map: z.unknown()
-    }).partial()
-}).partial()
-
-const User = z.object({
-  name: z.string(),
-  age: z.number(),
-  isAdmin: z.boolean(),
-});
+    hiddenArray: z.array(z.unknown()),
+    hiddenMap: z.unknown(),
+    status: z.union([
+      z.literal("Active"),
+      z.literal("Deleted"),
+    ]),
+    readOnlyString: z.string().readonly(),
+    readOnlyType: z.object({
+            id: z.number(),
+            uid: z.string(),
+        }).readonly(),
+    readonlyArr: z.array(z.string()).readonly()
+  })
 
 const Comment = z.object({
   username: z.string(),
   content: z.number(),
 });
 
-const BlogPost = z.object({
-  title: z.string(),
-  content: z.string(),
-  comments: z.array(Comment),
-  author: z.union([z.null(), User]),
-});
+const Blog = z.object({
+    title: z.string(),
+    comments: z.array(Comment),
+    fields: Comment.keyof()
+}).partial()
 
 const userObj = {
     name: "John",
@@ -120,34 +137,4 @@ function sayHello(name: string){
 }
 
 sayHello(userObj.name)
-```
-
-## Object transformation
-
-```typescript
-import * as t from 'io-ts';
-
-const User = t.type({
-  name: t.string,
-  age: t.number,
-  isAdmin: t.boolean,
-  permissions: t.array(t.string),
-  access: t.type({
-    top: t.union([t.null, t.boolean])
-  })
-});
-```
-
-```typescript
-import z from 'zod'
-
-const User = z.object({
-  name: z.string(),
-  age: z.number(),
-  isAdmin: z.boolean(),
-  permissions: z.array(z.string()),
-  access: z.object({
-    top: z.union([z.null(), z.boolean()])
-  })
-});
 ```
