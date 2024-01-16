@@ -9,18 +9,6 @@ tags: #syntax, #default, #export
 ```grit
 language js
 
-function current_filename() {
-    $parts = split($filename, "/"),
-    $final = $parts[-1],
-    return $final
-}
-
-function current_filename_without_extension() {
-    $raw = current_filename(),
-    $split = split($raw, "."),
-    return $split[0]
-}
-
 function make_identifiable($original) js {
     return $original.text.replaceAll("-", "_");
 }
