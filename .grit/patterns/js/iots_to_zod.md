@@ -10,35 +10,47 @@ tags: #migration, #js, #zod, #io-ts
 engine marzano(0.1)
 language js
 
-`import * as $alias from "io-ts"` => `import z from 'zod'` where {
-    $program <: contains bubble($alias) or {
-        `$alias.partial($val)` => `z.object($val).partial()`,
-        `$alias.type($val)` => `z.object($val)`,
-        `$alias.readonly($val)` => `$val.readonly()`,
-        `$alias.readonlyArray($val)` => `z.array($val).readonly()`,
-        `$alias.keyof($val)` => `$val.keyof()`,
-        `$alias.$typeName($val)` => `z.$typeName($val)`,   
-        `$alias.$typeName` => `z.$typeName` where $typeName <: bubble or {            
-                contains `nullType` => `null()`,
-                contains `Int` => `number()`,
-                contains `voidType` => `void()`,
-                contains `Function` => `function()`,
-                contains `UnknownArray` => `array(z.unknown())`,                                
-                contains `UnknownRecord` => `unknown()`,                
-                // not sure this one 
-                $typeName => `$typeName()` where $typeName <: not or {
-                    `array`, `union`, `literal`, `readonly`
-                } 
+or {
+    `import * as $alias from "io-ts"` => `import z from 'zod'` where {
+        $program <: contains bubble($alias) or {
+            `$alias.$type($val)` as $exp => `z.$type($val)` where or {
+                $type <: `type` => `object`,
+                $exp <: `$alias.partial($val)`  => `z.object($val).partial()`,
+                $exp <: `$alias.readonly($val)` => `$val.readonly()`,
+                $exp <: `$alias.readonlyArray($val)` => `z.array($val).readonly()`,
+                $exp <: `$alias.keyof($val)` => `$val.keyof()`,
+                $exp <: `$alias.intersection([$args])` => `z.intersection($args)`,
+                $exp <: `$alias.$typeName($val)` => `z.$typeName($val)`,
+            },
+            `$alias.$type` => `z.$type` where $type <: or {
+                `nullType` => `null()`,
+                `Int` => `number()`,
+                or {`void`, `voidType`} => `void()`,
+                `Function` => `function()`,
+                `UnknownArray` => `array(z.unknown())`,
+                `UnknownRecord` => `unknown()`,
+            },
+            `$alias.$type($val)` => `z.$type($val)`,
+            `$alias.$type` => `z.$type()`,
         }
-        
-   }
+    },
+    `import $alias from "fp-ts/Either"` => . where {
+         $program <: contains or {
+             `$schema.decode($val)` => `$schema.safeParse($val)`,
+             `$var.right` => `$var.data`,
+             `isLeft($data)` => `!$data.success`
+         }
+    }
 }
 ```
 
+## Transform io-ts schemas and validation to zod equivalent
+
 ```typescript
 import * as t from 'io-ts';
+import { isLeft } from "fp-ts/Either";
 
-const BaseUser = t.type({
+const User = t.type({
     name: t.string,
     age: t.number,
     nothing: t.null,
@@ -50,6 +62,7 @@ const BaseUser = t.type({
     tags: t.array(t.string),
     hiddenArray: t.UnknownArray,
     hiddenMap: t.UnknownRecord,
+    optional: t.union([t.string, t.null]),
     status: t.union([
       t.literal("Active"),
       t.literal("Deleted"),
@@ -64,6 +77,21 @@ const BaseUser = t.type({
     readonlyArr: t.readonlyArray(t.string)
   })
 
+const A = t.type({
+  foo: t.string
+})
+
+const B = t.partial({
+  bar: t.number
+})
+
+const C = t.type({
+    foo: t.string,
+    bar: t.number
+})
+
+const ABC = t.intersection([A, B, C])
+
 const Comment = t.type({
   username: t.string,
   content: t.number,
@@ -75,23 +103,21 @@ const Blog = t.partial({
     fields: t.keyof(Comment)
 })
 
-const userObj = {
-    name: "John",
-    age: 10
+const data: unknown = {}
+const decoded = User.decode(data); 
+
+if (isLeft(decoded)) {
+  throw Error("Validation failed");
+  
 }
 
-function sayHello(name: string){
-    console.log(`log: ${name}`)
-    return `Hello ${name}`
-}
-
-sayHello(userObj.name)
+const decodedUser = decoded.right; 
 ```
 
 ```typescript
 import z from 'zod'
 
-const BaseUser = z.object({
+const User = z.object({
     name: z.string(),
     age: z.number(),
     nothing: z.null(),
@@ -103,6 +129,7 @@ const BaseUser = z.object({
     tags: z.array(z.string()),
     hiddenArray: z.array(z.unknown()),
     hiddenMap: z.unknown(),
+    optional: z.union([z.string(), z.null()]),
     status: z.union([
       z.literal("Active"),
       z.literal("Deleted"),
@@ -115,6 +142,21 @@ const BaseUser = z.object({
     readonlyArr: z.array(z.string()).readonly()
   })
 
+const A = z.object({
+  foo: z.string()
+})
+
+const B = z.object({
+  bar: z.number()
+}).partial()
+
+const C = z.object({
+    foo: z.string(),
+    bar: z.number()
+})
+
+const ABC = z.intersection(A, B, C)
+
 const Comment = z.object({
   username: z.string(),
   content: z.number(),
@@ -126,15 +168,13 @@ const Blog = z.object({
     fields: Comment.keyof()
 }).partial()
 
-const userObj = {
-    name: "John",
-    age: 10
+const data: unknown = {}
+const decoded = User.safeParse(data); 
+
+if (!decoded.success) {
+  throw Error("Validation failed");
+  
 }
 
-function sayHello(name: string){
-    console.log(`log: ${name}`)
-    return `Hello ${name}`
-}
-
-sayHello(userObj.name)
+const decodedUser = decoded.data; 
 ```
