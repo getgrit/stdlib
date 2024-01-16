@@ -37,8 +37,10 @@ function guess_name() {
         or {
             `async function $name() { $_ }` where { !$name <: . },
             `function $name() { $_ }` where { !$name <: . },
+            `function* $name() { $_ }` where { !$name <: . },
             `async function($params) { $body }` => `async function $guess_name($params) { $body }`,
-            `function($params) { $body }` => `function $guess_name($params) { $body }`
+            `function($params) { $body }` => `function $guess_name($params) { $body }`,
+            `function* ($params) { $body }` => `function* $guess_name($params) { $body }`,
         } where {
             $full_export => `export $export`
         },
@@ -122,10 +124,25 @@ export async function foofile() {
 }
 ```
 
+## Generator function
+
+```javascript
+// @filename: foofile.js
+export default function* () {
+  console.log('anon');
+}
+```
+
+```javascript
+// @filename: foofile.js
+export function* foofile() {
+  console.log('anon');
+}
+```
+
 # TODO
 
 ```
-export default function functionName() { /* … */ }
 export default class ClassName { /* … */ }
 export default function* generatorFunctionName() { /* … */ }
 export default function () { /* … */ }
