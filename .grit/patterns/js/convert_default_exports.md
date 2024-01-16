@@ -9,8 +9,24 @@ tags: #syntax, #default, #export
 ```grit
 language js
 
+function current_filename() {
+    $parts = split($filename, "/"),
+    $final = $parts[-1],
+    return $final
+}
+
+function current_filename_without_extension() {
+    $raw = current_filename(),
+    $split = split($raw, "."),
+    return $split[0]
+}
+
 `export default $export` where {
-    $export <: `function $name() { $_ }`
+    $new_name = current_filename_without_extension(),
+    $export <: or {
+        `function $name() { $_ }` where { !$name <: . },
+        `function() { $body }` => `function $new_name() { $body }`
+    }
 } => `export $export`
 ```
 
@@ -22,23 +38,29 @@ export default function name() {
 }
 ```
 
+```javascript
+export function name() {
+  console.log('test');
+}
+```
+
 ## Anon function
 
 ```javascript
+// @filename: foofile.js
 export default function () {
   console.log('anon');
 }
 ```
 
-## Bag of cases
-
 ```javascript
-export default class ClassName { /* … */ }
-export default function* generatorFunctionName() { /* … */ }
-export default function () { /* … */ }
-export default class { /* … */ }
-export default function* () { /* … */ }
+// @filename: foofile.js
+export function foofile() {
+  console.log('anon');
+}
 ```
+
+# TODO
 
 ## Generic expression
 
