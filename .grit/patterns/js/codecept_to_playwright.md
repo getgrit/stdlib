@@ -42,6 +42,7 @@ pattern convert_test() {
             `I.selectInDropdown` => `this.selectInDropdown`,
             expression_statement($expression) where {
                 $expression <: call_expression(),
+                $expression <: not `console.log($_)`,
                 $expression => `await $expression`,
             },
             `I.haveWithCachePing($client)` => `factory.create($client)`,
@@ -158,6 +159,7 @@ pattern convert_locators($page) {
         `I.waitForText($text, $target)` => `await expect($target).toHaveText($text, {
             ignoreCase: true,
         })`,
+        `I.waitForText($text)` => `await $page.getByText($text).waitFor({ state: 'visible' })`,
         `I.wait($timeout)` => `await $page.waitForTimeout($timeout * 1000)`,
         `I.seeElement($target)` => `await expect($target).toBeVisible()`,
         `I.dontSeeElement($target)` => `await expect($target).toBeHidden()`,
@@ -222,6 +224,7 @@ pattern convert_locators($page) {
         `I.attachFile($target, $file)` => `await $target.setInputFiles($file)`,
         `I.clearFieldValue($field)` => `await $field.clear()`,
         `I.fillFieldViaPressKeys($target, $value)` => `await $target.fill($value)`,
+        `I.fillField($target, $value)` => `await $target.fill($value)`,
         `I.grabNumberOfVisibleElements($target)` => `await $target.count()`,
         `I.seeNumberOfVisibleElements($target, $count)` => `expect(await $target.count()).toEqual($count)`,
         `I.waitNumberOfVisibleElements($target, $count)` => `await expect($target).toHaveCount($count)`,
@@ -231,6 +234,7 @@ pattern convert_locators($page) {
         `I.assertNotEqual($actual, $expected)` => `expect($actual).not.toEqual($expected)`,
         `I.backToPreviousPage()` => `await $page.goBack()`,
         `I.seeCheckboxIsChecked($target)` => `await expect($target).toBeChecked()`,
+        `I.dontSeeCheckboxIsChecked($target)` => `await expect($target).not.toBeChecked()`,
         `I.grabTextFrom($target)` => `page.locator($target).allInnerTexts()`,
         `I.say($log)` => `console.log($log)`,
         `$target.at($nth)` as $at where {
