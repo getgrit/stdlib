@@ -42,6 +42,7 @@ pattern convert_test() {
             `I.selectInDropdown` => `this.selectInDropdown`,
             expression_statement($expression) where {
                 $expression <: call_expression(),
+                $expression <: not `console.log($_)`,
                 $expression => `await $expression`,
             },
             `I.haveWithCachePing($client)` => `factory.create($client)`,
