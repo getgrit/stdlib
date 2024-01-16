@@ -233,6 +233,7 @@ pattern convert_locators($page) {
         `I.assertNotEqual($actual, $expected)` => `expect($actual).not.toEqual($expected)`,
         `I.backToPreviousPage()` => `await $page.goBack()`,
         `I.seeCheckboxIsChecked($target)` => `await expect($target).toBeChecked()`,
+        `I.dontSeeCheckboxIsChecked($target)` => `await expect($target).not.toBeChecked()`,
         `I.grabTextFrom($target)` => `page.locator($target).allInnerTexts()`,
         `I.say($log)` => `console.log($log)`,
         `$target.at($nth)` as $at where {
