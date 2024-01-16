@@ -64,6 +64,20 @@ export function name() {
 }
 ```
 
+## Async function
+
+```javascript
+export default async function name() {
+  console.log('test');
+}
+```
+
+```javascript
+export async function name() {
+  console.log('test');
+}
+```
+
 ## Anon function
 
 ```javascript
