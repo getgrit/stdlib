@@ -9,45 +9,40 @@ tags: #syntax, #default, #export
 ```grit
 language js
 
-or {
-  `export default async function($args) { $body }` => `export default async function main($args) { $body }`,
-  `export default function($args) { $body }` => `export default function main($args) { $body }`,
-  `export default $f` => `const main = $f;\nexport default main` where {
-    $f <: `($args) => { $body }`
-  }
-}
+`export default $export` where {
+    $export <: `function $name() { $_ }`
+} => `export $export`
 ```
 
-## Name synchronous function declaration main
+## Named function
 
 ```javascript
-export default function () {
+export default function name() {
   console.log('test');
 }
 ```
 
-```typescript
-
-```
-
-## Name asynchronous function declaration main
+## Anon function
 
 ```javascript
-export default async function (test) {
-  console.log(test);
+export default function () {
+  console.log('anon');
 }
 ```
 
-```typescript
-
-```
-
-## Name arrow function main
+## Bag of cases
 
 ```javascript
-
+export default class ClassName { /* … */ }
+export default function* generatorFunctionName() { /* … */ }
+export default function () { /* … */ }
+export default class { /* … */ }
+export default function* () { /* … */ }
 ```
 
-```typescript
+## Generic expression
 
+```javascript
+const myFunc = () => {};
+export default wrapper(myFunc);
 ```
