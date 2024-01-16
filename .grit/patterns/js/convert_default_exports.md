@@ -21,13 +21,15 @@ function current_filename_without_extension() {
     return $split[0]
 }
 
-`export default $export` where {
-    $new_name = current_filename_without_extension(),
+`export default $export` as $full_export where {
+    $guess_name = current_filename_without_extension(),
     $export <: or {
         `function $name() { $_ }` where { !$name <: . },
-        `function() { $body }` => `function $new_name() { $body }`
+        `function($params) { $body }` => `function $guess_name($params) { $body }`
+    } where {
+        $full_export => `export $export`
     }
-} => `export $export`
+}
 ```
 
 ## Named function
@@ -61,6 +63,16 @@ export function foofile() {
 ```
 
 # TODO
+
+```
+export default expression;
+export default function functionName() { /* … */ }
+export default class ClassName { /* … */ }
+export default function* generatorFunctionName() { /* … */ }
+export default function () { /* … */ }
+export default class { /* … */ }
+export default function* () { /* … */ }
+```
 
 ## Generic expression
 
