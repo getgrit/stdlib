@@ -14,7 +14,10 @@ pattern replace_default_import($source, $new_name) {
     `import { $imports } from $source` where {
       $imports <: contains `default` => $new_name
     },
-    `import $alias from $source` => `import { $new_name } from $source`,
+    `import $alias, { $imports } from $source` => `import { $imports } from $source` where {
+      $imports += `$new_name as $alias`
+    },
+    `import $alias from $source` => `import { $new_name as $alias } from $source`,
   }
 }
 
@@ -33,7 +36,21 @@ import otherImport from 'foobar';
 
 ```ts
 import starImport from 'star';
-import { namedImport } from 'here';
+import { namedImport as ourImport } from 'here';
+import otherImport from 'foobar';
+```
+
+## Default imports and named imports
+
+```ts
+import starImport from 'star';
+import ourImport, { otherImport, coolImport } from 'here';
+import otherImport from 'foobar';
+```
+
+```ts
+import starImport from 'star';
+import { otherImport, coolImport, namedImport as ourImport } from 'here';
 import otherImport from 'foobar';
 ```
 
