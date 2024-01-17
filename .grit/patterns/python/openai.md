@@ -198,13 +198,23 @@ pattern pytest_patch() {
     },
 }
 
-
+pattern fix_object_accessing($var) {
+  or {
+    `$x['$y']` as $sub => `$x.$y` where {
+      $sub <: contains $var
+    },
+    `$x.get("$y")` => `$x.$y` where {
+      $x <: contains $var
+    }
+  }
+}
 
 // When there is a variable used by an openai call, make sure it isn't subscripted
 pattern fix_downstream_openai_usage() {
     $var where {
-        $program <: maybe contains bubble($var) `$x['$y']` as $sub => `$x.$y` where {
-          $sub <: contains $var
+        $program <: maybe contains fix_object_accessing($var),
+        $program <: maybe contains `for $chunk in $var: $body` where {
+          $body <: maybe contains fix_object_accessing($chunk)
         }
     }
 }
@@ -658,12 +668,13 @@ from openai import OpenAI
 client = OpenAI()
 
 completion = client.chat.completions.create(model=model,
-messages=[
-    {"role": "system", "content": system},
-    {"role": "user", "content":
-     user + text},
-],
-stream=True)
+  messages=[
+      {"role": "system", "content": system},
+      {"role": "user", "content":
+      user + text},
+  ],
+  stream=True
+)
 
 for chunk in completion:
     print(chunk)
