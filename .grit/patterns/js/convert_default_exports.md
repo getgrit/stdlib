@@ -31,7 +31,7 @@ function guess_name() {
             `function($params) { $body }` => `function $guess_name($params) { $body }`,
             `function* ($params) { $body }` => `function* $guess_name($params) { $body }`,
             `class { $body }` where {
-              $class_name = capitalize($guess_name)
+                $class_name = capitalize($guess_name)
             } => `class $class_name { $body }`
         } where {
             $full_export => `export $export`
