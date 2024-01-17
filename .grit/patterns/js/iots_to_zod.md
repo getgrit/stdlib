@@ -13,23 +13,22 @@ language js
 or {
     `import * as $alias from "io-ts"` => `import z from 'zod'` where {
         $program <: contains bubble($alias) or {
-            `$alias.$type($val)` as $exp => `z.$type($val)` where or {
-                $type <: `type` => `object`,
-                $exp <: `$alias.partial($val)`  => `z.object($val).partial()`,
-                $exp <: `$alias.readonly($val)` => `$val.readonly()`,
-                $exp <: `$alias.readonlyArray($val)` => `z.array($val).readonly()`,
-                $exp <: `$alias.keyof($val)` => `$val.keyof()`,
-                $exp <: `$alias.intersection([$args])` => `z.intersection($args)`,
-                $exp <: `$alias.$typeName($val)` => `z.$typeName($val)`,
+            `$alias.$type($val)` as $exp => `z.$type($val)` where $exp <: or {                
+                `$alias.type($val)`  => `z.object($val)`,
+                `$alias.partial($val)`  => `z.object($val).partial()`,
+                `$alias.readonly($val)` => `$val.readonly()`,
+                `$alias.readonlyArray($val)` => `z.array($val).readonly()`,
+                `$alias.keyof($val)` => `$val.keyof()`,
+                `$alias.intersection([$args])` => `z.intersection($args)`,
             },
-            `$alias.$type` => `z.$type` where $type <: or {
+            `$alias.$type` => `z.$type` where $type <: or {                
                 `nullType` => `null()`,
                 `Int` => `number()`,
                 or {`void`, `voidType`} => `void()`,
                 `Function` => `function()`,
-                `UnknownArray` => `array(z.unknown())`,
-                `UnknownRecord` => `unknown()`,
-            },
+                `UnknownArray` => `array(z.unknown())`,                                
+                `UnknownRecord` => `unknown()`, 
+            },            
             `$alias.$type($val)` => `z.$type($val)`,
             `$alias.$type` => `z.$type()`,
         }
@@ -38,7 +37,7 @@ or {
          $program <: contains or {
              `$schema.decode($val)` => `$schema.safeParse($val)`,
              `$var.right` => `$var.data`,
-             `isLeft($data)` => `!$data.success`
+             `isLeft($data)` => `!$data.success` 
          }
     }
 }
