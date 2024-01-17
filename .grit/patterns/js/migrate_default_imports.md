@@ -16,9 +16,10 @@ multifile {
   bubble($modules) file($name, $body) where {
     $modules <: some bubble($body) $module where {
       $module_name = $module[0],
+      $import_name = strip_extension($module_name),
       $new_name = $module[1],
       $body <: contains replace_default_import($source, $new_name) where {
-        $source <: `"mymodule"`
+        $source <: `"$import_name"`
       }
     }
   }

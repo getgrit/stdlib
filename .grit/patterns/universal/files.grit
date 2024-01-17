@@ -17,6 +17,6 @@ function strip_extension($original) {
 function current_filename_without_extension() {
     $raw = current_filename(),
     $stripped = strip_extension($raw),
-    return $split[0]
+    return $stripped
 }
 
