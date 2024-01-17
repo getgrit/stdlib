@@ -1,0 +1,22 @@
+language universal
+
+// Useful utilities for working with files
+
+function current_filename() {
+    $parts = split($filename, "/"),
+    $final = $parts[-1],
+    return $final
+}
+
+function strip_extension($original) {
+    $parts = split($original, "."),
+    $final = $parts[0],
+    return $final
+}
+
+function current_filename_without_extension() {
+    $raw = current_filename(),
+    $stripped = strip_extension($raw),
+    return $stripped
+}
+
