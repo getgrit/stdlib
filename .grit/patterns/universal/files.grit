@@ -8,9 +8,15 @@ function current_filename() {
     return $final
 }
 
+function strip_extension($original) {
+    $parts = split($original, "."),
+    $final = $parts[0],
+    return $final
+}
+
 function current_filename_without_extension() {
     $raw = current_filename(),
-    $split = split($raw, "."),
+    $stripped = strip_extension($raw),
     return $split[0]
 }
 

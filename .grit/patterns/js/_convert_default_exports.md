@@ -19,29 +19,35 @@ function guess_name() {
     return $identifiable
 }
 
-`export default $export` as $full_export where {
-    $guess_name = guess_name(),
-    $export <: or {
-        or {
-            `async function $name() { $_ }` where { !$name <: . },
-            `function $name() { $_ }` where { !$name <: . },
-            `function* $name() { $_ }` where { !$name <: . },
-            `class $name { $_ }` where { !$name <: . },
-            `async function($params) { $body }` => `async function $guess_name($params) { $body }`,
-            `function($params) { $body }` => `function $guess_name($params) { $body }`,
-            `function* ($params) { $body }` => `function* $guess_name($params) { $body }`,
-            `class { $body }` where {
-              $class_name = capitalize($guess_name)
-            } => `class $class_name { $body }`
-        } where {
-            $full_export => `export $export`
-        },
-        // handle expression statements
-        `$_` where {
-            $full_export => `export const $guess_name = $export;`
-        }
-    }
+
+pattern convert_default_exports($export_name) {
+  `export default $export` as $full_export where {
+      $guess_name = guess_name(),
+      $export_name = $guess_name,
+      $export <: or {
+          or {
+              `async function $name() { $_ }` where { !$name <: ., $export_name = $name },
+              `function $name() { $_ }` where { !$name <: ., $export_name = $name },
+              `function* $name() { $_ }` where { !$name <: ., $export_name = $name },
+              `class $name { $_ }` where { !$name <: ., $export_name = $name },
+              `async function($params) { $body }` => `async function $guess_name($params) { $body }`,
+              `function($params) { $body }` => `function $guess_name($params) { $body }`,
+              `function* ($params) { $body }` => `function* $guess_name($params) { $body }`,
+              `class { $body }` where {
+                $class_name = capitalize($guess_name)
+              } => `class $class_name { $body }`
+          } where {
+              $full_export => `export $export`
+          },
+          // handle expression statements
+          `$_` where {
+              $full_export => `export const $guess_name = $export;`
+          }
+      }
+  }
 }
+
+convert_default_exports()
 ```
 
 ## Named function
