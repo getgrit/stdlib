@@ -630,3 +630,43 @@ comp = completion.usage.completion_tokens
 # unrelated variable
 foo = something['else']
 ```
+
+## Fix completion streaming
+
+```python
+import openai
+
+completion = openai.ChatCompletion.create(
+    model=model,
+    messages=[
+        {"role": "system", "content": system},
+        {"role": "user", "content":
+         user + text},
+    ],
+    stream=True
+)
+
+for chunk in completion:
+    print(chunk)
+    print(chunk.choices[0].delta.get("content"))
+    print("****************")
+```
+
+```python
+from openai import OpenAI
+
+client = OpenAI()
+
+completion = client.chat.completions.create(model=model,
+messages=[
+    {"role": "system", "content": system},
+    {"role": "user", "content":
+     user + text},
+],
+stream=True)
+
+for chunk in completion:
+    print(chunk)
+    print(chunk.choices[0].delta.content)
+    print("****************")
+```
