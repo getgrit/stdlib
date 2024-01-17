@@ -11,6 +11,9 @@ language js
 pattern replace_default_import($source, $new_name) {
   or {
     `import * as $alias from $source` => `import { $new_name as $alias } from $source`,
+    `import { $imports } from $source` where {
+      $imports <: contains `default` => $new_name
+    },
     `import $alias from $source` => `import { $new_name } from $source`,
   }
 }
@@ -52,12 +55,26 @@ import otherImport from 'foobar';
 
 ```ts
 import starImport from 'star';
-import { default as alias } from 'module-name';
+import { default as alias } from 'here';
 import otherImport from 'foobar';
 ```
 
 ```ts
 import starImport from 'star';
-import { namedImport as alias } from 'module-name';
+import { namedImport as alias } from 'here';
+import otherImport from 'foobar';
+```
+
+## Default import alias, with siblings
+
+```ts
+import starImport from 'star';
+import { default as alias, sibling } from 'here';
+import otherImport from 'foobar';
+```
+
+```ts
+import starImport from 'star';
+import { namedImport as alias, sibling } from 'here';
 import otherImport from 'foobar';
 ```
