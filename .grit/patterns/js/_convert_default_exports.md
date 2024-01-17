@@ -177,3 +177,91 @@ export class MyClass {
   }
 }
 ```
+
+## Arrow function
+
+```js
+export default () => {
+  console.log('test');
+};
+```
+
+```js
+export const test_file_0 = () => {
+  console.log('test');
+};
+```
+
+## Object
+
+```js
+export default {
+  foo: 'bar',
+};
+```
+
+```js
+export const test_file_0 = {
+  foo: 'bar',
+};
+```
+
+## Array
+
+```js
+export default [1, 2, 3];
+```
+
+```js
+export const test_file_0 = [1, 2, 3];
+```
+
+## String
+
+```js
+export default 'hello';
+```
+
+```js
+export const test_file_0 = 'hello';
+```
+
+## Number
+
+```js
+export default 123;
+```
+
+```js
+export const test_file_0 = 123;
+```
+
+## Boolean
+
+```js
+export default true;
+```
+
+```js
+export const test_file_0 = true;
+```
+
+## Null
+
+```js
+export default null;
+```
+
+```js
+export const test_file_0 = null;
+```
+
+## Undefined
+
+```js
+export default undefined;
+```
+
+```js
+export const test_file_0 = undefined;
+```
