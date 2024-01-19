@@ -10,18 +10,23 @@ language js
 multifile {
   $modules = [],
   // First collect the exports
-  bubble($modules) file($name, $body) where {
+  bubble($modules) maybe file($name, $body) where {
     $body <: contains convert_default_exports($export_name),
-    $modules += [$name, $export_name]
+    $canonical_path = resolve($name),
+    $modules += [$canonical_path, $export_name]
   },
   // Then replace the imports, if they match
-  maybe bubble($modules) file($name, $body) where {
+  bubble($modules) maybe file($name, $body) where {
     $modules <: some bubble($body) $module where {
-      $module_name = $module[0],
-      $import_name = strip_extension($module_name),
+      $candidate_path = $module[0],
+      $candidate_path = strip_extension($candidate_path),
       $new_name = $module[1],
-      $body <: contains replace_default_import($source, $new_name) where {
-        $source <: `"$import_name"`
+      $body <: contains bubble($candidate_path, $new_name, $body) replace_default_import($source, $new_name) where {
+        $source <: `"$candidate_source"`,
+        $this_canonical = resolve($candidate_source),
+        $this_stripped = strip_extension($this_canonical),
+        // $this_stripped <: $import_name
+        $body += `ours: $this_stripped, theirs: $candidate_path\n`
       }
     }
   }
@@ -31,23 +36,23 @@ multifile {
 ## Basic case
 
 ```ts
-// @filename: mymodule.ts
+// @filename: foo/mymodule.ts
 export default function name() {
   console.log('test');
 }
 
-// @filename: module_user.ts
+// @filename: foo/module_user.ts
 import name from 'mymodule';
 import other from 'othermodule';
 ```
 
 ```ts
-// @filename: mymodule.ts
+// @filename: foo/mymodule.ts
 export function name() {
   console.log('test');
 }
 
-// @filename: module_user.ts
+// @filename: foo/module_user.ts
 import { name as name } from 'mymodule';
 import other from 'othermodule';
 ```
