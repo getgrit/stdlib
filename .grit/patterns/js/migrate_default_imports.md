@@ -12,7 +12,7 @@ multifile {
   // First collect the exports
   bubble($modules) maybe file($name, $body) where {
     $body <: contains convert_default_exports($export_name),
-    $canonical_path = resolve($name),
+    $canonical_path = $absolute_filename,
     $modules += [$canonical_path, $export_name]
   },
   // Then replace the imports, if they match
@@ -25,8 +25,7 @@ multifile {
         $source <: `"$candidate_source"`,
         $this_canonical = resolve($candidate_source),
         $this_stripped = strip_extension($this_canonical),
-        // $this_stripped <: $import_name
-        $body += `ours: $this_stripped, theirs: $candidate_path\n`
+        $this_stripped <: $candidate_path
       }
     }
   }
