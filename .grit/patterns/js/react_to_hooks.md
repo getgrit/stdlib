@@ -685,6 +685,12 @@ class MyComponent extends Component {
   constructor(props: Props) {
     const five = 2 + 3;
     this.saySomething();
+
+    if(five === 5){
+      console.log("Hello");
+      this.doSomething();
+    }
+
     this.state = {
       secret: five,
     };
@@ -692,6 +698,10 @@ class MyComponent extends Component {
 
   saySomething() {
     console.log('hi');
+  }
+
+  doSomething(){
+    console.log("Welcome")
   }
 
   render() {
@@ -709,10 +719,17 @@ const MyComponent = () => {
   const saySomethingHandler = useCallback(() => {
     console.log('hi');
   }, []);
-
+  const doSomethingHandler = useCallback(() => {
+    console.log("Welcome");
+  }, []);
+  
   const five = 2 + 3;
-  saySomethingHandler();
-
+  saySomethingHandler(); 
+  if (five === 5) {
+    console.log("Hello")
+    doSomethingHandler()
+  }
+  
   return <></>;
 };
 ```
