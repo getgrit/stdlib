@@ -9,8 +9,6 @@ This pattern wraps a PLSQL `CREATE PROCEDURE` body in dollar quotes and adds a l
 engine marzano(0.1)
 language sql
 
-language sql
-
 pattern dollar_quote_procedure_body() {
 `CREATE PROCEDURE $name($args) AS $decl $block;` as $proc where {
     $block => `$$$block;\n$$ LANGUAGE plpgsql`,
