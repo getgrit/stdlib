@@ -1236,3 +1236,40 @@ const Loader = () => {
 
 export default Loader;
 ```
+
+## Remove method this binding
+
+```ts
+import { Component } from 'base';
+
+export default class ThisBind extends Component {
+  constructor(props){
+    super(props)
+
+    this.sayHello = this.sayHello.bind(this)
+  }
+
+  sayHello(){
+    console.log("Hello!")
+  }
+
+  render() {
+    return null;
+  }
+}
+```
+
+```ts
+import { Component } from "base";
+import { useCallback } from "react";
+
+const ThisBind = () => {
+  const sayHelloHandler = useCallback(() => {
+    console.log("Hello!");
+  }, []);
+
+  return null;
+};
+
+export default ThisBind;
+```
