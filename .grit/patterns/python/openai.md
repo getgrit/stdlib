@@ -198,13 +198,23 @@ pattern pytest_patch() {
     },
 }
 
-
+pattern fix_object_accessing($var) {
+  or {
+    `$x['$y']` as $sub => `$x.$y` where {
+      $sub <: contains $var
+    },
+    `$x.get("$y")` => `$x.$y` where {
+      $x <: contains $var
+    }
+  }
+}
 
 // When there is a variable used by an openai call, make sure it isn't subscripted
 pattern fix_downstream_openai_usage() {
     $var where {
-        $program <: maybe contains bubble($var) `$x['$y']` as $sub => `$x.$y` where {
-          $sub <: contains $var
+        $program <: maybe contains fix_object_accessing($var),
+        $program <: maybe contains `for $chunk in $var: $body` where {
+          $body <: maybe contains fix_object_accessing($chunk)
         }
     }
 }
@@ -255,7 +265,13 @@ pattern openai_main($client, $azure) {
                   $client_params += `api_version=$val`,
                 },
                 $_ where {
-                  $res = todo(message=`The 'openai.$field' option isn't read in the client API. You will need to pass it when you instantiate the client, e.g. 'OpenAI($field=$val)'`, target=$setter),
+                  // Rename the field, if necessary
+                  if ($field <: `api_base`) {
+                    $new_name = `base_url`,
+                  } else {
+                    $new_name = $field
+                  },
+                  $res = todo(message=`The 'openai.$field' option isn't read in the client API. You will need to pass it when you instantiate the client, e.g. 'OpenAI($new_name=$val)'`, target=$setter),
                   $need_openai_import = `true`,
                 }
               }
@@ -400,7 +416,7 @@ import openai
 if openai_proxy:
     # TODO: The 'openai.proxy' option isn't read in the client API. You will need to pass it when you instantiate the client, e.g. 'OpenAI(proxy=openai_proxy)'
     # openai.proxy = openai_proxy
-    # TODO: The 'openai.api_base' option isn't read in the client API. You will need to pass it when you instantiate the client, e.g. 'OpenAI(api_base=self.openai_api_base)'
+    # TODO: The 'openai.api_base' option isn't read in the client API. You will need to pass it when you instantiate the client, e.g. 'OpenAI(base_url=self.openai_api_base)'
     # openai.api_base = self.openai_api_base
 ```
 
@@ -623,4 +639,45 @@ comp = completion.usage.completion_tokens
 
 # unrelated variable
 foo = something['else']
+```
+
+## Fix completion streaming
+
+```python
+import openai
+
+completion = openai.ChatCompletion.create(
+    model=model,
+    messages=[
+        {"role": "system", "content": system},
+        {"role": "user", "content":
+         user + text},
+    ],
+    stream=True
+)
+
+for chunk in completion:
+    print(chunk)
+    print(chunk.choices[0].delta.get("content"))
+    print("****************")
+```
+
+```python
+from openai import OpenAI
+
+client = OpenAI()
+
+completion = client.chat.completions.create(model=model,
+  messages=[
+      {"role": "system", "content": system},
+      {"role": "user", "content":
+      user + text},
+  ],
+  stream=True
+)
+
+for chunk in completion:
+    print(chunk)
+    print(chunk.choices[0].delta.content)
+    print("****************")
 ```
