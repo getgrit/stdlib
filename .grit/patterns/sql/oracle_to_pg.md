@@ -26,6 +26,7 @@ CREATE TABLE employees
 	boid VARCHAR2(40 CHAR),
     info CLOB,
     data BLOB,
+    my_interval INTERVAL DAY TO SECOND,
     pct_complete FLOAT,
 	updated_at TIMESTAMP(9),
     config XMLTYPE
@@ -52,6 +53,7 @@ CREATE TABLE employees
 	boid VARCHAR(40),
     info TEXT,
     data BYTEA,
+    my_interval INTERVAL,
     pct_complete DOUBLE PRECISION,
 	updated_at TIMESTAMP(9),
     config XML
