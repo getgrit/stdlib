@@ -2,17 +2,14 @@
 title: (WIP) Convert Oracle PL/SQL syntax into PL/pgSQL
 ---
 
-This pattern combines several smaller patterns 
+This pattern combines several smaller patterns
 
 ```grit
 engine marzano(0.1)
 language sql
 
-sequential {
-    convert_types(),
-    add_unit_tests_for_procedures(),
-    dollar_quote_procedure_body()
-}
+
+convert_oracle_to_pg()
 ```
 
 ## example
@@ -25,10 +22,11 @@ CREATE TABLE employees
     empID NUMBER,
     salary NUMBER(6),
     pkey NUMBER(12,0),
-    category_name VARCHAR2(15 BYTE), 
+    category_name VARCHAR2(15 BYTE),
 	boid VARCHAR2(40 CHAR),
     info CLOB,
     data BLOB,
+    -- my_interval INTERVAL DAY TO SECOND,
     pct_complete FLOAT,
 	updated_at TIMESTAMP(9),
     config XMLTYPE
@@ -51,10 +49,11 @@ CREATE TABLE employees
     empID NUMERIC,
     salary NUMERIC(6),
     pkey NUMERIC(12,0),
-    category_name VARCHAR(15 BYTE), 
+    category_name VARCHAR(15 BYTE),
 	boid VARCHAR(40),
     info TEXT,
     data BYTEA,
+    -- my_interval INTERVAL DAY TO SECOND,
     pct_complete DOUBLE PRECISION,
 	updated_at TIMESTAMP(9),
     config XML

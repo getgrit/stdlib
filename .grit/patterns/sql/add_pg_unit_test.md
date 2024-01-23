@@ -17,6 +17,7 @@ SELECT has_function('$proc_name');
 SELECT is_procedure('$proc_name');
 SELECT function_lang_is('$proc_name', 'pgplsql' );
 `
+
    }
 }
 
