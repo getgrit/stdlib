@@ -2,31 +2,39 @@ engine marzano(0.1)
 language sql
 
 pattern convert_types() {
-    or {
-    	`RAW` => `BYTEA`,
-        `BINARY_DOUBLE` => `NUMERIC`,
-        `BINARY_FLOAT` => `REAL`,
-        `BINARY_INTEGER` => `INTEGER`,
-        `BLOB` => `BYTEA`,
-        `CLOB` => `TEXT`,
-        `DEC` => `DECIMAL`,
-        `DATE` => `TIMESTAMP`,
-        `FLOAT` => `DOUBLE PRECISION`,
-        `LONG` => `TEXT`,
-        "INTERVAL DAY TO SECOND" => `INTERVAL`,
-        // `NUMBER($N)` => `NUMERIC($N)`,
-        `NUMBER` => `NUMERIC`,
-        `PLS_INTEGER` => `INTEGER`,
-        `SDO_GEOMETRY` => `GEOMETRY`,
-        `ST_GEOMETRY` => `GEOMETRY`,
-        `STRING` => `VARCHAR`,
-        `TIMESTAMP WITH LOCAL TIME ZONE` => `TIMESTAMPTZ`,
-        `TIMESTAMP($P)` => `TIMESTAMP($P)`,
-        `VARCHAR2($N CHAR)` => `VARCHAR($N)`,
-        `VARCHAR2` => `VARCHAR`,
-        `XMLTYPE` => `XML`,
-    }
+    file($body) where {
+      // $body <: contains or {
+      //   column_definition($name) as $col where {
+      //     $col <: contains `INTERVAL` => `$name INTERVAL`,
+      //   }
+      // },
+      $body <: contains or {
+        `RAW` => `BYTEA`,
+          `BINARY_DOUBLE` => `NUMERIC`,
+          `BINARY_FLOAT` => `REAL`,
+          `BINARY_INTEGER` => `INTEGER`,
+          `BLOB` => `BYTEA`,
+          `CLOB` => `TEXT`,
+          `DEC` => `DECIMAL`,
+          `DATE` => `TIMESTAMP`,
+          `FLOAT` => `DOUBLE PRECISION`,
+          `LONG` => `TEXT`,
+          "INTERVAL DAY TO SECOND" => `INTERVAL`,
+          // `NUMBER($N)` => `NUMERIC($N)`,
+          `NUMBER` => `NUMERIC`,
+          `PLS_INTEGER` => `INTEGER`,
+          `SDO_GEOMETRY` => `GEOMETRY`,
+          `ST_GEOMETRY` => `GEOMETRY`,
+          `STRING` => `VARCHAR`,
+          `TIMESTAMP WITH LOCAL TIME ZONE` => `TIMESTAMPTZ`,
+          `TIMESTAMP($P)` => `TIMESTAMP($P)`,
+          `VARCHAR2($N CHAR)` => `VARCHAR($N)`,
+          `VARCHAR2` => `VARCHAR`,
+          `XMLTYPE` => `XML`,
+      }
+  }
 }
+
 pattern convert_builtins() {
     or {
         `:NEW` => `NEW`,
