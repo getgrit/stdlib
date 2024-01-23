@@ -13,7 +13,6 @@ pattern convert_types() {
         `DATE` => `TIMESTAMP`,
         `FLOAT` => `DOUBLE PRECISION`,
         `LONG` => `TEXT`,
-        "INTERVAL DAY TO SECOND" => `INTERVAL`,
         // `NUMBER($N)` => `NUMERIC($N)`,
         `NUMBER` => `NUMERIC`,
         `PLS_INTEGER` => `INTEGER`,
