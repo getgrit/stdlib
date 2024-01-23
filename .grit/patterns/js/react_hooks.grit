@@ -54,7 +54,7 @@ private pattern handle_one_statement($class_name, $statements, $states_statement
                                 },
                             expression_statement() as $decl where {
                                 $decl <: not contains `super($props)`,
-                                $decl <: not contains "bind",
+                                $decl <: not contains `$_.bind($_)`,
                                 $constructor_statements += $decl,
                             },
                         }
