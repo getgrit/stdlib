@@ -683,7 +683,12 @@ import { Component } from 'react';
 
 class MyComponent extends Component {
   constructor(props: Props) {
+    super(props);
     const five = 2 + 3;
+
+    this.doSomething = this.doSomething.bind(this)
+    this.saySomething = this.saySomething.bind(this)
+
     this.saySomething();
 
     if(five === 5){

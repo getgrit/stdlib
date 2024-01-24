@@ -44,12 +44,15 @@ private pattern handle_one_statement($class_name, $statements, $states_statement
             or {
                 and {
                     $name <: js"constructor",
-                    $body <: contains `super($_)` => .,
-                    $body <: contains `this.$_ = $_.bind(this)` => .,
-                    $body <: maybe bubble($constructor_statements) {
+                    $body <: maybe contains bubble($constructor_statements) {
                         statement_block($statements) where {
-                            $statements <: some bubble($constructor_statements) $statement where {                                
-                                $constructor_statements += $statement 
+                            $statements <: some bubble($constructor_statements) $statement where {
+                                $constructor_statements <: not contains $statement,
+                                $statement <: not contains or {
+                                    `super($_)`,
+                                    `this.$_ = $_.bind(this)`,
+                                },
+                                $constructor_statements += $statement
                             }
                         }
                     },
