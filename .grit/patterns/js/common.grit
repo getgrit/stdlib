@@ -28,3 +28,10 @@ pattern variable($declarations) {
     lexical_declaration($declarations)
   }
 }
+
+pattern base_string() {
+    or {
+        string(),
+        template_string(),
+    }
+}

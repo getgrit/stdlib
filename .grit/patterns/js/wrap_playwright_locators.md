@@ -9,13 +9,6 @@ tags: #hidden
 ```grit
 language js
 
-pattern base_string() {
-    or {
-        string(),
-        template_string(),
-    }
-}
-
 pattern concatenated_string() {
     `$a + $b` where {
         $a <: contains base_string(),
