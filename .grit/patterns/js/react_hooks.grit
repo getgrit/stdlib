@@ -46,12 +46,12 @@ private pattern handle_one_statement($class_name, $statements, $states_statement
                     $name <: js"constructor",
                     $body <: contains `super($_)` => .,
                     $body <: contains `this.$_ = $_.bind(this)` => .,
-                    $body <: maybe contains bubble($constructor_statements) {
-                        statement_block($statements) where {                            
+                    $body <: maybe bubble($constructor_statements) {
+                        statement_block($statements) where {
                             $statements <: some bubble($constructor_statements) $statement where {                                
-                                $constructor_statements += $statement
+                                $constructor_statements += $statement 
                             }
-                        }                    
+                        }
                     },
                     $body <: change_this($states_statements, is_constructor=true),
                 },
