@@ -9,9 +9,23 @@ tags: #hidden
 ```grit
 language js
 
+pattern base_string() {
+    or {
+        string(),
+        template_string(),
+    }
+}
+
+pattern concatenated_string() {
+    `$a + $b` where {
+        $a <: contains base_string(),
+        $b <: contains base_string(),
+    }
+}
+
 or {
-    string(),
-    template_string(),
+    concatenated_string(),
+    base_string() as $base where $base <: not within concatenated_string(),
 } as $bare where {
     or {
         and {
@@ -49,6 +63,24 @@ class MyPage {
       header: this.page.locator('h4'),
       description: this.page.locator('//p[contains(text(), "description")]'),
     };
+  }
+}
+```
+
+## Treats concatenated locators as one locator
+
+```js
+class MyPage {
+  description(value) {
+    return '//div[contains(text(),"' + value + '")]';
+  }
+}
+```
+
+```js
+class MyPage {
+  description(value) {
+    return this.page.locator('//div[contains(text(),"' + value + '")]');
   }
 }
 ```
