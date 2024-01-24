@@ -45,22 +45,11 @@ private pattern handle_one_statement($class_name, $statements, $states_statement
                 and {
                     $name <: js"constructor",
                     $body <: maybe contains bubble($constructor_statements) {
-                        or {
-                            if_statement($condition, $consequence) as $exp where {
-                                $constructor_statements += $exp
-                            },
-                            lexical_declaration($declarations) as $decl where $declarations <:
-                                variable_declarator($name, $value) where {
-                                    $name <: not contains js"this.state",
-                                    $value <: not contains js"this.state",
-                                    $constructor_statements += $decl
-                                },
-                            expression_statement() as $decl where {
-                                $decl <: not contains `super($props)`,
-                                $decl <: not contains `$_.bind($_)`,
-                                $decl <: not within if_statement(),
-                                $constructor_statements += $decl,
-                            },
+                        statement_block() as $block where and {
+                            $block <: not contains `super(props)`,
+                            $block <: not contains `$_.bind($_)`,
+                            $block <: not contains `this.state = $_`,
+                            $constructor_statements += `$block`
                         }
                     },
                     $body <: change_this($states_statements, is_constructor=true),
