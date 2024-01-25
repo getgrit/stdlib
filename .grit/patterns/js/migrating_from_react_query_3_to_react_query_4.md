@@ -8,18 +8,23 @@ tags: #react, #migration, #reactquery
 
 ```grit
 engine marzano(0.1)
-language js(jsx)
+language js
 
 or {
     `"react-query"` => `"@tanstack/react-query"`,
     `"react-query/devtools"` => `"@tanstack/react-query-devtools"`,
-    `useQuery($params1, $param2)` => `useQuery([$params1], $param2)`, // need more improvement
+    `useQuery($params)` where {
+        $params <: contains `'$param'` => `['$param']`
+    },
     `useQueries([$param])` => `useQueries({queries: [$param]})`,
     `"react-query/persistQueryClient-experimental"` => `"@tanstack/react-query-persist-client"`,
     `"react-query/createWebStoragePersistor-experimental"` => `"@tanstack/query-sync-storage-persister"`,
     `"react-query/createAsyncStoragePersistor-experimental"` => `"@tanstack/query-async-storage-persister"`,
     `setLogger($customLogger)` => ``,
-    `new QueryClient()` => `new QueryClient({ logger: customLogger})`, // need more improvement
+    `` as $queryClient where {
+        $queryClient <: contains `setLogger($customLogger)`,
+        $queryClient <: contains `new QueryClient()` => `new QueryClient({logger: $customLogger});`
+    },
     `"react-query/hydration"` => `"@tanstack/react-query"`,
     `"react-query/react"` => `"@tanstack/react-query/reactjs"`,
 }
@@ -43,6 +48,7 @@ const queryClient = new QueryClient();
 
 
 useQuery('todos', fetchTodos)
+useQuery('todos', fetchTodos, cacheParams)
 useQueries([{ queryKey1, queryFn1, options1 }, { queryKey2, queryFn2, options2 }])
 ```
 
@@ -57,9 +63,10 @@ import { dehydrate, hydrate, useHydrate, Hydrate } from "@tanstack/react-query"
 import { QueryClientProvider } from "@tanstack/react-query/reactjs";
 
 
-const queryClient = new QueryClient({ logger: customLogger});
+const queryClient = new QueryClient({logger: customLogger});
 
 
 useQuery(['todos'], fetchTodos)
+useQuery(['todos'], fetchTodos, cacheParams)
 useQueries({queries: [{ queryKey1, queryFn1, options1 }, { queryKey2, queryFn2, options2 }]})
 ```
