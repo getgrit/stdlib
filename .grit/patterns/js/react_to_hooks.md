@@ -1296,3 +1296,32 @@ const ThisBind = () => {
 
 export default ThisBind;
 ```
+
+
+## Keep the constructor logic even if there is not super(props)
+
+```ts
+import { Component } from 'base';
+
+export default class ThisBind extends Component {
+  constructor(){
+    console.log("Hello?")
+  }
+
+  render() {
+    return null;
+  }
+}
+```
+
+```ts
+import { Component } from "base";
+
+const ThisBind = () => {
+  console.log("Hello?");
+
+  return null;
+};
+
+export default ThisBind;
+```
