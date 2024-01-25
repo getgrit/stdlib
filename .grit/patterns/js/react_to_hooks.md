@@ -95,12 +95,13 @@ class App extends Component {
 ```
 
 ```ts
-import { useState, useEffect, useCallback } from 'react';
-const App = () => {
+import { useState, useEffect, useCallback, useRef } from 'react';
+const App = (props) => {
   const [name, setName] = useState('');
   const [another, setAnother] = useState(3);
   const [count, setCount] = useState();
   const [isOpen, setIsOpen] = useState();
+  const prevProps = usePreviousValue(props);  
 
   useEffect(() => {
     document.title = `You clicked ${count} times`;
@@ -112,7 +113,7 @@ const App = () => {
     if (isOpen && !prevProps.isOpen) {
       alert('You just opened the modal!');
     }
-  }, [count, isOpen]);
+  }, [count, isOpen, prevProps]);
   const alertNameHandler = useCallback(() => {
     alert(name);
   }, [name]);
@@ -142,6 +143,14 @@ App.bar = (input) => {
 App.another = (input) => {
   console.error(input);
 };
+
+function usePreviousValue() {
+  const ref = useRef();
+  useEffect(() => {
+    ref.current = props;
+  });
+  return ref.current;
+}
 ```
 
 ## MobX - Observables and Computed

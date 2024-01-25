@@ -38,7 +38,7 @@ private pattern handle_ref($statements, $statement, $name, $type) {
   }
 }
 
-private pattern handle_one_statement($class_name, $statements, $states_statements, $static_statements, $render_statements, $constructor_statements, $handler_callback_suffix, $use_ref_from) {
+private pattern handle_one_statement($class_name, $statements, $states_statements, $static_statements, $render_statements, $constructor_statements, $handler_callback_suffix, $use_ref_from, $use_previous_value_hook) {
     or {
         method_definition($static, $async, $name, $body, $parameters) as $statement where {
             or {
@@ -62,6 +62,11 @@ private pattern handle_one_statement($class_name, $statements, $states_statement
                     $statement <: prepend_comment($statements),
                     $name <: or { `componentDidUpdate`, `componentDidMount` },
                     $body <: change_this($states_statements, is_constructor=false),
+                    $parameters <: maybe contains required_parameter(pattern=$prevProps) where {
+                        $body <: contains $prevProps,
+                        $use_previous_value_hook = true,
+                        $states_statements += `const $prevProps = usePreviousValue(props);`,
+                    },
                     or {
                         {
                             $async <: `async`,
@@ -348,6 +353,7 @@ private pattern maybe_wrapped_class_declaration($class_name, $body, $class) {
 pattern first_step($use_ref_from, $handler_callback_suffix) {
     maybe_wrapped_class_declaration($class_name, $body, $class) where {
         $statements = [],
+        $use_previous_value_hook = false,
         $constructor_statements = [],
         $states_statements = [],
         $static_statements = [],
@@ -373,7 +379,7 @@ pattern first_step($use_ref_from, $handler_callback_suffix) {
 
         // Set an alternative callback suffix, or remove it entirely
 
-        $body <: contains handle_one_statement($class_name, $statements, $states_statements, $static_statements, $render_statements, $constructor_statements, $handler_callback_suffix, $use_ref_from) until `defaultProps = { $_ }`,
+        $body <: contains handle_one_statement($class_name, $statements, $states_statements, $static_statements, $render_statements, $constructor_statements, $handler_callback_suffix, $use_ref_from, $use_previous_value_hook) until `defaultProps = { $_ }`,
         $program <: maybe contains interface_declaration(body=$interface, name=$interface_name) where {
             $state_type <: $interface_name,
             $interface <: contains bubble($states_statements, $body) {
@@ -424,14 +430,18 @@ pattern first_step($use_ref_from, $handler_callback_suffix) {
         } else {
             $args = .
         },
-
+        if ($use_previous_value_hook <: true) {
+            $previous_value_hook = `\nfunction usePreviousValue(){\n    const ref = useRef();\n    useEffect(() => {\n        ref.current = props;\n    });\n    return ref.current;\n}\n`,
+        } else {
+            $previous_value_hook = .
+        },
+  
         $separator = `\n    `,
         $states_statements = distinct(list=$states_statements),
         $states_statements = join(list = $states_statements, $separator),
         $statements = join(list = $statements, $separator),
         $constructor_statements = join(list = $constructor_statements, $separator),
         $the_function = `($args) => {\n    $states_statements\n\n    $statements\n\n    $constructor_statements\n\n    $render_statements \n}`,
-
         // Construct the final class name
         $original_name = $class_name,
         if ($body <: contains r"(v|V)iewState"($_)) {
@@ -444,7 +454,7 @@ export const $original_name = observer($base_name);`,
         },
 
         $static_statements = join(list = $static_statements, $separator),
-        $class => `$the_const\n\n$static_statements\n`
+        $class => `$the_const\n\n$static_statements\n $previous_value_hook`,
     }
 }
 
