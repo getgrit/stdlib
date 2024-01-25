@@ -729,6 +729,7 @@ const MyComponent = () => {
   }, []);
   
   const five = 2 + 3;
+
   saySomethingHandler(); 
   if (five === 5) {
     console.log("Hello")
