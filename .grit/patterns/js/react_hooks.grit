@@ -227,11 +227,13 @@ private pattern handle_one_statement($class_name, $statements, $states_statement
         },
     }
 }
+
 private pattern prepend_comment($statements) {
     maybe after comment() as $comment where {
         $statements += js"$comment"
     }
 }
+
 private pattern change_this($states_statements, $is_constructor) {
     maybe contains bubble($states_statements, $is_constructor) or {
         assignment_expression(
@@ -273,7 +275,6 @@ private pattern find_miscellaneous_state($states_statements) {
         $states_statements += `const [$name, set$capitalized] = useState();`,
     },
 }
-
 
 private pattern gather_hooks($hooks) {
     contains or {
@@ -350,6 +351,7 @@ private pattern maybe_wrapped_class_declaration($class_name, $body, $class) {
         $heritage <: contains extends_clause(value = contains or { `Component`, `PureComponent` })
     }
 }
+
 pattern first_step($use_ref_from, $handler_callback_suffix) {
     maybe_wrapped_class_declaration($class_name, $body, $class) where {
         $statements = [],
@@ -357,6 +359,7 @@ pattern first_step($use_ref_from, $handler_callback_suffix) {
         $constructor_statements = [],
         $states_statements = [],
         $static_statements = [],
+
         if ($body <: contains js"$class_name.$name = $_" ) {
             $static_statements += raw`/*\n* TODO: Class component's static variables are reassigned, needs manual handling\n*/`,
         },
@@ -425,23 +428,25 @@ pattern first_step($use_ref_from, $handler_callback_suffix) {
             $type_annotation = .
         },
 
-        if ($body <: contains `props`) {
+        if (or { $body <: contains `props`, $use_previous_value_hook <: true }) {
             $args = `$[the_props]$[type_annotation]`
-        } else {
+        } else  {
             $args = .
         },
+
         if ($use_previous_value_hook <: true) {
             $previous_value_hook = `\nfunction usePreviousValue(){\n    const ref = useRef();\n    useEffect(() => {\n        ref.current = props;\n    });\n    return ref.current;\n}\n`,
         } else {
             $previous_value_hook = .
         },
-  
+
         $separator = `\n    `,
         $states_statements = distinct(list=$states_statements),
         $states_statements = join(list = $states_statements, $separator),
         $statements = join(list = $statements, $separator),
         $constructor_statements = join(list = $constructor_statements, $separator),
         $the_function = `($args) => {\n    $states_statements\n\n    $statements\n\n    $constructor_statements\n\n    $render_statements \n}`,
+        
         // Construct the final class name
         $original_name = $class_name,
         if ($body <: contains r"(v|V)iewState"($_)) {
