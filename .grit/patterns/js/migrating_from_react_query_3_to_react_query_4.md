@@ -30,7 +30,7 @@ or {
 }
 ```
 
-## React query 3 --> React query 4
+## TanStack query 3 --> React query 4
 
 ```javascript
 import { useQuery } from 'react-query'
