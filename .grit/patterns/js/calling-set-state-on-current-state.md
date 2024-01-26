@@ -10,7 +10,7 @@ tags: #fix
 engine marzano(0.1)
 language js
 
-`const $name = ($props) => {$body}` where {
+react_functional_component($props, $body) where {
     and {
         or {
             $body <: contains `const [$x, $y] = useState<boolean>($boolean)`,
