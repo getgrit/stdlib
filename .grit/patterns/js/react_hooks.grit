@@ -446,7 +446,7 @@ pattern first_step($use_ref_from, $handler_callback_suffix) {
         $statements = join(list = $statements, $separator),
         $constructor_statements = join(list = $constructor_statements, $separator),
         $the_function = `($args) => {\n    $states_statements\n\n    $statements\n\n    $constructor_statements\n\n    $render_statements \n}`,
-        
+
         // Construct the final class name
         $original_name = $class_name,
         if ($body <: contains r"(v|V)iewState"($_)) {
@@ -575,6 +575,11 @@ private pattern gather_accesses($hoisted_states, $hoisted_refs, $use_memos) {
             and {
                 $name <: array_pattern(elements = [$used_name, $_]),
                 $value <: `useState($_)`,
+                $hoisted_states += $name
+            },
+            and {
+                $name <: $used_name,
+                $value <: `usePreviousValue($_)`,
                 $hoisted_states += $name
             },
             and {
