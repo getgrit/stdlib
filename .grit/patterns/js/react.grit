@@ -7,3 +7,13 @@ pattern ReactNode($name, $props, $children) {
     `<$name $props />`
   }
 }
+
+
+pattern react_functional_component($props, $body) {
+  or {
+    `const $name = ($props) => {$body}`,
+    `const $name: React.FC<$propsType> = ($props) => {$body}`,
+    `function $func($props) {$body}`,
+    `function $func($props: $propsType): $returnType {$body}`,
+  }
+}
