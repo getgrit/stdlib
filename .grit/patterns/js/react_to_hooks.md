@@ -683,8 +683,19 @@ import { Component } from 'react';
 
 class MyComponent extends Component {
   constructor(props: Props) {
+    super(props);
     const five = 2 + 3;
+
+    this.doSomething = this.doSomething.bind(this)
+    this.saySomething = this.saySomething.bind(this)
+
     this.saySomething();
+
+    if(five === 5){
+      console.log("Hello");
+      this.doSomething();
+    }
+
     this.state = {
       secret: five,
     };
@@ -692,6 +703,10 @@ class MyComponent extends Component {
 
   saySomething() {
     console.log('hi');
+  }
+
+  doSomething(){
+    console.log("Welcome")
   }
 
   render() {
@@ -709,10 +724,18 @@ const MyComponent = () => {
   const saySomethingHandler = useCallback(() => {
     console.log('hi');
   }, []);
-
+  const doSomethingHandler = useCallback(() => {
+    console.log("Welcome");
+  }, []);
+  
   const five = 2 + 3;
-  saySomethingHandler();
 
+  saySomethingHandler(); 
+  if (five === 5) {
+    console.log("Hello")
+    doSomethingHandler()
+  }
+  
   return <></>;
 };
 ```
@@ -1267,6 +1290,35 @@ const ThisBind = () => {
   const sayHelloHandler = useCallback(() => {
     console.log("Hello!");
   }, []);
+
+  return null;
+};
+
+export default ThisBind;
+```
+
+
+## Keep the constructor logic even if there is not super(props)
+
+```ts
+import { Component } from 'base';
+
+export default class ThisBind extends Component {
+  constructor(){
+    console.log("Hello?")
+  }
+
+  render() {
+    return null;
+  }
+}
+```
+
+```ts
+import { Component } from "base";
+
+const ThisBind = () => {
+  console.log("Hello?");
 
   return null;
 };
