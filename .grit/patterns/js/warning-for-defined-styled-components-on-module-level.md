@@ -2,7 +2,8 @@
 title: Warning for defined styled components on module level
 ---
 
-Creating a styled component inside the render method in React leads to performance issues because it dynamically generates a new component in the DOM on each render. This causes React to discard and recalculate that part of the DOM subtree every time, rather than efficiently updating only the changed parts. This can result in performance bottlenecks and unpredictable behaviour. 
+Creating a styled component inside the render method in React leads to performance issues because it dynamically generates a new component in the DOM on each render. This causes React to discard and recalculate that part of the DOM subtree every time, rather than efficiently updating only the changed parts. This can result in performance bottlenecks and unpredictable behaviour.
+
 - [reference](https://styled-components.com/docs/faqs#why-should-i-avoid-declaring-styled-components-in-the-render-method)
 
 tags: #react, #migration, #styled-component
@@ -12,17 +13,12 @@ engine marzano(0.1)
 language js
 
 or {
-    react_functional_component($props, $body) where {
-        or {
-            $body <: contains js"styled($component)`$style`" as $styledComponent => `$styledComponent // warnig: styled components should be always outside react component`,
-            $body <: contains js"styled.$tag`$style`" as $styledComponent => `$styledComponent // warnig: styled components should be always outside react component`,
-        }
-    },
-    react_class_component($props, $body) where {
-        or {
-            $body <: contains js"styled($component)`$style`" as $styledComponent => `$styledComponent // warnig: styled components should be always outside react component`,
-            $body <: contains js"styled.$tag`$style`" as $styledComponent => `$styledComponent // warnig: styled components should be always outside react component`,
-        }
+    react_functional_component($props, $body),
+    react_class_component($props, $body)
+} where {
+    or {
+        $body <: contains js"styled($component)`$style`" as $styledComponent => `$styledComponent // warnig: styled components should be always outside react component`,
+        $body <: contains js"styled.$tag`$style`" as $styledComponent => `$styledComponent // warnig: styled components should be always outside react component`,
     }
 }
 ```

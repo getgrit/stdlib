@@ -18,8 +18,10 @@ pattern react_functional_component($props, $body) {
 }
 
 pattern react_class_component($props, $body) {
-    or {
-        `class $classComponent {$body}`,
-        `class $classComponent<$props> {$body}`,
-    }
+  or {
+    `class $ClassComponent {$body}`,
+    `class $ClassComponent extends $ComponentName {$body}`,
+    `class $ClassComponent<$props> {$body}`,
+    `class $ClassComponent extends $ComponentName<$props> {$body}`,
+  }
 }
