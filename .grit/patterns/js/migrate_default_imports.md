@@ -7,6 +7,13 @@ tags: #migration, #js, #imports, #default, #multifile
 ```grit
 language js
 
+function strip_extension($original) js {
+    const pathParts = $original.text.split("/");
+    const lastParts = pathParts[pathParts.length - 1].split(".");
+    pathParts[pathParts.length - 1] = lastParts.length > 1 ? lastParts.slice(0, -1).join(".") : lastParts[0];
+    return pathParts.join("/");
+}
+
 multifile {
   $modules = [],
   // First collect the exports
@@ -25,6 +32,8 @@ multifile {
         $source <: `"$candidate_source"`,
         $this_canonical = resolve($candidate_source),
         $this_stripped = strip_extension($this_canonical),
+        $fuck = `This stripped is $this_stripped and canonical is $this_canonical and candidate source is $candidate_source and candidate path is $candidate_path`,
+        log(message=$fuck),
         $this_stripped <: $candidate_path
       }
     }

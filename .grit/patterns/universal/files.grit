@@ -8,10 +8,8 @@ function current_filename() {
     return $final
 }
 
-function strip_extension($original) {
-    $parts = split($original, "."),
-    $final = $parts[0],
-    return $final
+function strip_extension($original) js {
+    return $original.text.split(".").slice(0, -1).join(".");
 }
 
 function current_filename_without_extension() {
