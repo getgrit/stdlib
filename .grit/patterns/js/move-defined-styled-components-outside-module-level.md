@@ -22,7 +22,6 @@ or {
     } as $styledComponent,
     $copy = text($styledComponent),
     $styledComponent => .,
-    $body <: contains `return <$componentName />` => ``,
     $comp => `$copy\n\n$comp`,
 }
 ```
@@ -54,7 +53,7 @@ function FunctionalComponent2() {
   return <Component3 />
 }
 
-class MyComponent extends Component {
+class MyComponent {
   public render() {
     const Component4 = styled.div`
         color: blue;
@@ -90,7 +89,7 @@ const Component3 = styled.div`
 
 function FunctionalComponent() {
   
-  
+  return <Component3 />
 }
 
 const Component3 = styled(FunctionalComponent)`
@@ -99,17 +98,17 @@ const Component3 = styled(FunctionalComponent)`
 
 function FunctionalComponent2() {
   
-  
+  return <Component3 />
 }
 
 const Component4 = styled.div`
         color: blue;
     `
 
-class MyComponent extends Component {
+class MyComponent {
   public render() {
     
-    
+    return <Component4 />
   }
 }
 
@@ -120,7 +119,7 @@ const Component4 = styled.div`
 class MyComponent extends Component <Compnent, {}> {
   public render() {
     
-    
+    return <Component4 />
   }
 }
 ```
