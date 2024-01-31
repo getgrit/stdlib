@@ -99,11 +99,11 @@ FOR EACH ROW EXECUTE FUNCTION add_no_of_cars()
 }
 pattern convert_oracle_to_pg() {
     sequential {
-        maybe convert_types(),
-        maybe convert_builtins(),
-        maybe add_unit_tests_for_procedures(),
-        maybe dollar_quote_procedure_body(),
-        maybe add_unit_tests_for_datetime(),
-        maybe convert_trigger()
+        maybe contains convert_types(),
+        maybe contains convert_builtins(),
+        maybe contains add_unit_tests_for_procedures(),
+        maybe contains dollar_quote_procedure_body(),
+        maybe contains add_unit_tests_for_datetime(),
+        maybe contains convert_trigger()
     }
 }
