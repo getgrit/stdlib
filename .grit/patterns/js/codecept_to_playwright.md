@@ -719,7 +719,7 @@ Scenario('Trivial test', async ({ I }) => {
 ```js
 import { expect } from '@playwright/test';
 
-test('Trivial test @Projects @Studio @Email', async ({ page, factory, context }) => {
+test('Trivial test @Email @Studio @Projects', async ({ page, factory, context }) => {
   var project_page = new ProjectPage(page, context);
   await project_page.open();
   await page.locator('.list' + ' ' + className).waitFor({ state: 'visible' });
@@ -757,7 +757,7 @@ test.describe('Project page', () => {
     console.log('Ensure that you have access to the project');
   });
 
-  test('Trivial test @Projects @Studio @Email', async ({ page, factory, context }) => {
+  test('Trivial test @Email @Studio @Projects', async ({ page, factory, context }) => {
     var projectPage = new ProjectPage(page, context);
     await projectPage.open();
   });
