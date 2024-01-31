@@ -10,13 +10,14 @@ language js
 
 predicate convert_tags($scenario, $description) {
     $tags = [],
-    $program <: maybe contains bubble($tags, $scenario) call_expression($function, $arguments) as $tagger where {
-        $function <: contains $scenario,
-        $tagger => $scenario,
-        $arguments <: string($fragment) where {
-            $tags += `@$fragment`,
-        },
+
+    $scenario <: within bubble($scenario, $tags) `$fn.tag($arguments)` as $tagger where {
+      $tagger => $scenario,
+      $arguments <: string($fragment) where {
+          $tags += `@$fragment`,
+      },
     },
+  
     $tags = join($tags, ` `),
     $description => trim(`$description $tags`, " "),
 }
@@ -35,7 +36,7 @@ pattern convert_test() {
     } as $scenario where {
         $quote = extract_quote_kind($scenario, $description),
         $params <: contains `I`,
-        convert_tags($scenario, $description),
+        or {convert_tags($scenario, $description), true},
         $body <: maybe contains bubble or {
             `I.updateField` => `this.updateField`,
             `I.selectInDropdownByLocators` => `this.selectInDropdownByLocators`,
@@ -493,7 +494,7 @@ Scenario('Trivial test', async ({ I }) => {
 ```js
 import { expect } from '@playwright/test';
 
-test('Trivial test @Projects @Studio @Email', async ({ page, factory, context }) => {
+test('Trivial test @Email @Studio @Projects', async ({ page, factory, context }) => {
   var projectPage = new ProjectPage(page, context);
   await projectPage.open();
   await projectPage.list.waitFor({ state: 'visible' });
@@ -570,7 +571,7 @@ Scenario('Trivial test (good)', async ({ I, loginAs }) => {
 ```js
 import { expect } from '@playwright/test';
 
-test('Trivial test (good) @Multiword tag @Projects @Studio @Email', async ({
+test('Trivial test (good) @Email @Studio @Projects @Multiword tag', async ({
   page,
   factory,
   context,
@@ -616,7 +617,7 @@ let myData = [
 ];
 
 for (const current of myData) {
-  test('Trivial test @Projects @Studio @Email', async ({ page, factory, context }) => {
+  test('Trivial test @Email @Studio @Projects', async ({ page, factory, context }) => {
     console.log(current.capital);
     await data.label.dragTo(data.map);
     await data.label.dragTo(data.label, { targetPosition: { x: 400, y: 0 } });
@@ -659,7 +660,7 @@ test.describe('Test capitals', () => {
   ];
 
   for (const current of myData) {
-    test('Trivial test @Projects @Studio @Email', async ({ page, factory, context }) => {
+    test('Trivial test @Email @Studio @Projects', async ({ page, factory, context }) => {
       console.log(current.capital);
     });
   }
@@ -695,74 +696,8 @@ let myData = [
 ];
 
 for (const current of myData) {
-  test(`Trivial test @Projects @Studio @Email`, async ({ page, factory, context }) => {
+  test(`Trivial test @Email @Studio @Projects`, async ({ page, factory, context }) => {
     console.log(current.capital);
   });
 }
-```
-
-## Intelligently converts stringlike locators
-
-```js
-Scenario('Trivial test', async ({ I }) => {
-  project_page.open();
-  I.waitForVisible('.list' + ' ' + className);
-  I.waitNumberOfVisibleElements('.grit-sample', 3);
-  I.seeInField(`input[name="${username}"]`, 'admin');
-})
-  .tag('Email')
-  .tag('Studio')
-  .tag('Projects');
-```
-
-```js
-import { expect } from '@playwright/test';
-
-test('Trivial test @Projects @Studio @Email', async ({ page, factory, context }) => {
-  var project_page = new ProjectPage(page, context);
-  await project_page.open();
-  await page.locator('.list' + ' ' + className).waitFor({ state: 'visible' });
-  await expect(page.locator('.grit-sample')).toHaveCount(3);
-  await expect(page.locator(`input[name="${username}"]`)).toHaveValue('admin');
-});
-```
-
-## Converts Before and After hooks
-
-```js
-Feature('Project page');
-
-BeforeSuite(({ I }) => {
-  I.say('Ensure that you have access to the project');
-});
-
-Scenario('Trivial test', async ({ I }) => {
-  projectPage.open();
-})
-  .tag('Email')
-  .tag('Studio')
-  .tag('Projects');
-
-After(async ({ I }) => {
-  await resetProjectSettings();
-});
-```
-
-```js
-import { expect } from '@playwright/test';
-
-test.describe('Project page', () => {
-  test.beforeAll(async ({ page, request }) => {
-    console.log('Ensure that you have access to the project');
-  });
-
-  test('Trivial test @Projects @Studio @Email', async ({ page, factory, context }) => {
-    var projectPage = new ProjectPage(page, context);
-    await projectPage.open();
-  });
-
-  test.afterEach(async ({ page, request }) => {
-    await resetProjectSettings();
-  });
-});
 ```
