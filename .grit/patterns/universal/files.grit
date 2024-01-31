@@ -8,11 +8,29 @@ function current_filename() {
     return $final
 }
 
-function strip_extension($original) js {
-    const pathParts = $original.text.split("/");
-    const lastParts = pathParts[pathParts.length - 1].split(".");
-    pathParts[pathParts.length - 1] = lastParts.length > 1 ? lastParts.slice(0, -1).join(".") : lastParts[0];
-    return pathParts.join("/");
+function strip_extension($original) {
+    $parts = [],
+    $original = split($original, "/"),
+    $original <: some bubble($parts, $original) $part where {
+      if ($part <: not $original[-1]) {
+        $parts += $part,
+      },
+    },
+    $last_parts = split($original[-1], "."),
+    $length = length($last_parts),
+    if ($length <: 1) {
+      $parts += $last_parts
+    } else {
+      $dot_parts = [],
+      $last_parts <: some $last_part where {
+        if ($last_part <: not $last_parts[-1]) {
+          $dot_parts += $last_part,
+        },
+      },
+      $dot_parts = join($dot_parts, "."),
+      $parts += $dot_parts,
+    },
+    return join($parts, "/")
 }
 
 function current_filename_without_extension() {
