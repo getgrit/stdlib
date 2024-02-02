@@ -15,10 +15,10 @@ or {
     $config,
     csrfPrevention: true
 })` where {
-        $config <: not contains `csrfPrevention: $boolean`
+        $config <: not contains `csrfPrevention: $boolean`        
     },
     `new ApolloServer({$config})` where {
-        $config <: contains `csrfPrevention: false` => `csrfPrevention: true`
+        $config <: contains `csrfPrevention: false` => `csrfPrevention: true`       
     },
 }
 ```
@@ -28,44 +28,44 @@ or {
 ```javascript
 // BAD 1: Lacks 'csrfPrevention: true'
 const apollo_server_1 = new ApolloServer({
-  typeDefs,
-  resolvers,
+    typeDefs,
+    resolvers
 });
 
 // BAD 2: Has 'csrfPrevention: false'
 const apollo_server_2 = new ApolloServer({
-  typeDefs,
-  resolvers,
-  csrfPrevention: false,
+    typeDefs,
+    resolvers, 
+    csrfPrevention: false,
 });
 
 // Good: Has 'csrfPrevention: true'
 const apollo_server_3 = new ApolloServer({
-  typeDefs,
-  resolvers,
-  csrfPrevention: true,
+    typeDefs,
+    resolvers,
+    csrfPrevention: true,
 });
 ```
 
 ```javascript
 // BAD 1: Lacks 'csrfPrevention: true'
 const apollo_server_1 = new ApolloServer({
-  typeDefs,
-  resolvers,
-  csrfPrevention: true,
+    typeDefs,
+    resolvers,
+    csrfPrevention: true
 });
 
 // BAD 2: Has 'csrfPrevention: false'
 const apollo_server_2 = new ApolloServer({
-  typeDefs,
-  resolvers,
-  csrfPrevention: true,
+    typeDefs,
+    resolvers, 
+    csrfPrevention: true,
 });
 
 // Good: Has 'csrfPrevention: true'
 const apollo_server_3 = new ApolloServer({
-  typeDefs,
-  resolvers,
-  csrfPrevention: true,
+    typeDefs,
+    resolvers,
+    csrfPrevention: true,
 });
 ```
