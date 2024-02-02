@@ -12,26 +12,57 @@ tags: #js, #es6, #migration, #cjs, #commonjs
 engine marzano(0.1)
 language js
 
+function transformProps($imports) {
+    $import_list = [],
+    $imports <: some bubble($import_list) {
+        or {
+            shorthand_property_identifier_pattern() as $key where $import_list += $key,
+            pair_pattern($key, $value) where $import_list += `$key as $value`
+        }
+    },
+    return join(list = $import_list, separator = ", "),
+}
+
 or {
     `const $sentry = require('@sentry/node')` => `import * as $sentry from '@sentry/node'`,
     // see https://github.com/motdotla/dotenv#how-do-i-use-dotenv-with-import
     `require("dotenv").config($config)` => `import * as dotenv from 'dotenv';\ndotenv.config($config)`,
 
-    `const { $imports } = require($source)` where {
-        $import_list = [],
-        $imports <: some bubble($import_list) {
-            or {
-                shorthand_property_identifier_pattern() as $key where $import_list += $key,
-                pair_pattern($key, $value) where $import_list += `$key as $value`
+    `const { $id: { $imports } } = require($specifier)` => `import { $id } from $specifier\nconst { $imports } = $id`,
+    `const { $imports } = require($specifier)` where { $transformed = transformProps($imports) } => `import { $transformed } from $specifier`,
+    `const $id = require($specifier).default` => `import $id from $specifier`,
+    `const $id = require($specifier).$named` => `import { $id } from $specifier` where { $id <: $named},
+    `const $id = require($specifier).$key` => `import { $key as $id } from $specifier`,
+
+    `const $id = $requireCall` where {
+        $requireCall <: contains r"require\(([^)]+)\)\.(.+)"($specifier, $rest)
+    } => `import __$id from $specifier;\nconst $id = __$id.$rest`,
+
+    `const $declarations` as $whole where {
+        $new_declarations = [],
+        $declarations <: contains bubble($new_declarations) or {
+            `$id = require($specifier).$named`,
+            `{ $id: $value } = require($specifier)`,
+            `$id = require($specifier)`
+        } where {
+            if ($named <: not undefined) {
+                if($named <: $id) {
+                  $new_declarations += `import { $id } from $specifier;`
+                } else {
+                  $new_declarations += `import { $named as $id } from $specifier;`
+                }
+            } else if ($value <: not undefined) {
+                $new_declarations += `import { $id } from $specifier;\nconst $value = $id`
+            } else {
+                $new_declarations += `import $id from $specifier;`
             }
         },
-        $transformed = join(list = $import_list, separator = ", "),
-    } => `import { $transformed } from $source`,
-    `const $import = require($source).default` => `import $import from $source`,
-    `const $name = require($source).$from` => `import { $name } from $source` where { $name <: $from},
-    `const $import = require($source).$foo` => `import { $foo as $import } from $source`,
+        $whole => join($new_declarations, `;\n`)
+    },
+
+
      // this relies on healing for correctness:
-    `const $import = require($source)` => `import $import from $source`
+    `const $id = require($specifier)` => `import $id from $specifier`
 }
 ```
 
@@ -91,4 +122,61 @@ const Sentry = require('@sentry/node');
 
 ```ts
 import * as Sentry from '@sentry/node';
+```
+
+### Handle deep props
+
+```js
+const assert = require('test-lib').assert,
+  path = require('path'),
+  hash = require('../hash'),
+  {
+    Some: {
+      Deep: { Concerns },
+    },
+  } = require('@org/pkg'),
+  { ancestorExport } = require('../../ancestor');
+
+const defaultOptions = require('../../conf/default-cli-options');
+const pkg = require('../../package.json');
+
+const {
+  Legacy: {
+    ConfigOps,
+    naming,
+    CascadingConfigArrayFactory,
+    IgnorePattern,
+    getUsedExtractedConfigs,
+    ModuleResolver,
+  },
+} = require('@org/pkg');
+
+const proxyquire = require('proxyquire').noCallThru().noPreserveCache();
+```
+
+```js
+import { assert } from 'test-lib';
+import path from 'path';
+import hash from '../hash';
+import { Some } from '@org/pkg';
+const {
+  Deep: { Concerns },
+} = Some;
+import { ancestorExport } from '../../ancestor';
+
+import defaultOptions from '../../conf/default-cli-options';
+import pkg from '../../package.json';
+
+import { Legacy } from '@org/pkg';
+const {
+  ConfigOps,
+  naming,
+  CascadingConfigArrayFactory,
+  IgnorePattern,
+  getUsedExtractedConfigs,
+  ModuleResolver,
+} = Legacy;
+
+import __proxyquire from 'proxyquire';
+const proxyquire = __proxyquire.noCallThru().noPreserveCache();
 ```

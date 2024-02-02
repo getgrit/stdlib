@@ -18,6 +18,7 @@ or {
             // it's only safe to remove the overall export if every property is individually exported
             $vals <: some bubble($new_export) $prop where {
                 $prop <: or {
+                    method_definition(name=$name) as $value => `function $value`,
                     shorthand_property_identifier() as $name where { $value = $name },
                     pair(key=$name, $value)
                 },
@@ -123,4 +124,25 @@ const { sub1, sub2 } = require('mod5'); // not handled
 
 export { sub1 };
 export { sub2 };
+```
+
+### Transforms method definition shorthand
+
+```js
+const shorthand = 1;
+
+module.exports = {
+  shorthand,
+  fn(args) {
+    return 'impl';
+  },
+};
+```
+
+```js
+export const shorthand = 1;
+
+export const fn = function fn(args) {
+  return 'impl';
+};
 ```
