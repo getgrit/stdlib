@@ -8,12 +8,20 @@ pattern ReactNode($name, $props, $children) {
   }
 }
 
-
 pattern react_functional_component($props, $body) {
   or {
     `const $name = ($props) => {$body}`,
     `const $name: React.FC<$propsType> = ($props) => {$body}`,
     `function $func($props) {$body}`,
     `function $func($props: $propsType): $returnType {$body}`,
+  }
+}
+
+pattern react_class_component($props, $body) {
+  or {
+    `class $ClassComponent {$body}`,
+    `class $ClassComponent extends $ComponentName {$body}`,
+    `class $ClassComponent<$props> {$body}`,
+    `class $ClassComponent extends $ComponentName<$props> {$body}`,
   }
 }
