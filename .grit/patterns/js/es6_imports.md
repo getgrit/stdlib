@@ -32,6 +32,7 @@ or {
         $declarations <: contains bubble($new_declarations) or {
             `$id = require($specifier).default`,
             `$id = require($specifier).$named`,
+            `$id = $rest` where { $rest <: contains `require($specifier).$suffix` => $suffix },
             `{ $id: { $keepObj } } = require($specifier)`,
             `{ $transformValue } = require($specifier)` where { $transformed = transformProps($transformValue) },
             `$id = require($specifier)`
@@ -46,16 +47,14 @@ or {
                 $new_declarations += `import { $id } from $specifier;\nconst { $keepObj } = $id`
             } else if ($transformed <: not undefined) {
                 $new_declarations += `import { $transformed } from $specifier;`
+            } else if ($rest <: not undefined) {
+                $new_declarations += `import __$id from $specifier;\nconst $id = __$id.$rest`
             } else {
                 $new_declarations += `import $id from $specifier;`
             }
         },
         $whole => join($new_declarations, `;\n`)
     },
-
-    `const $id = $requireCall` where {
-      $requireCall <: contains r"require\(([^)]+)\)\.(.+)"($specifier, $rest)
-    } => `import __$id from $specifier;\nconst $id = __$id.$rest`,
 
      // this relies on healing for correctness:
     `const $id = require($specifier)` => `import $id from $specifier`
