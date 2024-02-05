@@ -18,7 +18,7 @@ or {
             // it's only safe to remove the overall export if every property is individually exported
             $vals <: some bubble($new_export) $prop where {
                 $prop <: or {
-                    method_definition(name=$name) as $value => `function $value`,
+                    method_definition(name=$method_name) as $name,
                     shorthand_property_identifier() as $name where { $value = $name },
                     pair(key=$name, $value)
                 },
@@ -35,7 +35,9 @@ or {
                             function_declaration($name)
                         } as $match => `export $match`
                     },
-                    if ($value <: $name) {
+                    if($method_name <: not undefined) {
+                        $new_export += `export function $name;\n`
+                    } else if ($value <: $name) {
                         $new_export += `export { $name };\n`
                     } else {
                         $new_export += `export const $name = $value;\n`
@@ -142,7 +144,7 @@ module.exports = {
 ```js
 export const shorthand = 1;
 
-export const fn = function fn(args) {
+export function fn(args) {
   return 'impl';
-};
+}
 ```
