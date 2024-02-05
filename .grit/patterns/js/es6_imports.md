@@ -27,22 +27,13 @@ or {
     `const $sentry = require('@sentry/node')` => `import * as $sentry from '@sentry/node'`,
     // see https://github.com/motdotla/dotenv#how-do-i-use-dotenv-with-import
     `require("dotenv").config($config)` => `import * as dotenv from 'dotenv';\ndotenv.config($config)`,
-
-    `const { $id: { $imports } } = require($specifier)` => `import { $id } from $specifier\nconst { $imports } = $id`,
-    `const { $imports } = require($specifier)` where { $transformed = transformProps($imports) } => `import { $transformed } from $specifier`,
-    `const $id = require($specifier).default` => `import $id from $specifier`,
-    `const $id = require($specifier).$named` => `import { $id } from $specifier` where { $id <: $named},
-    `const $id = require($specifier).$key` => `import { $key as $id } from $specifier`,
-
-    `const $id = $requireCall` where {
-        $requireCall <: contains r"require\(([^)]+)\)\.(.+)"($specifier, $rest)
-    } => `import __$id from $specifier;\nconst $id = __$id.$rest`,
-
     `const $declarations` as $whole where {
         $new_declarations = [],
         $declarations <: contains bubble($new_declarations) or {
+            `$id = require($specifier).default`,
             `$id = require($specifier).$named`,
-            `{ $id: $value } = require($specifier)`,
+            `{ $id: { $keepObj } } = require($specifier)`,
+            `{ $transformValue } = require($specifier)` where { $transformed = transformProps($transformValue) },
             `$id = require($specifier)`
         } where {
             if ($named <: not undefined) {
@@ -51,8 +42,10 @@ or {
                 } else {
                   $new_declarations += `import { $named as $id } from $specifier;`
                 }
-            } else if ($value <: not undefined) {
-                $new_declarations += `import { $id } from $specifier;\nconst $value = $id`
+            } else if ($keepObj <: not undefined) {
+                $new_declarations += `import { $id } from $specifier;\nconst { $keepObj } = $id`
+            } else if ($transformed <: not undefined) {
+                $new_declarations += `import { $transformed } from $specifier;`
             } else {
                 $new_declarations += `import $id from $specifier;`
             }
@@ -60,6 +53,9 @@ or {
         $whole => join($new_declarations, `;\n`)
     },
 
+    `const $id = $requireCall` where {
+      $requireCall <: contains r"require\(([^)]+)\)\.(.+)"($specifier, $rest)
+    } => `import __$id from $specifier;\nconst $id = __$id.$rest`,
 
      // this relies on healing for correctness:
     `const $id = require($specifier)` => `import $id from $specifier`
