@@ -12,13 +12,8 @@ tags: #fix #best-practice
 engine marzano(0.1)
 language js
 
-or {
-    `for($a;$b;$c){$body}`,
-    `$arr.forEach(($condition) => {$body})`,
-    `while($condition){$body}`,
-    `do {$body} while($condition)`
-} where {
-    $body <: contains `zlib.deflate` => `zlib.deflateSync`
+`zlib.deflate` as $zlib => `zlib.deflateSync` where {
+    $zlib <: within loop_like()
 }
 ```
 

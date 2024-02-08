@@ -13,6 +13,15 @@ pattern function_like($name, $args, $statements) {
   }
 }
 
+pattern loop_like() {
+  or {
+    `for($a;$b;$c){$body}`,
+    `$arr.forEach(($condition) => {$body})`,
+    `while($condition){$body}`,
+    `do {$body} while($condition)`
+  } 
+}
+
 // All core stdlib functions can be done here
 private pattern before_each_file_stdlib() {
   before_each_file_prep_imports()
