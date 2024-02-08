@@ -4,6 +4,10 @@ title: Replace `JSON.stringify` ⇒ `json-stable-stringify`
 
 The JSON.stringify method does not guarantee a stable key ordering, and it is not recommended for reliably producing object keys. It is advisable to use json-stable-stringify instead.
 
+### references
+- [json-stable-stringify](https://www.npmjs.com/package/json-stable-stringify)
+- [stackoverflow](https://stackoverflow.com/a/16168003)
+
 tags: #fix
 
 ```grit
