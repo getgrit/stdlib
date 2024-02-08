@@ -14,7 +14,7 @@ tags: #fix
 engine marzano(0.1)
 language js
 
-`$string.replaceAll("$stringValue", $replaceString)` => `$string.replace("$stringValue", $replaceString)`
+`$string.replaceAll("$stringValue", $replaceString)` => `$string.replace(/$stringValue/g, $replaceString)`
 ```
 
 ## Transforms replaceAll to replace when have regex pattern
@@ -29,6 +29,8 @@ const str1 = old_str1.replaceAll(hello, '    ');
 const str2 = old_str2.replaceAll('\t', '    ');
 // GOOD: replaceAll
 const str3 = old_str3.replace('\t', '    ');
+// BAD: replaceAll
+const mystr = mystring.replaceAll('bad', 'good');
 ```
 
 ```javascript
@@ -38,7 +40,9 @@ const str1 = old_str1.replaceAll(str, '    ');
 // GOOD: replaceAll
 const str1 = old_str1.replaceAll(hello, '    ');
 // BAD: replaceAll
-const str2 = old_str2.replace('\t', '    ');
+const str2 = old_str2.replace(/\t/g, '    ');
 // GOOD: replaceAll
 const str3 = old_str3.replace('\t', '    ');
+// BAD: replaceAll
+const mystr = mystring.replace(/bad/g, "good")
 ```
