@@ -4,7 +4,7 @@ title: Rewrite `replaceAll` ⇒ `replace` when have regex pattern
 
 Replaces `replaceAll` with `replace`, when have regex pattern.
 
-The string method replaceAll is not supported in all versions of javascript, and is not supported by older browser versions. Consider using replace() with a regex as the first argument instead like mystring.replace(/bad/g, "good") instead of mystring.replaceAll("bad", "good") 
+The `replaceAll` string method may not be supported in all JavaScript versions and older browsers. It is advisable to use the `replace()` method with a regular expression as the first argument. For example, use `mystring.replace(/bad/g, "good") `instead of `mystring.replaceAll("bad", "good")`
 
 - [reference](https://discourse.threejs.org/t/replaceall-is-not-a-function/14585)
 
