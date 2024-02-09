@@ -42,6 +42,10 @@ pattern concourse_handle_task() {
 
 sequential {
   bubble file($body) where $body <: contains concourse_handle_task(),
+  bubble file($body) where $body <: contains bubble `in_parallel: $tasks` where {
+    $n = 0,
+    $tasks <: contains bubble($task_name, $n) `task: $task_name` where { $n += 1 } => text(`task: $task_name-$n`)
+  },
   bubble file($body) where $body <: maybe contains `across: $_` => .
 }
 ```
