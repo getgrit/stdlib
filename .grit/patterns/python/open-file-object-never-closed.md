@@ -4,6 +4,8 @@ title: Close file object opened and never closed
 
 We should close the file object opened without corresponding close.
 
+- [reference](https://realpython.com/why-close-file-python/)
+
 #fix #good-practice
 
 ```grit
