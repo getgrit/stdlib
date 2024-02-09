@@ -12,9 +12,12 @@ Detected hardcoded temp directory. Consider using `tempfile.TemporaryFile` inste
 engine marzano(0.1)
 language python
 
-`open($url, $mode)` as $readPath => `$readPath // BAD: hardcoded tmp path` where {
+or {
+    `$file = open($url, $mode)`,
+    `with open($url, $mode) as $filePath:`
+} as $readPath  where {
     $url <: contains r"(^\/tmp.*)"($badString)
-}
+} => `# BAD: hardcoded tmp path \n$readPath`
 ```
 
 ## Warning for hardcoded tmp path
@@ -51,12 +54,14 @@ def test5():
 
 ```python
 def test1():
-    f = open("/tmp/blah.txt", 'w') // BAD: hardcoded tmp path
+    # BAD: hardcoded tmp path 
+    f = open("/tmp/blah.txt", 'w')
     f.write("hello world")
     f.close()
 
 def test2():
-    f = open("/tmp/blah/blahblah/blah.txt", 'r') // BAD: hardcoded tmp path
+    # BAD: hardcoded tmp path 
+    f = open("/tmp/blah/blahblah/blah.txt", 'r')
     data = f.read()
     f.close()
 
@@ -71,7 +76,8 @@ def test3a():
     f.close()
 
 def test4():
-    with open("/tmp/blah.txt", 'r') // BAD: hardcoded tmp path as fin:
+    # BAD: hardcoded tmp path 
+    with open("/tmp/blah.txt", 'r') as fin:
         data = fin.read()
 
 def test5():
