@@ -31,7 +31,6 @@ pattern concourse_handle_task() {
       // Use our template to build task for each sub value
       $parallel_tasks = [],
       $sub_values <: some bubble($sub_name, $template, $parallel_tasks) `$sub_value` where {
-          $n += 1,
           $new_task = do_replace($template, $sub_value),
           $parallel_tasks += `
   - $new_task`
