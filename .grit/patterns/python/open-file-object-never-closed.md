@@ -6,7 +6,7 @@ We should close the file object opened without corresponding close.
 
 - [reference](https://realpython.com/why-close-file-python/)
 
-#fix #good-practice
+tags: #fix #good-practice
 
 ```grit
 engine marzano(0.1)
