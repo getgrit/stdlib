@@ -39,13 +39,31 @@ def func1():
     
 def func1():
     # BAD: open-never-closed
-    fd = tarfile.open('foo')
+    fdd = tarfile.open('foo')
     x = 123    
   
 def func1():
     # BAD: open-never-closed
-    fd = tempfile.SpooledTemporaryFile('foo')
-    x = 123    
+    fd22 = tempfile.SpooledTemporaryFile('foo')
+    x = 123 
+
+
+def test4():
+    # GOOD: close-not-needed
+    with open("/tmp/blah.txt", 'r') as fin:
+        data = fin.read()       
+
+def test4():
+    # GOOD: close-not-needed
+    with io.open("/tmp/blah.txt", 'r') as fin:
+        data = fin.read()    
+
+def test4():
+    # GOOD: close-not-needed
+    with empfile.TemporaryFile("/tmp/blah.txt", 'r') as fin:
+        data = fin.read()    
+
+
 
 def func2():
     # GOOD:open-never-closed
@@ -70,15 +88,33 @@ def func1():
     
 def func1():
     # BAD: open-never-closed
-    fd = tarfile.open('foo')
+    fdd = tarfile.open('foo')
     x = 123 
-    fd.close()    
+    fdd.close()    
   
 def func1():
     # BAD: open-never-closed
-    fd = tempfile.SpooledTemporaryFile('foo')
+    fd22 = tempfile.SpooledTemporaryFile('foo')
     x = 123 
-    fd.close()    
+    fd22.close() 
+
+
+def test4():
+    # GOOD: close-not-needed
+    with open("/tmp/blah.txt", 'r') as fin:
+        data = fin.read()       
+
+def test4():
+    # GOOD: close-not-needed
+    with io.open("/tmp/blah.txt", 'r') as fin:
+        data = fin.read()    
+
+def test4():
+    # GOOD: close-not-needed
+    with empfile.TemporaryFile("/tmp/blah.txt", 'r') as fin:
+        data = fin.read()    
+
+
 
 def func2():
     # GOOD:open-never-closed
