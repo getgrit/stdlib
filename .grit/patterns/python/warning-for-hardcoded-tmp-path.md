@@ -6,7 +6,7 @@ Detected hardcoded temp directory. Consider using `tempfile.TemporaryFile` inste
 
 - [reference](https://docs.python.org/3/library/tempfile.html#tempfile.TemporaryFile)
 
-#warning #good-practice
+tags: #warning #good-practice
 
 ```grit
 engine marzano(0.1)
