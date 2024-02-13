@@ -2,7 +2,7 @@
 title: Warning for tempfile without flush
 ---
 
-"Be cautious when using `$F.name` without preceding it with `.flush()` or `.close()`, as it may result in an error. This is because the file referenced by `$F.name` might not exist at the time of use. To prevent issues, ensure that you either call `.flush()` to write any buffered data to the file or close the file with .close() before referencing `$F.name`.
+Be cautious when using `$F.name` without preceding it with `.flush()` or `.close()`, as it may result in an error. This is because the file referenced by `$F.name` might not exist at the time of use. To prevent issues, ensure that you either call `.flush()` to write any buffered data to the file or close the file with .close() before referencing `$F.name`.
 
 - [reference](https://docs.python.org/3/library/tempfile.html#tempfile.mkdtemp)
 
@@ -31,7 +31,7 @@ or {
 }
 ```
 
-## Replace `tempfile.mktemp` ⇒ `tempfile.NamedTemporaryFile`
+## Warning for tempfile without flush
 
 ```python
 import tempfile
