@@ -12,10 +12,10 @@ tags: #fix #good-practice
 engine marzano(0.1)
 language python
 
-and {
-    `$tempfile.mktemp($params)` => `$tempfile.NamedTemporaryFile($params delete=False)`,
-    `$tempfile.mktemp($params)` where {
-        $params => `$params ,`,
+`$tempfile.mktemp($params)` => `$tempfile.NamedTemporaryFile($[params]delete=False)` where {
+    // If $params is present, add the comma
+    if ($params <: not .) {
+        $params => `$params, `
     }
 }
 ```
@@ -36,8 +36,8 @@ x = tempfile.mktemp(dir="/tmp")
 import tempfile as tf
 
 # BAD: tempfile-insecure
-x = tempfile.NamedTemporaryFile( delete=False)
+x = tempfile.NamedTemporaryFile(delete=False)
 
 # BAD: tempfile-insecure
-x = tempfile.NamedTemporaryFile(dir="/tmp" , delete=False)
+x = tempfile.NamedTemporaryFile(dir="/tmp", delete=False)
 ```
