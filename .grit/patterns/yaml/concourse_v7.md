@@ -9,44 +9,58 @@ It handles these cases:
 ```grit
 language yaml
 
-function do_replace($input, $value) js {
-    return $input.text.replaceAll("((.:name))", $value.text)
+function do_replace($input, $key, $value) js {
+    $search = "((.:" + $key.text + "))"
+    return $input.text.replaceAll($search, $value.text)
 }
 
-pattern concourse_handle_task() {
-  `- $task` where {
-      $task <: block_mapping($items),
-
-      // TODO: build cartesian product
-      $sub_values = [],
-      $items <: some `across: $across` where {
-          $across <: contains `var: $sub_name`,
-          $across <: contains `values: $values`,
-          $values <: contains bubble($sub_values) `- $value`  where $sub_values += $value
-      },
-
-      // make the template
-      $template = $task,
-
-      // Use our template to build task for each sub value
-      $parallel_tasks = [],
-      $sub_values <: some bubble($sub_name, $template, $parallel_tasks) `$sub_value` where {
-          $new_task = do_replace($template, $sub_value),
-          $parallel_tasks += `
-  - $new_task`
-      },
-
-      $task => `in_parallel: $parallel_tasks`
-  }
+pattern distribute_variables() {
+    $vars_map = {},
+    `across: $vars` as $across where {
+        $vars <: contains bubble($vars_map) `var: $name
+values: $vals` where {
+            $val_list = [],
+            $vals <: some bubble($vars_map, $val_list) `- $name` where {
+                $val_list += $name
+            },
+            $vars_map.$name = $val_list,
+        },
+        $across <: within block_mapping($items) where {
+            $accumulate = [],
+            $items <: some bubble($accumulate, $across, $key, $val) {
+                $item where {
+                    not $item <: $across,
+                    $new_item = text($item),
+                    if ($item <: `task: $_`) {
+                        $accumulate += `- $item`
+                    } else {
+                        $accumulate += $item
+                    },
+                    $item => .
+                }
+            },
+            $accumulate = join(list = $accumulate, separator = `\n  `),
+            $vars_map <: some bubble($accumulate) [$key, $vals] where {
+                $new = [],
+                $vals <: some bubble($accumulate, $key, $new) $value where {
+                    $replaced = do_replace($accumulate, $key, $value),
+                    $new += `$replaced`
+                },
+                $accumulate = join(list = $new, separator = ``)
+            }
+        },
+        $across => `in_parallel:\n$accumulate`
+    }
 }
+
+// distribute_variables()
 
 sequential {
-  bubble file($body) where $body <: contains concourse_handle_task(),
-  bubble file($body) where $body <: contains bubble `in_parallel: $tasks` where {
+  contains distribute_variables(),
+  contains bubble `in_parallel: $tasks` where {
     $n = 0,
     $tasks <: contains bubble($task_name, $n) `task: $task_name` where { $n += 1 } => text(`task: $task_name-$n`)
   },
-  bubble file($body) where $body <: maybe contains `across: $_` => .
 }
 ```
 
@@ -55,86 +69,114 @@ sequential {
 ```yaml
 jobs:
   - across:
-      - var: name
-        values:
-          - file1
-          - file2
-          - file3
+    - var: function
+      values:
+      - file1
+      - file2
+      - file3
+    - var: x
+      values:
+      - one
+      - two
+    - var: y
+      values:
+      - a
+      - b
     task: create-file
-    config:
-      platform: linux
-      image_resource:
-        type: registry-image
-        source: { repository: busybox }
-      run:
-        path: touch
-        args:
-          - manifests/((.:name))
-      outputs:
-        - name: manifests
-  - task: list-file
-    config:
-      platform: linux
-      image_resource:
-        type: registry-image
-        source: { repository: busybox }
-      inputs:
-        - name: manifests
-      run:
-        path: ls
-        args:
-          - manifests
+    params:
+      FUNCTION: ((.:function))-js
+    input_mapping:
+      code: ((.:x))-js
+    output_mapping:
+      code: ((.:y))-js
+
 ```
 
 ```yaml
 jobs:
   - in_parallel:
-      - task: create-file-1
-        config:
-          platform: linux
-          image_resource:
-            type: registry-image
-            source: { repository: busybox }
-          run:
-            path: touch
-            args:
-              - manifests/file1
-          outputs:
-            - name: manifests
-      - task: create-file-2
-        config:
-          platform: linux
-          image_resource:
-            type: registry-image
-            source: { repository: busybox }
-          run:
-            path: touch
-            args:
-              - manifests/file2
-          outputs:
-            - name: manifests
-      - task: create-file-3
-        config:
-          platform: linux
-          image_resource:
-            type: registry-image
-            source: { repository: busybox }
-          run:
-            path: touch
-            args:
-              - manifests/file3
-          outputs:
-            - name: manifests
-  - task: list-file
-    config:
-      platform: linux
-      image_resource:
-        type: registry-image
-        source: { repository: busybox }
-      inputs:
-        - name: manifests
-      run:
-        path: ls
-        args:
-          - manifests
+    - task: create-file-1
+      params:
+          FUNCTION: file1-js
+      input_mapping:
+          code: one-js
+      output_mapping:
+          code: a-js
+    - task: create-file-2
+      params:
+          FUNCTION: file2-js
+      input_mapping:
+          code: one-js
+      output_mapping:
+          code: a-js
+    - task: create-file-3
+      params:
+          FUNCTION: file3-js
+      input_mapping:
+          code: one-js
+      output_mapping:
+          code: a-js
+    - task: create-file-4
+      params:
+          FUNCTION: file1-js
+      input_mapping:
+          code: two-js
+      output_mapping:
+          code: a-js
+    - task: create-file-5
+      params:
+          FUNCTION: file2-js
+      input_mapping:
+          code: two-js
+      output_mapping:
+          code: a-js
+    - task: create-file-6
+      params:
+          FUNCTION: file3-js
+      input_mapping:
+          code: two-js
+      output_mapping:
+          code: a-js
+    - task: create-file-7
+      params:
+          FUNCTION: file1-js
+      input_mapping:
+          code: one-js
+      output_mapping:
+          code: b-js
+    - task: create-file-8
+      params:
+          FUNCTION: file2-js
+      input_mapping:
+          code: one-js
+      output_mapping:
+          code: b-js
+    - task: create-file-9
+      params:
+          FUNCTION: file3-js
+      input_mapping:
+          code: one-js
+      output_mapping:
+          code: b-js
+    - task: create-file-10
+      params:
+          FUNCTION: file1-js
+      input_mapping:
+          code: two-js
+      output_mapping:
+          code: b-js
+    - task: create-file-11
+      params:
+          FUNCTION: file2-js
+      input_mapping:
+          code: two-js
+      output_mapping:
+          code: b-js
+    - task: create-file-12
+      params:
+          FUNCTION: file3-js
+      input_mapping:
+          code: two-js
+      output_mapping:
+          code: b-js
 ```
