@@ -179,6 +179,4 @@ jobs:
           code: two-js
       output_mapping:
           code: b-js
-    
-    
 ```
