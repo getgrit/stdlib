@@ -15,6 +15,7 @@ function do_replace($input, $key, $value) js {
 }
 
 pattern distribute_variables() {
+    // build up a map from variable names to list of values the variable can take
     $vars_map = {},
     `across: $vars` as $across where {
         $vars <: contains bubble($vars_map) `var: $name
@@ -25,27 +26,33 @@ values: $vals` where {
             },
             $vars_map.$name = $val_list,
         },
+        // construct a template consisting of all the tasks not including the 
+        // element defining all the variables
         $across <: within block_mapping($items) where {
-            $accumulate = [],
-            $items <: some bubble($accumulate, $across, $key, $val) {
+            $template = [],
+            $items <: some bubble($template, $across, $key, $val) {
                 $item where {
                     not $item <: $across,
                     $new_item = text($item),
                     if ($item <: `task: $_`) {
-                        $accumulate += `- $item`
+                        $template += `- $item`
                     } else {
-                        $accumulate += $item
+                        $template += $item
                     },
                     $item => .
                 }
             },
-            $accumulate = join(list = $accumulate, separator = `\n  `),
+            // join the template into a string
+            $accumulate = join(list = $template, separator = `\n  `),
             $vars_map <: some bubble($accumulate) [$key, $vals] where {
+                // initial list that will replace $accumulate in the next iteration
                 $new = [],
+                // append a copy of the previous iteration with the variable replaced with each value it can take
                 $vals <: some bubble($accumulate, $key, $new) $value where {
                     $replaced = do_replace($accumulate, $key, $value),
                     $new += `$replaced`
                 },
+                // set accumulate equal the new list
                 $accumulate = join(list = $new, separator = ``)
             }
         },
