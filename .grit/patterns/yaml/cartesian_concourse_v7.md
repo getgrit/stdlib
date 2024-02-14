@@ -46,14 +46,22 @@ values: $vals` where {
                     $replaced = do_replace($accumulate, $key, $value),
                     $new += `$replaced`
                 },
-                $accumulate = join(list = $new, separator = `\n`)
+                $accumulate = join(list = $new, separator = ``)
             }
         },
         $across => `in_parallel:\n$accumulate`
     }
 }
 
-distribute_variables()
+// distribute_variables()
+
+sequential {
+  contains distribute_variables(),
+  contains bubble `in_parallel: $tasks` where {
+    $n = 0,
+    $tasks <: contains bubble($task_name, $n) `task: $task_name` where { $n += 1 } => text(`task: $task_name-$n`)
+  },
+}
 ```
 
 ## Basic input
@@ -87,95 +95,84 @@ jobs:
 ```yaml
 jobs:
   - in_parallel:
-    - task: create-file
+    - task: create-file-1
       params:
           FUNCTION: file1-js
       input_mapping:
           code: one-js
       output_mapping:
           code: a-js
-    
-    - task: create-file
+    - task: create-file-2
       params:
           FUNCTION: file2-js
       input_mapping:
           code: one-js
       output_mapping:
           code: a-js
-    
-    - task: create-file
+    - task: create-file-3
       params:
           FUNCTION: file3-js
       input_mapping:
           code: one-js
       output_mapping:
           code: a-js
-    
-    - task: create-file
+    - task: create-file-4
       params:
           FUNCTION: file1-js
       input_mapping:
           code: two-js
       output_mapping:
           code: a-js
-    
-    - task: create-file
+    - task: create-file-5
       params:
           FUNCTION: file2-js
       input_mapping:
           code: two-js
       output_mapping:
           code: a-js
-    
-    - task: create-file
+    - task: create-file-6
       params:
           FUNCTION: file3-js
       input_mapping:
           code: two-js
       output_mapping:
           code: a-js
-    
-    - task: create-file
+    - task: create-file-7
       params:
           FUNCTION: file1-js
       input_mapping:
           code: one-js
       output_mapping:
           code: b-js
-    
-    - task: create-file
+    - task: create-file-8
       params:
           FUNCTION: file2-js
       input_mapping:
           code: one-js
       output_mapping:
           code: b-js
-    
-    - task: create-file
+    - task: create-file-9
       params:
           FUNCTION: file3-js
       input_mapping:
           code: one-js
       output_mapping:
           code: b-js
-    
-    - task: create-file
+    - task: create-file-10
       params:
           FUNCTION: file1-js
       input_mapping:
           code: two-js
       output_mapping:
           code: b-js
-    
-    - task: create-file
+    - task: create-file-11
       params:
           FUNCTION: file2-js
       input_mapping:
           code: two-js
       output_mapping:
           code: b-js
-    
-    - task: create-file
+    - task: create-file-12
       params:
           FUNCTION: file3-js
       input_mapping:
