@@ -10,7 +10,7 @@ pattern EtherTransfer($amount) {
 }
 
 pattern Loop($body) {
-  orelse {
+  or {
     `while($_) { $body; }`,
     `do { $body; } while ($_)`,
     `for ($_; $_; $_) { $body; }`
