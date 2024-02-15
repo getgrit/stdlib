@@ -1,5 +1,5 @@
 ---
-title: Detected use of an insecure `MD4` or `MD5` hash function
+title: Detected use of an insecure `MD4` or `MD5` hash function and replace with `SHA256`
 ---
 
 Identified the utilization of an insecure `MD4` or `MD5` hash function, both of which have well-documented vulnerabilities and are deemed deprecated. It is recommended to replace them with more secure options such as `SHA256` or a comparable hash function for improved security.
