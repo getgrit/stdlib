@@ -1,0 +1,79 @@
+---
+title: Detected use of an insecure `MD4` or `MD5` hash function
+---
+
+Identified the utilization of an insecure `MD4` or `MD5` hash function, both of which have well-documented vulnerabilities and are deemed deprecated. It is recommended to replace them with more secure options such as `SHA256` or a comparable hash function for improved security.
+
+### references
+
+- [rfc6151](https://tools.ietf.org/html/rfc6151)
+- [stackexchange](https://crypto.stackexchange.com/questions/44151/how-does-the-flame-malware-take-advantage-of-md5-collision)
+- [sha3_256](https://pycryptodome.readthedocs.io/en/latest/src/hash/sha3_256.html)
+
+tags: #fix #security
+
+```grit
+engine marzano(0.1)
+language python
+
+`hashlib.new($params)` where {
+    or {
+        $params <: contains `'md5'` => `'sha256'`,
+        $params <: contains `'MD5'` => `'sha256'`,
+        $params <: contains `'md4'` => `'sha256'`,
+        $params <: contains `'MD4'` => `'sha256'`,
+    }
+}
+```
+
+## Detected use of an insecure `MD4` or `MD5` hash function
+
+```python
+import hashlib
+
+# BAD: insecure-hash-function
+hashlib.new("md5")
+
+# BAD: insecure-hash-function
+hashlib.new('md4', 'test')
+
+# BAD: insecure-hash-function
+hashlib.new(name='md5', string='test')
+
+# BAD: insecure-hash-function
+hashlib.new('MD4', string='test')
+
+# BAD: insecure-hash-function
+hashlib.new(string='test', name='MD5')
+
+# GOOD: insecure-hash-function
+hashlib.new('sha256')
+
+# GOOD: insecure-hash-function
+hashlib.new('SHA512')
+```
+
+```python
+import hashlib
+
+# BAD: insecure-hash-function
+hashlib.new('sha256')
+
+# BAD: insecure-hash-function
+hashlib.new('sha256', 'test')
+
+# BAD: insecure-hash-function
+hashlib.new(name='sha256', string='test')
+
+# BAD: insecure-hash-function
+hashlib.new('sha256', string='test')
+
+# BAD: insecure-hash-function
+hashlib.new(string='test', name='sha256')
+
+# GOOD: insecure-hash-function
+hashlib.new('sha256')
+
+# GOOD: insecure-hash-function
+hashlib.new('SHA512')
+```
