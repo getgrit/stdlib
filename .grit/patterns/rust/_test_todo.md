@@ -13,15 +13,12 @@ language rust
 ## Multi-line
 
 ```rust
-# GOOD
-
 if x {
   y
 }
 ```
 
 ```rust
-
 todo!("Consider using a match instead");
 if x {
   y
