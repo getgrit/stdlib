@@ -28,52 +28,46 @@ language python
 
 ## Detected use of an insecure `MD4` or `MD5` hash function
 
+### BAD: insecure-hash-function
+
 ```python
 import hashlib
 
-# BAD: insecure-hash-function
 hashlib.new("md5")
 
-# BAD: insecure-hash-function
 hashlib.new('md4', 'test')
 
-# BAD: insecure-hash-function
 hashlib.new(name='md5', string='test')
 
-# BAD: insecure-hash-function
 hashlib.new('MD4', string='test')
 
-# BAD: insecure-hash-function
 hashlib.new(string='test', name='MD5')
-
-# GOOD: insecure-hash-function
-hashlib.new('sha256')
-
-# GOOD: insecure-hash-function
-hashlib.new('SHA512')
 ```
 
 ```python
 import hashlib
 
-# BAD: insecure-hash-function
 hashlib.new('sha256')
 
-# BAD: insecure-hash-function
 hashlib.new('sha256', 'test')
 
-# BAD: insecure-hash-function
 hashlib.new(name='sha256', string='test')
 
-# BAD: insecure-hash-function
 hashlib.new('sha256', string='test')
 
-# BAD: insecure-hash-function
 hashlib.new(string='test', name='sha256')
+```
 
-# GOOD: insecure-hash-function
+### GOOD: secure-hash-function
+
+```python
 hashlib.new('sha256')
 
-# GOOD: insecure-hash-function
+hashlib.new('SHA512')
+```
+
+```python
+hashlib.new('sha256')
+
 hashlib.new('SHA512')
 ```
