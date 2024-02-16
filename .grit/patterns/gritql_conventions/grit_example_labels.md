@@ -7,6 +7,7 @@ language markdown
 
 file($body, $name) where {
     $name <: includes ".grit/patterns",
+    $name <: not includes "example_labels",
     $body <: contains bubble code_span() as $code where {
         $code <: r"(?s)(?:.+)(GOOD|BAD)(?:.+)"($label),
         $label => .,
