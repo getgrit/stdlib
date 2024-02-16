@@ -6,7 +6,7 @@ While it is tempting to put "# GOOD" and "# BAD" comments inside examples, the G
 language markdown
 
 code_span() as $code where {
-    $code <: r"(?:.+)(GOOD|BAD)(?:.+)"($label),
+    $code <: r"(?s)(?:.+)(GOOD|BAD)(?:.+)"($label),
     $label => .,
     $code => `$label\n$code`,
 }
@@ -30,12 +30,22 @@ GOOD
 Bad example, the "good" labels are inside the examples:
 ````md
 // @filename: patterns/gritql_conventions/bad_sample.md
-`# GOOD This is some code sample more stuff`
+Yada yaa
+```
+# GOOD
+source code here
+```
 ````
+
+Corrected example:
 ````md
 // @filename: patterns/gritql_conventions/bad_sample.md
-GOOD
-`#  This is some code sample`
+Yada yaa
+GOOD 
+```
+# 
+source code here
+```
 ````
 
 ### Counter-example
