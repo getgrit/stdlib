@@ -7,7 +7,8 @@ language markdown
 
 code_span() as $code where {
     $code <: r"(?:.+)(GOOD|BAD)(?:.+)"($label),
-    $label => .
+    $label => .,
+    $code => `$label\n$code`,
 }
 ```
 
@@ -20,7 +21,8 @@ Bad example, the "good" labels are inside the examples:
 ```
 ```md
 // @filename: patterns/gritql_conventions/bad_sample.md
-`# This is some code sample`
+GOOD
+`#  This is some code sample`
 ```
 
 ### Counter-example
