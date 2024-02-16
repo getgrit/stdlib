@@ -17,13 +17,26 @@ code_span() as $code where {
 Bad example, the "good" labels are inside the examples:
 ```md
 // @filename: patterns/gritql_conventions/bad_sample.md
-`# GOOD This is some code sample`
+`# GOOD This is some code sample more stuff`
 ```
 ```md
 // @filename: patterns/gritql_conventions/bad_sample.md
 GOOD
-`#  This is some code sample`
+`#  This is some code sample more stuff`
 ```
+
+### Multi-Example
+
+Bad example, the "good" labels are inside the examples:
+````md
+// @filename: patterns/gritql_conventions/bad_sample.md
+`# GOOD This is some code sample more stuff`
+````
+````md
+// @filename: patterns/gritql_conventions/bad_sample.md
+GOOD
+`#  This is some code sample`
+````
 
 ### Counter-example
 
