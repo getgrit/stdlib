@@ -4,7 +4,10 @@ pattern upgrade_dependency($target_dep, $target_version, $dependency_key) {
     or {
         `$key: $value` where {
             $key <: `"$target_dep"`,
-            $value => `"$target_version"`
+            $value <: or {
+                r"^.+" => `"^$target_version"`,
+                $_ => `"$target_version"`
+            }
         },
         pair($key, $value) where {
             $key <: $dependency_key,
