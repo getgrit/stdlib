@@ -2,7 +2,7 @@
 title: Remove the mutex. Channel guarded with mutex
 ---
 
-Detected a channel guarded with a mutex. Channels already have an internal mutex, so this is unnecessary. Remove the mutex
+Detected a channel guarded with a `mutex`. Channels already have an internal `mutex`, so this is unnecessary. Remove the mutex
 
 ### references
 
