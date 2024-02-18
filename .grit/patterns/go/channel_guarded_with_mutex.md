@@ -1,0 +1,98 @@
+---
+title: Remove the mutex. Channel guarded with mutex
+---
+
+Detected a channel guarded with a mutex. Channels already have an internal mutex, so this is unnecessary. Remove the mutex
+
+### references
+
+- [go-antipatterns](https://hackmysql.com/golang/go-antipatterns/#guarded-channel)
+
+tags: #fix #best-practice
+
+```grit
+language go
+
+`` as $body where {
+    $body <: contains `var $mutax sync.Mutex` => .,
+    $body <: contains `$mutax.Lock()` => .,
+    $body <: contains `$mutax.Unlock()` => .,
+}
+```
+
+## Remove the mutex. Channel guarded with mutex
+
+```python
+package main
+
+import (
+	"fmt"
+	"sync"
+)
+
+func main() {
+	var wg sync.WaitGroup
+	var mu sync.Mutex
+	channel := make(chan int)
+
+	// Producer
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		for i := 0; i < 5; i++ {
+			mu.Lock()
+			channel <- i
+			mu.Unlock()
+		}
+		close(channel)
+	}()
+
+	// Consumer
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		for num := range channel {
+			mu.Lock()
+			fmt.Println(num)
+			mu.Unlock()
+		}
+	}()
+
+	wg.Wait()
+}
+```
+
+```python
+package main
+
+import (
+	"fmt"
+	"sync"
+)
+
+func main() {
+	var wg sync.WaitGroup
+	channel := make(chan int)
+
+	// Producer
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		for i := 0; i < 5; i++ {
+			channel <- i
+		}
+		close(channel)
+	}()
+
+	// Consumer
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		for num := range channel {
+			fmt.Println(num)
+		}
+	}()
+
+	wg.Wait()
+}
+```
