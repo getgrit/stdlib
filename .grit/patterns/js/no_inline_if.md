@@ -20,15 +20,15 @@ else $else` => `if ($cond) {
 ## Examples
 
 ```javascript
-if (condition) doSomething()
-else doSomethingElse()
+if (condition) doSomething();
+else doSomethingElse();
 ```
 
 ```javascript
 if (condition) {
-    doSomething()
+  doSomething();
 } else {
-    doSomethingElse()
+  doSomethingElse();
 }
 ```
 
@@ -36,16 +36,28 @@ if (condition) {
 
 ```javascript
 if (condition) {
-    doSomething()
+  doSomething();
 } else {
-    doSomethingElse()
+  doSomethingElse();
 }
 ```
 
 ```js
 if (condition) {
-    doSomething()
+  doSomething();
 } else {
-    doSomethingElse()
+  doSomethingElse();
 }
+```
+
+## If by itself
+
+This pattern only targets `if` statements that are followed by an `else` statement. If the `if` statement is by itself, it is not affected.
+
+```javascript
+if (condition) doSomething();
+```
+
+```javascript
+if (condition) doSomething();
 ```
