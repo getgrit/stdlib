@@ -30,3 +30,13 @@ grit patterns test
 ```
 
 Once you have your sample(s) passing locally, creating a PR will automatically trigger a CI build running the same tests in a range of environments.
+
+## GritQL conventions
+
+When writing GritQL patterns, follow the conventions in the [GritQL conventions](./grit/patterns/gritql_conventions) directory.
+
+You can confirm you're following the conventions by running the following command:
+
+```sh
+grit check
+```
