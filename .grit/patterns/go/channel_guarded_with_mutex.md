@@ -14,7 +14,7 @@ tags: #fix #best-practice
 language go
 
 `{ $body } ` where {
-    $body <: contains `$channel := make(chan $dataType)`)
+    $body <: contains `$channel := make(chan $dataType)`,
     $body <: contains `var $mutax sync.Mutex` => .,
     $body <: contains `$mutax.Lock()` => .,
     $body <: contains `$mutax.Unlock()` => .,
