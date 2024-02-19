@@ -13,14 +13,16 @@ tags: #fix #best-practice
 ```grit
 language go
 
-`{ $body }` where {
-    $body <: contains `var $mutax sync.Mutex` => .,
-    $body <: contains `$mutax.Lock()` => .,
-    $body <: contains `$mutax.Unlock()` => .,
+`{ $body } ` where {
+    if( $body <: contains `$channel := make(chan $dataType)` ){
+        $body <: contains `var $mutax sync.Mutex` => .,
+        $body <: contains `$mutax.Lock()` => .,
+        $body <: contains `$mutax.Unlock()` => .,
+    }
 }
 ```
 
-## Remove the mutex. Channel guarded with mutex
+## Channel guarded with mutex
 
 ```go
 package main
@@ -91,6 +93,86 @@ func main() {
 		for num := range channel {
 			fmt.Println(num)
 		}
+	}()
+
+	wg.Wait()
+}
+```
+
+## Without Channel guarded with mutex
+
+```go
+package main
+
+import (
+	"fmt"
+	"sync"
+)
+
+func main() {
+	var wg sync.WaitGroup
+	var mu sync.Mutex
+	data := make([]int, 0)
+
+	// Producer
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		for i := 0; i < 5; i++ {
+			mu.Lock()
+			data = append(data, i)
+			mu.Unlock()
+		}
+	}()
+
+	// Consumer
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		mu.Lock()
+		for _, num := range data {
+			fmt.Println(num)
+		}
+		mu.Unlock()
+	}()
+
+	wg.Wait()
+}
+```
+
+```go
+package main
+
+import (
+	"fmt"
+	"sync"
+)
+
+func main() {
+	var wg sync.WaitGroup
+	var mu sync.Mutex
+	data := make([]int, 0)
+
+	// Producer
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		for i := 0; i < 5; i++ {
+			mu.Lock()
+			data = append(data, i)
+			mu.Unlock()
+		}
+	}()
+
+	// Consumer
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		mu.Lock()
+		for _, num := range data {
+			fmt.Println(num)
+		}
+		mu.Unlock()
 	}()
 
 	wg.Wait()
