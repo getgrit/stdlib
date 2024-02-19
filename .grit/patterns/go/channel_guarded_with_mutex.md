@@ -14,11 +14,10 @@ tags: #fix #best-practice
 language go
 
 `{ $body } ` where {
-    if( $body <: contains `$channel := make(chan $dataType)` ){
-        $body <: contains `var $mutax sync.Mutex` => .,
-        $body <: contains `$mutax.Lock()` => .,
-        $body <: contains `$mutax.Unlock()` => .,
-    }
+    $body <: contains `$channel := make(chan $dataType)`)
+    $body <: contains `var $mutax sync.Mutex` => .,
+    $body <: contains `$mutax.Lock()` => .,
+    $body <: contains `$mutax.Unlock()` => .,
 }
 ```
 
