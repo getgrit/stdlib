@@ -13,7 +13,7 @@ tags: #fix #best-practice
 ```grit
 language go
 
-`{ $body}` where {
+`{ $body }` where {
     $body <: contains `var $mutax sync.Mutex` => .,
     $body <: contains `$mutax.Lock()` => .,
     $body <: contains `$mutax.Unlock()` => .,
