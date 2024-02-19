@@ -13,7 +13,7 @@ tags: #fix #best-practice
 ```grit
 language go
 
-`` as $body where {
+`{ $body}` where {
     $body <: contains `var $mutax sync.Mutex` => .,
     $body <: contains `$mutax.Lock()` => .,
     $body <: contains `$mutax.Unlock()` => .,
@@ -22,7 +22,7 @@ language go
 
 ## Remove the mutex. Channel guarded with mutex
 
-```python
+```go
 package main
 
 import (
@@ -62,7 +62,7 @@ func main() {
 }
 ```
 
-```python
+```go
 package main
 
 import (
