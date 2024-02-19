@@ -18,7 +18,7 @@ language go
 
 ## Replace strconv.Atoi ⇒ strconv.ParseInt
 
-```python
+```go
 package main
 
 import (
@@ -50,7 +50,7 @@ func main() {
 }
 ```
 
-```python
+```go
 package main
 
 import (
