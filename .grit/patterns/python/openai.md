@@ -278,7 +278,7 @@ pattern openai_main($client, $azure) {
             } => $res
           },
           // Remap errors
-          contains `openai.error.$exp` => `openai.$exp` where {
+          contains bubble($need_openai_import) `openai.error.$exp` => `openai.$exp` where {
             $need_openai_import = `true`,
           },
           contains `import openai` as $import_stmt where {
