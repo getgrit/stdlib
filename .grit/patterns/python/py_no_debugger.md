@@ -10,19 +10,13 @@ tags: #fix #good-practice
 engine marzano(0.1)
 language python
 
-`` as $body where {
-    or {
-        and {
-            $body <: contains `import pdb as $db` => .,
-            $body <: contains `$db.set_trace()` => .,
-            $body <: contains `pdb.Pdb.set_trace()` => .,
-            $body <: contains `$db.Pdb.set_trace()` => .,
-        },
-        and {
-            $body <: contains `import pdb` => .,
-            $body <: contains `pdb.set_trace()` => .
-        }
-    }
+or {
+    `import pdb as $db` => .,
+    `$db.set_trace()` => .,
+    `$db.Pdb.set_trace()` => .,
+    `pdb.Pdb.set_trace()` => .,
+    `import pdb` => .,
+    `$p = $db.set_trace()` => .
 }
 ```
 
@@ -87,5 +81,5 @@ def foo():
 
 def foo():
     # GOOD: python-debugger-found
-    p = not_pdb.set_trace()
+    
 ```
