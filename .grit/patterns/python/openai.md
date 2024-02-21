@@ -681,3 +681,31 @@ for chunk in completion:
     print(chunk.choices[0].delta.content)
     print("****************")
 ```
+
+## Fix multiple exceptions
+Repair https://github.com/openai/openai-python/issues/1165, ensure we fix all exceptions in one pass.
+
+```python
+try:
+   # Some completions handler
+   pass
+except openai.error.RateLimitError as e:
+   print(e)
+except openai.error.AuthenticationError as e:
+   print(e)
+except openai.error.InvalidRequestError as e:
+    print(e)
+```
+
+Fixed:
+```python
+try:
+   # Some completions handler
+   pass
+except openai.RateLimitError as e:
+   print(e)
+except openai.AuthenticationError as e:
+   print(e)
+except openai.InvalidRequestError as e:
+    print(e)
+```
