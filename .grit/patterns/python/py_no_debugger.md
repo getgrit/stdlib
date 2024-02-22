@@ -11,17 +11,12 @@ engine marzano(0.1)
 language python
 
 file($name, $body) where {
-     or {
-        any {
-            $body <: contains `import pdb as $db` => .,
-            $body <: contains `$db.set_trace()` => .,
-            $body <: contains `pdb.Pdb.set_trace()` => .,
-            $body <: contains `$db.Pdb.set_trace()` => .,
-        },
-        any {
-            $body <: contains `import pdb` => .,
-            $body <: contains `pdb.set_trace()` => .
-        }
+    any {
+        $body <: contains `import pdb as $db` => .,
+        $body <: contains `import pdb` => .,
+        $body <: contains `$db.set_trace()` => .,
+        $body <: contains `pdb.Pdb.set_trace()` => .,
+        $body <: contains `$db.Pdb.set_trace()` => .,
     }
 }
 ```
@@ -61,7 +56,7 @@ def foo():
     pdb = "also a string"
     # BAD: pdb-remove
     # BAD: pdb-remove
-    
+
 ```
 
 ## Remove debugger direct import
