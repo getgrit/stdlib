@@ -12,13 +12,13 @@ language python
 
 file($name, $body) where {
      or {
-        and {
+        any {
             $body <: contains `import pdb as $db` => .,
             $body <: contains `$db.set_trace()` => .,
             $body <: contains `pdb.Pdb.set_trace()` => .,
             $body <: contains `$db.Pdb.set_trace()` => .,
         },
-        and {
+        any {
             $body <: contains `import pdb` => .,
             $body <: contains `pdb.set_trace()` => .
         }
