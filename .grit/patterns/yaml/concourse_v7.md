@@ -53,14 +53,12 @@ values: $vals` where {
                     $new += `$replaced`
                 },
                 // set accumulate equal the new list
-                $accumulate = join(list = $new, separator = ``)
+                $accumulate = join(list = $new, separator = `\n`)
             }
         },
         $across => `in_parallel:\n$accumulate`
     }
 }
-
-// distribute_variables()
 
 sequential {
   contains distribute_variables(),
@@ -96,7 +94,6 @@ jobs:
       code: ((.:x))-js
     output_mapping:
       code: ((.:y))-js
-
 ```
 
 ```yaml
