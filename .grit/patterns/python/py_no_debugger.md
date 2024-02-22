@@ -10,13 +10,14 @@ tags: #fix #good-practice
 engine marzano(0.1)
 language python
 
-file($name, $body) where {
-    any {
-        $body <: contains `import pdb as $db` => .,
-        $body <: contains `import pdb` => .,
-        $body <: contains `$db.set_trace()` => .,
-        $body <: contains `pdb.Pdb.set_trace()` => .,
-        $body <: contains `$db.Pdb.set_trace()` => .,
+or {
+  `import $pdb as $db`,
+  `import pdb` where $db = `pdb`
+} where {
+    $program <: maybe contains or {
+        `$db.set_trace()` => .,
+        `$db.Pdb.set_trace()` => .,
+        `$pdb.Pdb.set_trace()` => .,
     }
 }
 ```
@@ -43,7 +44,7 @@ def foo():
 ```
 
 ```python
-
+import pdb as db
 
 
 def foo():
@@ -56,7 +57,7 @@ def foo():
     pdb = "also a string"
     # BAD: pdb-remove
     # BAD: pdb-remove
-
+    
 ```
 
 ## Remove debugger direct import
@@ -76,6 +77,7 @@ def foo():
 
 ```python
 # BAD: python-debugger-found
+import pdb
 
 # BAD: python-debugger-found
 
