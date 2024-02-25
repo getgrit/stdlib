@@ -13,11 +13,11 @@ tags: #fix #correctness
 ```grit
 language go
 
-`for _, $val := range $values { $body }` where {
-    $body <: not contains `$val := $val`,
-    $body <: contains `&$val`
-} => `for _, $val := range $values { 
-        $val := $val \n $body 
+`for _, $value := range $values { $body }` where {
+    $body <: not contains `$value := $value`,
+    $body <: contains `&$value`
+} => `for _, $value := range $values { 
+        $value := $value \n $body 
     }`
 ```
 
@@ -41,9 +41,8 @@ func() {
         print_pointer(&val)
     }
 }
-```
 
-```go
+
 func() {
     values := []string{"a", "b", "c"}
     var funcs []func()
@@ -66,8 +65,6 @@ func (){
 }
 ```
 
-## loop iterations without pointers
-
 ```go
 func() {
     values := []string{"a", "b", "c"}
@@ -88,9 +85,8 @@ func() {
  print_pointer(&val) 
     }
 }
-```
 
-```go
+
 func() {
     values := []string{"a", "b", "c"}
     var funcs []func()
