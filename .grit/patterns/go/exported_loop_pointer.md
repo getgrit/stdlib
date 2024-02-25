@@ -14,11 +14,11 @@ tags: #fix #correctness
 language go
 
 `for _, $val := range $values { $body }` where {
-    and {
-        $body <: not contains `$val := $val`,
-        $body <: contains `$funcName(&$value)` => `$val := $val \n $funcName(&$value)`,
-    }
-}
+    $body <: not contains `$val := $val`,
+    $body <: contains `&$val`
+} => `for _, $val := range $values { 
+        $val := $val \n $body 
+    }`
 ```
 
 ## loop iterations with pointers
@@ -27,7 +27,7 @@ language go
 func() {
     values := []string{"a", "b", "c"}
     var funcs []func()
-    // BAD: exported_loop_pointer
+    // exported_loop_pointer
     for _, val := range values {
         funcs = append(funcs, func() {
             fmt.Println(&val)
@@ -36,7 +36,7 @@ func() {
 }
 
 func() {
-    // BAD: exported_loop_pointer
+    // exported_loop_pointer
     for _, val := range values {
         print_pointer(&val)
     }
@@ -47,21 +47,22 @@ func() {
 func() {
     values := []string{"a", "b", "c"}
     var funcs []func()
-    // BAD: exported_loop_pointer
+    // exported_loop_pointer
     for _, val := range values {
+        val := val // pin!
         funcs = append(funcs, func() {
-            val := val
- fmt.Println(&val)
+            fmt.Println(&val)
         })
     }
 }
 
-func() {
-    // BAD: exported_loop_pointer
-    for _, val := range values {
-        val := val
- print_pointer(&val)
-    }
+func (){
+	input := []string{"a", "b", "c"}
+	output := []string{}
+    // exported_loop_pointer
+	for _, val := range input {
+		output = append(output, val)
+	}
 }
 ```
 
@@ -71,22 +72,21 @@ func() {
 func() {
     values := []string{"a", "b", "c"}
     var funcs []func()
-    // GOOD: exported_loop_pointer
-    for _, val := range values {
-        val := val // pin!
-        funcs = append(funcs, func() {
+    // exported_loop_pointer
+    for _, val := range values { 
+        val := val 
+ funcs = append(funcs, func() {
             fmt.Println(&val)
-        })
+        }) 
     }
 }
 
-func (){
-	input := []string{"a", "b", "c"}
-	output := []string{}
-    // GOOD: exported_loop_pointer
-	for _, val := range input {
-		output = append(output, val)
-	}
+func() {
+    // exported_loop_pointer
+    for _, val := range values { 
+        val := val 
+ print_pointer(&val) 
+    }
 }
 ```
 
@@ -94,7 +94,7 @@ func (){
 func() {
     values := []string{"a", "b", "c"}
     var funcs []func()
-    // GOOD: exported_loop_pointer
+    // exported_loop_pointer
     for _, val := range values {
         val := val // pin!
         funcs = append(funcs, func() {
@@ -106,7 +106,7 @@ func() {
 func (){
 	input := []string{"a", "b", "c"}
 	output := []string{}
-    // GOOD: exported_loop_pointer
+    // exported_loop_pointer
 	for _, val := range input {
 		output = append(output, val)
 	}
