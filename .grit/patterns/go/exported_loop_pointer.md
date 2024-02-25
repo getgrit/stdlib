@@ -24,58 +24,87 @@ language go
 ## loop iterations with pointers
 
 ```go
-package main
-
-import (
-	"fmt"
-)
-
-func main() {
-	funcs := generateFunctions()
-	for _, f := range funcs {
-		f()
-	}
+func() {
+    values := []string{"a", "b", "c"}
+    var funcs []func()
+    // exported_loop_pointer
+    for _, val := range values {
+        funcs = append(funcs, func() {
+            fmt.Println(&val)
+        })
+    }
 }
 
-func generateFunctions() []func() {
-	values := []string{"a", "b", "c"}
-	var funcs []func()
-	// ruleid:exported_loop_pointer
-	for _, val := range values {
-		val := val // Fix: create a new variable inside the loop
-		funcs = append(funcs, func() {
-			fmt.Println(&val)
-		})
+func() {
+    // exported_loop_pointer
+    for _, val := range values {
+        print_pointer(&val)
+    }
+}
+
+
+func() {
+    values := []string{"a", "b", "c"}
+    var funcs []func()
+    // exported_loop_pointer
+    for _, val := range values {
+        val := val // pin!
+        funcs = append(funcs, func() {
+            fmt.Println(&val)
+        })
+    }
+}
+
+func (){
+	input := []string{"a", "b", "c"}
+	output := []string{}
+    // exported_loop_pointer
+	for _, val := range input {
+		output = append(output, val)
 	}
-	return funcs
 }
 ```
 
 ```go
-package main
-
-import (
-	"fmt"
-)
-
-func main() {
-	funcs := generateFunctions()
-	for _, f := range funcs {
-		f()
-	}
+func() {
+    values := []string{"a", "b", "c"}
+    var funcs []func()
+    // exported_loop_pointer
+    for _, val := range values { 
+        val := val 
+ funcs = append(funcs, func() {
+            fmt.Println(&val)
+        }) 
+    }
 }
 
-func generateFunctions() []func() {
-	values := []string{"a", "b", "c"}
-	var funcs []func()
-	// ruleid:exported_loop_pointer
-	for _, val := range values { 
+func() {
+    // exported_loop_pointer
+    for _, val := range values { 
         val := val 
- val := val // Fix: create a new variable inside the loop
-		funcs = append(funcs, func() {
-			fmt.Println(&val)
-		}) 
+ print_pointer(&val) 
     }
-	return funcs
+}
+
+
+func() {
+    values := []string{"a", "b", "c"}
+    var funcs []func()
+    // exported_loop_pointer
+    for _, val := range values {
+        val := val // pin!
+        funcs = append(funcs, func() {
+            fmt.Println(&val)
+        })
+    }
+}
+
+func (){
+	input := []string{"a", "b", "c"}
+	output := []string{}
+    // exported_loop_pointer
+	for _, val := range input {
+		output = append(output, val)
+	}
 }
 ```
