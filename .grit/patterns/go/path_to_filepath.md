@@ -6,7 +6,8 @@ Utilize `filepath.Join(...)` instead of `path.Join(...)` as it accommodates OS-s
 
 ### references
 
-- [strconv](https://pkg.go.dev/strconv)
+- [path.join-considered-harmful](https://parsiya.net/blog/2019-03-09-path.join-considered-harmful/)
+- [path.go](https://go.dev/src/path/path.go?s=4034:4066#L145)
 
 tags: #fix #correctness
 
