@@ -24,7 +24,28 @@ language go
 ## loop iterations with pointers
 
 ```go
+func() {
+    values := []string{"a", "b", "c"}
+    var funcs []func()
+    // exported_loop_pointer
+    for _, val := range values {
+        funcs = append(funcs, func() {
+            fmt.Println(&val)
+        })
+    }
+}
 ```
 
 ```go
+func() {
+    values := []string{"a", "b", "c"}
+    var funcs []func()
+    // exported_loop_pointer
+    for _, val := range values { 
+        val := val 
+ funcs = append(funcs, func() {
+            fmt.Println(&val)
+        }) 
+    }
+}
 ```
