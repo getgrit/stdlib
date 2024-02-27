@@ -13,11 +13,11 @@ tags: #fix #correctness
 ```grit
 language go
 
-`for _, $value := range $values { $body }` where {
-    $body <: not contains `$value := $value`,
-    $body <: contains `&$value`
-} => `for _, $value := range $values { 
-        $value := $value \n $body 
+`for _, $val := range $values { $body }` where {
+    $body <: not contains `$val := $val`,
+    $body <: contains `&$val`
+} => `for _, $val := range $values { 
+        $val := $val \n $body 
     }`
 ```
 
@@ -27,7 +27,6 @@ language go
 func() {
     values := []string{"a", "b", "c"}
     var funcs []func()
-    // exported_loop_pointer
     for _, val := range values {
         funcs = append(funcs, func() {
             fmt.Println(&val)
@@ -36,7 +35,6 @@ func() {
 }
 
 func() {
-    // exported_loop_pointer
     for _, val := range values {
         print_pointer(&val)
     }
@@ -46,7 +44,6 @@ func() {
 func() {
     values := []string{"a", "b", "c"}
     var funcs []func()
-    // exported_loop_pointer
     for _, val := range values {
         val := val // pin!
         funcs = append(funcs, func() {
@@ -58,18 +55,17 @@ func() {
 func (){
 	input := []string{"a", "b", "c"}
 	output := []string{}
-    // exported_loop_pointer
 	for _, val := range input {
 		output = append(output, val)
 	}
 }
+
 ```
 
 ```go
 func() {
     values := []string{"a", "b", "c"}
     var funcs []func()
-    // exported_loop_pointer
     for _, val := range values { 
         val := val 
  funcs = append(funcs, func() {
@@ -79,7 +75,6 @@ func() {
 }
 
 func() {
-    // exported_loop_pointer
     for _, val := range values { 
         val := val 
  print_pointer(&val) 
@@ -90,7 +85,6 @@ func() {
 func() {
     values := []string{"a", "b", "c"}
     var funcs []func()
-    // exported_loop_pointer
     for _, val := range values {
         val := val // pin!
         funcs = append(funcs, func() {
@@ -102,9 +96,9 @@ func() {
 func (){
 	input := []string{"a", "b", "c"}
 	output := []string{}
-    // exported_loop_pointer
 	for _, val := range input {
 		output = append(output, val)
 	}
 }
+
 ```
