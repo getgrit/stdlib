@@ -17,7 +17,7 @@ or {
 }`
 ```
 
-## Detected identical statements in the if body
+## Detected identical statements in the else if
 
 ```go
 package main
@@ -31,25 +31,13 @@ func main() {
 		fmt.Println("of course")
 	}
 
-	// BAD: useless-if-conditional
+	// useless-if-conditional
 	if (y) {
 		fmt.Println("same condition")
 	} else if (y) {
 		fmt.Println("same condition")
 	}
-	// BAD: useless-if-body
-	if (y) {
-		fmt.Println("of course")
-	} else {
-		fmt.Println("of course")
-	}
-
-	// GOOD: useless-if-body
-	if (y) {
-		fmt.Println("of course")
-	} else {
-		fmt.Println("different condition")
-	}
+	
 }
 ```
 
@@ -65,16 +53,76 @@ func main() {
 		fmt.Println("of course")
 	}
 
-	// BAD: useless-if-conditional
+	// useless-if-conditional
 	if (y) { 
     fmt.Println("same condition") 
 }
-	// BAD: useless-if-body
+	
+}
+```
+
+## Detected identical statements in the if else
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+	var y = 1
+
+	// useless-if-body
+	if (y) {
+		fmt.Println("of course")
+	} else {
+		fmt.Println("of course")
+	}
+}
+```
+
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+	var y = 1
+
+	// useless-if-body
 	if (y) { 
     fmt.Println("of course") 
 }
+}
+```
 
-	// GOOD: useless-if-body
+## Detected identical statements in the different if else
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+	var y = 1
+	
+	if (y) {
+		fmt.Println("of course")
+	} else {
+		fmt.Println("different condition")
+	}
+}
+```
+
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+	var y = 1
+	
 	if (y) {
 		fmt.Println("of course")
 	} else {
