@@ -16,10 +16,10 @@ or {
     `if(true){
         $body
     }` 
-} as $comp => `// BAD: comparison \n $comp`
+} as $comp => `// INCORRECT: comparison \n $comp`
 ```
 
-## Warning for bad comparison `if (True)` and `if (False)`
+## Warning for INCORRECT comparison `if (True)`
 
 ```go
 package main
@@ -29,10 +29,6 @@ import "fmt"
 func mainFunc() {
     fmt.Println("hello world")
     var y = "hello";
-
-    if (false) {
-        fmt.Println("never")
-    }
 
     if (true) {
         fmt.Println("never")
@@ -49,13 +45,43 @@ func mainFunc() {
     fmt.Println("hello world")
     var y = "hello";
 
-    // BAD: comparison 
- if (false) {
+    // INCORRECT: comparison 
+ if (true) {
         fmt.Println("never")
     }
+}
+```
 
-    // BAD: comparison 
- if (true) {
+
+## Warning for INCORRECT comparison `if (False)`
+
+```go
+package main
+
+import "fmt"
+
+func mainFunc() {
+    fmt.Println("hello world")
+    var y = "hello";
+
+    if (false) {
+        fmt.Println("never")
+    }
+}
+```
+
+
+```go
+package main
+
+import "fmt"
+
+func mainFunc() {
+    fmt.Println("hello world")
+    var y = "hello";
+
+    // INCORRECT: comparison 
+ if (false) {
         fmt.Println("never")
     }
 }
