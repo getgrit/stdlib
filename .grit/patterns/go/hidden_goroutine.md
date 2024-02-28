@@ -25,28 +25,13 @@ package main
 
 import "fmt"
 
-// BAD: hidden goroutine
+//  hidden goroutine
 func HiddenGoroutine() {
     go func() {
         fmt.Println("hello world")
     }()
 }
 
-// GOOD: hidden goroutine
-func FunctionThatCallsGoroutineIsOk() {
-    fmt.Println("This is normal")
-    go func() {
-        fmt.Println("This is OK because the function does other things")
-    }()
-}
-
-// GOOD: hidden goroutine
-func FunctionThatCallsGoroutineAlsoOk() {
-    go func() {
-        fmt.Println("This is OK because the function does other things")
-    }()
-    fmt.Println("This is normal")
-}
 ```
 
 ```go
@@ -54,24 +39,54 @@ package main
 
 import "fmt"
 
-// BAD: hidden goroutine
+//  hidden goroutine
 func HiddenGoroutine() { 
     fmt.Println("hello world") 
 }
 
-// GOOD: hidden goroutine
+```
+
+## Detected a hidden goroutine with other operation on top
+
+```go
+//  hidden goroutine
 func FunctionThatCallsGoroutineIsOk() {
     fmt.Println("This is normal")
     go func() {
         fmt.Println("This is OK because the function does other things")
     }()
 }
+```
 
-// GOOD: hidden goroutine
+```go
+//  hidden goroutine
+func FunctionThatCallsGoroutineIsOk() {
+    fmt.Println("This is normal")
+    go func() {
+        fmt.Println("This is OK because the function does other things")
+    }()
+}
+```
+
+## Detected a hidden goroutine with other operation on bottom
+```go
+//  hidden goroutine
 func FunctionThatCallsGoroutineAlsoOk() {
     go func() {
         fmt.Println("This is OK because the function does other things")
     }()
     fmt.Println("This is normal")
 }
+
+```
+
+```go
+//  hidden goroutine
+func FunctionThatCallsGoroutineAlsoOk() {
+    go func() {
+        fmt.Println("This is OK because the function does other things")
+    }()
+    fmt.Println("This is normal")
+}
+
 ```
