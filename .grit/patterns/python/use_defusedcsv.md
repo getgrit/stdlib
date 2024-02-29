@@ -19,10 +19,10 @@ language python
 `import csv` => `import defusedcsv as csv`
 ```
 
-## BAD: use-defusedcsv
+## without use-defusedcsv
 
 ```python
-# BAD: use-defusedcsv
+# use-defusedcsv
 import csv
 
 with open("file", 'r') as fin:
@@ -33,7 +33,7 @@ with open("file", 'w') as fout:
 ```
 
 ```python
-# BAD: use-defusedcsv
+# use-defusedcsv
 import defusedcsv as csv
 
 with open("file", 'r') as fin:
@@ -43,10 +43,10 @@ with open("file", 'w') as fout:
     writer = csv.writer(fout, quoting=csv.QUOTE_ALL)
 ```
 
-## GOOD: use-defusedcsv
+## with use-defusedcsv
 
 ```python
-# GOOD: use-defusedcsv
+# use-defusedcsv
 import defusedcsv as csv
 
 with open("file", 'w') as fout:
@@ -54,7 +54,7 @@ with open("file", 'w') as fout:
 ```
 
 ```python
-# GOOD: use-defusedcsv
+# use-defusedcsv
 import defusedcsv as csv
 
 with open("file", 'w') as fout:
