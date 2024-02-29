@@ -46,6 +46,9 @@ jobs:
         run: |
           pip install ruff
 
+      - name: Setup Go environment
+        uses: actions/setup-go@v5.0.0
+
       - name: Install @getgrit/launcher
         run: npm install -g @getgrit/launcher
 
