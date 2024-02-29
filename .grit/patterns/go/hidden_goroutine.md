@@ -68,11 +68,6 @@ func HiddenGoroutine() {
         fmt.Println("hello world")
     }()
 }
-
-func main() {
-	// Call the HiddenGoroutine function
-	
-}
 ```
 
 ```go
@@ -84,11 +79,6 @@ import "fmt"
 func HiddenGoroutine() { 
         fmt.Println("hello world") 
     }
-
-func main() {
-	// Call the HiddenGoroutine function
-	
-}
 ```
 
 ## Detected a hidden goroutine with other operation on top
