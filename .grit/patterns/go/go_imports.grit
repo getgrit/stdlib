@@ -5,6 +5,6 @@ language go
 pattern ensure_import($source) {
     import_declaration(imports=import_spec_list(imports=$mod)) where {
         $mod <: not contains $source,
-        $mod => `$mod\n$source`
+        $mod += $source
     }
 }
