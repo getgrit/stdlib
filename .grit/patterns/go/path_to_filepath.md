@@ -64,7 +64,7 @@ package main
 import (
 	"fmt"
 	"path"
-"path/filepath"
+	"path/filepath"
 )
 
 func getDirectory() string {
