@@ -14,13 +14,13 @@ file($name, $body) where {
     } => `func $func() { 
         $funcBody 
     }`,
-    $body <: contains `func main(){ $mainBody }` where {
+    $body <: maybe contains `func main(){ $mainBody }` where {
         $mainBody <: contains `$func()` => `go $func()`
     }
 }
 ```
 
-## Detected a hidden goroutine
+## Detected a hidden goroutine with func call
 
 ```go
 package main
@@ -53,6 +53,42 @@ func HiddenGoroutine() {
 func main() {
 	// Call the HiddenGoroutine function
 	go HiddenGoroutine()
+}
+```
+
+## Detected a hidden goroutine without func call
+
+```go
+package main
+
+import "fmt"
+
+//  hidden goroutine
+func HiddenGoroutine() {
+    go func() {
+        fmt.Println("hello world")
+    }()
+}
+
+func main() {
+	// Call the HiddenGoroutine function
+	
+}
+```
+
+```go
+package main
+
+import "fmt"
+
+//  hidden goroutine
+func HiddenGoroutine() { 
+        fmt.Println("hello world") 
+    }
+
+func main() {
+	// Call the HiddenGoroutine function
+	
 }
 ```
 
