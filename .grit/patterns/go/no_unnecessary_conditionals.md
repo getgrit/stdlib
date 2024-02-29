@@ -1,8 +1,8 @@
 ---
-title: Warning for bad comparison if (True), if (False)
+title: Avoid unnecessary if statements
 ---
 
-Identified redundant if statement: `if (True)`, `if (False)` consistently yield the same outcome, making one of the expressions unnecessary in the code. Remove either the `if (False)` segment entirely or the `if (True)` comparison, depending on which is present in the code.
+If statements that always evaluate to `true` or `false` are redundant and should be removed.
 
 tags: #fix #warning
 
@@ -10,13 +10,9 @@ tags: #fix #warning
 language go
 
 or {
-    `if(false){
-        $body
-    }`,
-    `if(true){
-        $body
-    }` 
-} as $comp => `// INCORRECT: comparison \n $comp`
+	`if(false){ $body }` => .,
+	`if(true){ $body }`  => $body
+}
 ```
 
 ## Warning for INCORRECT comparison `if (True)`
@@ -45,10 +41,7 @@ func mainFunc() {
     fmt.Println("hello world")
     var y = "hello";
 
-    // INCORRECT: comparison 
- if (true) {
-        fmt.Println("never")
-    }
+    fmt.Println("never")
 }
 ```
 
@@ -80,9 +73,5 @@ func mainFunc() {
     fmt.Println("hello world")
     var y = "hello";
 
-    // INCORRECT: comparison 
- if (false) {
-        fmt.Println("never")
-    }
 }
 ```
