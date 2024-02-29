@@ -2,7 +2,7 @@
 title: Detected a hidden goroutine
 ---
 
-Detected a hidden goroutine. Function invocations are expected to synchronous, and this function will execute asynchronously because all it does is call a goroutine. Instead, remove the internal goroutine and call the function using `go`
+Function invocations are expected to synchronous, and this function will execute asynchronously because all it does is call a goroutine. Instead, remove the internal goroutine and call the function using `go`.
 
 tags: #correctness #best-practice
 
