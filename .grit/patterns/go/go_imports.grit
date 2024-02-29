@@ -1,0 +1,10 @@
+language go
+
+/** This is a utility file, you do not need to implement it yourself */
+
+pattern ensure_import($source) {
+    import_declaration(imports=import_spec_list(imports=$mod)) where {
+        $mod <: not contains $source,
+        $mod += $source
+    }
+}
