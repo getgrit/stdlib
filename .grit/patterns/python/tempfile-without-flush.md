@@ -12,7 +12,7 @@ tags: #fix #good-practice
 engine marzano(0.1)
 language python
 
-`def $name():` as $func where {
+`def $name(): $body` as $func where {
     $func <: contains or {
         `$f = $tempfile.NamedTemporaryFile($params)`,
         `with $tempfile.NamedTemporaryFile($params) as $f:`
