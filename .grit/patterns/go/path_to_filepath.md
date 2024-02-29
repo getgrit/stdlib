@@ -14,7 +14,10 @@ tags: #fix #correctness
 ```grit
 language go
 
-`path.Join($params)` => `filepath.Join($params)`
+or {
+    `path.Join($params)` => `filepath.Join($params)`,
+    ensure_import(`"path/filepath"`)
+}
 ```
 
 ## Replace `path.Join()` ⇒ `filepath.Join()`
@@ -25,7 +28,6 @@ package main
 import (
 	"fmt"
 	"path"
-	"path/filepath"
 )
 
 func getDirectory() string {
@@ -53,6 +55,7 @@ func exampleFunction3(p string) {
 
 	fmt.Println(filepath.Join(a.Path, "baz"))
 }
+
 ```
 
 ```go
@@ -61,7 +64,7 @@ package main
 import (
 	"fmt"
 	"path"
-	"path/filepath"
+"path/filepath"
 )
 
 func getDirectory() string {
@@ -89,4 +92,5 @@ func exampleFunction3(p string) {
 
 	fmt.Println(filepath.Join(a.Path, "baz"))
 }
+
 ```
