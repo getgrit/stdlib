@@ -10,8 +10,7 @@ tags: #correctness #best-practice
 language go
 
 file($name, $body) where {
-    $body <: contains `func $func() { go func() { $funcBody }() }` as $hiddenFunc where {
-    } => `func $func() { 
+    $body <: contains `func $func() { go func() { $funcBody }() }` as $hiddenFunc => `func $func() { 
         $funcBody 
     }`,
     $body <: maybe contains `func main(){ $mainBody }` where {
