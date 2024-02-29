@@ -9,13 +9,15 @@ tags: #correctness #best-practice
 ```grit
 language go
 
-`func $func() { 
-    go func() {
+file($name, $body) where {
+    $body <: contains `func $func() { go func() { $funcBody }() }` as $hiddenFunc where {
+    } => `func $func() { 
         $funcBody 
-    }() 
-}` => `func $func() { 
-    $funcBody 
-}`
+    }`,
+    $body <: contains `func main(){ $mainBody }` where {
+        $mainBody <: contains `$func()` => `go $func()`
+    }
+}
 ```
 
 ## Detected a hidden goroutine
@@ -32,6 +34,10 @@ func HiddenGoroutine() {
     }()
 }
 
+func main() {
+	// Call the HiddenGoroutine function
+	HiddenGoroutine()
+}
 ```
 
 ```go
@@ -41,9 +47,13 @@ import "fmt"
 
 //  hidden goroutine
 func HiddenGoroutine() { 
-    fmt.Println("hello world") 
-}
+        fmt.Println("hello world") 
+    }
 
+func main() {
+	// Call the HiddenGoroutine function
+	go HiddenGoroutine()
+}
 ```
 
 ## Detected a hidden goroutine with other operation on top
@@ -56,6 +66,10 @@ func FunctionThatCallsGoroutineIsOk() {
         fmt.Println("This is OK because the function does other things")
     }()
 }
+
+func main() {
+	FunctionThatCallsGoroutineIsOk()
+}
 ```
 
 ```go
@@ -65,6 +79,10 @@ func FunctionThatCallsGoroutineIsOk() {
     go func() {
         fmt.Println("This is OK because the function does other things")
     }()
+}
+
+func main() {
+	FunctionThatCallsGoroutineIsOk()
 }
 ```
 
@@ -78,6 +96,9 @@ func FunctionThatCallsGoroutineAlsoOk() {
     fmt.Println("This is normal")
 }
 
+func main() {
+    FunctionThatCallsGoroutineAlsoOk()
+}
 ```
 
 ```go
@@ -89,4 +110,7 @@ func FunctionThatCallsGoroutineAlsoOk() {
     fmt.Println("This is normal")
 }
 
+func main() {
+    FunctionThatCallsGoroutineAlsoOk()
+}
 ```
