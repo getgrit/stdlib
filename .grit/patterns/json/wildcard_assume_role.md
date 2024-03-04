@@ -2,32 +2,27 @@
 title: Detected wildcard access granted to sts:AssumeRole and limit to a specific identity in your account
 ---
 
-# Auto-upgrade TypeScript
-
 Detected wildcard access granted to sts:AssumeRole. This means anyone with your AWS account ID and the name of the role can assume the role. Instead, limit to a specific identity in your account, like this: `arn:aws:iam::<account_id>:root`.
 
+tags: #aws
 ### references
 
 - [aws](https://rhinosecuritylabs.com/aws/assume-worst-aws-assume-role-enumeration/)
 
-tags: #aws
+
 
 ```grit
 language json
 
-`{
-    "Effect": $type,
-    $config,
+`{ 
+    "Effect": $type, 
+    $config, 
     "Action": "sts:AssumeRole"
 }` where {
     $config <: contains `"Principal": { "AWS": $key }` where {
-        any {
-            if( $key <: contains `*` ){
-                $type <: contains `Allow` => `Deny`
-            },
-            if( $key <: contains `"arn:aws:iam::$account_id:root"`){
-                $type <: contains `Deny` => `Allow`
-            }
+        $key <: contains or {
+            `*` where $type <: contains `Allow` => `Deny`,
+            `"arn:aws:iam::$account_id:root"` where $type <: contains `Deny` => `Allow`
         }
     },
 }
