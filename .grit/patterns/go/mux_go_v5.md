@@ -46,7 +46,10 @@ New:
 package main
 
 func main() {
-  client := mux.NewClient(muxoption.WithTokenID(os.Getenv("MUX_TOKEN_ID")), muxoption.WithTokenSecret(os.Getenv("MUX_TOKEN_SECRET")))
+  client := mux.NewClient(
+    muxoption.WithTokenID(os.Getenv("MUX_TOKEN_ID")),
+    muxoption.WithTokenSecret(os.Getenv("MUX_TOKEN_SECRET"))
+  )
 }
 ```
 
