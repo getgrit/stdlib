@@ -193,10 +193,10 @@ import "context"
 import "github.com/muxinc/mux-go/video"
 
 func main() {
-	asset, err := client.Video.Assets.New(context.TODO(), video.AssetNewParams{Input: muxgo.F([]muxgo.InputSettings{{
+	asset, err := client.Video.Assets.New(context.TODO(), video.AssetNewParams{Input: muxgo.F([]muxgo.AssetNewParamsInput{{
 			Url: muxgo.F("https://storage.googleapis.com/muxdemofiles/mux-video-intro.mp4"),
 		}}),
-		PlaybackPolicy: muxgo.F([]muxgo.PlaybackPolicy{muxgo.PUBLIC})})
+		PlaybackPolicy: muxgo.F([]shared.PlaybackPolicy{shared.PUBLIC})})
 }
 ```
 
