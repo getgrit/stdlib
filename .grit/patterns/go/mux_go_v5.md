@@ -23,8 +23,9 @@ pattern fix_api_calls() {
 			`$client.DimensionsApi.ListDimensions` => `$client.Data.Dimensions.List`,
 			// `ListDimensionValues` => `ListDimensionValues($args[0], muxgo.WithParams($args[1]))`
 		},
+		$ctx = require_import(source=`context`),
 		if ($args <: .) {
-			$overall => `$call(context.TODO())`
+			$overall => `$call($ctx.TODO())`
 		}
 	}
 }
@@ -99,10 +100,10 @@ package main
 
 import (
 	"fmt"
-	"os"
 
 	muxgo "github.com/muxinc/mux-go"
 	"github.com/muxinc/mux-go/examples/common"
+	"os"
 )
 
 func main() {
@@ -126,10 +127,11 @@ package main
 
 import (
 	"fmt"
-	"os"
 
+	"context"
 	muxgo "github.com/muxinc/mux-go"
 	"github.com/muxinc/mux-go/examples/common"
+	"os"
 )
 
 func main() {
