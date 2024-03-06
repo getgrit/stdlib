@@ -29,6 +29,12 @@ private pattern wrap_mux_fields() {
 	}
 }
 
+pattern simple_renames() {
+	or {
+		`$muxgo.PlaybackPolicy` => `shared.PlaybackPolicy`
+	}
+}
+
 pattern rename_params() {
 	or {
 		`$muxgo.ListDimensionValuesParams{$params}` where {
@@ -37,8 +43,13 @@ pattern rename_params() {
 		`$muxgo.CreateAssetRequest{$params}` where {
 			$video = require_import(source=`github.com/muxinc/mux-go/video`),
 		} => `$video.AssetNewParams{$params}`,
+		`$muxgo.InputSetting` => `video.VIDEO`,
+		`$muxgo.InputSettings{$params}` where {
+			$video = require_import(source=`github.com/muxinc/mux-go/video`),
+		} => `$video.AssetNewParamsInput{$params}`,
 	} where {
-		$params <: maybe wrap_mux_fields()
+		$params <: maybe wrap_mux_fields(),
+		$params <: maybe contains rename_params()
 	}
 }
 
@@ -59,12 +70,16 @@ pattern fix_api_calls() {
 	}
 }
 
-file($name, $body) where {
-    $body <: contains or {
-			fix_api_client(),
-			fix_api_calls(),
-			rename_params()
-		}
+
+sequential {
+	bubble file($name, $body) where {
+			$body <: contains or {
+				fix_api_client(),
+				fix_api_calls(),
+				rename_params(),
+			}
+	},
+	maybe bubble file($name, $body) where $body <: contains simple_renames()
 }
 ```
 
@@ -113,7 +128,6 @@ func main() {
 
 ```go
 package main
-
 import "context"
 
 func main() {
@@ -163,12 +177,11 @@ package main
 import muxgo "github.com/muxinc/mux-go"
 
 func main() {
-	// asset, err := client.AssetsApi.CreateAsset(muxgo.CreateAssetRequest{
-	// 	Input: []muxgo.InputSettings{{
-	// 		Url: "https://storage.googleapis.com/muxdemofiles/mux-video-intro.mp4",
-	// 	}},
-	// 	PlaybackPolicy: []muxgo.PlaybackPolicy{muxgo.PUBLIC},
-	// })
+	asset, err := client.AssetsApi.CreateAsset(muxgo.CreateAssetRequest{Input: []muxgo.InputSettings{{
+			Url: "https://storage.googleapis.com/muxdemofiles/mux-video-intro.mp4",
+		}},
+		PlaybackPolicy: []muxgo.PlaybackPolicy{muxgo.PUBLIC},
+	})
 }
 ```
 
@@ -180,12 +193,10 @@ import "context"
 import "github.com/muxinc/mux-go/video"
 
 func main() {
-	// asset, err := client.Video.Assets.New(context.TODO(), video.AssetNewParams{
-	// 	Input: mux.F([]video.AssetNewParamsInput{{
-	// 		URL: mux.F("https://storage.googleapis.com/muxdemofiles/mux-video-intro.mp4"),
-	// 	}}),
-	// 	PlaybackPolicy: mux.F([]shared.PlaybackPolicy{shared.PlaybackPolicyPublic}),
-	// })
+	asset, err := client.Video.Assets.New(context.TODO(), video.AssetNewParams{Input: muxgo.F([]muxgo.InputSettings{{
+			Url: muxgo.F("https://storage.googleapis.com/muxdemofiles/mux-video-intro.mp4"),
+		}}),
+		PlaybackPolicy: muxgo.F([]muxgo.PlaybackPolicy{muxgo.PUBLIC})})
 }
 ```
 
