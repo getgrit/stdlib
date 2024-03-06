@@ -134,7 +134,7 @@ package main
 import muxgo "github.com/muxinc/mux-go"
 
 func main() {
-	req := muxgo.CreateAssetRequest{Url: "https://storage.googleapis.com/muxdemofiles/mux-video-intro.mp4",PlaybackPolicy: "public"}
+	req := muxgo.CreateAssetRequest{Url: "https://storage.googleapis.com/muxdemofiles/mux-video-intro.mp4", PlaybackPolicy: "public",}
 }
 ```
 
