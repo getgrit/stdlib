@@ -38,7 +38,7 @@ pattern rename_params() {
 			$video = require_import(source=`github.com/muxinc/mux-go/video`),
 		} => `$video.AssetNewParams{$params}`,
 	} where {
-		$params <: wrap_mux_fields()
+		$params <: maybe wrap_mux_fields()
 	}
 }
 
@@ -134,10 +134,7 @@ package main
 import muxgo "github.com/muxinc/mux-go"
 
 func main() {
-	req = muxgo.CreateAssetRequest{
-		Url: "https://storage.googleapis.com/muxdemofiles/mux-video-intro.mp4",
-		PlaybackPolicy: "public"
-	}
+	req := muxgo.CreateAssetRequest{Url: "https://storage.googleapis.com/muxdemofiles/mux-video-intro.mp4",PlaybackPolicy: "public"}
 }
 ```
 
@@ -149,10 +146,7 @@ import muxgo "github.com/muxinc/mux-go"
 import "github.com/muxinc/mux-go/video"
 
 func main() {
-	req = muxgo.CreateAssetRequest{
-		Url: "https://storage.googleapis.com/muxdemofiles/mux-video-intro.mp4",
-		PlaybackPolicy: "public"
-	}
+	req := video.AssetNewParams{Url: muxgo.F("https://storage.googleapis.com/muxdemofiles/mux-video-intro.mp4"), PlaybackPolicy: muxgo.F("public")}
 }
 ```
 
