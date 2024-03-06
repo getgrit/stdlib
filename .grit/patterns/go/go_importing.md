@@ -8,12 +8,12 @@ The main function for Go is `require_import(source=$module)`, which ensures that
 
 ```grit
 engine marzano(0.1)
-language python
+language go
 
 contains bubble or {
   `use_real_getenv()` where {
     $os = require_import(source="os")
-  } => `$os.Getenv()
+  } => `$os.Getenv()`
 }
 ```
 

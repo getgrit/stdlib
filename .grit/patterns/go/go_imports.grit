@@ -6,7 +6,11 @@ pattern before_each_file_prep_imports() {
     }
 }
 
-/** This is a utility file, you do not need to implement it yourself */
+function require_import($source) {
+    $GLOBAL_NEW_IMPORTS += [$source],
+    return `foo`
+}
+
 
 pattern ensure_import($source) {
     import_declaration(imports=import_spec_list(imports=$mod)) where {
