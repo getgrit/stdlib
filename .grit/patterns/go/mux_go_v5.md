@@ -28,7 +28,8 @@ pattern fix_api_calls() {
 		$args <: maybe contains `$muxgo.WithParams($ref)` => `$ref`,
 		$call <: or {
 			`$client.DimensionsApi.ListDimensions` => `$client.Data.Dimensions.List`,
-			`$client.DimensionsApi.ListDimensionValues` => `$client.Data.Dimensions.ListValues`
+			`$client.DimensionsApi.ListDimensionValues` => `$client.Data.Dimensions.ListValues`,
+			`$client.AssetsApi.CreateAsset` => `$client.Video.Assets.New`,
 		},
 		$ctx = require_import(source=`context`),
 		if ($args <: .) {
@@ -102,7 +103,10 @@ func main() {
 ```
 
 ## Video API
+The Video API has been moved under the `Video` namespace of the client and methods have been renamed:
+- `AssetsApi.CreateAsset` -> `Video.Assets.New`
 
+Request parameters must be imported from the `video` package.
 
 ```go
 package main
@@ -110,10 +114,12 @@ package main
 import muxgo "github.com/muxinc/mux-go"
 
 func main() {
-	d, err := client.DimensionsApi.ListDimensions()
-
-	ldp := muxgo.ListDimensionValuesParams{Timeframe: []string{"7:days"}}
-	dv, err := client.DimensionsApi.ListDimensionValues("browser", muxgo.WithParams(&ldp))
+	asset, err := client.AssetsApi.CreateAsset(muxgo.CreateAssetRequest{
+		Input: []muxgo.InputSettings{{
+			Url: "https://storage.googleapis.com/muxdemofiles/mux-video-intro.mp4",
+		}},
+		PlaybackPolicy: []muxgo.PlaybackPolicy{muxgo.PUBLIC},
+	})
 }
 ```
 
@@ -122,12 +128,15 @@ package main
 
 import muxgo "github.com/muxinc/mux-go"
 import "context"
+import "github.com/muxinc/mux-go/video"
 
 func main() {
-	d, err := client.Data.Dimensions.List(context.TODO())
-
-	ldp := muxgo.data.DimensionListValuesParams{Timeframe: []string{"7:days"}}
-	dv, err := client.Data.Dimensions.ListValues(context.TODO(), "browser", &ldp)
+	asset, err := client.Video.Assets.New(context.TODO(), video.AssetNewParams{
+		Input: mux.F([]video.AssetNewParamsInput{{
+			URL: mux.F("https://storage.googleapis.com/muxdemofiles/mux-video-intro.mp4"),
+		}}),
+		PlaybackPolicy: mux.F([]shared.PlaybackPolicy{shared.PlaybackPolicyPublic}),
+	})
 }
 ```
 
