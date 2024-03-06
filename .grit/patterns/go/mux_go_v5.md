@@ -22,7 +22,8 @@ private pattern wrap_mux_fields() {
 		$params <: contains bubble($muxgo) $value where {
 			$muxgo = require_import(source=`"github.com/muxinc/mux-go"`, as=`mux`),
 			$value <: or {
-				`"$_"` => `$muxgo.F($value)`
+				`"$_"` => `$muxgo.F($value)`,
+				composite_literal() => `$muxgo.F($value)`
 			}
 		}
 	}
@@ -223,7 +224,7 @@ import "context"
 func main() {
 	d, err := client.Data.Dimensions.List(context.TODO())
 
-	ldp := data.DimensionListValuesParams{Timeframe: []string{muxgo.F("7:days")}}
+	ldp := data.DimensionListValuesParams{Timeframe: muxgo.F([]string{muxgo.F("7:days")})}
 	dv, err := client.Data.Dimensions.ListValues(context.TODO(), "browser", &ldp)
 }
 ```
