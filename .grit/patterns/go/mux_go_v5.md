@@ -46,6 +46,7 @@ New:
 package main
 
 import "os"
+import "github.com/muxinc/mux-go/muxoption"
 
 func main() {
   client := mux.NewClient(muxoption.WithTokenID(os.Getenv("MUX_TOKEN_ID")), muxoption.WithTokenSecret(os.Getenv("MUX_TOKEN_SECRET")))
