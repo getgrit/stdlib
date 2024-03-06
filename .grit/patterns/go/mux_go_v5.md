@@ -113,14 +113,15 @@ func main() {
 
 ## Request parameters
 
-All request parameters are now wrapped in a generic Field type, which helps to distinguish zero values from null or omitted fields.
+All request parameters are now wrapped in a generic Field type, which helps to distinguish zero values from null or omitted fields. In most cases, primitive values should simply be wrapped in `muxgo.F()`.
+
+Fields which you want to be null *must* now be sent and should be specified using `muxgo.Null[<type>]()`.
 
 Before:
 ```go
 package main
 
 import muxgo "github.com/muxinc/mux-go"
-import "github.com/muxinc/mux-go/video"
 
 func main() {
 	req = muxgo.CreateAssetRequest{
@@ -136,6 +137,7 @@ After:
 package main
 
 import muxgo "github.com/muxinc/mux-go"
+import "github.com/muxinc/mux-go/video"
 
 func main() {
 	req = muxgo.CreateAssetRequest{
