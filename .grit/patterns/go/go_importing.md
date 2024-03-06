@@ -13,7 +13,10 @@ language go
 contains bubble or {
   `use_real_getenv()` where {
     $os = require_import(source="somepackage/somemodule")
-  } => `$os.Getenv()`
+  } => `$os.Getenv()`,
+  `second_case()` where {
+    $case_two = require_import(source="somepackage/somemodule")
+  } => `$case_two.CaseTwo()`
 }
 ```
 
@@ -86,6 +89,43 @@ import (
   "bar"
   "somepackage/somemodule"
 )
+
+func main() {
+  somemodule.Getenv()
+}
+```
+
+## Add the same import twice
+
+```go
+package main
+
+import (
+  "foo"
+  "bar"
+)
+
+func foo() {
+  second_case()
+}
+
+func main() {
+  use_real_getenv()
+}
+```
+
+```go
+package main
+
+import (
+  "foo"
+  "bar"
+  "somepackage/somemodule"
+)
+
+func foo() {
+  second_case()
+}
 
 func main() {
   somemodule.Getenv()

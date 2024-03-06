@@ -16,7 +16,6 @@ pattern after_each_file_handle_imports() {
                 }
             },
             `$_`
-            // $program += `import fmt`
         }
     }
 }
