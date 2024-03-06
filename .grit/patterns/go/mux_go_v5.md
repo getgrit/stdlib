@@ -45,8 +45,8 @@ pattern rename_params() {
 pattern final_mux_renames() {
 	or {
 		`[]$muxgo.InputSettings{$params}` where {
-			$video = require_import(source=`github.com/muxinc/mux-go/video`),
-		} => `[]$video.AssetNewParamsInput{$params}`,
+			// $video = require_import(source=`github.com/muxinc/mux-go/video`),
+		} => `[]video.AssetNewParamsInput{$params}`,
 	}
 }
 
