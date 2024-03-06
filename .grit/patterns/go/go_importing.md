@@ -22,6 +22,7 @@ contains bubble or {
 ```go
 package main
 
+import "othermodule"
 import "somepackage/somemodule"
 
 func main() {
@@ -32,6 +33,7 @@ func main() {
 ```go
 package main
 
+import "othermodule"
 import "somepackage/somemodule"
 
 func main() {
@@ -39,3 +41,24 @@ func main() {
 }
 ```
 
+## Aliased import
+
+```go
+package main
+
+import aliasmodule "somepackage/somemodule"
+
+func main() {
+  use_real_getenv()
+}
+```
+
+```go
+package main
+
+import aliasmodule "somepackage/somemodule"
+
+func main() {
+  aliasmodule.Getenv()
+}
+```
