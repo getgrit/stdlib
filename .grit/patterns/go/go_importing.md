@@ -12,7 +12,7 @@ language go
 
 contains bubble or {
   `use_real_getenv()` where {
-    $os = require_import(source="os")
+    $os = require_import(source="somepackage/somemodule")
   } => `$os.Getenv()`
 }
 ```
@@ -22,7 +22,7 @@ contains bubble or {
 ```go
 package main
 
-import "os"
+import "somepackage/somemodule"
 
 func main() {
   use_real_getenv()
@@ -32,10 +32,10 @@ func main() {
 ```go
 package main
 
-import "os"
+import "somepackage/somemodule"
 
 func main() {
-  os.Getenv()
+  somemodule.Getenv()
 }
 ```
 
