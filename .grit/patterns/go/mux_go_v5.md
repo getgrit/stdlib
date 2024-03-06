@@ -223,7 +223,7 @@ import "context"
 func main() {
 	d, err := client.Data.Dimensions.List(context.TODO())
 
-	ldp := data.DimensionListValuesParams{Timeframe: []string{"7:days"}}
+	ldp := data.DimensionListValuesParams{Timeframe: []string{muxgo.F("7:days")}}
 	dv, err := client.Data.Dimensions.ListValues(context.TODO(), "browser", &ldp)
 }
 ```
