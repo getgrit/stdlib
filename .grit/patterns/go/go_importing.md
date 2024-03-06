@@ -206,3 +206,27 @@ func main() {
   model.my_import()
 }
 ```
+
+## As does not conflict
+
+If the import is already aliased, the aliased name will be used.
+
+```go
+package main
+
+import coolmodel "somepackage/my-model"
+
+func main() {
+  add_aliased_import()
+}
+```
+
+```go
+package main
+
+import coolmodel "somepackage/my-model"
+
+func main() {
+  coolmodel.my_import()
+}
+```
