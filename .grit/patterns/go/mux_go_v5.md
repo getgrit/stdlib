@@ -17,11 +17,18 @@ pattern fix_api_client() {
   } => `mux.NewClient($opts)`
 }
 
+private pattern wrap_param_fields($params) {
+	
+}
+
 pattern rename_params() {
 	or {
 		`$muxgo.ListDimensionValuesParams{$params}` where {
 			$data = require_import(source=`github.com/muxinc/mux-go/data`),
-		}=> `$data.DimensionListValuesParams{$params}`,
+		} => `$data.DimensionListValuesParams{$params}`,
+		`$muxgo.CreateAssetRequest{$params}` where {
+			$video = require_import(source=`github.com/muxinc/mux-go/video`),
+		} => `$video.AssetNewParams{$params}`,
 	}
 }
 
@@ -101,6 +108,41 @@ import "context"
 
 func main() {
 	d, err := client.Data.Dimensions.List(context.TODO())
+}
+```
+
+## Request parameters
+
+All request parameters are now wrapped in a generic Field type, which helps to distinguish zero values from null or omitted fields.
+
+Before:
+```go
+package main
+
+import muxgo "github.com/muxinc/mux-go"
+
+func main() {
+	req = muxgo.CreateAssetRequest{
+		Url: "https://storage.googleapis.com/muxdemofiles/mux-video-intro.mp4",
+		PlaybackPolicy: []muxgo.PlaybackPolicy{muxgo.PUBLIC},
+		// Null field Description
+	}
+}
+```
+
+After:
+```go
+package main
+
+import muxgo "github.com/muxinc/mux-go"
+
+func main() {
+	req = muxgo.CreateAssetRequest{
+		Url: "https://storage.googleapis.com/muxdemofiles/mux-video-intro.mp4",
+		PlaybackPolicy: "public"
+		// Null field Description
+		Description: muxgo.Null[string](),
+	}
 }
 ```
 
