@@ -19,7 +19,9 @@ pattern fix_api_client() {
 
 pattern rename_params() {
 	or {
-		`$muxgo.ListDimensionValuesParams{$params}` => `$muxgo.data.DimensionListValuesParams{$params}`,
+		`$muxgo.ListDimensionValuesParams{$params}` where {
+			$data = require_import(source=`github.com/muxinc/mux-go/data`),
+		}=> `$data.DimensionListValuesParams{$params}`,
 	}
 }
 
@@ -161,12 +163,13 @@ func main() {
 package main
 
 import muxgo "github.com/muxinc/mux-go"
+import "github.com/muxinc/mux-go/data"
 import "context"
 
 func main() {
 	d, err := client.Data.Dimensions.List(context.TODO())
 
-	ldp := muxgo.data.DimensionListValuesParams{Timeframe: []string{"7:days"}}
+	ldp := data.DimensionListValuesParams{Timeframe: []string{"7:days"}}
 	dv, err := client.Data.Dimensions.ListValues(context.TODO(), "browser", &ldp)
 }
 ```
