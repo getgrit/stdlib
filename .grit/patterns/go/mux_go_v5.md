@@ -97,14 +97,12 @@ func main() {
 	common.AssertNotNil(d.Data)
 	common.AssertNotNil(d.Data.Basic)
 	common.AssertNotNil(d.Data.Advanced)
-	fmt.Println("list-dimensions ✅")
 
 	// ========== list-dimension-values ==========
 	ldp := muxgo.ListDimensionValuesParams{Timeframe: []string{"7:days"}}
 	dv, err := client.DimensionsApi.ListDimensionValues("browser", muxgo.WithParams(&ldp))
 	common.AssertNoError(err)
 	common.AssertNotNil(dv.Data)
-	fmt.Println("list-dimension-values ✅")
 }
 ```
 
@@ -126,13 +124,11 @@ func main() {
 	common.AssertNotNil(d.Data)
 	common.AssertNotNil(d.Data.Basic)
 	common.AssertNotNil(d.Data.Advanced)
-	fmt.Println("list-dimensions ✅")
 
 	// ========== list-dimension-values ==========
 	ldp := muxgo.ListDimensionValuesParams{Timeframe: []string{"7:days"}}
 	dv, err := client.DimensionsApi.ListDimensionValues("browser", muxgo.WithParams(&ldp))
 	common.AssertNoError(err)
 	common.AssertNotNil(dv.Data)
-	fmt.Println("list-dimension-values ✅")
 }
 ```
