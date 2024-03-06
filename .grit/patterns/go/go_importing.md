@@ -124,7 +124,7 @@ import (
 )
 
 func foo() {
-  second_case()
+  somemodule.CaseTwo()
 }
 
 func main() {
