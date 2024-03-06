@@ -17,8 +17,23 @@ pattern fix_api_client() {
   } => `mux.NewClient($opts)`
 }
 
+pattern fix_api_calls() {
+	`$call($args)` as $overall where {
+		$call <: or {
+			`$client.DimensionsApi.ListDimensions` => `$client.Data.Dimensions.List`,
+			// `ListDimensionValues` => `ListDimensionValues($args[0], muxgo.WithParams($args[1]))`
+		},
+		if ($args <: .) {
+			$overall => `$call(context.TODO())`
+		}
+	}
+}
+
 file($name, $body) where {
-    $body <: contains fix_api_client()
+    $body <: contains or {
+			fix_api_client(),
+			fix_api_calls()
+		}
 }
 ```
 
@@ -53,7 +68,7 @@ func main() {
 }
 ```
 
-## Context
+## Context is now required
 
 All API calls now require a context to be passed in. This is to allow for better control over the request lifecycle.
 
@@ -71,7 +86,7 @@ package main
 import "context"
 
 func main() {
-	d, _, err := client.DimensionsApi.ListDimensions(context.TODO())
+	d, err := client.Data.Dimensions.List(context.TODO())
 }
 ```
 
@@ -92,7 +107,7 @@ import (
 
 func main() {
 	// ========== list-dimensions ==========
-	d, err := client.Data.Dimensions.List()
+	d, err := client.DimensionsApi.ListDimensions()
 	common.AssertNoError(err)
 	common.AssertNotNil(d.Data)
 	common.AssertNotNil(d.Data.Basic)
@@ -119,7 +134,7 @@ import (
 
 func main() {
 	// ========== list-dimensions ==========
-	d, err := client.Data.Dimensions.List(ctx.TODO())
+	d, err := client.Data.Dimensions.List(context.TODO())
 	common.AssertNoError(err)
 	common.AssertNotNil(d.Data)
 	common.AssertNotNil(d.Data.Basic)
