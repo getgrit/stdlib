@@ -120,6 +120,7 @@ Before:
 package main
 
 import muxgo "github.com/muxinc/mux-go"
+import "github.com/muxinc/mux-go/video"
 
 func main() {
 	req = muxgo.CreateAssetRequest{
