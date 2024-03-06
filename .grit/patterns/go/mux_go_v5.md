@@ -53,9 +53,31 @@ func main() {
 }
 ```
 
-# Unconverted
+## Context
 
-## End-to-End Example
+All API calls now require a context to be passed in. This is to allow for better control over the request lifecycle.
+
+```go
+package main
+
+func main() {
+	d, err := client.DimensionsApi.ListDimensions()
+}
+```
+
+```go
+package main
+
+import "context"
+
+func main() {
+	d, _, err := client.DimensionsApi.ListDimensions(context.TODO())
+}
+```
+
+## Dimensions API initialization
+
+The Dimensions API has been moved under the `Data` namespace of the client, with two methods: `List` and `ListValues`.
 
 ```go
 package main
@@ -69,16 +91,8 @@ import (
 )
 
 func main() {
-
-	// API Client Initialization
-	client := muxgo.NewAPIClient(
-		muxgo.NewConfiguration(
-			muxgo.WithBasicAuth(os.Getenv("MUX_TOKEN_ID"), os.Getenv("MUX_TOKEN_SECRET")),
-		)
-  )
-
 	// ========== list-dimensions ==========
-	d, err := client.DimensionsApi.ListDimensions()
+	d, err := client.Data.Dimensions.List()
 	common.AssertNoError(err)
 	common.AssertNotNil(d.Data)
 	common.AssertNotNil(d.Data.Basic)
@@ -93,6 +107,7 @@ func main() {
 	fmt.Println("list-dimension-values ✅")
 }
 ```
+
 ```go
 package main
 
@@ -105,15 +120,8 @@ import (
 )
 
 func main() {
-
-	// API Client Initialization
-	client := muxgo.NewAPIClient(
-		muxgo.NewConfiguration(
-			muxgo.WithBasicAuth(os.Getenv("MUX_TOKEN_ID"), os.Getenv("MUX_TOKEN_SECRET")),
-		))
-
 	// ========== list-dimensions ==========
-	d, err := client.DimensionsApi.ListDimensions()
+	d, err := client.Data.Dimensions.List(ctx.TODO())
 	common.AssertNoError(err)
 	common.AssertNotNil(d.Data)
 	common.AssertNotNil(d.Data.Basic)
