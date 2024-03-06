@@ -62,3 +62,32 @@ func main() {
   aliasmodule.Getenv()
 }
 ```
+
+## Add the import, existing list
+
+```go
+package main
+
+import (
+  "foo"
+  "bar"
+)
+
+func main() {
+  use_real_getenv()
+}
+```
+
+```go
+package main
+
+import (
+  "foo"
+  "bar"
+  "somepackage/somemodule"
+)
+
+func main() {
+  somemodule.Getenv()
+}
+```
