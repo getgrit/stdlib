@@ -101,9 +101,9 @@ func main() {
 }
 ```
 
-## Dimensions API initialization
+## Dimensions API
 
-The Dimensions API has been moved under the `Data` namespace of the client, with two methods: `List` and `ListValues`.
+The Dimensions API has been moved under the `Data` namespace of the client, with two methods: `List` and `ListValues`. The `ListValues` receives params from the `data.DimensionListValuesParams` struct.
 
 ```go
 package main
@@ -112,23 +112,13 @@ import (
 	"fmt"
 
 	muxgo "github.com/muxinc/mux-go"
-	"github.com/muxinc/mux-go/examples/common"
-	"os"
 )
 
 func main() {
-	// ========== list-dimensions ==========
 	d, err := client.DimensionsApi.ListDimensions()
-	common.AssertNoError(err)
-	common.AssertNotNil(d.Data)
-	common.AssertNotNil(d.Data.Basic)
-	common.AssertNotNil(d.Data.Advanced)
 
-	// ========== list-dimension-values ==========
 	ldp := muxgo.ListDimensionValuesParams{Timeframe: []string{"7:days"}}
 	dv, err := client.DimensionsApi.ListDimensionValues("browser", muxgo.WithParams(&ldp))
-	common.AssertNoError(err)
-	common.AssertNotNil(dv.Data)
 }
 ```
 
@@ -138,24 +128,15 @@ package main
 import (
 	"fmt"
 
-	"context"
 	muxgo "github.com/muxinc/mux-go"
-	"github.com/muxinc/mux-go/examples/common"
-	"os"
+
+	"context"
 )
 
 func main() {
-	// ========== list-dimensions ==========
 	d, err := client.Data.Dimensions.List(context.TODO())
-	common.AssertNoError(err)
-	common.AssertNotNil(d.Data)
-	common.AssertNotNil(d.Data.Basic)
-	common.AssertNotNil(d.Data.Advanced)
 
-	// ========== list-dimension-values ==========
 	ldp := muxgo.data.DimensionListValuesParams{Timeframe: []string{"7:days"}}
 	dv, err := client.Data.Dimensions.ListValues(context.TODO(), "browser", &ldp)
-	common.AssertNoError(err)
-	common.AssertNotNil(dv.Data)
 }
 ```
