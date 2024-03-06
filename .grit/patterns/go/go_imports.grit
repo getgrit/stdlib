@@ -12,7 +12,7 @@ pattern after_each_file_handle_imports() {
         $program <: or {
             contains import_declaration(imports=import_spec_list(imports=$imports)) where {
                 $GLOBAL_NEW_IMPORTS <: some bubble($imports) $import where {
-                    $imports += $import,
+                    $imports += `"$import"`,
                 }
             },
             `$_`
