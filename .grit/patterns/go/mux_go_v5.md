@@ -17,15 +17,24 @@ pattern fix_api_client() {
   } => `mux.NewClient($opts)`
 }
 
+pattern rename_params() {
+	or {
+		`$muxgo.ListDimensionValuesParams{$params}` => `$muxgo.data.DimensionListValuesParams{$params}`,
+	}
+}
+
 pattern fix_api_calls() {
 	`$call($args)` as $overall where {
+		$args <: maybe contains `$muxgo.WithParams($ref)` => `$ref`,
 		$call <: or {
 			`$client.DimensionsApi.ListDimensions` => `$client.Data.Dimensions.List`,
-			// `ListDimensionValues` => `ListDimensionValues($args[0], muxgo.WithParams($args[1]))`
+			`$client.DimensionsApi.ListDimensionValues` => `$client.Data.Dimensions.ListValues`
 		},
 		$ctx = require_import(source=`context`),
 		if ($args <: .) {
 			$overall => `$call($ctx.TODO())`
+		} else {
+			$overall => `$call($ctx.TODO(), $args)`
 		}
 	}
 }
@@ -33,7 +42,8 @@ pattern fix_api_calls() {
 file($name, $body) where {
     $body <: contains or {
 			fix_api_client(),
-			fix_api_calls()
+			fix_api_calls(),
+			rename_params()
 		}
 }
 ```
@@ -143,8 +153,8 @@ func main() {
 	common.AssertNotNil(d.Data.Advanced)
 
 	// ========== list-dimension-values ==========
-	ldp := muxgo.ListDimensionValuesParams{Timeframe: []string{"7:days"}}
-	dv, err := client.DimensionsApi.ListDimensionValues("browser", muxgo.WithParams(&ldp))
+	ldp := muxgo.data.DimensionListValuesParams{Timeframe: []string{"7:days"}}
+	dv, err := client.Data.Dimensions.ListValues(context.TODO(), "browser", &ldp)
 	common.AssertNoError(err)
 	common.AssertNotNil(dv.Data)
 }
