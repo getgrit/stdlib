@@ -10,7 +10,7 @@ language go
 pattern fix_api_client() {
   `$muxgo.NewAPIClient($cfg)` where {
     $cfg <: contains `muxgo.NewConfiguration($opts)`,
-    $muxoption = `muxoption`,
+    $muxoption = require_import(source=`github.com/muxinc/mux-go/muxoption`),
     $opts <: some bubble($muxgo, $muxoption) or {
       `$muxgo.WithBasicAuth($a, $b)` => `$muxoption.WithTokenID($a), $muxoption.WithTokenSecret($b)`
     }

@@ -1,5 +1,11 @@
 language go
 
+pattern before_each_file_prep_imports() {
+    $_ where {
+        $GLOBAL_NEW_IMPORTS = [],
+    }
+}
+
 /** This is a utility file, you do not need to implement it yourself */
 
 pattern ensure_import($source) {
