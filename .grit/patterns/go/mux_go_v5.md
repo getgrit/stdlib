@@ -101,18 +101,13 @@ func main() {
 }
 ```
 
-## Dimensions API
+## Video API
 
-The Dimensions API has been moved under the `Data` namespace of the client, with two methods: `List` and `ListValues`. The `ListValues` receives params from the `data.DimensionListValuesParams` struct.
 
 ```go
 package main
 
-import (
-	"fmt"
-
-	muxgo "github.com/muxinc/mux-go"
-)
+import muxgo "github.com/muxinc/mux-go"
 
 func main() {
 	d, err := client.DimensionsApi.ListDimensions()
@@ -125,13 +120,39 @@ func main() {
 ```go
 package main
 
-import (
-	"fmt"
+import muxgo "github.com/muxinc/mux-go"
+import "context"
 
-	muxgo "github.com/muxinc/mux-go"
+func main() {
+	d, err := client.Data.Dimensions.List(context.TODO())
 
-	"context"
-)
+	ldp := muxgo.data.DimensionListValuesParams{Timeframe: []string{"7:days"}}
+	dv, err := client.Data.Dimensions.ListValues(context.TODO(), "browser", &ldp)
+}
+```
+
+## Dimensions API
+
+The Dimensions API has been moved under the `Data` namespace of the client, with two methods: `List` and `ListValues`. The `ListValues` receives params from the `data.DimensionListValuesParams` struct.
+
+```go
+package main
+
+import muxgo "github.com/muxinc/mux-go"
+
+func main() {
+	d, err := client.DimensionsApi.ListDimensions()
+
+	ldp := muxgo.ListDimensionValuesParams{Timeframe: []string{"7:days"}}
+	dv, err := client.DimensionsApi.ListDimensionValues("browser", muxgo.WithParams(&ldp))
+}
+```
+
+```go
+package main
+
+import muxgo "github.com/muxinc/mux-go"
+import "context"
 
 func main() {
 	d, err := client.Data.Dimensions.List(context.TODO())
