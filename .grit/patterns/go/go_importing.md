@@ -35,7 +35,7 @@ package main
 import "os"
 
 func main() {
-  use_real_getenv()
+  os.Getenv()
 }
 ```
 

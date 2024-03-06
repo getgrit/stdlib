@@ -6,9 +6,15 @@ pattern before_each_file_prep_imports() {
     }
 }
 
+// Handle inserting imports if we accumulated any
+pattern after_each_file_handle_imports() {
+    
+}
+
 function require_import($source) {
+    $split_source = split($source, "/"),
     $GLOBAL_NEW_IMPORTS += [$source],
-    return `foo`
+    return $split_source[-1]
 }
 
 
