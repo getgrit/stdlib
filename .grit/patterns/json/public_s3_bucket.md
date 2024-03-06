@@ -9,7 +9,7 @@ Detected public S3 bucket. This policy allows anyone to have some kind of access
 ### references
 - [AmazonS3](https://docs.aws.amazon.com/AmazonS3/latest/userguide/access-control-block-public-access.html)
 
-tags: #aws
+tags: #aws, #cloudformation
 
 ```grit
 language json
