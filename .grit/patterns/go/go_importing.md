@@ -16,7 +16,10 @@ contains bubble or {
   } => `$os.Getenv()`,
   `second_case()` where {
     $case_two = require_import(source="somepackage/somemodule")
-  } => `$case_two.CaseTwo()`
+  } => `$case_two.CaseTwo()`,
+  `module_two()` where {
+    $module = require_import(source="somepackage/packagetwo")
+  } => `$module.ModuleTwo()`,
 }
 ```
 
@@ -153,5 +156,27 @@ import "somepackage/somemodule"
 
 func main() {
   somemodule.Getenv()
+}
+```
+
+## No imports at all
+
+```go
+package main
+
+func main() {
+  use_real_getenv()
+  module_two()
+}
+```
+
+```go
+package main
+
+import "somepackage/somemodule"
+
+func main() {
+  somemodule.Getenv()
+  packagetwo.ModuleTwo()
 }
 ```
