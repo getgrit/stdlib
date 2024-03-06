@@ -20,6 +20,9 @@ contains bubble or {
   `module_two()` where {
     $module = require_import(source="somepackage/packagetwo")
   } => `$module.ModuleTwo()`,
+  `add_aliased_import()` where {
+    $alias = require_import(source="somepackage/somemodule", as="model")
+  } => `model.my_import()`
 }
 ```
 
@@ -179,5 +182,27 @@ import "somepackage/packagetwo"
 func main() {
   somemodule.Getenv()
   packagetwo.ModuleTwo()
+}
+```
+
+## Known name
+
+Sometimes the package name is different from the module name. In those cases, you must specify it explicitly, like `require_import(source="somepackage/somemodule", as="model")`.
+
+```go
+package main
+
+func main() {
+  add_aliased_import()
+}
+```
+
+```go
+package main
+
+import "somepackage/my-model"
+
+func main() {
+  model.my_import()
 }
 ```
