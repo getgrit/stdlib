@@ -174,6 +174,7 @@ func main() {
 package main
 
 import "somepackage/somemodule"
+import "somepackage/packagetwo"
 
 func main() {
   somemodule.Getenv()
