@@ -29,12 +29,6 @@ private pattern wrap_mux_fields() {
 	}
 }
 
-pattern simple_renames() {
-	or {
-		`$muxgo.PlaybackPolicy` => `shared.PlaybackPolicy`
-	}
-}
-
 pattern rename_params() {
 	or {
 		`$muxgo.ListDimensionValuesParams{$params}` where {
@@ -43,13 +37,16 @@ pattern rename_params() {
 		`$muxgo.CreateAssetRequest{$params}` where {
 			$video = require_import(source=`github.com/muxinc/mux-go/video`),
 		} => `$video.AssetNewParams{$params}`,
-		`$muxgo.InputSetting` => `video.VIDEO`,
-		`$muxgo.InputSettings{$params}` where {
-			$video = require_import(source=`github.com/muxinc/mux-go/video`),
-		} => `$video.AssetNewParamsInput{$params}`,
 	} where {
 		$params <: maybe wrap_mux_fields(),
-		$params <: maybe contains rename_params()
+	}
+}
+
+pattern final_mux_renames() {
+	or {
+		`[]$muxgo.InputSettings{$params}` where {
+			$video = require_import(source=`github.com/muxinc/mux-go/video`),
+		} => `[]$video.AssetNewParamsInput{$params}`,
 	}
 }
 
@@ -79,7 +76,7 @@ sequential {
 				rename_params(),
 			}
 	},
-	maybe bubble file($name, $body) where $body <: contains simple_renames()
+	maybe bubble file($name, $body) where $body <: contains final_mux_renames()
 }
 ```
 
@@ -193,10 +190,10 @@ import "context"
 import "github.com/muxinc/mux-go/video"
 
 func main() {
-	asset, err := client.Video.Assets.New(context.TODO(), video.AssetNewParams{Input: muxgo.F([]muxgo.AssetNewParamsInput{{
+	asset, err := client.Video.Assets.New(context.TODO(), video.AssetNewParams{Input: muxgo.F([]video.AssetNewParamsInput{{
 			Url: muxgo.F("https://storage.googleapis.com/muxdemofiles/mux-video-intro.mp4"),
 		}}),
-		PlaybackPolicy: muxgo.F([]shared.PlaybackPolicy{shared.PUBLIC})})
+		PlaybackPolicy: muxgo.F([]muxgo.PlaybackPolicy{muxgo.PUBLIC})})
 }
 ```
 
