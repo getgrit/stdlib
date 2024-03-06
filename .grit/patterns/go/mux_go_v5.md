@@ -19,7 +19,7 @@ pattern fix_api_client() {
 
 private pattern wrap_mux_fields() {
 	$params where {
-		$params <: contains bubble($muxgo) $value where {
+		$params <: maybe contains bubble($muxgo) $value where {
 			$muxgo = require_import(source=`"github.com/muxinc/mux-go"`, as=`mux`),
 			$value <: or {
 				`"$_"` => `$muxgo.F($value)`,
@@ -136,8 +136,7 @@ import muxgo "github.com/muxinc/mux-go"
 func main() {
 	req = muxgo.CreateAssetRequest{
 		Url: "https://storage.googleapis.com/muxdemofiles/mux-video-intro.mp4",
-		PlaybackPolicy: []muxgo.PlaybackPolicy{muxgo.PUBLIC},
-		// Null field Description
+		PlaybackPolicy: "public"
 	}
 }
 ```
@@ -153,8 +152,6 @@ func main() {
 	req = muxgo.CreateAssetRequest{
 		Url: "https://storage.googleapis.com/muxdemofiles/mux-video-intro.mp4",
 		PlaybackPolicy: "public"
-		// Null field Description
-		Description: muxgo.Null[string](),
 	}
 }
 ```
@@ -163,7 +160,8 @@ func main() {
 The Video API has been moved under the `Video` namespace of the client and methods have been renamed:
 - `AssetsApi.CreateAsset` -> `Video.Assets.New`
 
-Request parameters must be imported from the `video` package.
+Request parameters must be imported from the `video` package, and some have been renamed:
+- `MasterAccess` -> `PlaybackPolicy
 
 ```go
 package main
@@ -171,12 +169,12 @@ package main
 import muxgo "github.com/muxinc/mux-go"
 
 func main() {
-	asset, err := client.AssetsApi.CreateAsset(muxgo.CreateAssetRequest{
-		Input: []muxgo.InputSettings{{
-			Url: "https://storage.googleapis.com/muxdemofiles/mux-video-intro.mp4",
-		}},
-		PlaybackPolicy: []muxgo.PlaybackPolicy{muxgo.PUBLIC},
-	})
+	// asset, err := client.AssetsApi.CreateAsset(muxgo.CreateAssetRequest{
+	// 	Input: []muxgo.InputSettings{{
+	// 		Url: "https://storage.googleapis.com/muxdemofiles/mux-video-intro.mp4",
+	// 	}},
+	// 	PlaybackPolicy: []muxgo.PlaybackPolicy{muxgo.PUBLIC},
+	// })
 }
 ```
 
@@ -188,12 +186,12 @@ import "context"
 import "github.com/muxinc/mux-go/video"
 
 func main() {
-	asset, err := client.Video.Assets.New(context.TODO(), video.AssetNewParams{
-		Input: mux.F([]video.AssetNewParamsInput{{
-			URL: mux.F("https://storage.googleapis.com/muxdemofiles/mux-video-intro.mp4"),
-		}}),
-		PlaybackPolicy: mux.F([]shared.PlaybackPolicy{shared.PlaybackPolicyPublic}),
-	})
+	// asset, err := client.Video.Assets.New(context.TODO(), video.AssetNewParams{
+	// 	Input: mux.F([]video.AssetNewParamsInput{{
+	// 		URL: mux.F("https://storage.googleapis.com/muxdemofiles/mux-video-intro.mp4"),
+	// 	}}),
+	// 	PlaybackPolicy: mux.F([]shared.PlaybackPolicy{shared.PlaybackPolicyPublic}),
+	// })
 }
 ```
 
