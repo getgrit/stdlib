@@ -20,7 +20,7 @@ pattern fix_api_client() {
 private pattern wrap_mux_fields() {
 	$params where {
 		$params <: contains bubble($muxgo) $value where {
-			$muxgo = require_import(source=`github.com/muxinc/mux-go`),
+			$muxgo = require_import(source=`"github.com/muxinc/mux-go"`, as=`mux`),
 			$value <: or {
 				`"$_"` => `$muxgo.F($value)`
 			}
