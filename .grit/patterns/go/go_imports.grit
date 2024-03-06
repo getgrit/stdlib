@@ -35,7 +35,7 @@ pattern after_each_file_handle_imports() {
     }
 }
 
-function require_import($source) {
+function require_import($source, $as) {
     // Default condition
     $split_source = split($source, "/"),
     $name_to_use = $split_source[-1],

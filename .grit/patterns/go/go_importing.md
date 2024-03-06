@@ -21,8 +21,8 @@ contains bubble or {
     $module = require_import(source="somepackage/packagetwo")
   } => `$module.ModuleTwo()`,
   `add_aliased_import()` where {
-    $alias = require_import(source="somepackage/somemodule", as="model")
-  } => `model.my_import()`
+    $alias = require_import(source="somepackage/my-model", as="model")
+  } => `$alias.my_import()`
 }
 ```
 
