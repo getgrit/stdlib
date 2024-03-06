@@ -12,7 +12,7 @@ pattern fix_api_client() {
     $cfg <: contains `muxgo.NewConfiguration($opts)`,
     $muxoption = `muxoption`,
     $opts <: some bubble($muxgo, $muxoption) or {
-      `$muxgo.WithBasicAuth($a, $b)` => `$muxoption.WithTokenID($a), $muxoption.WithTokenSecret($b)`
+      `$muxgo.WithBasicAuth($a, $b)` => `$muxoption.WithTokenID($a), $muxoption.WithTokenSecret($b),`
     }
   } => `mux.NewClient($opts)`
 }
@@ -32,6 +32,8 @@ Old:
 ```go
 package main
 
+import "os"
+
 func main() {
   client := muxgo.NewAPIClient(
     muxgo.NewConfiguration(
@@ -45,11 +47,13 @@ New:
 ```go
 package main
 
+import "os"
+
 func main() {
-  client := mux.NewClient(
-    muxoption.WithTokenID(os.Getenv("MUX_TOKEN_ID")),
-    muxoption.WithTokenSecret(os.Getenv("MUX_TOKEN_SECRET"))
-  )
+	client := mux.NewClient(
+		muxoption.WithTokenID(os.Getenv("MUX_TOKEN_ID")),
+		muxoption.WithTokenSecret(os.Getenv("MUX_TOKEN_SECRET")),
+	)
 }
 ```
 
