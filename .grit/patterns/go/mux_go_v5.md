@@ -17,8 +17,15 @@ pattern fix_api_client() {
   } => `mux.NewClient($opts)`
 }
 
-private pattern wrap_param_fields($params) {
-	
+private pattern wrap_mux_fields() {
+	$params where {
+		$params <: contains bubble($muxgo) $value where {
+			$muxgo = require_import(source=`github.com/muxinc/mux-go`),
+			$value <: or {
+				`"$_"` => `$muxgo.F($value)`
+			}
+		}
+	}
 }
 
 pattern rename_params() {
@@ -29,6 +36,8 @@ pattern rename_params() {
 		`$muxgo.CreateAssetRequest{$params}` where {
 			$video = require_import(source=`github.com/muxinc/mux-go/video`),
 		} => `$video.AssetNewParams{$params}`,
+	} where {
+		$params <: wrap_mux_fields()
 	}
 }
 
