@@ -10,10 +10,19 @@ pattern before_each_file_prep_imports() {
 pattern after_each_file_handle_imports() {
     $_ where {
         $program <: or {
-            contains import_declaration(imports=import_spec_list(imports=$imports)) where {
-                $GLOBAL_NEW_IMPORTS <: some bubble($imports) $import where {
-                    $imports += `"$import"`,
-                }
+            contains import_declaration(imports=$list) as $outer where {
+                $list <: or {
+                    import_spec_list(imports=$imports) where {
+                        $GLOBAL_NEW_IMPORTS <: some bubble($imports) $import where {
+                            $imports += `"$import"`,
+                        }
+                    },
+                    import_spec() where {
+                        $GLOBAL_NEW_IMPORTS <: some bubble($outer) $import where {
+                            $outer += `\nimport "$import"`,
+                        }
+                    }
+                },
             },
             `$_`
         }

@@ -131,3 +131,27 @@ func main() {
   somemodule.Getenv()
 }
 ```
+
+
+## Single existing import
+
+```go
+package main
+
+import "foo"
+
+func main() {
+  use_real_getenv()
+}
+```
+
+```go
+package main
+
+import "foo"
+import "somepackage/somemodule"
+
+func main() {
+  somemodule.Getenv()
+}
+```
