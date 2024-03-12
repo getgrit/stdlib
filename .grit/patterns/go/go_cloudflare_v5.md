@@ -7,7 +7,7 @@ The Go SDK has been rewritten for v5 and contains significant breaking changes.
 ```grit
 language go
 
-pattern convert_field_methods() {
+pattern cloudflare_method_renaming() {
   field_identifier() as $method where $method <: or {
     `AccessAuditLogs` => `ZeroTrust.Access.Logs`,
     `ListHyperdriveConfigs` => `Hyperdrive.Configs.List`,
