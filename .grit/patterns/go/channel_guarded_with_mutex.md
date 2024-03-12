@@ -2,7 +2,7 @@
 title: Avoid mutexes on channels
 ---
 
-Detected a channel guarded with a `mutex`. Channels already have an internal `mutex`, so this is unnecessary. Remove the mutex.
+Detect a channel guarded with a `mutex`. Channels already have an internal `mutex`, so this is unnecessary.
 
 ### references
 
