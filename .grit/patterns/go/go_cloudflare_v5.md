@@ -2,7 +2,7 @@
 title: Upgrade to CloudFlare v5
 ---
 
-The Go SDK has been rewritten for v2 and contains significant breaking changes.
+The Go SDK has been rewritten for v5 and contains significant breaking changes.
 
 ```grit
 language go
@@ -671,14 +671,14 @@ func main() {
 
 ```go
 func CreateWorkersKVNamespace(api *cloudflare.API, OrganizationId string, Name string) (resp interface{}, err error) {
-	resp, err = api.CreateWorkersKVNamespace(context.TODO(), &cloudflare.WorkersKVNamespaceRequest{Title: Name})
-	return
+  resp, err = api.CreateWorkersKVNamespace(context.TODO(), &cloudflare.WorkersKVNamespaceRequest{Title: Name})
+  return
 }
 ```
 
 ```go
 func CreateWorkersKVNamespace(api *cloudflare.API, OrganizationId string, Name string) (resp interface{}, err error) {
-	resp, err = api.KV.Namespaces.New(context.TODO(), &cloudflare.WorkersKVNamespaceRequest{Title: Name})
-	return
+  resp, err = api.KV.Namespaces.New(context.TODO(), &cloudflare.WorkersKVNamespaceRequest{Title: Name})
+  return
 }
 ```
