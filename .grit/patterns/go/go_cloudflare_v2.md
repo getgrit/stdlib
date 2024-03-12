@@ -1,5 +1,5 @@
 ---
-title: Upgrade to CloudFlare v2
+title: Upgrade to Cloudflare v2
 ---
 
 The Go SDK has been rewritten for v2 and contains significant breaking changes.
