@@ -1,8 +1,8 @@
 ---
-title: Upgrade to CloudFlare v5
+title: Upgrade to CloudFlare v2
 ---
 
-The Go SDK has been rewritten for v5 and contains significant breaking changes.
+The Go SDK has been rewritten for v2 and contains significant breaking changes.
 
 ```grit
 language go
