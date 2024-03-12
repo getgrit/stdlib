@@ -7,7 +7,7 @@ The Go SDK has been rewritten for v2 and contains significant breaking changes.
 ```grit
 language go
 
-pattern cloudflare_renames() {
+pattern cloudflare_method_renaming() {
   or {
     `AccessAuditLogs` => `ZeroTrust.Access.Logs`,
     `ListHyperdriveConfigs` => `Hyperdrive.Configs.List`,
@@ -321,8 +321,8 @@ pattern cloudflare_renames() {
     `UpdateZoneDNSSEC` => `DNSSEC.Edit`,
     `ListCertificatePacks` => `SSL.CertificatePacks.List`,
     `CertificatePack` => `SSL.CertificatePacks.Get`,
-    `CreateCertificatePack` => SSL.CertificatePacks.New`,
-    `DeleteCertificatePack` => SSL.CertificatePacks.Delete`,
+    `CreateCertificatePack` => `SSL.CertificatePacks.New`,
+    `DeleteCertificatePack` => `SSL.CertificatePacks.Delete`,
     `Filter` => `Filters.Get`,
     `Filters` => `Filters.List`,
     `CreateFilters` => `Filters.New`,
@@ -394,7 +394,7 @@ pattern cloudflare_renames() {
     `UpdateMagicTransitStaticRoute` => `MagicTransit.Routes.Update`,
     `DeleteMagicTransitStaticRoute` => `MagicTransit.Routes.Delete`,
     `ListTunnelRoutes` => `ZeroTrust.Networks.Routes.List`,
-    `GetTunnelRouteForIP` => `ZeroTrust.Networks.Routes.Get`,,
+    `GetTunnelRouteForIP` => `ZeroTrust.Networks.Routes.Get`,
     `CreateTunnelRoute` => `ZeroTrust.Networks.Routes.New`,
     `DeleteTunnelRoute` => `ZeroTrust.Networks.Routes.Delete`,
     `UpdateTunnelRoute` => `ZeroTrust.Networks.Routes.Update`,
@@ -618,6 +618,50 @@ pattern cloudflare_renames() {
     `UpdateHostnameTLSSetting` => `OriginTLSClientAuth.Settings.Update`,
     `ListHostnameTLSSettingsCiphers` => `Hostname.TLSSettings.Ciphers.List`,
     `UpdateHostnameTLSSettingCiphers` => `Hostname.TLSSetting.Ciphers.Update`,
-    `DeleteHostnameTLSSettingCiphers` => `Hostname.TLSSetting.Ciphers.Delete`,
+    `DeleteHostnameTLSSettingCiphers` => `Hostname.TLSSetting.Ciphers.Delete`
   }
 }
+
+pattern cloudflare_client_constructor() {
+  `cloudflare.New($api_key, $api_email)` as $init => `cloudflare.NewClient(
+    option.WithAPIKey($api_key),
+    option.WithAPIEmail($api_email)
+  )` where {
+    $init <: maybe within `$api, $err := $init` => `$api := $init`
+  }
+}
+
+// The main pattern body
+file($body) where {
+  $body <: contains or {
+    cloudflare_client_constructor(),
+    cloudflare_method_renaming(),
+  }
+}
+
+```
+
+## Client construction
+
+Old:
+
+```go
+package main
+
+func main() {
+  api, err := cloudflare.New(os.Getenv("CLOUDFLARE_API_KEY"), os.Getenv("CLOUDFLARE_API_EMAIL"))
+}
+```
+
+New:
+
+```go
+package main
+
+func main() {
+  api := cloudflare.NewClient(
+    option.WithAPIKey(os.Getenv("CLOUDFLARE_API_KEY")),
+    option.WithAPIEmail(os.Getenv("CLOUDFLARE_API_EMAIL"))
+  )
+}
+```
