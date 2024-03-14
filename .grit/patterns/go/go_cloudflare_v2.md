@@ -1,5 +1,5 @@
 ---
-title: Upgrade to CloudFlare v5
+title: Upgrade to Cloudflare v2
 ---
 
 The Go SDK has been rewritten for v2 and contains significant breaking changes.
@@ -8,7 +8,7 @@ The Go SDK has been rewritten for v2 and contains significant breaking changes.
 language go
 
 pattern cloudflare_method_renaming() {
-  or {
+  field_identifier() as $method where $method <: or {
     `AccessAuditLogs` => `ZeroTrust.Access.Logs`,
     `ListHyperdriveConfigs` => `Hyperdrive.Configs.List`,
     `CreateHyperdriveConfig` => `Hyperdrive.Config.New`,
@@ -618,7 +618,7 @@ pattern cloudflare_method_renaming() {
     `UpdateHostnameTLSSetting` => `OriginTLSClientAuth.Settings.Update`,
     `ListHostnameTLSSettingsCiphers` => `Hostname.TLSSettings.Ciphers.List`,
     `UpdateHostnameTLSSettingCiphers` => `Hostname.TLSSetting.Ciphers.Update`,
-    `DeleteHostnameTLSSettingCiphers` => `Hostname.TLSSetting.Ciphers.Delete`
+    `DeleteHostnameTLSSettingCiphers` => `Hostname.TLSSetting.Ciphers.Delete`,
   }
 }
 
@@ -663,5 +663,21 @@ func main() {
     option.WithAPIKey(os.Getenv("CLOUDFLARE_API_KEY")),
     option.WithAPIEmail(os.Getenv("CLOUDFLARE_API_EMAIL"))
   )
+}
+```
+
+## Converts Cloudflare field method
+
+```go
+func CreateWorkersKVNamespace(api *cloudflare.API, OrganizationId string, Name string) (resp interface{}, err error) {
+  resp, err = api.CreateWorkersKVNamespace(context.TODO(), &cloudflare.WorkersKVNamespaceRequest{Title: Name})
+  return
+}
+```
+
+```go
+func CreateWorkersKVNamespace(api *cloudflare.API, OrganizationId string, Name string) (resp interface{}, err error) {
+  resp, err = api.KV.Namespaces.New(context.TODO(), &cloudflare.WorkersKVNamespaceRequest{Title: Name})
+  return
 }
 ```
