@@ -1,6 +1,6 @@
 import styled, { css } from 'styled-components';
 
-export const Button = styled.a<{ $primary?: boolean }>`
+export const styled = const Button = styled.a<{ $primary?: boolean }>`
   background: transparent;
   border-radius: 3px;
 
