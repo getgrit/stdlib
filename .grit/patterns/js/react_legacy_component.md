@@ -1,5 +1,5 @@
 ---
-title: Update React legacy component
+title: Remove legacy React lifecycle methods
 ---
 
 detected Legacy component lifecycle
