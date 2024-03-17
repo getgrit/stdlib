@@ -27,6 +27,7 @@ def process_document(file_path):
         # The tags line looks like tags: #foo #bar #baz
         # Convert it to tags: [foo, bar, baz
         fixed_tags_line = re.sub(r"#(\w+)", r"\1", tags_line)
+        fixed_tags_line = re.sub(r"tags: (.+)", r"tags: [\1]", fixed_tags_line)
 
         # If there's a valid frontmatter section
         if frontmatter_end_index is not None:

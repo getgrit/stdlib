@@ -1,8 +1,11 @@
+---
+tags: [pytest, testing, hygiene]
+---
+
 # No skipped tests
 
 Disable skipping pytest tests without an explanation.
 
-tags: #pytest, #testing, #hygiene
 
 ```grit
 engine marzano(0.1)

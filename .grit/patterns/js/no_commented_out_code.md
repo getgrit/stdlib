@@ -1,8 +1,11 @@
+---
+tags: [hidden, linting, best-practice, recommended, ai]
+---
+
 # No Commented Out Code
 
 Please [don't commit commented out code](https://kentcdodds.com/blog/please-dont-commit-commented-out-code).
 
-tags: #hidden, #linting, #best-practice, #recommended, #ai
 
 ```grit
 engine marzano(0.1)

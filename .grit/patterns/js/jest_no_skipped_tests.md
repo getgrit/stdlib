@@ -1,8 +1,11 @@
+---
+tags: [jest, testing, hygiene]
+---
+
 # No skipped tests
 
 Disable skipping Jest tests without an explanation.
 
-tags: #jest, #testing, #hygiene
 
 ```grit
 engine marzano(0.1)
