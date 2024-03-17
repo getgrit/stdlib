@@ -26,6 +26,9 @@ contains or {
     $comp <: "Component",
     $source = `"React"`,
     $comp <: ensure_import_from($source),
+  },
+  `final_case` where {
+    add_import("just_ensure", `"this_place"`)
   }
 }
 ```
@@ -145,4 +148,18 @@ console.log('this is a test');
 class Button extends Component {
   // ...
 }
+```
+
+## Standalone add_import
+
+The `add_import($name, $source)` predicate can be used to add an import to a file.
+
+```typescript
+final_case('this is a test');
+```
+
+```typescript
+import { just_ensure } from 'this_place';
+
+final_case('this is a test');
 ```

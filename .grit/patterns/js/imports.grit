@@ -116,3 +116,7 @@ pattern replace_import($old, $new) {
         $name <: ensure_import_from(source=$new)
     }
 }
+
+predicate add_import($name, $source) {
+    $name <: ensure_import_from(source=$source)
+}
