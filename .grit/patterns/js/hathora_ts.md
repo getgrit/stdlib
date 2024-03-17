@@ -1,8 +1,11 @@
+---
+tags: [migration, sdk, typescript, hathora, speakeasy]
+---
+
 # Upgrade Hathora to Dedicated TS SDK
 
 Migrate from the [legacy Hathora Cloud SDK](https://github.com/hathora/hathora-cloud-sdks/tree/main/typescript) to the [TypeScript SDK](https://github.com/hathora/cloud-sdk-typescript).
 
-tags: #migration, #sdk, #typescript, #hathora, #speakeasy
 
 ```grit
 engine marzano(0.1)

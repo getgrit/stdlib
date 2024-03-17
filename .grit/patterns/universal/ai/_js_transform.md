@@ -1,8 +1,11 @@
+---
+tags: [ai, hidden, test]
+---
+
 # AI transform - JS
 
 GritQL can use AI to transform a target variable based on some instruction using the `ai_transform` function.
 
-tags: #ai, #hidden, #test
 
 ```grit
 language js

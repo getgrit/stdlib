@@ -1,8 +1,11 @@
+---
+tags: [utility, test]
+---
+
 ## Test shadow scope
 
 This tests the `shadows_identifier` pattern by finding all cases where a variable is shadowed.
 
-tags: #utility, #test
 
 ```grit
 language js
