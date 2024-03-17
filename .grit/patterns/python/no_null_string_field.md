@@ -2,7 +2,7 @@
 title: Avoid using `null` on string-based fields such as CharField and TextField
 ---
 
-void using null on string-based fields such as CharField and TextField. If a string-based field has null=True, that means it has two possible values for "no data": NULL, and the empty string. In most cases, it's redundant to have two possible values for "no data" the Django convention is to use the empty string, not NULL.
+Avoid using null on string-based fields such as CharField and TextField. If a string-based field has null=True, that means it has two possible values for "no data": NULL, and the empty string. In most cases, it's redundant to have two possible values for "no data" the Django convention is to use the empty string, not NULL.
 
 
 tags: #fix #best-practice
