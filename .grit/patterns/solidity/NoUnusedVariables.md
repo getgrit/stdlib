@@ -1,8 +1,9 @@
+---
+tags: [Solidity, SWC-131, SWC-103, security, hygiene]
+---
 # Avoid unused variables
 
 Unusued variables should not be defined on contracts, either as state variables or as local variables. This corresponds to [SWC-103](https://swcregistry.io/docs/SWC-131).
-
-Tags: #security, #solidity, #hygiene, #swc, #swc-131
 
 ```grit
 language sol
