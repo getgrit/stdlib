@@ -1,10 +1,10 @@
 ---
 title: Rewrite `throw "Err"` ⇒ `throw new Error("Err")`
+tags: [good]
 ---
 
 It is a good practice to throw `Error` objects on exceptions because they automatically keep track of where they were created.
 
-tags: #good
 
 ```grit
 engine marzano(0.1)

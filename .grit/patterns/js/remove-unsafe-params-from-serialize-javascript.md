@@ -1,12 +1,12 @@
 ---
 title: Remove unsafe params from serialize-javascript
+tags: [fix, security]
 ---
 
 `serialize-javascript` used with `unsafe` parameter, this could be vulnerable to XSS.
 
 [references](https://owasp.org/Top10/A03_2021-Injection)
 
-tags: #fix, #security
 
 ```grit
 engine marzano(0.1)

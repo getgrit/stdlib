@@ -1,8 +1,11 @@
+---
+tags: [migration, js, imports, default, multifile]
+---
+
 # Migrate default imports to named imports
 
 This pattern combines [convert_default_exports](https://github.com/getgrit/stdlib/blob/9dfce85d25977e08bbd476f693e6cbc07ef08316/.grit/patterns/js/_convert_default_exports.md) and [\_convert_default_imports](https://github.com/getgrit/stdlib/blob/9dfce85d25977e08bbd476f693e6cbc07ef08316/.grit/patterns/js/_convert_default_imports.md#L4) to replace default exports to named exports and replace default imports with named imports.
 
-tags: #migration, #js, #imports, #default, #multifile
 
 ```grit
 language js

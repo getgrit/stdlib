@@ -1,10 +1,10 @@
 ---
 title: Adopt OpenRouter
+tags: [migration, openai, openrouter, sdk]
 ---
 
 Switch the OpenAI JS/TS SDK to use [OpenRouter](https://openrouter.ai/docs#format).
 
-tags: #migration, #openai, #openrouter, #sdk
 
 ```grit
 engine marzano(0.1)

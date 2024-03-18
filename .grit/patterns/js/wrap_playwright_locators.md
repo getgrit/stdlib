@@ -1,10 +1,10 @@
 ---
 title: Wrap Playwright locators
+tags: [hidden]
 ---
 
 Wrap string literal locators in Playwright-style `page.locator`.
 
-tags: #hidden
 
 ```grit
 language js

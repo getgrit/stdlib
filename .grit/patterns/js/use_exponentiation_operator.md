@@ -1,10 +1,10 @@
 ---
 title: Rewrite `Math.pow` ⇒ `**`
+tags: [ES7, SE]
 ---
 
 ES7 introduced the exponentiation operator `**` so that using `Math.pow` is no longer necessary.
 
-tags: #ES7, #SE
 
 ```grit
 engine marzano(0.1)

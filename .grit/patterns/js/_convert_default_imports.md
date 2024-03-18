@@ -1,8 +1,11 @@
+---
+tags: [js, es6, cjs, commonjs]
+---
+
 # Replace default imports with a named import
 
 Replaces default
 
-tags: #js, #es6, #cjs, #commonjs
 
 ```grit
 engine marzano(0.1)

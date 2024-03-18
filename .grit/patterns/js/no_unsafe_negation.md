@@ -1,5 +1,6 @@
 ---
 title: Rewrite `!key in col` ⇒ `!(key in col)`
+tags: [fix]
 ---
 
 # {{ page.title }}
@@ -12,7 +13,6 @@ For `!key in foo`, operator precedence makes it equivalent to `(!key) in foo` an
 
 For `!obj instanceof Ctor`, operator precedence makes it equivalent to `(!obj) instanceof Ctor` which is always `false` since boolean values are not objects.
 
-tags: #fix
 
 ```grit
 engine marzano(0.1)

@@ -1,10 +1,10 @@
 ---
 title: Always braces around arrow function body
+tags: [js, es6, migration]
 ---
 
 Converts arrow function single expression to to block body
 
-tags: #js, #es6, #migration
 
 ```grit
 engine marzano(0.1)

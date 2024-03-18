@@ -1,11 +1,11 @@
 ---
 title: Migrate Knockout to React
+tags: [react, migration, complex, knockout, framework]
 ---
 
 Knockout.js is an older JavaScript framework that is still used by many developers.
 This migration helps with migrating your Knockout code to React.
 
-tags: #react, #migration, #complex, #knockout, #framework
 
 ```grit
 engine marzano(0.1)

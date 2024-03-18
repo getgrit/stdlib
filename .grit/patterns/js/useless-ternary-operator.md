@@ -1,10 +1,10 @@
 ---
 title: Find useless ternary operator
+tags: [fix]
 ---
 
 If $condition ? `$answer`:`$answer` then this expression returns $answer. This is probably a human error
 
-tags: #fix
 
 ```grit
 engine marzano(0.1)

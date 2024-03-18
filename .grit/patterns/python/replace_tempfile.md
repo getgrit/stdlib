@@ -1,12 +1,12 @@
 ---
 title: Replace `tempfile.mktemp` ⇒ `tempfile.NamedTemporaryFile`
+tags: [fix, good-practice]
 ---
 
 Prefer using tempfile.NamedTemporaryFile instead. According to the official Python documentation, the tempfile.mktemp function is considered unsafe and should be avoided. This is because the generated file name may initially point to a non-existent file, and by the time you attempt to create it, another process may have already created a file with the same name, leading to potential conflicts.
 
 - [reference](https://docs.python.org/3/library/tempfile.html#tempfile.mkdtemp)
 
-tags: #fix #good-practice
 
 ```grit
 engine marzano(0.1)

@@ -1,10 +1,10 @@
 ---
 title: Split tRPC Router
+tags: [trpc, router, split, typescript]
 ---
 
 Split a tRPC router into multiple files, one per route.
 
-tags: #trpc, #router, #split, #typescript
 
 ```grit
 engine marzano(0.1)

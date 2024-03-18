@@ -1,10 +1,10 @@
 ---
 title: Remove return statements at the end of a block
+tags: [clippy]
 ---
 
 It is more idiomatic to remove the return keyword and the semicolon.
 
-tags: #clippy
 
 ```grit
 language rust

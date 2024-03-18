@@ -1,10 +1,10 @@
 ---
 title: Rewrite `new Symbol` ⇒ `Symbol`
+tags: [good]
 ---
 
 Calling `Symbol` with the `new` operator throws a `TypeError` exception.
 
-tags: #good
 
 ```grit
 engine marzano(0.1)

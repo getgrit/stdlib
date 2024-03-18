@@ -1,10 +1,10 @@
 ---
 title: Transform `io-ts` to `zod schema`
+tags: [migration, js, zod, io-ts]
 ---
 
 Transform `io-ts` schemas to `zod` schema
 
-tags: #migration, #js, #zod, #io-ts
 
 ```grit
 engine marzano(0.1)

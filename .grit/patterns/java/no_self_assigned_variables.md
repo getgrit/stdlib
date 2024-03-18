@@ -1,12 +1,12 @@
 ---
 title: Variables should not be self-assigned
+tags: [java]
 ---
 
 # Variables should not be self-assigned
 
 It is redundant and usually a bug when a variable is assigned to itself.
 
-tags: #java
 
 ```grit
 language java

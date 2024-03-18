@@ -1,5 +1,6 @@
 ---
 title: Replace strconv.Atoi ⇒ strconv.ParseInt
+tags: [fix, correctness]
 ---
 
 Identified a potential risk in converting the outcome of a `strconv.Atoi` command to int16. This may lead to integer overflow, possibly causing unforeseen issues and even privilege escalation. It is recommended to utilize `strconv.ParseInt` instead.
@@ -8,7 +9,6 @@ Identified a potential risk in converting the outcome of a `strconv.Atoi` comman
 
 - [strconv](https://pkg.go.dev/strconv)
 
-tags: #fix #correctness
 
 ```grit
 language go

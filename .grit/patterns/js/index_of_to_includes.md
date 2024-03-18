@@ -1,10 +1,10 @@
 ---
 title: Rewrite `indexOf(...) === -1` ⇒ `includes`
+tags: [ES7, SE]
 ---
 
 ES7 introduced the `includes` method for arrays so bitwise and comparisons to `-1` are no longer needed.
 
-tags: #ES7, #SE
 
 ```grit
 engine marzano(0.1)

@@ -1,10 +1,10 @@
 ---
 title: Remove `confirm` statement
+tags: [fix]
 ---
 
 JavaScript’s confirm function is widely considered to be obtrusive as UI elements and should be replaced by a more appropriate custom UI implementation.
 
-tags: #fix
 
 ```grit
 engine marzano(0.1)

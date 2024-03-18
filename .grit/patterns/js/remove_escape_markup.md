@@ -1,10 +1,10 @@
 ---
 title: Remove `.escapeMarkup = false`
+tags: [security, fix]
 ---
 
 Some template engines allow disabling HTML escaping, which can allow XSS vulnerabilities.
 
-tags: #security, #fix
 
 ```grit
 engine marzano(0.1)
