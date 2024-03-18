@@ -2,7 +2,7 @@
 
 ```grit
 engine marzano(0.1)
-language js(typescript,jsx)
+language js
 
 `async ($args) => { $body }` where {
     $body <: not contains `try`,
