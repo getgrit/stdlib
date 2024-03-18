@@ -1,6 +1,6 @@
 ---
 title: Rewrite `PureComponent` ⇒ `Component`
-tags: [SD,, React]
+tags: [SD, React]
 ---
 
 If a `PureComponent` has the `shouldComponentUpdate` method, convert it to a regular `Component`.
