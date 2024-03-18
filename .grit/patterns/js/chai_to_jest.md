@@ -1,10 +1,9 @@
 ---
 title: Chai to Jest
-tags: [migration,, js]
+tags: [migration, js]
 ---
 
 Convert Chai test assertions to Jest.
-
 
 ```grit
 engine marzano(0.1)

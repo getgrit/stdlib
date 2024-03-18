@@ -1,10 +1,9 @@
 ---
 title: Convert Drizzle Schema from MySQL to PostgreSQL
-tags: [drizzle,, mysql,, postgresql]
+tags: [drizzle, mysql, postgresql]
 ---
 
-Migrate the Drizzle DB schema from MySQL to PostgreSQL. 
-
+Migrate the Drizzle DB schema from MySQL to PostgreSQL.
 
 ```grit
 `import $alias from "drizzle-orm/mysql-core"` => `import $alias from "drizzle-orm/pg-core"` where {
@@ -76,7 +75,7 @@ import {
   serial,
   smallint,
   varchar,
-} from "drizzle-orm/pg-core"
+} from 'drizzle-orm/pg-core';
 
 export const tableOne = pgTable('table', {
   id: serial('id').primaryKey().notNull(),
