@@ -57,6 +57,10 @@ def create_new_tournament_dangerous(request):
 ## with `form.cleaned_data`
 
 ```python
+from django.shortcuts import render, redirect
+from .models import *
+from .forms import *
+
 def create_new_tournament_safe(request):
     if request.method == 'POST':
         form = CreateTournamentForm(request.POST)
@@ -70,6 +74,10 @@ def create_new_tournament_safe(request):
 ```
 
 ```python
+from django.shortcuts import render, redirect
+from .models import *
+from .forms import *
+
 def create_new_tournament_safe(request):
     if request.method == 'POST':
         form = CreateTournamentForm(request.POST)
@@ -116,5 +124,4 @@ def create_new_tournament_dangerous(request):
     else:
         context = { 'form': CreateTournamentForm()}
         return render(request, 'create_tournament.html', context)
-
 ```
