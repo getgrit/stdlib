@@ -1,12 +1,11 @@
 ---
 title: Add Type To Caught Errors
-tags: [js,, ts]
+tags: [js, ts]
 ---
 
 # Add Type To Caught Errors
 
 Add `any` type annotation to caught errors. It is a common source of tsc errors.
-
 
 ```grit
 engine marzano(1.0)
