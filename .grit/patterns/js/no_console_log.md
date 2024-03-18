@@ -1,10 +1,10 @@
 ---
 title: Remove `console.log`
+tags: [good]
 ---
 
 Remove `console.log` statements.
 
-tags: #good
 
 ```grit
 engine marzano(0.1)

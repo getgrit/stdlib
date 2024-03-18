@@ -1,12 +1,12 @@
 ---
 title: Unused private methods should be removed
+tags: [java]
 ---
 
 # Unused private methods should be removed
 
 Unused private methods, excepting methods with annotations and special methods overriding Java's default behaviour, constitute dead code and should therefore be removed.
 
-tags: #java
 
 ```grit
 language java

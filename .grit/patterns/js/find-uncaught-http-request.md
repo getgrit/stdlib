@@ -1,10 +1,10 @@
 ---
 title: ⇒ Find uncaught HTTP requests
+tags: [fix]
 ---
 
 Find uncaught HTTP requests and wrap it with try {} catch{ }
 
-tags: #fix
 
 ```grit
 engine marzano(0.1)

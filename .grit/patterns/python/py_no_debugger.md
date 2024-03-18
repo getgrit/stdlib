@@ -1,10 +1,10 @@
 ---
 title: Remove debugger
+tags: [fix, good-practice]
 ---
 
 We should remove debugger from production code
 
-tags: #fix #good-practice
 
 ```grit
 engine marzano(0.1)

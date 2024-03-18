@@ -1,12 +1,12 @@
 ---
 title: Convert AWS Lambda Functions to Fermyon Spin
+tags: [js, serverless, fermyon, alpha, hidden]
 ---
 
 This pattern converts a serverless function to a spin function designed to run on [Fermyon](https://www.fermyon.com/).
 
 Note: the full migration is packaged as a workflow. This is just a subcomponent.
 
-tags: #js, #serverless, #fermyon, #alpha, #hidden
 
 ```grit
 engine marzano(0.1)

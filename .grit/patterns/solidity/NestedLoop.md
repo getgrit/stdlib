@@ -1,12 +1,12 @@
 ---
 title: Nested Loop
+tags: [reentrancy, vulnerability]
 ---
 
 # {{ page.title }}
 
 Inspect nested loops.
 
-tags: #reentrancy, #vulnerability
 
 ```grit
 language sol

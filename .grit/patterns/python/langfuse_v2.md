@@ -1,10 +1,10 @@
 ---
 title: Upgrade Langfuse to v2
+tags: [python, upgrade, langfuse, migration]
 ---
 
 Upgrade the Langfuse SDK to v2 following [this guide](https://langfuse.com/docs/sdk/python#upgrading-from-v1xx-to-v2xx).
 
-tags: #python, #upgrade, #langfuse, #migration
 
 ```grit
 engine marzano(0.1)

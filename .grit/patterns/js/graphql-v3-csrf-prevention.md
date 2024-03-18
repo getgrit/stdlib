@@ -1,10 +1,10 @@
 ---
 title: GraphQL Sever v3 csrf prevention
+tags: [fix, graphql, security]
 ---
 
 The Apollo GraphQL server lacks the 'csrfPrevention' option. This option is 'false' by the default in v3 of the Apollo GraphQL v3, which can enable CSRF attacks.
 
-tags: #fix #graphQL, #security
 
 ```grit
 engine marzano(0.1)

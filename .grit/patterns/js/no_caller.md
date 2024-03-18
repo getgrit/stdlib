@@ -1,12 +1,12 @@
 ---
 title: Remove `arguments.caller` and `arguments.callee`
+tags: [fix]
 ---
 
 `arguments.caller` and `arguments.called` have been deprecated.
 
 They make code optimizations difficult and their use is forbidden in ECMAScript 5 while in strict mode.
 
-tags: #fix
 
 ```grit
 engine marzano(0.1)

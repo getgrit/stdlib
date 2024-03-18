@@ -1,10 +1,9 @@
 ---
 title: Replace default exports with named exports
+tags: [syntax, default, export]
 ---
 
 Replaces `export default $something` with `export const $name = $something`. The chosen name matches the file name.
-
-tags: #syntax, #default, #export
 
 ```grit
 language js

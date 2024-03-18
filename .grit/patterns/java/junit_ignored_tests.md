@@ -1,12 +1,12 @@
 ---
 title: JUnit5 test classes and methods should not be silently ignored
+tags: [java]
 ---
 
 # JUnit5 test classes and methods should not be silently ignored
 
 JUnit silently ignores private classes and private methods, static methods, and methods returning a value without being a TestFactory.
 
-tags: #java
 
 ```grit
 language java

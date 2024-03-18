@@ -1,10 +1,10 @@
 ---
 title: Detected a hidden goroutine
+tags: [correctness, best-practice]
 ---
 
 Function invocations are expected to synchronous, and this function will execute asynchronously because all it does is call a goroutine. Instead, remove the internal goroutine and call the function using `go`.
 
-tags: #correctness #best-practice
 
 ```grit
 language go

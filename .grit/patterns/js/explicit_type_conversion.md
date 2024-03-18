@@ -1,10 +1,10 @@
 ---
 title: ⇒ explicit conversion between types
+tags: [SE]
 ---
 
 Use explicit conversions between types, e.g., `'' + x` => `String(s)`.
 
-tags: #SE
 
 ```grit
 engine marzano(0.1)

@@ -1,10 +1,10 @@
 ---
 title: Protractor to Playwright
+tags: [migration, js, playwright, protractor]
 ---
 
 Protractor to Playwright.
 
-tags: #migration, #js, #playwright, #protractor
 
 ```grit
 engine marzano(0.1)

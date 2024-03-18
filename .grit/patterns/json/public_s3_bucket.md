@@ -1,5 +1,6 @@
 ---
 title: Detected public S3 bucket and make sure they are set with intended values
+tags: [aws, cloudformation]
 ---
 
 # Public S3 bucket
@@ -9,7 +10,6 @@ Detected public S3 bucket. This policy allows anyone to have some kind of access
 ### references
 - [AmazonS3](https://docs.aws.amazon.com/AmazonS3/latest/userguide/access-control-block-public-access.html)
 
-tags: #aws, #cloudformation
 
 ```grit
 language json

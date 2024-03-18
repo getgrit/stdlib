@@ -1,10 +1,10 @@
 ---
 title: Convert `<></>` ⇒ `React.Fragment`
+tags: [fix]
 ---
 
 React suggest to use `React.Fragment` besides `<>`
 
-tags: #fix
 
 ```grit
 engine marzano(0.1)

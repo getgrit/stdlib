@@ -1,10 +1,10 @@
 ---
 title: Combine the conditions of nested if statements
+tags: [clippy]
 ---
 
 Redundant layers of nesting add undesirable complexity.
 
-tags: #clippy
 
 ```grit
 language rust

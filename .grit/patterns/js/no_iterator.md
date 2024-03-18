@@ -1,10 +1,10 @@
 ---
 title: Rewrite `__iterator__` property ⇒ `_iterator_`
+tags: [good]
 ---
 
 Use `_iterator_` instead of `__iterator__`. `__iterator__` is obsolete and is not implemented by all browsers.
 
-tags: #good
 
 ```grit
 engine marzano(1.0)

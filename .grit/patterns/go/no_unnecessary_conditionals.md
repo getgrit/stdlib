@@ -1,10 +1,10 @@
 ---
 title: Avoid unnecessary if statements
+tags: [fix, warning]
 ---
 
 If statements that always evaluate to `true` or `false` are redundant and should be removed.
 
-tags: #fix #warning
 
 ```grit
 language go

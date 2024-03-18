@@ -1,10 +1,10 @@
 ---
 title: React to Hooks (MobX)
+tags: [react, migration, complex, hidden]
 ---
 
 This is an alternative version of the React to Hooks pattern that uses MobX.
 
-tags: #react, #migration, #complex, #hidden
 
 ```grit
 engine marzano(0.1)

@@ -1,10 +1,10 @@
 ---
 title: Warning for hardcoded github token
+tags: [fix, warning]
 ---
 
 Avoid hard-coding secrets, such as credentials and sensitive data, directly into your application's source code. This practice poses a security risk as the information may be inadvertently leaked.
 
-tags: #fix #warning
 
 ```grit
 engine marzano(0.1)

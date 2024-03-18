@@ -1,10 +1,10 @@
 ---
 title: [React2Hooks] Intelligent useEffect vs useLayoutEffect
+tags: [fix]
 ---
 
 If a useEffect depends on layout etc. it should switch to useLayoutEffect.
 
-tags: #fix
 
 ```grit
 engine marzano(0.1)
