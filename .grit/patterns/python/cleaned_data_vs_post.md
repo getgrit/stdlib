@@ -1,6 +1,6 @@
 ---
 title: Use `$FORM.cleaned_data[]` instead of `request.POST[]` after `form.is_valid()`
-tags: [fix, best-practice]
+tags: [fix, best-practice, django]
 ---
 
 Use `$FORM.cleaned_data[]` instead of `request.POST[]` after `form.is_valid()` has been executed to only access sanitized data.
@@ -8,8 +8,6 @@ Use `$FORM.cleaned_data[]` instead of `request.POST[]` after `form.is_valid()` h
 ### references
 
 - https://docs.djangoproject.com/en/4.2/ref/forms/api/#accessing-clean-data
-
-tags: #fix, #best-practice
 
 ```grit
 engine marzano(0.1)
