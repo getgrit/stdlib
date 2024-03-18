@@ -1,10 +1,10 @@
 ---
 title: Identical statements in the if else body
+tags: [fix, correctness]
 ---
 
 Identical statements found in both the `if` and `else` bodies of an `if-statement`. This results in the same code execution regardless of the if-expression outcome. To optimize, eliminate the `if` statement entirely.
 
-tags: #fix #correctness
 
 ```grit
 language go

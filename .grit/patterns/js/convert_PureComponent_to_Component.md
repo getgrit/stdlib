@@ -1,5 +1,6 @@
 ---
 title: Rewrite `PureComponent` ⇒ `Component`
+tags: [SD,, React]
 ---
 
 If a `PureComponent` has the `shouldComponentUpdate` method, convert it to a regular `Component`.
@@ -7,7 +8,6 @@ If a `PureComponent` has the `shouldComponentUpdate` method, convert it to a reg
 `React.PureComponent` provides an implementation for `shouldComponentUpdate()` which compares props by reference to determine if they have changed.
 If you overwrite it with your own implementation, it doesn't make sense to extend `React.PureComponent`.
 
-tags: #SD, #React
 
 ```grit
 engine marzano(1.0)

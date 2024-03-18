@@ -1,12 +1,12 @@
 ---
 title: Exceptions should not be created without being thrown
+tags: [java]
 ---
 
 # Exceptions should not be created without being thrown
 
 Creating a new Throwable without actually throwing or binding it is useless and is probably due to a mistake.
 
-tags: #java
 
 ```grit
 language java

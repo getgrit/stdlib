@@ -1,5 +1,6 @@
 ---
 title: Fix pointer is shared between loop iterations
+tags: [fix, correctness]
 ---
 
 `$VALUE` serves as a loop pointer that might be exported from the loop. Since this pointer is shared across loop iterations, the exported reference will consistently point to the last loop value, potentially leading to unintended consequences. To address this issue, duplicate the pointer within the loop to ensure each iteration has its own distinct reference.
@@ -8,7 +9,6 @@ title: Fix pointer is shared between loop iterations
 
 - [looppointer](https://github.com/kyoh86/looppointer)
 
-tags: #fix #correctness
 
 ```grit
 language go

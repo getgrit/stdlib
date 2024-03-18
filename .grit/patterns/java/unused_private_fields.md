@@ -1,12 +1,12 @@
 ---
 title: Unused private fields should be removed
+tags: [java]
 ---
 
 # Unused private fields should be removed
 
 Unused private fields constitute dead code and should therefore be removed.
 
-tags: #java
 
 ```grit
 language java
