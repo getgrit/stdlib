@@ -1,11 +1,11 @@
 ---
 title: Migrate from moment.js to date-fns
+tags: [migration, alpha, hidden]
 ---
 
 Moment.js is an older date manipulation framework that has reached end of life.
 Maintainers of the library now advise migrating to modern atlernatives like `date-fns`.
 
-tags: #migration, #alpha, #hidden
 
 ```grit
 engine marzano(0.1)

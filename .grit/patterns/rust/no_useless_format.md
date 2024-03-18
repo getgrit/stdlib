@@ -1,10 +1,10 @@
 ---
 title: Replace unnecessary format macro with `to_string()`
+tags: [clippy]
 ---
 
 Checks for the use of `format!("string literal with no argument")` and `format!("{}", foo)` where foo is a string.
 
-tags: #clippy
 
 ```grit
 language rust

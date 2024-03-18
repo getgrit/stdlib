@@ -1,10 +1,10 @@
 ---
 title: Rewrite `Function.prototype.method = ` ⇒ es6 class
+tags: [es6, js, class]
 ---
 
 Older code often uses the function prototype to create "classes" out of functions. This upgrades those to ES6 class syntax.
 
-tags: #es6, #js, #class
 
 ```grit
 engine marzano(0.1)

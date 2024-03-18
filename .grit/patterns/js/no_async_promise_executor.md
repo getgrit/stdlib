@@ -1,12 +1,12 @@
 ---
 title: Remove `async` from `Promise`
+tags: [fix, bug]
 ---
 
 The Promise is already executed asynchronously and exceptions thrown by the function will be lost.
 
 Creating an Promise from an async function is [usually an error](https://eslint.org/docs/rules/no-async-promise-executor).
 
-tags: #fix, #bug
 
 ```grit
 engine marzano(0.1)

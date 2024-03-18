@@ -1,12 +1,12 @@
 ---
 title: Prefer require over imports
+tags: [js, es6, cjs, commonjs]
 ---
 
 # ES6 imports to require
 
 Converts ES6-style `import` to `require` statements.
 
-tags: #js, #es6, #cjs, #commonjs
 
 ```grit
 engine marzano(0.1)

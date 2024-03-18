@@ -34,6 +34,8 @@ def process_document(file_path):
         tag_words = tags_line.split()[1:]  # Split by spaces and ignore the first word "tags:"
         # Remove the # from each tag
         tag_words = [tag[1:] for tag in tag_words]
+        # Remove any commas, just in case
+        tag_words = [tag.replace(",", "") for tag in tag_words]
         # Filter out empty tags
         tag_words = [tag for tag in tag_words if tag]
         fixed_tags_line = "tags: [" + ", ".join(tag_words) + "]"

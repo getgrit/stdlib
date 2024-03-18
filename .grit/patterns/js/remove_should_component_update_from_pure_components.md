@@ -1,12 +1,12 @@
 ---
 title: Rewrite `shouldComponentUpdate` ⇒ `.`
+tags: [fix, React]
 ---
 
 Remove the `shouldComponentUpdate` method from `PureComponent`. `PureComponent` already has an implementation.
 
 `PureComponent` provides an implementation for `shouldComponentUpdate` which compares props by reference to determine if they have changed.
 
-tags: #fix, #React
 
 ```grit
 engine marzano(0.1)

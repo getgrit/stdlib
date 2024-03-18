@@ -1,10 +1,10 @@
 ---
 title: Prefer ES6-style exports over module.exports
+tags: [js, es6, migration, cjs, commonjs]
 ---
 
 Converts CommonJS `module.exports` to ES6-style exports.
 
-tags: #js, #es6, #migration, #cjs, #commonjs
 
 ```grit
 engine marzano(0.1)

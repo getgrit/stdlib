@@ -1,10 +1,10 @@
 ---
 title: Jest to Vitest
+tags: [migration, js]
 ---
 
 Convert Jest tests to Vitest
 
-tags: #migration, #js
 
 ```grit
 engine marzano(0.1)

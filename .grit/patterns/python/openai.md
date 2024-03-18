@@ -1,10 +1,10 @@
 ---
 title: Upgrade to OpenAI Python SDK v1.X
+tags: [python, openai, migration]
 ---
 
 Convert OpenAI from openai version to the v1 version.
 
-tags: #python, #openai, #migration
 
 ```grit
 engine marzano(0.1)

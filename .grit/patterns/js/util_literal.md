@@ -1,10 +1,10 @@
 ---
 title: Literals
+tags: [util, syntax]
 ---
 
 Utility patterns for matching literals.
 
-tags: #util, #syntax
 
 ```grit
 engine marzano(0.1)
