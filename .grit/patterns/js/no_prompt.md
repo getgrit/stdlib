@@ -1,10 +1,10 @@
 ---
 title: Remove `prompt` statement
+tags: [fix]
 ---
 
 JavaScript’s prompt function is widely considered to be obtrusive as UI elements and should be replaced by a more appropriate custom UI implementation. 
 
-tags: #fix
 
 ```grit
 engine marzano(0.1)

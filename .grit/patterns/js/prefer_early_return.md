@@ -1,12 +1,12 @@
 ---
 title: PreferEarlyReturn
+tags: [lint, style]
 ---
 
 # {{ page.title }}
 
 Prefer to use early returns to keep functions flat.
 
-tags: #lint, #style
 
 ```grit
 engine marzano(0.1)

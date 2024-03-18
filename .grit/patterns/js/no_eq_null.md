@@ -1,10 +1,10 @@
 ---
 title: Compare `null` using  `===` or `!==`
+tags: [good]
 ---
 
 Comparing to `null` needs a type-checking operator (=== or !==), to avoid incorrect results when the value is `undefined`.
 
-tags: #good
 
 ```grit
 engine marzano(0.1)

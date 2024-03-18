@@ -1,12 +1,12 @@
 ---
 title: Warning for hardcoded tmp path
+tags: [warning, good-practice]
 ---
 
 Detected hardcoded temp directory. Consider using `tempfile.TemporaryFile` instead
 
 - [reference](https://docs.python.org/3/library/tempfile.html#tempfile.TemporaryFile)
 
-tags: #warning #good-practice
 
 ```grit
 engine marzano(0.1)

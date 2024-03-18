@@ -1,12 +1,12 @@
 ---
 title: Enzyme to React Testing Library
+tags: [enzyme, react-testing-library, rtl, alpha, migration, hidden]
 ---
 
 (Alpha) This pattern is a work in progress and is not yet ready for use.
 
 Note: the full migration is packaged as a workflow. This is just a subcomponent.
 
-tags: #enzyme, #react-testing-library, #rtl, #alpha, #migration, #hidden
 
 ```grit
 language js

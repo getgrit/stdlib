@@ -1,10 +1,10 @@
 ---
 title: Collapse redundant match arms for readability
+tags: [clippy]
 ---
 
 Finds nested match expressions where the patterns may be combined to reduce the number of branches.
 
-tags: #clippy
 
 ```grit
 language rust

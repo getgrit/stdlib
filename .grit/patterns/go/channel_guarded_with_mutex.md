@@ -1,5 +1,6 @@
 ---
 title: Avoid mutexes on channels
+tags: [fix, best-practice]
 ---
 
 Detected a channel guarded with a `mutex`. Channels already have an internal `mutex`, so this is unnecessary. Remove the mutex.
@@ -8,7 +9,6 @@ Detected a channel guarded with a `mutex`. Channels already have an internal `mu
 
 - [go-antipatterns](https://hackmysql.com/golang/go-antipatterns/#guarded-channel)
 
-tags: #fix #best-practice
 
 ```grit
 language go

@@ -1,10 +1,10 @@
 ---
 title: Convert React Class Components to Functional Components
+tags: [react, migration, complex]
 ---
 
 This pattern converts React class components to functional components, with hooks.
 
-tags: #react, #migration, #complex
 
 ```grit
 engine marzano(0.1)

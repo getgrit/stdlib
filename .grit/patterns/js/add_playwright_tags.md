@@ -1,10 +1,10 @@
 ---
 title: Add tags to Playwright test descriptions
+tags: [hidden]
 ---
 
 Add tags to Playwright test descriptions.
 
-tags: #hidden
 
 ```grit
 engine marzano(0.1)

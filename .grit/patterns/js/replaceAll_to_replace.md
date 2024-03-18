@@ -1,5 +1,6 @@
 ---
 title: Rewrite `replaceAll` ⇒ `replace` when have regex pattern
+tags: [fix]
 ---
 
 Replaces `replaceAll` with `replace`, when have regex pattern.
@@ -8,7 +9,6 @@ The `replaceAll` string method may not be supported in all JavaScript versions a
 
 - [reference](https://discourse.threejs.org/t/replaceall-is-not-a-function/14585)
 
-tags: #fix
 
 ```grit
 engine marzano(0.1)

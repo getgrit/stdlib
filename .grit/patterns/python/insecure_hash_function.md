@@ -1,5 +1,6 @@
 ---
 title: Detected use of an insecure `MD4` or `MD5` hash function and replace with `SHA256`
+tags: [fix, security]
 ---
 
 Identified the utilization of an insecure `MD4` or `MD5` hash function, both of which have well-documented vulnerabilities and are deemed deprecated. It is recommended to replace them with more secure options such as `SHA256` or a comparable hash function for improved security.
@@ -10,7 +11,6 @@ Identified the utilization of an insecure `MD4` or `MD5` hash function, both of 
 - [stackexchange](https://crypto.stackexchange.com/questions/44151/how-does-the-flame-malware-take-advantage-of-md5-collision)
 - [sha3_256](https://pycryptodome.readthedocs.io/en/latest/src/hash/sha3_256.html)
 
-tags: #fix #security
 
 ```grit
 engine marzano(0.1)

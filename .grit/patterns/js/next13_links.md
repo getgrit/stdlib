@@ -1,10 +1,10 @@
 ---
 title: Remove `<a>` Tags From Link Components
+tags: [good]
 ---
 
 Migrate Link component children to Next13
 
-tags: #good
 
 ```grit
 engine marzano(0.1)

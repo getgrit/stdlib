@@ -1,12 +1,12 @@
 ---
 title: Upgrade to Azure OpenAI Python SDK v1.x
+tags: [python, openai, migration, stainless, azure]
 ---
 
 This migration attempts to encode some of the [Azure-specific details](https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/migration) for migration to OpenAI Python SDK v1.x.
 
 This is a variant of the [standard migration](https://github.com/getgrit/python/blob/main/.grit/patterns/openai.md).
 
-tags: #python, #openai, #migration, #stainless, #azure
 
 ```grit
 engine marzano(0.1)

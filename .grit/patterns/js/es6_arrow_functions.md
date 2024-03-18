@@ -1,10 +1,10 @@
 ---
 title: Function expressions to arrow functions
+tags: [js, es6, migration]
 ---
 
 Converts function expressions to ES6 arrow functions
 
-tags: #js, #es6, #migration
 
 ```grit
 engine marzano(0.1)

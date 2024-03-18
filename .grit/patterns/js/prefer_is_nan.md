@@ -1,5 +1,6 @@
 ---
 title: Rewrite `=== NaN` ⇒ `isNaN`
+tags: [fix]
 ---
 
 Convert comparisons to `NaN` (e.g., `x == NaN`) to use `isNaN` (e.g., `isNaN(x)`).
@@ -8,7 +9,6 @@ In JavaScript, `NaN` is a special value of `Number` type. It’s used to represe
 
 `NaN` is unique in JavaScript by not being equal to anything, including itself, so it does not make sense to compare to it.
 
-tags: #fix
 
 ```grit
 engine marzano(0.1)

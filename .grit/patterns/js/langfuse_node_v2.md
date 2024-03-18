@@ -1,10 +1,10 @@
 ---
 title: Upgrade Langfuse to v2
+tags: [js, ts, npm, upgrade, langfuse, migration]
 ---
 
 Upgrade the Langfuse SDK to v2 following [this guide](https://langfuse.com/docs/sdk/typescript#upgrade1to2).
 
-tags: #js, #ts, #npm, #upgrade, #langfuse, #migration
 
 ```grit
 engine marzano(0.1)

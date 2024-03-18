@@ -1,10 +1,10 @@
 ---
 title: Remove unreachable code
+tags: [good, SE]
 ---
 
 Remove unreachable code found after `return` / `throw` / `continue` or `break` statements.
 
-tags: #good, #SE
 
 ```grit
 engine marzano(0.1)

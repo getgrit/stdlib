@@ -1,10 +1,10 @@
 ---
 title: Convert Drizzle Schema from MySQL to PostgreSQL
+tags: [drizzle,, mysql,, postgresql]
 ---
 
 Migrate the Drizzle DB schema from MySQL to PostgreSQL. 
 
-tags: #drizzle, #mysql, #postgresql
 
 ```grit
 `import $alias from "drizzle-orm/mysql-core"` => `import $alias from "drizzle-orm/pg-core"` where {

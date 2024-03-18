@@ -1,10 +1,10 @@
 ---
 title: Yoda conditions not
+tags: [good, syntax]
 ---
 
 Prefer natural language style conditions in favour of Yoda style conditions.
 
-tags: #good, #syntax
 
 ```grit
 engine marzano(0.1)

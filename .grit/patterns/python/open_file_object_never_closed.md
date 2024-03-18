@@ -1,12 +1,12 @@
 ---
 title: Close file object opened and never closed
+tags: [fix, good-practice]
 ---
 
 We should close the file object opened without corresponding close.
 
 - [reference](https://realpython.com/why-close-file-python/)
 
-tags: #fix #good-practice
 
 ```grit
 engine marzano(0.1)

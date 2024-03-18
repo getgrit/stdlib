@@ -1,12 +1,12 @@
 ---
 title: Strict tsconfig
+tags: [js, ts, tsconfig, strict]
 ---
 
 # Strict tsconfig
 
 Adds `"strict": true, "allowJs": true, "checkJs": false` from a tsconfig's `compilerOptions`, and then removes existing redundant options (such as `noImplicitAny`).
 
-tags: #js, #ts, #tsconfig, #strict
 
 ```grit
 engine marzano(0.1)

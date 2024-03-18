@@ -1,5 +1,6 @@
 ---
 title: Replace jwt.SigningMethodNone ⇒ jwt.SigningMethodHS256
+tags: [fix, security]
 ---
 
 Using the `none` algorithm in a `JWT` token is risky because it assumes the token's integrity is already ensured. This could let a malicious actor create a fake JWT token that gets automatically verified. Avoid using `none` and go for a safer algorithm like `HS256` instead.
@@ -8,7 +9,6 @@ Using the `none` algorithm in a `JWT` token is risky because it assumes the toke
 
 - [Cryptographic_Failures](https://owasp.org/Top10/A02_2021-Cryptographic_Failures)
 
-tags: #fix #security
 
 ```grit
 language go

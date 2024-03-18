@@ -1,10 +1,10 @@
 ---
 title: ⇒ self-closing JSX tags
+tags: [SE, syntax, React]
 ---
 
 Components without children can be self-closed to avoid unnecessary extra closing tag.
 
-tags: #SE, #syntax, #React
 
 ```grit
 engine marzano(0.1)

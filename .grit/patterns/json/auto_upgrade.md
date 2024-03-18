@@ -1,5 +1,6 @@
 ---
 title: Auto-upgrade TypeScript
+tags: [js, ts, package-json]
 ---
 
 # Auto-upgrade TypeScript
@@ -8,7 +9,6 @@ An example illustrating the upgrade_dependency utility function, which upgrades 
 
 This example upgrades Typescript to v5.0.3.
 
-tags: #js, #ts, #package-json
 
 ```grit
 language json

@@ -1,10 +1,10 @@
 ---
 title: Fix `for` counter direction
+tags: [bug, fix, good]
 ---
 
 If a `for` counter moves in the wrong direction the loop will run infinitely. Mostly, an infinite `for` loop is a typo and causes a bug.
 
-tags: #bug, #fix, #good
 
 ```grit
 engine marzano(0.1)
