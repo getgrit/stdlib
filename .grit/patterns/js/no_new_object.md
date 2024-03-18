@@ -1,12 +1,12 @@
 ---
 title: Rewrite `new Object()` ⇒ `{}`
+tags: [good, syntax]
 ---
 
 The `{}` literal form is a more concise way of creating an object.
 
 There is no performance difference.
 
-tags: #good, #syntax
 
 ```grit
 engine marzano(0.1)

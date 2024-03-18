@@ -1,10 +1,10 @@
 ---
 title: Replace `str::bytes().count()` with `str::len()`
+tags: [clippy]
 ---
 
 `str::bytes().count()` is longer and may not be as performant as using `str::len()`.
 
-tags: #clippy
 
 ```grit
 language rust

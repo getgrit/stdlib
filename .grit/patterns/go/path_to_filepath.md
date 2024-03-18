@@ -1,5 +1,6 @@
 ---
 title: Replace `path.Join()` ⇒ `filepath.Join()`
+tags: [fix, correctness]
 ---
 
 Utilize `filepath.Join(...)` instead of `path.Join(...)` as it accommodates OS-specific path separators, mitigating potential issues on systems like Windows that may employ different delimiters.
@@ -9,7 +10,6 @@ Utilize `filepath.Join(...)` instead of `path.Join(...)` as it accommodates OS-s
 - [path.join-considered-harmful](https://parsiya.net/blog/2019-03-09-path.join-considered-harmful/)
 - [path.go](https://go.dev/src/path/path.go?s=4034:4066#L145)
 
-tags: #fix #correctness
 
 ```grit
 language go

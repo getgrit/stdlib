@@ -1,11 +1,11 @@
 ---
 title: Prototype methods ⇒ `Object.prototype` methods
+tags: [fix]
 ---
 
 Call `hasOwnProperty`, `isPrototypeOf`, `propertyIsEnumerable` methods only from `Object.prototype`.  
 Otherwise it can cause errors.
 
-tags: #fix
 
 ```grit
 engine marzano(0.1)

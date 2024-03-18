@@ -1,12 +1,12 @@
 ---
 title: Hoist assignment out of `return` statement
+tags: [good, se]
 ---
 
 # {{ page.title }}
 
 This rule hoists the assignments out of `return`. Does not apply when assignment is wrapped in parentheses.
 
-tags: #good, #se
 
 ```grit
 engine marzano(0.1)

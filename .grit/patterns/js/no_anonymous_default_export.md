@@ -1,10 +1,10 @@
 ---
 title: Rename anonymous default export functions ⇒ main
+tags: [syntax]
 ---
 
 Replaces `export default function () { }` with `export default function main () { }` and `export default () => { }` with `const main = () => { }; export default main`
 
-tags: #syntax
 
 ```grit
 engine marzano(0.1)

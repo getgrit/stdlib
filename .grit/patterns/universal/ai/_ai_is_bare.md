@@ -1,8 +1,11 @@
+---
+tags: [ai, sample, util, hidden]
+---
+
 # AI conditions.
 
 Test `ai_is` with no counter-examples.
 
-tags: #ai, #sample, #util, #hidden
 
 ```grit
 `console.log($msg)` => `// REDACTED: $msg` where {

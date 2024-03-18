@@ -1,10 +1,10 @@
 ---
 title: Remove `noAssert` from `Buffer` calls
+tags: [security, fix, node]
 ---
 
 If the `noAssert` flag is set, `offset` can go beyond the end of the `Buffer`, which is a security vulnerability.
 
-tags: #security, #fix, #node
 
 ```grit
 engine marzano(0.1)

@@ -1,10 +1,10 @@
 ---
 title: Migrate from TanStack Query 3 to React query 4
+tags: [react, migration, reactquery]
 ---
 
 This pattern migrates from React Query v3 to React Query v4. It is the equivalent of the [codemod](https://github.com/TanStack/query/tree/8e7c34f448923694fdeac43fbaac83579b74f485/packages/codemods/src/v4).
 
-tags: #react, #migration, #reactquery
 
 ```grit
 engine marzano(0.1)

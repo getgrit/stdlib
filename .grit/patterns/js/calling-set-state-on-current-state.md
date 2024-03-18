@@ -1,10 +1,10 @@
 ---
 title: Calling setState on the current state is always a no-op. so change the state like $Y(!$X) instead.
+tags: [fix]
 ---
 
 Calling setState on the current state is always a no-op. Did you mean to change the state like $Y(!$X) instead?
 
-tags: #fix
 
 ```grit
 engine marzano(0.1)
