@@ -3,7 +3,7 @@ title: use `JsonResponse` over `json` and `HttpResponse`
 tags: [fix, best-practice, django]
 ---
 
-Use `JsonResponse` over `json` and `HttpResponse`
+`JsonResponse` in Django offers a concise and efficient way to return `JSON` responses compared to using `json.dumps` along with `HttpResponse`. It simplifies the process by automatically handling serialization and setting the correct content type.
 
 ```grit
 engine marzano(0.1)
