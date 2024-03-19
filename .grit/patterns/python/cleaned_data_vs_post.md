@@ -100,9 +100,9 @@ from .forms import *
 def create_new_tournament_dangerous(request):
     if request.method == 'POST':
         form = CreateTournamentForm(request.POST)
-        if form.is_valid():          
+        if form.is_valid():
             t.save()
-            t = Tournament(name=request.POST.get['address'])
+            t = Tournament(name=request.POST.get('address'))
             return redirect('index')
     else:
         context = { 'form': CreateTournamentForm()}
@@ -117,9 +117,9 @@ from .forms import *
 def create_new_tournament_dangerous(request):
     if request.method == 'POST':
         form = CreateTournamentForm(request.POST)
-        if form.is_valid():          
+        if form.is_valid():
             t.save()
-            t = Tournament(name=form.cleaned_data.get['address'])
+            t = Tournament(name=form.cleaned_data.get('address'))
             return redirect('index')
     else:
         context = { 'form': CreateTournamentForm()}
