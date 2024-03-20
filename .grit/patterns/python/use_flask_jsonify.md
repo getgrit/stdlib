@@ -3,7 +3,7 @@ title: use `flask.jsonify()`
 tags: [fix, best-pactice, flask]
 ---
 
-`flask.jsonify()` is a `Flask` helper method which handles the correct settings for returning `JSON` from `Flask` routes
+`flask.jsonify()` simplifies returning `JSON` from `Flask` routes by automatically serializing Python objects into JSON format and setting the appropriate Content-Type header, resulting in cleaner and more readable code while ensuring consistency and compatibility with web standards.
 
 ### references
 
@@ -13,7 +13,8 @@ tags: [fix, best-pactice, flask]
 engine marzano(0.1)
 language python
 
-`def $func($params):$funcBody` where {
+`@app.route($routesParams)
+def $func($funcParams):$funcBody` where {
     $import = "jsonify",
     $import <: ensure_import_from(source=`flask`),
     $funcBody <: contains or {`return json.dumps($user_dict)`, `return dumps($user_dict)`} => `return jsonify($user_dict)`
