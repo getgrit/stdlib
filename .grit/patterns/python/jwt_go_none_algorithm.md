@@ -6,7 +6,7 @@ tags: [fix, correctness, JWT]
 Detected use of the `'none'` algorithm in a JWT token. The `'none'` algorithm assumes the integrity of the token has already been verified. This would allow a malicious actor to forge a `JWT` token that will automatically be verified. Do not explicitly use the `'none'` algorithm. Instead, use an algorithm such as `'HS256'`.
 
 ## references
-- (Cryptographic_Failures)[https://owasp.org/Top10/A02_2021-Cryptographic_Failures]
+- [Cryptographic Failures](https://owasp.org/Top10/A02_2021-Cryptographic_Failures)
 
 ```grit
 engine marzano(0.1)
