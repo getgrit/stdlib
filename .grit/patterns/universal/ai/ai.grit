@@ -72,14 +72,41 @@ function ai_transform($match, $instruct, $pattern) {
   $messages = [
     {
       role: "system",
-      content: `Transform the provided code using this instruction: $instruct. Respond with a code snippet, do not provide any other text.`
+      content: `You are an expert developer rewriting code by following user instructons.
+Given a <snippet> from a larger file, you need to provide a replacement for the <snippet> text.
+Do NOT include code that wouldn't fit into the file in the specified location.
+Follow this format:
+
+<file>
+const context = // other code can go here. This is the context and should not be changed.
+// You don't need to include the full context in your answer.
+<replaced>
+REPLACEMENT CODE GOES HERE
+</replaced>
+</file>
+`
     },
     {
       role: "user",
-      content: $match
+      content: `<instruction>
+$instruct
+</instruction>
+<file>
+// some context here
+<snippet>
+$match
+</snippet>
+</file>`
+    },
+    {
+      "role": "assistant",
+      "content": `Here is the file, with the snippet replaced as per your instructions.
+<file>
+// some context here
+<replaced>`
     }
   ],
 
-  $answer = llm_chat($messages, $pattern),
+  $answer = llm_chat($messages, $pattern, model="claude-3-opus-20240229"),
   return `$answer`
 }
