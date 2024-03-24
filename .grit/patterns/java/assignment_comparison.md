@@ -1,6 +1,6 @@
 ---
 title: Assignment Comparison
-tags: [java, good-practice]
+tags: [good-practice]
 ---
 
 Consolidate assignment-based conditionals `($var = true/false)` and equality checks `($var == true/$var)` into a single simplified conditional `(if($var))` to enhance code clarity and prevent unintended variable modifications.
@@ -9,13 +9,11 @@ Consolidate assignment-based conditionals `($var = true/false)` and equality che
 language java
 
 or {
-    `if($var = true) { $body }`, 
-    `if($var = false) { $body }`,
-    `if($var == true) { $body }`,
-    `if($var == $var) { $body }`
-} => `if($var){ 
-            $body 
-        }`
+    `if($var = true) { $body }` => `if($var == true) { $body }`, 
+    `if($var = false) { $body }` => `if($var == false) { $body }`,
+    `if($var == true) { $body }` => `if($var){ $body }`,
+    `if($var == $var) { $body }` => `$body`
+}
 ```
 
 ## $x == #x
@@ -35,9 +33,7 @@ class Bar {
 class Bar {
     void main() {
         boolean myBoolean;
-        if(myBoolean){ 
-            continue; 
-        }
+        continue;
     }
 }
 ```
@@ -59,9 +55,7 @@ class Bar {
 class Bar {
     void main() {
         boolean myBoolean;
-        if(myBoolean){ 
-            continue; 
-        }
+        if(myBoolean == true) { continue; }
     }
 }
 ```
@@ -83,9 +77,7 @@ class Bar {
 class Bar {
     void main() {
         boolean myBoolean;
-        if(myBoolean){ 
-            continue; 
-        }
+        if(myBoolean){ continue; }
     }
 }
 ```
@@ -107,9 +99,7 @@ class Bar {
 class Bar {
     void main() {
         boolean myBoolean;
-        if(myBoolean){ 
-            continue; 
-        }
+        if(myBoolean == false) { continue; }
     }
 }
 ```
