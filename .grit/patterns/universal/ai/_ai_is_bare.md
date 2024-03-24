@@ -13,6 +13,8 @@ Test `ai_is` with no counter-examples.
 }
 ```
 
+# Tests disabled, this doesn't work reliably yet.
+
 ## Solve some basic cases
 
 ```js

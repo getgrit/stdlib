@@ -12,7 +12,7 @@ function ai_ask($question, $choices) {
       content: $question
     }
   ],
-  $answer = llm_chat($messages, pattern=$choices),
+  $answer = llm_chat($messages, pattern=$choices, model="gpt-3.5-turbo"),
   return $answer
 }
 
