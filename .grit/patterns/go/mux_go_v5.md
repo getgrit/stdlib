@@ -82,7 +82,7 @@ sequential {
 
 ## Client initialization
 
-The client initialization method has renamed to use `NewClient` and configuration is now set using `muxoption` functions instead of `NewConfiguration`.
+The client initialization method has renamed to `NewClient` and configuration is now set using `muxoption` calls instead of `NewConfiguration`.
 
 Basic Auth has been replaced with `WithTokenID` and `WithTokenSecret` options.
 
@@ -166,7 +166,7 @@ The Video API has been moved under the `Video` namespace of the client and metho
 - `AssetsApi.CreateAsset` -> `Video.Assets.New`
 
 Request parameters must be imported from the `video` package, and some have been renamed:
-- `MasterAccess` -> `PlaybackPolicy
+- `MasterAccess` -> `PlaybackPolicy`
 
 ```go
 package main
@@ -199,7 +199,7 @@ func main() {
 
 ## Dimensions API
 
-The Dimensions API has been moved under the `Data` namespace of the client, with two methods: `List` and `ListValues`. The `ListValues` receives params from the `data.DimensionListValuesParams` struct.
+The Dimensions API has been moved under the `Data` namespace of the client, with two methods: `List` and `ListValues`. The `ListValues` method receives params from the `data.DimensionListValuesParams` struct.
 
 ```go
 package main
