@@ -41,7 +41,7 @@ def bad1():
 ```
 
 
-## `algorithm='none'`
+## `algorithm=['none']`
 
 ```python
 import jwt
