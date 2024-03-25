@@ -79,9 +79,9 @@ jobs:
                 path: touch
                 args:
                   - manifests/file1
-            outputs:
-              - name: manifests
-        
+              outputs:
+                - name: manifests
+            file: input.yaml
           - task: task-2
             config:
               platform: linux
@@ -92,9 +92,9 @@ jobs:
                 path: touch
                 args:
                   - manifests/file2
-            outputs:
-              - name: manifests
-        
+              outputs:
+                - name: manifests
+            file: input.yaml
           - task: task-3
             config:
               platform: linux
@@ -105,10 +105,10 @@ jobs:
                 path: touch
                 args:
                   - manifests/file3
-            outputs:
-              - name: manifests
+              outputs:
+                - name: manifests
+            file: input.yaml
         
-        file: input.yaml
       - task: list-file
         config:
           platform: linux
