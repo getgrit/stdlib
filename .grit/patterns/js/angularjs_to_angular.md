@@ -42,21 +42,20 @@ This is the converted component:
 'use strict';
 
 import { Component } from '@angular/core';
-import { Phone } from './phone.model';
+import { Phone } from './phone.service';
 
 @Component({
   selector: 'app-phone-list',
-  templateUrl: 'phone-list/phone-list.template.html',
+  templateUrl: './phone-list.component.html',
+  providers: [Phone]
 })
-export class PhoneListController {
-  phones: Phone[];
-  orderProp: string;
+export class PhoneListComponent {
+  phones: any[];
+  orderProp = 'age';
 
-  constructor(private phoneService: PhoneService) {}
-
-  ngOnInit() {
+  constructor(private phoneService: Phone) {
     this.phones = this.phoneService.query();
-    this.orderProp = 'age';
   }
 }
+
 ```

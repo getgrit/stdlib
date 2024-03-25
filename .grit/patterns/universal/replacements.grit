@@ -1,0 +1,4 @@
+function replace_all($haystack, $search, $replacement) js {
+  const replacement = $haystack.text.replaceAll($search.text, $replacement.text);
+  return replacement;
+}
