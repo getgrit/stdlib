@@ -13,11 +13,11 @@ engine marzano(0.1)
 language python
 
 or {`jwt.encode($params)`, `jwt.decode($params)`} where {
-    any {
-        $params <: contains `algorithm='none'` => `algorithm='HS256'`,
+    or {
+        $params <: contains or {`algorithm='none'`, `algorithms=['none']`} => `algorithm='HS256'`,
         $params <: contains `algorithms=[$algo]` where {
-            $algo <: contains `'none'` => `'HS256'`
-        }
+            $algo <: contains `'none'` => .
+        },
     }
 }
 ```
@@ -55,7 +55,7 @@ def bad2(encoded):
 import jwt
 
 def bad2(encoded):
-    jwt.decode(encoded, None, algorithms=['HS256'])
+    jwt.decode(encoded, None, algorithm='HS256')
     return encoded
 ```
 
@@ -75,5 +75,59 @@ import jwt
 
 def ok(secret_key):
     encoded = jwt.encode({'some': 'payload'}, secret_key, algorithm='HS256')
+    return encoded
+```
+
+## `algorithms=["none", "other", "HS256"]`
+
+```python
+import jwt
+
+def bad2(encoded):
+    jwt.decode(encoded, None, algorithms=["none", "other", "HS256"])
+    return encoded
+```
+
+```python
+import jwt
+
+def bad2(encoded):
+    jwt.decode(encoded, None, algorithms=[ "other", "HS256"])
+    return encoded
+```
+
+## `algorithms=["HS256"]`
+
+```python
+import jwt
+
+def bad2(encoded):
+    jwt.decode(encoded, None, algorithms=["HS256"])
+    return encoded
+```
+
+```python
+import jwt
+
+def bad2(encoded):
+    jwt.decode(encoded, None, algorithms=["HS256"])
+    return encoded
+```
+
+## `algorithms=["none", "md5"]`
+
+```python
+import jwt
+
+def bad2(encoded):
+    jwt.decode(encoded, None, algorithms=["none", "md5"])
+    return encoded
+```
+
+```python
+import jwt
+
+def bad2(encoded):
+    jwt.decode(encoded, None, algorithms=[ "md5"])
     return encoded
 ```
