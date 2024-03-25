@@ -622,27 +622,19 @@ pattern cloudflare_method_renaming() {
   }
 }
 
-pattern cloudflare_client_constructor_with_api_key_and_email() {
-  `cloudflare.New($api_key, $api_email)` as $init => `cloudflare.NewClient(
-    option.WithAPIKey($api_key),
-    option.WithAPIEmail($api_email)
-  )` where {
-    $init <: maybe within `$api, $err := $init` => `$api := $init`
-  }
-}
-
-pattern cloudflare_client_constructor_with_api_token() {
-  `cloudflare.NewWithAPIToken($api_token)` as $init => `cloudflare.NewClient(
-    option.WithAPIToken($api_token)
-  )` where {
-    $init <: maybe within `$api, $err := $init` => `$api := $init`
-  }
-}
-
-pattern cloudflare_client_constructor_with_user_service_key() {
-  `cloudflare.NewWithUserServiceKey($user_service_key)` as $init => `cloudflare.NewClient(
-    option.WithUserServiceKey($user_service_key)
-  )` where {
+pattern cloudflare_client_constructor() {
+  or {
+    `cloudflare.New($api_key, $api_email)` => `cloudflare.NewClient(
+      option.WithAPIKey($api_key),
+      option.WithAPIEmail($api_email)
+    )`,
+    `cloudflare.NewWithAPIToken($api_token)` => `cloudflare.NewClient(
+      option.WithAPIToken($api_token)
+    )`,
+    `cloudflare.NewWithUserServiceKey($user_service_key)` => `cloudflare.NewClient(
+      option.WithUserServiceKey($user_service_key)
+    )`
+  } as $init where {
     $init <: maybe within `$api, $err := $init` => `$api := $init`
   }
 }
@@ -650,9 +642,7 @@ pattern cloudflare_client_constructor_with_user_service_key() {
 // The main pattern body
 file($body) where {
   $body <: contains or {
-    cloudflare_client_constructor_with_api_key_and_email(),
-    cloudflare_client_constructor_with_api_token(),
-    cloudflare_client_constructor_with_user_service_key(),
+    cloudflare_client_constructor(),
     cloudflare_method_renaming()
   }
 }
