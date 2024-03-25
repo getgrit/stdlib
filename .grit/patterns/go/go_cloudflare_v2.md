@@ -622,7 +622,7 @@ pattern cloudflare_method_renaming() {
   }
 }
 
-pattern cloudflare_client_constructor() {
+pattern cloudflare_client_constructor_with_api_key_and_email() {
   `cloudflare.New($api_key, $api_email)` as $init => `cloudflare.NewClient(
     option.WithAPIKey($api_key),
     option.WithAPIEmail($api_email)
@@ -631,17 +631,34 @@ pattern cloudflare_client_constructor() {
   }
 }
 
-// The main pattern body
-file($body) where {
-  $body <: contains or {
-    cloudflare_client_constructor(),
-    cloudflare_method_renaming(),
+pattern cloudflare_client_constructor_with_api_token() {
+  `cloudflare.NewWithAPIToken($api_token)` as $init => `cloudflare.NewClient(
+    option.WithAPIToken($api_token)
+  )` where {
+    $init <: maybe within `$api, $err := $init` => `$api := $init`
   }
 }
 
+pattern cloudflare_client_constructor_with_user_service_key() {
+  `cloudflare.NewWithUserServiceKey($user_service_key)` as $init => `cloudflare.NewClient(
+    option.WithUserServiceKey($user_service_key)
+  )` where {
+    $init <: maybe within `$api, $err := $init` => `$api := $init`
+  }
+}
+
+// The main pattern body
+file($body) where {
+  $body <: contains or {
+    cloudflare_client_constructor_with_api_key_and_email(),
+    cloudflare_client_constructor_with_api_token(),
+    cloudflare_client_constructor_with_user_service_key(),
+    cloudflare_method_renaming()
+  }
+}
 ```
 
-## Client construction
+## Client construction with API key and email
 
 Old:
 
@@ -662,6 +679,54 @@ func main() {
   api := cloudflare.NewClient(
     option.WithAPIKey(os.Getenv("CLOUDFLARE_API_KEY")),
     option.WithAPIEmail(os.Getenv("CLOUDFLARE_API_EMAIL"))
+  )
+}
+```
+
+## Client construction with API token
+
+Old:
+
+```go
+package main
+
+func main() {
+  api, err := cloudflare.NewWithAPIToken(os.Getenv("CLOUDFLARE_API_TOKEN"))
+}
+```
+
+New:
+
+```go
+package main
+
+func main() {
+  api := cloudflare.NewClient(
+    option.WithAPIToken(os.Getenv("CLOUDFLARE_API_TOKEN"))
+  )
+}
+```
+
+## Client construction with user service key
+
+Old:
+
+```go
+package main
+
+func main() {
+  api, err := cloudflare.NewWithUserServiceKey(os.Getenv("CLOUDFLARE_USER_SERVICE_KEY"))
+}
+```
+
+New:
+
+```go
+package main
+
+func main() {
+  api := cloudflare.NewClient(
+    option.WithUserServiceKey(os.Getenv("CLOUDFLARE_USER_SERVICE_KEY"))
   )
 }
 ```
