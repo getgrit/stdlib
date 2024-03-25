@@ -8,7 +8,7 @@ Update redundant incorrect comparison `($x == true)` to achieve clearer code log
 ```grit
 language java
 
-`if($var = true) { $body }` => `if($var == true) { $body }`, 
+`if($var = true) { $body }` => `if($var == true) { $body }`
 ```
 
 ## $x = true
