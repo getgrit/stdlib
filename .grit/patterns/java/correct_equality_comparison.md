@@ -8,9 +8,7 @@ Simplify redundant self-comparison `($var == $var)` to achieve clearer code logi
 ```grit
 language java
 
-or {
-    `if($var == $var) { $body }` => `$body`
-}
+`if($var == $var) { $body }` => `$body`
 ```
 
 ## $x == #x
