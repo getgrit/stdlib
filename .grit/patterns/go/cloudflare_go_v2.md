@@ -623,10 +623,14 @@ pattern cloudflare_method_renaming() {
 }
 
 pattern cloudflare_client_constructor() {
-  `cloudflare.New($api_key, $api_email)` as $init => `cloudflare.NewClient(
-    option.WithAPIKey($api_key),
-    option.WithAPIEmail($api_email)
-  )` where {
+  or {
+    `cloudflare.New($api_key, $api_email)` => `cloudflare.NewClient(
+      option.WithAPIKey($api_key),
+      option.WithAPIEmail($api_email),
+    )`,
+    `cloudflare.NewWithAPIToken($api_token)` => `cloudflare.NewClient(option.WithAPIToken($api_token))`,
+    `cloudflare.NewWithUserServiceKey($user_service_key)` => `cloudflare.NewClient(option.WithUserServiceKey($user_service_key))`
+  } as $init where {
     $init <: maybe within `$api, $err := $init` => `$api := $init`
   }
 }
@@ -635,13 +639,12 @@ pattern cloudflare_client_constructor() {
 file($body) where {
   $body <: contains or {
     cloudflare_client_constructor(),
-    cloudflare_method_renaming(),
+    cloudflare_method_renaming()
   }
 }
-
 ```
 
-## Client construction
+## Client construction with API key and email
 
 Old:
 
@@ -661,8 +664,52 @@ package main
 func main() {
   api := cloudflare.NewClient(
     option.WithAPIKey(os.Getenv("CLOUDFLARE_API_KEY")),
-    option.WithAPIEmail(os.Getenv("CLOUDFLARE_API_EMAIL"))
+    option.WithAPIEmail(os.Getenv("CLOUDFLARE_API_EMAIL")),
   )
+}
+```
+
+## Client construction with API token
+
+Old:
+
+```go
+package main
+
+func main() {
+  api, err := cloudflare.NewWithAPIToken(os.Getenv("CLOUDFLARE_API_TOKEN"))
+}
+```
+
+New:
+
+```go
+package main
+
+func main() {
+  api := cloudflare.NewClient(option.WithAPIToken(os.Getenv("CLOUDFLARE_API_TOKEN")))
+}
+```
+
+## Client construction with user service key
+
+Old:
+
+```go
+package main
+
+func main() {
+  api, err := cloudflare.NewWithUserServiceKey(os.Getenv("CLOUDFLARE_USER_SERVICE_KEY"))
+}
+```
+
+New:
+
+```go
+package main
+
+func main() {
+  api := cloudflare.NewClient(option.WithUserServiceKey(os.Getenv("CLOUDFLARE_USER_SERVICE_KEY")))
 }
 ```
 
