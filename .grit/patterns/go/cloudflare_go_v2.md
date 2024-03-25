@@ -687,9 +687,7 @@ New:
 package main
 
 func main() {
-  api := cloudflare.NewClient(
-    option.WithAPIToken(os.Getenv("CLOUDFLARE_API_TOKEN"))
-  )
+  api := cloudflare.NewClient(option.WithAPIToken(os.Getenv("CLOUDFLARE_API_TOKEN")))
 }
 ```
 
@@ -711,9 +709,7 @@ New:
 package main
 
 func main() {
-  api := cloudflare.NewClient(
-    option.WithUserServiceKey(os.Getenv("CLOUDFLARE_USER_SERVICE_KEY"))
-  )
+  api := cloudflare.NewClient(option.WithUserServiceKey(os.Getenv("CLOUDFLARE_USER_SERVICE_KEY")))
 }
 ```
 
