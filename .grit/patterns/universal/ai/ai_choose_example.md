@@ -19,6 +19,8 @@ $func`
 
 ```
 
+# WIP - not working yet
+
 ## Solve a basic case
 
 ```js
@@ -26,7 +28,7 @@ function (x) { return x + 1; }
 ```
 
 ```ts
-// This function: Adder
+// This function: Ad
 function (x) { return x + 1; }
 ```
 
@@ -37,7 +39,7 @@ function (x) { return x / 2; }
 ```
 
 ```ts
-// This function: Divider
+// This function: Div
 function (x) { return x / 2; }
 ```
 
@@ -48,6 +50,6 @@ function (x) { return x + ""; }
 ```
 
 ```ts
-// This function: Adder
+// This function: Ad
 function (x) { return x + ""; }
 ```
