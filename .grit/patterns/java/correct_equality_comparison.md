@@ -1,5 +1,5 @@
 ---
-title: Correct equality Comparison
+title: Correct equality `==` Comparison
 tags: [good-practice]
 ---
 
