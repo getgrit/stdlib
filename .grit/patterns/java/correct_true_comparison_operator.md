@@ -3,12 +3,15 @@ title: Correct comparison operator `$x = true`
 tags: [good-practice]
 ---
 
-Update redundant incorrect comparison `($x == true)` to achieve clearer code logic and avoid unnecessary repetition.
+Assignment inside a condition is usually accidental, this is likely meant to be a comparison.
 
 ```grit
 language java
 
-`if($var = true) { $body }` => `if($var == true) { $body }`
+`$var = true` => `$var == true` where {
+	  $var <: within `if ($cond) { $body }`,
+	  $var <: within $cond,
+	}
 ```
 
 ## $x = true
@@ -28,7 +31,9 @@ class Bar {
 class Bar {
     void main() {
         boolean myBoolean;
-        if(myBoolean == true) { continue; }
+        if (myBoolean == true) {
+            continue;
+        }
     }
 }
 ```
