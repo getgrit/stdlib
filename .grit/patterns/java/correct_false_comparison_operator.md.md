@@ -3,7 +3,7 @@ title: Correct comparison operator `$x = false`
 tags: [good-practice]
 ---
 
-Assignment inside a condition is usually accidental, this is likely meant to be a comparison.
+Assignment inside a condition like this `$x = false` is usually accidental, this is likely meant to be a comparison `$x == false`.
 
 ```grit
 language java
