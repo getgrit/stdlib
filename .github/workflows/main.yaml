@@ -4,8 +4,7 @@ env:
   GRIT_TELEMETRY_DISABLED: 'true'
 
 on:
-  push:
-    branches: [main]
+  push: {}
   pull_request:
     branches: [main]
 
