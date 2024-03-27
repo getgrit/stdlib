@@ -13,7 +13,7 @@ pattern used_alias($alias, $refs, $kept_refs) {
           `<$call $...>$...</$call>`,
           `<$call $.../>`
         } where {
-            $call <: nested_identifier(base=$alias, terminal=$name),
+            $call <: nested_identifier(object=$alias, property=$name),
         }
     } where {
       if ($program <: contains identifier() as $i where {$i <: $name, $i <: not within $call }) {
