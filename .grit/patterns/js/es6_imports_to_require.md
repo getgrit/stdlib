@@ -7,7 +7,6 @@ tags: [js, es6, cjs, commonjs]
 
 Converts ES6-style `import` to `require` statements.
 
-
 ```grit
 engine marzano(0.1)
 language js
@@ -16,14 +15,13 @@ or {
     `import { $import } from "$source"` where {
         $newports = [],
         $import <: some bubble($newports) {
-            import_specifier(name = or { 
-                identifier() as $name where {
-                    $newports += `$name`
+            import_specifier($name, $alias) where or {
+                and {
+                    $alias <: false,
+                    $newports += `$name`,
                 },
-                aliased_name($alias, $name) where {
-                    $newports += `$name: $alias` 
-                }
-            })
+                $newports += `$name: $alias`,
+            }
         },
         $transformed = join(list = $newports, separator = ", "),
     } => `const { $transformed } = require("$source")`,
