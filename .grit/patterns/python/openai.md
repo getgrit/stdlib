@@ -164,7 +164,7 @@ pattern unittest_patch() {
                     and {
                         $res <: deprecated_resource_cls(),
                         $line = $stmt,
-                        if ($body <: contains or { `with $stmt:`, `with $stmt as $_:` } as $l) {
+                        if ($body <: contains or { `with $stmt: $_`, `with $stmt as $_: $_` } as $l) {
                             $line = $l,
                         },
                         $line => todo(message=`The resource '$res' has been deprecated`, target=$line),
