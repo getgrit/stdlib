@@ -14,7 +14,7 @@ language python
 
 or {
     `$file = open($url, $mode)`,
-    `with open($url, $mode) as $filePath:`
+    `with open($url, $mode) as $filePath: $body`
 } as $readPath  where {
     $url <: contains r"(^\/tmp.*)"($badString)
 } => `# BAD: hardcoded tmp path \n$readPath`
