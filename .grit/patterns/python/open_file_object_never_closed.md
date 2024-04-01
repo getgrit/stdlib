@@ -12,7 +12,7 @@ We should close the file object opened without corresponding close.
 engine marzano(0.1)
 language python
 
-`def $func():` as $function where {
+`def $func(): $_` as $function where {
     and {
         $function <: contains or {
                 `$f = open($parms)`,
