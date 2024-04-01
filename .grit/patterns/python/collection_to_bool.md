@@ -9,9 +9,9 @@ engine marzano(0.1)
 language python
 
 or {
-    `if $cond:`,
+    `if $cond: $_`,
     elif_clause(condition=$cond),
-    `while $cond:`,
+    `while $cond: $_`,
 } where $cond <: or {
     `[$elms]` as $arr where {
         $elms <: or {
