@@ -22,7 +22,7 @@ private pattern moment_arith_lhs_identifier($date, $method, $count, $specifier) 
 
 // Any call expression that returns a moment.js date or duration object.
 private pattern exp_returns_moment($exp) {
-  `$fn()` as $exp where {
+  `$fn($_)` as $exp where {
     $fn <: or {
       `moment`,
       `$_.duration`,
