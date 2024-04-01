@@ -15,9 +15,9 @@ or {
   `import pdb` where $db = `pdb`
 } where {
     $program <: maybe contains or {
-        `$db.set_trace()` => .,
-        `$db.Pdb.set_trace()` => .,
-        `$pdb.Pdb.set_trace()` => .,
+        `$db.set_trace($_)` => .,
+        `$db.Pdb.set_trace($_)` => .,
+        `$pdb.Pdb.set_trace($_)` => .,
     }
 }
 ```
