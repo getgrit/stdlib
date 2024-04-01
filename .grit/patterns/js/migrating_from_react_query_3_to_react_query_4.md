@@ -20,10 +20,8 @@ or {
     `"react-query/persistQueryClient-experimental"` => `"@tanstack/react-query-persist-client"`,
     `"react-query/createWebStoragePersistor-experimental"` => `"@tanstack/query-sync-storage-persister"`,
     `"react-query/createAsyncStoragePersistor-experimental"` => `"@tanstack/query-async-storage-persister"`,
-    `setLogger($customLogger)` => ``,
-    `` as $queryClient where {
-        $queryClient <: contains `setLogger($customLogger)`,
-        $queryClient <: contains `new QueryClient()` => `new QueryClient({logger: $customLogger});`
+    `setLogger($customLogger)` => `` where {
+        $program <: contains `new QueryClient()` => `new QueryClient({logger: $customLogger});`
     },
     `"react-query/hydration"` => `"@tanstack/react-query"`,
     `"react-query/react"` => `"@tanstack/react-query/reactjs"`,
