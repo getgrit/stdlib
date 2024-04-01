@@ -15,7 +15,7 @@ language python
 `def $name(): $body` as $func where {
     $func <: contains or {
         `$f = $tempfile.NamedTemporaryFile($params)`,
-        `with $tempfile.NamedTemporaryFile($params) as $f:`
+        `with $tempfile.NamedTemporaryFile($params) as $f: $_`
     },
     $func <: not contains `$f.flush()`,
     $func <: not contains `$f.close()`,
