@@ -3,6 +3,15 @@
 In Cargo.toml files, switch from `name = version` to `name = { version = version }` to make it easier to read and maintain dependencies.
 
 ```grit
+language toml
+
+`[dependencies]
+$deps` where {
+  $deps <: some bubble `$name = $version` where {
+    $version <: string(),
+    $version => `{ version = $version }`
+  }
+}
 ```
 
 ## Basic example
@@ -17,7 +26,7 @@ name = "my-package"
 rand = "0.6"
 serde = { version = "1.0" }
 openssl = { version = "0.10" }
-other_old = "0.1.3"
+other_pkg = "0.1.3"
 ```
 
 New syntax, with all dependencies using the same format:
@@ -30,7 +39,7 @@ name = "my-package"
 rand = { version = "0.6" }
 serde = { version = "1.0" }
 openssl = { version = "0.10" }
-other_new = { version = "0.1.3" }
+other_pkg = { version = "0.1.3" }
 ```
 
 ## Ignore non-Cargo.toml files
