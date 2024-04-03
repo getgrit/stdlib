@@ -7,9 +7,10 @@ language toml
 
 `[dependencies]
 $deps` where {
+  $filename <: or { includes "Cargo.toml", includes "cargo.toml" },
   $deps <: some bubble `$name = $version` where {
     $version <: string(),
-    $version => `{ version = $version }`
+    $version => `{ version = $version }`,
   }
 }
 ```
