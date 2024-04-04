@@ -57,6 +57,17 @@ jobs:
       - name: Run doctor
         run: grit doctor
 
+      # grit check excludes all files under .grit, so we manually run this instead of using a check workflow
+      - name: Validate markdown names
+        run: |
+          cd .grit/patterns
+          output=$(grit apply grit_snake_case 2>&1)
+          echo "OUTPUT is:"
+          echo "$output"
+          if echo "$output" | grep -q 'found 0 matches'; then
+            echo "all file names valid"; else exit 1
+          fi
+
       - name: Remove grit modules
         run: rm -rf .grit/.gritmodules
 
