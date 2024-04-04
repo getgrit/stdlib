@@ -17,7 +17,7 @@ GritQL pattern is often by starting with before and after sample(s) of the code 
 iterate in the [GritQL studio](https://app.grit.io/studio) to develop your pattern.
 
 Once you have a pattern, you can add it to the repository by creating a new `.md` file in the `.grit/patterns`
-directory. The file name should be the snake-cased name of the pattern. Keep the file name short and
+directory. The file name must be the snake-cased name of the pattern. Kebab case/dashes in `.md` files are not allowed by the GritQL parser. Keep the file name short and
 descriptive, and add a concise description as well as any relevant tags. All PRs must contain at least
 one sample of before/after code with a descriptive name.
 
