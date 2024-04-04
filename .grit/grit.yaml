@@ -1,6 +1,6 @@
 version: 0.0.1
 patterns:
-  - name: grit_pattern_name
+  - name: grit_snake_case
     level: error
     description: Markdown files committed to stdlib's patterns directory must have names conforming to GritQL's pattern name convention.
     body: |
