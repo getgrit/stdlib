@@ -6,6 +6,7 @@ tags: [fix, correctness, jwt, security]
 Detected use of the `'none'` algorithm in a JWT token. The `'none'` algorithm assumes the integrity of the token has already been verified. This would allow a malicious actor to forge a `JWT` token that will automatically be verified. Do not explicitly use the `'none'` algorithm. Instead, use an algorithm such as `'HS256'`.
 
 ## references
+
 - [Cryptographic Failures](https://owasp.org/Top10/A02_2021-Cryptographic_Failures)
 
 ```grit
@@ -40,7 +41,6 @@ def bad1():
     return encoded
 ```
 
-
 ## `algorithm=['none']`
 
 ```python
@@ -59,16 +59,7 @@ def bad2(encoded):
     return encoded
 ```
 
-
 ## `algorithm='HS256'`
-
-```python
-import jwt
-
-def ok(secret_key):
-    encoded = jwt.encode({'some': 'payload'}, secret_key, algorithm='HS256')
-    return encoded
-```
 
 ```python
 import jwt
@@ -97,14 +88,6 @@ def bad2(encoded):
 ```
 
 ## `algorithms=["HS256"]`
-
-```python
-import jwt
-
-def bad2(encoded):
-    jwt.decode(encoded, None, algorithms=["HS256"])
-    return encoded
-```
 
 ```python
 import jwt
