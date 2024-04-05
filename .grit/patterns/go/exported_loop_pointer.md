@@ -71,7 +71,7 @@ func() {
 
 ```
 
-## loop iterations with with pointers and values assigned to new varible
+## loop iterations with pointers and values assigned to new variable
 
 ```go
 func() {
@@ -87,32 +87,7 @@ func() {
 
 ```
 
-```go
-func() {
-    values := []string{"a", "b", "c"}
-    var funcs []func()
-    for _, val := range values {
-        val := val // pin!
-        funcs = append(funcs, func() {
-            fmt.Println(&val)
-        })
-    }
-}
-
-```
-
-## loop iterations with without pointers
-
-```go
-func (){
-	input := []string{"a", "b", "c"}
-	output := []string{}
-	for _, val := range input {
-		output = append(output, val)
-	}
-}
-
-```
+## loop iterations without pointers
 
 ```go
 func (){

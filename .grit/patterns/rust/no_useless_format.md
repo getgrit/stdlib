@@ -5,7 +5,6 @@ tags: [clippy]
 
 Checks for the use of `format!("string literal with no argument")` and `format!("{}", foo)` where foo is a string.
 
-
 ```grit
 language rust
 
@@ -40,11 +39,6 @@ let hi = greeting.to_string();
 ```
 
 ## Does not replace necessary formats
-
-```rust
-let hi = format!("hello {}", "world");
-let another = format!("{:?}", strawberry);
-```
 
 ```rust
 let hi = format!("hello {}", "world");

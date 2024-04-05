@@ -73,23 +73,6 @@ def create_new_tournament_safe(request):
         return render(request, 'create_tournament.html', context)
 ```
 
-```python
-from django.shortcuts import render, redirect
-from .models import *
-from .forms import *
-
-def create_new_tournament_safe(request):
-    if request.method == 'POST':
-        form = CreateTournamentForm(request.POST)
-        if form.is_valid():
-            t = Tournament(name=form.cleaned_data['name'])
-            t.save()
-            return redirect('index')
-    else:
-        context = { 'form': CreateTournamentForm()}
-        return render(request, 'create_tournament.html', context)
-```
-
 ## with `request.POST.get`
 
 ```python

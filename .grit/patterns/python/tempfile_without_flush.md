@@ -7,7 +7,6 @@ Be cautious when using `$F.name` without preceding it with `.flush()` or `.close
 
 - [reference](https://docs.python.org/3/library/tempfile.html#tempfile.mkdtemp)
 
-
 ```grit
 engine marzano(0.1)
 language python
@@ -23,7 +22,6 @@ language python
     $func <: contains `$f.write($parms)` => `$f.write($parms) \n$f.close()`
 }
 ```
-
 
 ## Warning for tempfile without .flush() or .close()
 
@@ -62,7 +60,7 @@ def main_e():
 def main_c():
     with tempfile.NamedTemporaryFile("w") as fout:
       debug_print(astr)
-      fout.write(astr) 
+      fout.write(astr)
       fout.close()
       debug_print('wrote file')
       # tempfile-without-flush
@@ -72,7 +70,7 @@ def main_c():
 def main_d():
     fout = tempfile.NamedTemporaryFile('w')
     debug_print(astr)
-    fout.write(astr) 
+    fout.write(astr)
     fout.close()
 
     # tempfile-without-flush
@@ -83,7 +81,7 @@ def main_d():
 def main_e():
     fout = tempfile.NamedTemporaryFile('w')
     debug_print(astr)
-    fout.write(astr) 
+    fout.write(astr)
     fout.close()
 
     print(fout.name)
@@ -93,40 +91,6 @@ def main_e():
 ```
 
 ## Warning for tempfile with .flush() or .close()
-
-```python
-import tempfile
-
-import at
-import tf
-
-
-def main():
-    with tempfile.NamedTemporaryFile("w") as fout:
-        debug_print(astr)
-        fout.write(astr)
-        # tempfile-with-flush
-        fout.flush()
-        cmd = [binary_name, fout.name, *[str(path) for path in targets]]
-
-
-def main_b():
-    with tempfile.NamedTemporaryFile("w") as fout:
-        debug_print(astr)
-        fout.write(astr)
-        # tempfile-with-flush
-        fout.close()
-        cmd = [binary_name, fout.name, *[str(path) for path in targets]]
-
-
-def main_f():
-    fout = tempfile.NamedTemporaryFile('w', delete=False)
-    debug_print(astr)
-    fout.close()
-
-    # tempfile-with-flush
-    print(fout.name)
-```
 
 ```python
 import tempfile

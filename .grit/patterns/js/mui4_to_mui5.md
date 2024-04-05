@@ -24,7 +24,6 @@ This migration handles some of the cases not covered in the [official codemod](h
 
 - Restructures component definition
 
-
 ```grit
 engine marzano(0.1)
 language js
@@ -131,10 +130,6 @@ const theme = createTheme({ palette: { mode: 'light' } });
 const theme = createTheme({ palette: {} });
 ```
 
-```ts
-const theme = createTheme({ palette: {} });
-```
-
 ## Test when palette object has multiple properties
 
 ```js
@@ -207,10 +202,6 @@ import { ThemeProvider, styles } from '@mui/material/styles';
 import {} from '@mui/material/styles';
 ```
 
-```ts
-import {} from '@mui/material/styles';
-```
-
 ## Test when palette info color is `cyan[300]`
 
 ```js
@@ -275,25 +266,9 @@ object = {
 };
 ```
 
-```ts
-object = {
-  style: {
-    main: cyan[0],
-  },
-};
-```
-
 ## Test when palette info color is `cyan[710]`
 
 ```js
-object = {
-  style: {
-    main: cyan[710],
-  },
-};
-```
-
-```ts
 object = {
   style: {
     main: cyan[710],
@@ -311,25 +286,9 @@ object = {
 }
 ```
 
-```ts
-object = {
-  style: {
-    main: cyan[],
-  }
-}
-```
-
 ## Test when palette info color is not in a style object
 
 ```js
-object = {
-  config: {
-    main: cyan[300],
-  },
-};
-```
-
-```ts
 object = {
   config: {
     main: cyan[300],
@@ -401,14 +360,6 @@ object = {
 };
 ```
 
-```ts
-object = {
-  style: {
-    main: green[0],
-  },
-};
-```
-
 ## Test when palette success color is `green[710]`
 
 ```js
@@ -419,25 +370,9 @@ object = {
 };
 ```
 
-```ts
-object = {
-  style: {
-    main: green[710],
-  },
-};
-```
-
 ## Test when palette success color is not in a style object
 
 ```js
-object = {
-  config: {
-    main: green[300],
-  },
-};
-```
-
-```ts
 object = {
   config: {
     main: green[300],
@@ -509,25 +444,9 @@ object = {
 };
 ```
 
-```ts
-object = {
-  style: {
-    main: orange[0],
-  },
-};
-```
-
 ## Test when palette warning color is `orange[710]`
 
 ```js
-object = {
-  style: {
-    main: orange[710],
-  },
-};
-```
-
-```ts
 object = {
   style: {
     main: orange[710],
@@ -545,23 +464,9 @@ object = {
 };
 ```
 
-```ts
-object = {
-  config: {
-    main: orange[300],
-  },
-};
-```
-
 ## Test component definition when createTheme props is empty
 
 ```js
-const theme = createTheme({
-  props: {},
-});
-```
-
-```ts
 const theme = createTheme({
   props: {},
 });

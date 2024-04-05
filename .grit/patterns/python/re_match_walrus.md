@@ -144,15 +144,3 @@ match = regex.fullmatch("hello")
 if match:
     pass
 ```
-
-```python
-# re.sub is not transformed
-sub = re.sub("hello", "bye")
-if sub:
-    pass
-
-# regex.fullmatch is not transformed
-match = regex.fullmatch("hello")
-if match:
-    pass
-```

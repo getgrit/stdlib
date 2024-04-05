@@ -5,12 +5,11 @@ tags: [fix]
 
 Find uncaught HTTP requests and wrap it with try {} catch{ }
 
-
 ```grit
 engine marzano(0.1)
 language js
 
-or { 
+or {
     `await request($body)` as $httpRequest => `try { $httpRequest } catch() {}` where {
         !$httpRequest <: within `try { $_ } catch($catch) { $_ }`,
     },
@@ -23,40 +22,22 @@ or {
 ## Request without try catch block
 
 ```javascript
-await request("/bar")
+await request('/bar');
 ```
 
 ```javascript
-try { await request("/bar") } catch() {}
+try { await request('/bar') } catch() {}
 ```
 
 ## Request with try catch block
 
 ```javascript
 try {
-  await request("/foo");
-} catch { }
-```
-
-```javascript
-try {
-  await request("/foo");
-} catch { }
+  await request('/foo');
+} catch {}
 ```
 
 ## Request with async function
-
-```javascript
-async function doRequest() {
-  return request("/bar");
-}
-
-export function main() {
-  try {
-    await doRequest();
-  } catch { }
-}
-```
 
 ```javascript
 async function doRequest() {
@@ -74,13 +55,16 @@ export function main() {
 
 ```javascript
 function doRequest() {
-  return request("/bar");
+  return request('/bar');
 }
 ```
 
 ```javascript
 function doRequest() {
-  try { return request("/bar"); } catch(err) { return err}
+  try {
+    return request('/bar');
+  } catch (err) {
+    return err;
+  }
 }
 ```
-

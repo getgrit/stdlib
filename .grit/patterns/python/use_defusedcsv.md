@@ -11,7 +11,6 @@ If you're generating a CSV file using the built-in `csv` module and incorporatin
 - [CSV_Injection](https://owasp.org/www-community/attacks/CSV_Injection)
 - [comma-separated-vulnerabilities](https://web.archive.org/web/20220516052229/https://www.contextis.com/us/blog/comma-separated-vulnerabilities)
 
-
 ```grit
 engine marzano(0.1)
 language python
@@ -44,14 +43,6 @@ with open("file", 'w') as fout:
 ```
 
 ## with use-defusedcsv
-
-```python
-# use-defusedcsv
-import defusedcsv as csv
-
-with open("file", 'w') as fout:
-    writer = csv.writer(fout)
-```
 
 ```python
 # use-defusedcsv

@@ -79,10 +79,3 @@ def dumps():
 def test_empty_dumps():
     dumps()
 ```
-
-```python
-def dumps():
-  pass
-def test_empty_dumps():
-    dumps()
-```

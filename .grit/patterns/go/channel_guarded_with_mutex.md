@@ -9,7 +9,6 @@ Detected a channel guarded with a `mutex`. Channels already have an internal `mu
 
 - [go-antipatterns](https://hackmysql.com/golang/go-antipatterns/#guarded-channel)
 
-
 ```grit
 language go
 
@@ -99,45 +98,6 @@ func main() {
 ```
 
 ## Without Channel guarded with mutex
-
-```go
-package main
-
-import (
-	"fmt"
-	"sync"
-)
-
-func main() {
-	var wg sync.WaitGroup
-	var mu sync.Mutex
-	data := make([]int, 0)
-
-	// Producer
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		for i := 0; i < 5; i++ {
-			mu.Lock()
-			data = append(data, i)
-			mu.Unlock()
-		}
-	}()
-
-	// Consumer
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		mu.Lock()
-		for _, num := range data {
-			fmt.Println(num)
-		}
-		mu.Unlock()
-	}()
-
-	wg.Wait()
-}
-```
 
 ```go
 package main
