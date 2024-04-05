@@ -26,7 +26,7 @@ await request('/bar');
 ```
 
 ```javascript
-try { await request("/bar") } catch() {}
+try { await request('/bar') } catch() {}
 ```
 
 ## Request with try catch block
