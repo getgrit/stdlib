@@ -9,14 +9,15 @@ tags: [fix, correctness]
 
 - [looppointer](https://github.com/kyoh86/looppointer)
 
+
 ```grit
 language go
 
 `for _, $val := range $values { $body }` where {
     $body <: not contains `$val := $val`,
     $body <: contains `&$val`
-} => `for _, $val := range $values {
-        $val := $val \n $body
+} => `for _, $val := range $values { 
+        $val := $val \n $body 
     }`
 ```
 
@@ -33,9 +34,9 @@ func() {
 
 ```go
 func() {
-    for _, val := range values {
-        val := val
- print_pointer(&val)
+    for _, val := range values { 
+        val := val 
+ print_pointer(&val) 
     }
 }
 
@@ -60,11 +61,11 @@ func() {
 func() {
     values := []string{"a", "b", "c"}
     var funcs []func()
-    for _, val := range values {
-        val := val
+    for _, val := range values { 
+        val := val 
  funcs = append(funcs, func() {
             fmt.Println(&val)
-        })
+        }) 
     }
 }
 
