@@ -44,9 +44,47 @@ contract DerivedA is Base {
     }
 }
 ```
+```sol
+pragma solidity >=0.5.0;
+pragma experimental ABIEncoderV2;
+
+import "./base.sol";
+
+contract DerivedA is Base {
+    // i is not used in the current contract
+    A i = A(1);
+
+    int internal j = 500;
+
+    function assign3(A memory x) public returns (uint) {
+        return g[1] + x.a + uint(j);
+    }
+}
+```
 
 ## Local Variable
 
+```sol
+pragma solidity ^0.5.0;
+
+contract UnusedVariables {
+    int a = 1;
+
+    // x is not accessed
+    function neverAccessed(int test) public pure returns (int) {
+        int z = 10;
+
+        if (test > z) {
+            // x is not used
+            int x = test - z;
+
+            return test - z;
+        }
+
+        return z;
+    }
+}
+```
 ```sol
 pragma solidity ^0.5.0;
 

@@ -11,7 +11,6 @@ Identified the utilization of an insecure `MD4` or `MD5` hash function, both of 
 - [stackexchange](https://crypto.stackexchange.com/questions/44151/how-does-the-flame-malware-take-advantage-of-md5-collision)
 - [sha3_256](https://pycryptodome.readthedocs.io/en/latest/src/hash/sha3_256.html)
 
-
 ```grit
 engine marzano(0.1)
 language python
@@ -59,12 +58,6 @@ hashlib.new(string='test', name='sha256')
 ```
 
 ### GOOD: secure-hash-function
-
-```python
-hashlib.new('sha256')
-
-hashlib.new('SHA512')
-```
 
 ```python
 hashlib.new('sha256')

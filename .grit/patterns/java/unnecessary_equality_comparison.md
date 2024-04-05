@@ -46,15 +46,3 @@ class Bar {
     }
 }
 ```
-
-```java
-class Bar {
-    void main() {
-        boolean myBoolean;
-        boolean myBoolean2;
-        if(myBoolean == myBoolea2){
-            continue;
-        }
-    }
-}
-```

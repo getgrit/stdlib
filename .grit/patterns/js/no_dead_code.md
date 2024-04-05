@@ -5,7 +5,6 @@ tags: [good, SE]
 
 Remove unreachable code found after `return` / `throw` / `continue` or `break` statements.
 
-
 ```grit
 engine marzano(0.1)
 language js
@@ -60,6 +59,15 @@ function f() {
 ## Don't exit a scope
 
 ```javascript
+function f() {
+  if (a) {
+    return 3;
+  }
+  1 + 1;
+}
+```
+
+```typescript
 function f() {
   if (a) {
     return 3;

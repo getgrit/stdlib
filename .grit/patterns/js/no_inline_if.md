@@ -42,21 +42,9 @@ if (condition) {
 }
 ```
 
-```js
-if (condition) {
-  doSomething();
-} else {
-  doSomethingElse();
-}
-```
-
 ## If by itself
 
 This pattern only targets `if` statements that are followed by an `else` statement. If the `if` statement is by itself, it is not affected.
-
-```javascript
-if (condition) doSomething();
-```
 
 ```javascript
 if (condition) doSomething();

@@ -130,6 +130,12 @@ import { orderBy } from 'lodash';
 orderBy([1, 2, 3]);
 ```
 
+```js
+import { orderBy } from 'lodash';
+
+orderBy([1, 2, 3]);
+```
+
 ## Inserts imports when none exist
 
 ```typescript

@@ -64,7 +64,3 @@ let mut hasher = Sha256::new();
 ```rust
 let mut hasher = Sha256::new();
 ```
-
-```rust
-let mut hasher = Sha256::new();
-```

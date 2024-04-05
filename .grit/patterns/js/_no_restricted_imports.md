@@ -2,7 +2,7 @@
 
 This pattern provides the equivalent of the `no-restricted-imports` [rule in ESLint](https://eslint.org/docs/latest/rules/no-restricted-imports).
 
-You *must* provide a pattern that will match the imports you want to restrict.
+You _must_ provide a pattern that will match the imports you want to restrict.
 
 ```grit
 language js
@@ -11,14 +11,21 @@ language js
 no_restricted_imports($modules=or {"lodash", r"@shared/internal/(.*)"($_)})
 ```
 
-
 ## Lodash example
 
 ```js
 import { get } from 'lodash';
 ```
 
+```js
+import { get } from 'lodash';
+```
+
 ## Internal example
+
+```js
+import { get } from '@shared/internal/whatever';
+```
 
 ```js
 import { get } from '@shared/internal/whatever';

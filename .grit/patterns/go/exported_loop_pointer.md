@@ -9,15 +9,14 @@ tags: [fix, correctness]
 
 - [looppointer](https://github.com/kyoh86/looppointer)
 
-
 ```grit
 language go
 
 `for _, $val := range $values { $body }` where {
     $body <: not contains `$val := $val`,
     $body <: contains `&$val`
-} => `for _, $val := range $values { 
-        $val := $val \n $body 
+} => `for _, $val := range $values {
+        $val := $val \n $body
     }`
 ```
 
@@ -34,9 +33,9 @@ func() {
 
 ```go
 func() {
-    for _, val := range values { 
-        val := val 
- print_pointer(&val) 
+    for _, val := range values {
+        val := val
+ print_pointer(&val)
     }
 }
 
@@ -61,17 +60,17 @@ func() {
 func() {
     values := []string{"a", "b", "c"}
     var funcs []func()
-    for _, val := range values { 
-        val := val 
+    for _, val := range values {
+        val := val
  funcs = append(funcs, func() {
             fmt.Println(&val)
-        }) 
+        })
     }
 }
 
 ```
 
-## loop iterations with with pointers and values assigned to new varible
+## loop iterations with pointers and values assigned to new variable
 
 ```go
 func() {
@@ -87,32 +86,7 @@ func() {
 
 ```
 
-```go
-func() {
-    values := []string{"a", "b", "c"}
-    var funcs []func()
-    for _, val := range values {
-        val := val // pin!
-        funcs = append(funcs, func() {
-            fmt.Println(&val)
-        })
-    }
-}
-
-```
-
-## loop iterations with without pointers
-
-```go
-func (){
-	input := []string{"a", "b", "c"}
-	output := []string{}
-	for _, val := range input {
-		output = append(output, val)
-	}
-}
-
-```
+## loop iterations without pointers
 
 ```go
 func (){
