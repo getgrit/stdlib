@@ -69,7 +69,7 @@ pattern function_returning_DAG(
       $ref <: and { !within assignment(left=$dag_varname), $dag_varname, !within keyword_argument() },
       $dag_var_refs += $ref
     },
-    // if there is no reference outside of a kwarg, remove the declaration 
+    // if there is no reference outside of a kwarg, remove the declaration
     if ($dag_var_refs <: .) {
       $dag_decl => .
     }
@@ -108,7 +108,7 @@ pattern replace_task_refs() {
       },
       $decl => .
     }
-  }  
+  }
 }
 
 
@@ -134,10 +134,10 @@ pattern is_task_ref() {
             `SmoothOperator`,
             `BranchDayOfWeekOperator`
           },
-          $ref <: $taskname 
+          $ref <: $taskname
         }
       }
-      
+
     }
   }
 }
@@ -153,7 +153,7 @@ pattern rewrite_chaining() {
     if ($op <: "<<") {
       $out = `chain($b, $a)`
     }
-  } => `$out`  
+  } => `$out`
 }
 
 
@@ -187,25 +187,19 @@ def do_my_thing() -> DAG:
 ```python
 @dag(description="My cool DAG")
 def do_my_thing():
-    
+
     @task(task_id='do_db_thing', provide_context=True)
     def do_thing(**context: T.Any) -> bool:
         return not aws_rds.db_exists(region=get_variable(EnvVarKeys.TARGET))
     @task()
     def do_thing_two(**context: T.Any) -> bool:
         pass
-    
-    
+
+
     chain(do_thing, do_thing_two)
 ```
 
 ## Does not affect functions that do not work with dags
-
-```python
-def not_a_dag():
-  dag = notDAG()
-  return dag
-```
 
 ```python
 def not_a_dag():
@@ -229,7 +223,7 @@ def my_dag():
 ```python
 @dag()
 def my_dag():
-    
+
     o1 = EmptyOperator()
     o2 = EmptyOperator(foo=bar)
     return chain(o1, o2)
@@ -249,7 +243,7 @@ def some_dag():
 ```python
 @dag()
 def some_dag():
-    
+
     first = BashOperator(bash_command="echo hello")
     second = EmptyOperator()
     # second is upstream of first
@@ -278,8 +272,8 @@ def some_dag():
     @task()
     def print_dag():
         print(dag)
-    
-    
+
+
     chain(print_dag, print_dag)
 ```
 
@@ -291,7 +285,7 @@ def some_dag():
     def print_dag():
         print(dag)
     t1 = PythonOperator(dag=dag,python_callable=print_dag)
-    t2 = BashOperator(dag=dag,bash_command="echo 1") 
+    t2 = BashOperator(dag=dag,bash_command="echo 1")
     t1 >> t2
 ```
 
@@ -302,7 +296,7 @@ def some_dag():
     @task()
     def print_dag():
         print(dag)
-    
-    t2 = BashOperator(bash_command="echo 1") 
+
+    t2 = BashOperator(bash_command="echo 1")
     chain(print_dag, t2)
 ```
