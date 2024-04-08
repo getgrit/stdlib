@@ -12,14 +12,14 @@ patterns:
       }
     samples:
       - input: |
-          // @filename: .grit/patterns/kebab-case.md
+          <!-- @filename: .grit/patterns/kebab-case.md -->
 
           # This is a markdown file
         output: |
-          // @filename: .grit/patterns/kebab-case.md
+          <!-- @filename: .grit/patterns/kebab-case.md -->
 
           # This is a markdown file
       - input: |
-          // @filename: .grit/patterns/snake_case.md
+          <!-- @filename: .grit/patterns/snake_case.md -->
 
           # This is a markdown file
