@@ -20,7 +20,7 @@ $deps` where {
 Old syntax, with a mix of both:
 
 ```toml
-// @filename: Cargo.toml
+# @filename: Cargo.toml
 [package]
 name = "my-package"
 
@@ -34,7 +34,7 @@ other_pkg = "0.1.3"
 New syntax, with all dependencies using the same format:
 
 ```toml
-// @filename: Cargo.toml
+# @filename: Cargo.toml
 [package]
 name = "my-package"
 
@@ -50,7 +50,7 @@ other_pkg = { version = "0.1.3" }
 This rule only applies to Cargo.toml files, so it's safe to ignore other files.
 
 ```toml
-// @filename: other-file.toml
+# @filename: other-file.toml
 [dependencies]
 rand = "0.6"
 ```
