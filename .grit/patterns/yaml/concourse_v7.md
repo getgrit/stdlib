@@ -57,9 +57,9 @@ pattern distribute_variables() {
                 $accumulate = join(list = $new, separator = `\n`)
             }
         },
+        // TODO: insert steps
         $across => raw`in_parallel:
-  steps:
-    $accumulate`
+  $accumulate`
     }
 }
 
@@ -388,29 +388,28 @@ jobs:
 ```yaml
 jobs:
   - in_parallel:
-      steps:
-        - do:
-            - file: deploy.yml
-              task: deploy-1
-              params:
-                TARGET: eu-west-1
-                other_value: 42
-            - file: test.yml
-              task: smoke-test-1
-              params:
-                TARGET: eu-west-1
-                only_test: true
-        - do:
-            - file: deploy.yml
-              task: deploy
-              params:
-                TARGET: us-east-1
-                other_value: 42
-            - file: test.yml
-              task: smoke-test
-              params:
-                TARGET: us-east-1
-                only_test: true
+      - do:
+        - file: deploy.yml
+          task: deploy-1
+          params:
+            TARGET: eu-west-1
+            other_value: 42
+        - file: test.yml
+          task: smoke-test-1
+          params:
+            TARGET: eu-west-1
+            only_test: true
+    - do:
+        - file: deploy.yml
+          task: deploy
+          params:
+            TARGET: us-east-1
+            other_value: 42
+        - file: test.yml
+          task: smoke-test
+          params:
+            TARGET: us-east-1
+            only_test: true
   - task: other-task
     config:
       platform: linux
@@ -468,8 +467,7 @@ jobs:
 ```yaml
 jobs:
   - in_parallel:
-      steps:
-        - do:
+      - do:
         - file: deploy.yml
           task: deploy-1
           params:
