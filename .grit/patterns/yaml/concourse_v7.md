@@ -33,7 +33,7 @@ values: $vals` where {
             $items <: some bubble($template, $across, $key, $val) {
                 $item where {
                     not $item <: $across,
-                    $new_item = text($item),
+                    $new_item = $item,
                     if ($item <: `task: $_`) {
                         $template += `- $item`
                     } else {
@@ -64,7 +64,7 @@ sequential {
   contains distribute_variables(),
   contains bubble `in_parallel: $tasks` where {
     $n = 0,
-    $tasks <: contains bubble($task_name, $n) `task: $task_name` where { $n += 1 } => text(`task: $task_name-$n`)
+    $tasks <: contains bubble($task_name, $n) `task: $task_name` where { $n += 1 } => `task: $task_name-$n`
   },
 }
 ```
