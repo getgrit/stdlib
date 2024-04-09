@@ -352,6 +352,8 @@ jobs:
 
 ## Using simple do syntax
 
+The `do` syntax for steps is also supported.
+
 ```yaml
 jobs:
   - across:
@@ -467,6 +469,8 @@ jobs:
 ```yaml
 jobs:
   - in_parallel:
+      max_in_flight: 5
+      steps:
       - do:
         - file: deploy.yml
           task: deploy-1
@@ -478,17 +482,17 @@ jobs:
           params:
             TARGET: eu-west-1
             only_test: true
-    - do:
-        - file: deploy.yml
-          task: deploy
-          params:
-            TARGET: us-east-1
-            other_value: 42
-        - file: test.yml
-          task: smoke-test
-          params:
-            TARGET: us-east-1
-            only_test: true
+      - do:
+          - file: deploy.yml
+            task: deploy
+            params:
+              TARGET: us-east-1
+              other_value: 42
+          - file: test.yml
+            task: smoke-test
+            params:
+              TARGET: us-east-1
+              only_test: true
   - task: other-task
     config:
       platform: linux
