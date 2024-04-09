@@ -18,9 +18,9 @@ pattern distribute_variables() {
     // build up a map from variable names to list of values the variable can take
     $vars_map = {},
     `across: $vars` as $across where {
-        $vars <: contains bubble($vars_map) block_mapping($items) where {
-            $items <: contains `var: $name`,
-            $items <: contains `values: $vals`,
+        $vars <: some bubble($vars_map) `- $this_variable` where {
+            $this_variable <: contains `var: $name`,
+            $this_variable <: contains `values: $vals`,
             $val_list = [],
             $vals <: some bubble($vars_map, $val_list) `- $name` where {
                 $val_list += $name
@@ -72,7 +72,7 @@ pattern fix_task_names($task_name) {
 
 sequential {
   contains distribute_variables(),
-  contains bubble `in_parallel: $tasks` where {
+  maybe contains bubble `in_parallel: $tasks` where {
     $tasks <: contains bubble($tasks) `task: $task_name` where {
       // Grab each unique task name and append a number to it
       $tasks <: fix_task_names($task_name)
