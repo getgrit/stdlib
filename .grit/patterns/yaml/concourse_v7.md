@@ -59,7 +59,8 @@ pattern distribute_variables() {
         },
         // TODO: insert steps
         $across => raw`in_parallel:
-  $accumulate`
+  steps:
+    $accumulate`
     }
 }
 
@@ -113,89 +114,89 @@ jobs:
   - in_parallel:
       steps:
         - task: create-file-1
-          params:
-              FUNCTION: file1-js
-          input_mapping:
-              code: one-js
-          output_mapping:
-              code: a-js
-        - task: create-file
-          params:
-              FUNCTION: file2-js
-          input_mapping:
-              code: one-js
-          output_mapping:
-              code: a-js
-        - task: create-file
-          params:
-              FUNCTION: file3-js
-          input_mapping:
-              code: one-js
-          output_mapping:
-              code: a-js
-        - task: create-file
-          params:
-              FUNCTION: file1-js
-          input_mapping:
-              code: two-js
-          output_mapping:
-              code: a-js
-        - task: create-file
-          params:
-              FUNCTION: file2-js
-          input_mapping:
-              code: two-js
-          output_mapping:
-              code: a-js
-        - task: create-file
-          params:
-              FUNCTION: file3-js
-          input_mapping:
-              code: two-js
-          output_mapping:
-              code: a-js
-        - task: create-file
-          params:
-              FUNCTION: file1-js
-          input_mapping:
-              code: one-js
-          output_mapping:
-              code: b-js
-        - task: create-file
-          params:
-              FUNCTION: file2-js
-          input_mapping:
-              code: one-js
-          output_mapping:
-              code: b-js
-        - task: create-file
-          params:
-              FUNCTION: file3-js
-          input_mapping:
-              code: one-js
-          output_mapping:
-              code: b-js
-        - task: create-file
-          params:
-              FUNCTION: file1-js
-          input_mapping:
-              code: two-js
-          output_mapping:
-              code: b-js
-        - task: create-file
-          params:
-              FUNCTION: file2-js
-          input_mapping:
-              code: two-js
-          output_mapping:
-              code: b-js
-        - task: create-file
-          params:
-              FUNCTION: file3-js
-          input_mapping:
-              code: two-js
-          output_mapping:
-              code: b-js
+      params:
+          FUNCTION: file1-js
+      input_mapping:
+          code: one-js
+      output_mapping:
+          code: a-js
+    - task: create-file
+      params:
+          FUNCTION: file2-js
+      input_mapping:
+          code: one-js
+      output_mapping:
+          code: a-js
+    - task: create-file
+      params:
+          FUNCTION: file3-js
+      input_mapping:
+          code: one-js
+      output_mapping:
+          code: a-js
+    - task: create-file
+      params:
+          FUNCTION: file1-js
+      input_mapping:
+          code: two-js
+      output_mapping:
+          code: a-js
+    - task: create-file
+      params:
+          FUNCTION: file2-js
+      input_mapping:
+          code: two-js
+      output_mapping:
+          code: a-js
+    - task: create-file
+      params:
+          FUNCTION: file3-js
+      input_mapping:
+          code: two-js
+      output_mapping:
+          code: a-js
+    - task: create-file
+      params:
+          FUNCTION: file1-js
+      input_mapping:
+          code: one-js
+      output_mapping:
+          code: b-js
+    - task: create-file
+      params:
+          FUNCTION: file2-js
+      input_mapping:
+          code: one-js
+      output_mapping:
+          code: b-js
+    - task: create-file
+      params:
+          FUNCTION: file3-js
+      input_mapping:
+          code: one-js
+      output_mapping:
+          code: b-js
+    - task: create-file
+      params:
+          FUNCTION: file1-js
+      input_mapping:
+          code: two-js
+      output_mapping:
+          code: b-js
+    - task: create-file
+      params:
+          FUNCTION: file2-js
+      input_mapping:
+          code: two-js
+      output_mapping:
+          code: b-js
+    - task: create-file
+      params:
+          FUNCTION: file3-js
+      input_mapping:
+          code: two-js
+      output_mapping:
+          code: b-js
 
 ```
 
@@ -240,53 +241,53 @@ jobs:
   - in_parallel:
       steps:
         - task: create-file-1
-          config:
-              platform: linux
-              image_resource:
-                type: registry-image
-                source: { repository: busybox }
-              run:
-                path: touch
-                args:
-                  - manifests/file1
-              outputs:
-                - name: manifests
-        - task: create-file
-          config:
-              platform: linux
-              image_resource:
-                type: registry-image
-                source: { repository: busybox }
-              run:
-                path: touch
-                args:
-                  - manifests/file2
-              outputs:
-                - name: manifests
-        - task: create-file
-          config:
-              platform: linux
-              image_resource:
-                type: registry-image
-                source: { repository: busybox }
-              run:
-                path: touch
-                args:
-                  - manifests/file3
-              outputs:
-                - name: manifests
-      - task: list-file
-        config:
+      config:
           platform: linux
           image_resource:
             type: registry-image
             source: { repository: busybox }
-          inputs:
-            - name: manifests
           run:
-            path: ls
+            path: touch
             args:
-              - manifests
+              - manifests/file1
+          outputs:
+            - name: manifests
+    - task: create-file
+      config:
+          platform: linux
+          image_resource:
+            type: registry-image
+            source: { repository: busybox }
+          run:
+            path: touch
+            args:
+              - manifests/file2
+          outputs:
+            - name: manifests
+    - task: create-file
+      config:
+          platform: linux
+          image_resource:
+            type: registry-image
+            source: { repository: busybox }
+          run:
+            path: touch
+            args:
+              - manifests/file3
+          outputs:
+            - name: manifests
+  - task: list-file
+    config:
+      platform: linux
+      image_resource:
+        type: registry-image
+        source: { repository: busybox }
+      inputs:
+        - name: manifests
+      run:
+        path: ls
+        args:
+          - manifests
 ```
 
 ## Out of order
@@ -325,15 +326,15 @@ jobs:
   - in_parallel:
       steps:
         - file: deploy.yml
-          task: deploy-1
-          params:
-              TARGET: eu-west-1
-              other_value: 42
-        - file: deploy.yml
-          task: deploy
-          params:
-              TARGET: us-east-1
-              other_value: 42
+      task: deploy-1
+      params:
+          TARGET: eu-west-1
+          other_value: 42
+    - file: deploy.yml
+      task: deploy
+      params:
+          TARGET: us-east-1
+          other_value: 42
   - task: other-task
     config:
       platform: linux
@@ -390,7 +391,8 @@ jobs:
 ```yaml
 jobs:
   - in_parallel:
-      - do:
+      steps:
+        - do:
         - file: deploy.yml
           task: deploy-1
           params:
@@ -469,9 +471,8 @@ jobs:
 ```yaml
 jobs:
   - in_parallel:
-      max_in_flight: 5
       steps:
-      - do:
+        - do:
         - file: deploy.yml
           task: deploy-1
           params:
@@ -482,17 +483,17 @@ jobs:
           params:
             TARGET: eu-west-1
             only_test: true
-      - do:
-          - file: deploy.yml
-            task: deploy
-            params:
-              TARGET: us-east-1
-              other_value: 42
-          - file: test.yml
-            task: smoke-test
-            params:
-              TARGET: us-east-1
-              only_test: true
+    - do:
+        - file: deploy.yml
+          task: deploy
+          params:
+            TARGET: us-east-1
+            other_value: 42
+        - file: test.yml
+          task: smoke-test
+          params:
+            TARGET: us-east-1
+            only_test: true
   - task: other-task
     config:
       platform: linux
