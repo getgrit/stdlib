@@ -4,7 +4,7 @@ This pattern helps with upgrading Concourse pipelines to version 7.
 
 It handles these cases:
 
-- [across outputs](https://github.com/concourse/concourse/issues/7577)
+- [across outputs](https://github.com/concourse/concourse/issues/7577), by converting from [across](https://concourse-ci.org/across-step.html) steps to [in_parallel](https://concourse-ci.org/in-parallel-step.html) steps.
 
 ```grit
 language yaml
