@@ -27,6 +27,7 @@ pattern distribute_variables() {
             },
             $vars_map.$name = $val_list,
             if ($this_variable <: contains `max_in_flight: $max`) {
+              $max <: contains integer_scalar() as $max,
               $max_in_flight = $max
             }
         },
@@ -257,40 +258,40 @@ jobs:
       steps:
         - task: create-file-1
           config:
-            platform: linux
-            image_resource:
-              type: registry-image
-              source: { repository: busybox }
-            run:
-              path: touch
-              args:
-                - manifests/file1
-            outputs:
-              - name: manifests
+              platform: linux
+              image_resource:
+                type: registry-image
+                source: { repository: busybox }
+              run:
+                path: touch
+                args:
+                  - manifests/file1
+              outputs:
+                - name: manifests
         - task: create-file-2
           config:
-            platform: linux
-            image_resource:
-              type: registry-image
-              source: { repository: busybox }
-            run:
-              path: touch
-              args:
-                - manifests/file2
-            outputs:
-              - name: manifests
+              platform: linux
+              image_resource:
+                type: registry-image
+                source: { repository: busybox }
+              run:
+                path: touch
+                args:
+                  - manifests/file2
+              outputs:
+                - name: manifests
         - task: create-file-3
           config:
-            platform: linux
-            image_resource:
-              type: registry-image
-              source: { repository: busybox }
-            run:
-              path: touch
-              args:
-                - manifests/file3
-            outputs:
-              - name: manifests
+              platform: linux
+              image_resource:
+                type: registry-image
+                source: { repository: busybox }
+              run:
+                path: touch
+                args:
+                  - manifests/file3
+              outputs:
+                - name: manifests
   - task: list-file
     config:
       platform: linux
@@ -408,16 +409,16 @@ jobs:
   - in_parallel:
       steps:
         - do:
-          - file: deploy.yml
-            task: deploy-1
-            params:
-              TARGET: eu-west-1
-              other_value: 42
-          - file: test.yml
-            task: smoke-test-1
-            params:
-              TARGET: eu-west-1
-              only_test: true
+            - file: deploy.yml
+              task: deploy-1
+              params:
+                TARGET: eu-west-1
+                other_value: 42
+            - file: test.yml
+              task: smoke-test-1
+              params:
+                TARGET: eu-west-1
+                only_test: true
         - do:
             - file: deploy.yml
               task: deploy-2
@@ -489,27 +490,27 @@ jobs:
       limit: 5
       steps:
         - do:
-          - file: deploy.yml
-            task: deploy-1
-            params:
-              TARGET: eu-west-1
-              other_value: 42
-          - file: test.yml
-            task: smoke-test-1
-            params:
-              TARGET: eu-west-1
-              only_test: true
+            - file: deploy.yml
+              task: deploy-1
+              params:
+                TARGET: eu-west-1
+                other_value: 42
+            - file: test.yml
+              task: smoke-test-1
+              params:
+                TARGET: eu-west-1
+                only_test: true
         - do:
-          - file: deploy.yml
-            task: deploy-2
-            params:
-              TARGET: us-east-1
-              other_value: 42
-          - file: test.yml
-            task: smoke-test-2
-            params:
-              TARGET: us-east-1
-              only_test: true
+            - file: deploy.yml
+              task: deploy-2
+              params:
+                TARGET: us-east-1
+                other_value: 42
+            - file: test.yml
+              task: smoke-test-2
+              params:
+                TARGET: us-east-1
+                only_test: true
   - task: other-task
     config:
       platform: linux
@@ -522,6 +523,7 @@ jobs:
         path: ls
         args:
           - manifests
+
 ```
 
 ## Multiple max_in_flight variables
@@ -567,30 +569,32 @@ jobs:
 ```yaml
 jobs:
   - in_parallel:
-      limit: 5
+      limit: 2
       steps:
-        - do:
-          - file: deploy.yml
-            task: deploy-1
-            params:
+        - file: deploy.yml
+          task: deploy-1
+          params:
               TARGET: eu-west-1
               other_value: 42
-          - file: test.yml
-            task: smoke-test-1
-            params:
+              name: susan
+        - file: deploy.yml
+          task: deploy-2
+          params:
               TARGET: eu-west-1
-              only_test: true
-        - do:
-          - file: deploy.yml
-            task: deploy-2
-            params:
+              other_value: 42
+              name: alice
+        - file: deploy.yml
+          task: deploy-3
+          params:
               TARGET: us-east-1
               other_value: 42
-          - file: test.yml
-            task: smoke-test-2
-            params:
+              name: susan
+        - file: deploy.yml
+          task: deploy-4
+          params:
               TARGET: us-east-1
-              only_test: true
+              other_value: 42
+              name: alice
   - task: other-task
     config:
       platform: linux
@@ -603,4 +607,5 @@ jobs:
         path: ls
         args:
           - manifests
+
 ```
