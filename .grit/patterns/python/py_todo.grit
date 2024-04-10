@@ -10,16 +10,18 @@ function todo($target, $message) {
         $message = "This requires manual intervention."
     },
     $lines = lines(string = $message),
+    $result = [],
     $lines <: some bubble($result) $x where {
-        if ($result <: undefined) { 
-             $result = `# TODO: $x`
+        if ($result <: []) { 
+             $result += `# TODO: $x`
          } else { 
-             $result += `\n# $x`
+             $result += `# $x`
          }
     },
     $log_message = `TODO: $message`,
     log(message=$log_message, variable=$target),
     $lines = lines(string = $target),
-    $lines <: some bubble($result) $x where { $result += `\n# $x` },
+    $lines <: some bubble($result) $x where { $result += `# $x` },
+    $result = join(list=$result, separator=`\n`),
     return $result,
 }

@@ -47,14 +47,16 @@ if_statement($alternative, $condition, $consequence) as $if where {
     },
     $condition <: `$var` => `$var := $match_func($regex)`,
     if ($alternative <: "") {
-        $block = $consequence,
+        $if => `if $condition:
+    $consequence`
     }
     else {
         $separator = `\n`,
-        $block = join(list = [$consequence, $alternative], $separator),
+        $if => `if $condition:
+    $consequence
+$alternative`
     }
-} => `if $condition:
-    $block`
+}
 
 ```
 
