@@ -26,9 +26,11 @@ pattern distribute_variables() {
                 $val_list += $name
             },
             $vars_map.$name = $val_list,
-            if ($this_variable <: contains `max_in_flight: $max`) {
-              $max <: contains integer_scalar() as $max,
-              $max_in_flight = $max
+            if ($this_variable <: contains `max_in_flight: $in_flight_value`) {
+              $in_flight_value <: contains integer_scalar() as $max,
+              if (or { $max_in_flight <: undefined, $max <: $max_in_flight }) {
+                $max_in_flight = $max
+              }
             }
         },
         // construct a template consisting of all the tasks not including the 
@@ -488,6 +490,7 @@ jobs:
 jobs:
   - in_parallel:
       limit: 5
+
       steps:
         - do:
             - file: deploy.yml
@@ -539,6 +542,13 @@ jobs:
         values:
           - eu-west-1
           - us-east-1
+          - us-central-1
+        max_in_flight: 3
+      - var: middle_value
+        values:
+          - "a"
+          - "b"
+          - "c"
         max_in_flight: 1
       - var: namer
         values:
@@ -569,7 +579,8 @@ jobs:
 ```yaml
 jobs:
   - in_parallel:
-      limit: 2
+      limit: 3
+
       steps:
         - file: deploy.yml
           task: deploy-1
@@ -582,17 +593,101 @@ jobs:
           params:
               TARGET: eu-west-1
               other_value: 42
-              name: alice
+              name: susan
         - file: deploy.yml
           task: deploy-3
           params:
-              TARGET: us-east-1
+              TARGET: eu-west-1
               other_value: 42
               name: susan
         - file: deploy.yml
           task: deploy-4
           params:
+              TARGET: eu-west-1
+              other_value: 42
+              name: alice
+        - file: deploy.yml
+          task: deploy-5
+          params:
+              TARGET: eu-west-1
+              other_value: 42
+              name: alice
+        - file: deploy.yml
+          task: deploy-6
+          params:
+              TARGET: eu-west-1
+              other_value: 42
+              name: alice
+        - file: deploy.yml
+          task: deploy-7
+          params:
               TARGET: us-east-1
+              other_value: 42
+              name: susan
+        - file: deploy.yml
+          task: deploy-8
+          params:
+              TARGET: us-east-1
+              other_value: 42
+              name: susan
+        - file: deploy.yml
+          task: deploy-9
+          params:
+              TARGET: us-east-1
+              other_value: 42
+              name: susan
+        - file: deploy.yml
+          task: deploy-10
+          params:
+              TARGET: us-east-1
+              other_value: 42
+              name: alice
+        - file: deploy.yml
+          task: deploy-11
+          params:
+              TARGET: us-east-1
+              other_value: 42
+              name: alice
+        - file: deploy.yml
+          task: deploy-12
+          params:
+              TARGET: us-east-1
+              other_value: 42
+              name: alice
+        - file: deploy.yml
+          task: deploy-13
+          params:
+              TARGET: us-central-1
+              other_value: 42
+              name: susan
+        - file: deploy.yml
+          task: deploy-14
+          params:
+              TARGET: us-central-1
+              other_value: 42
+              name: susan
+        - file: deploy.yml
+          task: deploy-15
+          params:
+              TARGET: us-central-1
+              other_value: 42
+              name: susan
+        - file: deploy.yml
+          task: deploy-16
+          params:
+              TARGET: us-central-1
+              other_value: 42
+              name: alice
+        - file: deploy.yml
+          task: deploy-17
+          params:
+              TARGET: us-central-1
+              other_value: 42
+              name: alice
+        - file: deploy.yml
+          task: deploy-18
+          params:
+              TARGET: us-central-1
               other_value: 42
               name: alice
   - task: other-task
