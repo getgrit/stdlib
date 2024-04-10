@@ -28,7 +28,7 @@ pattern distribute_variables() {
             $vars_map.$name = $val_list,
             if ($this_variable <: contains `max_in_flight: $in_flight_value`) {
               $in_flight_value <: contains integer_scalar() as $max,
-              if (or { $max_in_flight <: undefined, $max <: $max_in_flight }) {
+              if ($max_in_flight <: undefined) {
                 $max_in_flight = $max
               }
             }
@@ -533,7 +533,7 @@ jobs:
 
 The semantics of `max_in_flight` are for multiple variables are complicated to replicate, since `across` can dynamically choose which tasks to parallelize.
 
-To keep things simple, this change just keeps the lowest `max_in_flight` value.
+To keep things simple, this change just keeps the first `max_in_flight` value.
 
 ```yaml
 jobs:
@@ -579,7 +579,7 @@ jobs:
 ```yaml
 jobs:
   - in_parallel:
-      limit: 1
+      limit: 3
 
       steps:
         - file: deploy.yml
