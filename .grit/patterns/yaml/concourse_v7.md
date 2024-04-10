@@ -579,7 +579,7 @@ jobs:
 ```yaml
 jobs:
   - in_parallel:
-      limit: 3
+      limit: 1
 
       steps:
         - file: deploy.yml
