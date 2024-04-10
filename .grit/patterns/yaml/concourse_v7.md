@@ -76,11 +76,11 @@ sequential {
     // Process each one
     $unique_task_names <: some bubble($tasks) `$task_name` where {
       $n = 0,
-      $tasks <: contains bubble($task_name, $n) `task: $this_name` where {
+      $tasks <: contains bubble($task_name, $n) `task: $task_name` where {
         // $this_name <: "$task_name",
         $n += 1,
         $current_name = text(`$task_name-$n`),
-      } => `task: TARGETED`
+      } => `task: $current_name`
     }
   },
 }
