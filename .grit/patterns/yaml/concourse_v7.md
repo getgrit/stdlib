@@ -477,6 +477,7 @@ jobs:
 ```yaml
 jobs:
   - in_parallel:
+      limit: 5
       steps:
         - do:
           - file: deploy.yml
@@ -512,5 +513,85 @@ jobs:
         path: ls
         args:
           - manifests
+```
 
+## Multiple max_in_flight variables
+
+The semantics of `max_in_flight` are for multiple variables are complicated to replicate, since `across` can dynamically choose which tasks to parallelize.
+
+To keep things simple, this change just keeps the lowest `max_in_flight` value.
+
+```yaml
+jobs:
+  - across:
+      - var: target
+        values:
+          - eu-west-1
+          - us-east-1
+        max_in_flight: 1
+      - var: namer
+        values:
+          - susan
+          - alice
+        max_in_flight: 2
+    file: deploy.yml
+    task: deploy
+    params:
+      TARGET: ((.:target))
+      other_value: 42
+      name: ((.:namer))
+  - task: other-task
+    config:
+      platform: linux
+      image_resource:
+        type: registry-image
+        source: { repository: busybox }
+      inputs:
+        - name: manifests
+      run:
+        path: ls
+        args:
+          - manifests
+
+```
+
+```yaml
+jobs:
+  - in_parallel:
+      limit: 5
+      steps:
+        - do:
+          - file: deploy.yml
+            task: deploy-1
+            params:
+              TARGET: eu-west-1
+              other_value: 42
+          - file: test.yml
+            task: smoke-test-1
+            params:
+              TARGET: eu-west-1
+              only_test: true
+        - do:
+          - file: deploy.yml
+            task: deploy-2
+            params:
+              TARGET: us-east-1
+              other_value: 42
+          - file: test.yml
+            task: smoke-test-2
+            params:
+              TARGET: us-east-1
+              only_test: true
+  - task: other-task
+    config:
+      platform: linux
+      image_resource:
+        type: registry-image
+        source: { repository: busybox }
+      inputs:
+        - name: manifests
+      run:
+        path: ls
+        args:
+          - manifests
 ```
