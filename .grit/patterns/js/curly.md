@@ -2,7 +2,7 @@
 title: Enforces braces for if/for/do/while statements.
 tags: [good-practice]
 ---
-
+This matches the [eslint rule](https://eslint.org/docs/latest/rules/curly).
 
 
 ```grit
