@@ -18,7 +18,7 @@ pattern distribute_variables() {
     // build up a map from variable names to list of values the variable can take
     $vars_map = {},
     `across: $vars` as $across where {
-        $vars <: some bubble($vars_map) `- $this_variable` where {
+        $vars <: some bubble($vars_map, $max_in_flight) `- $this_variable` where {
             $this_variable <: contains `var: $name`,
             $this_variable <: contains `values: $vals`,
             $val_list = [],
@@ -26,6 +26,9 @@ pattern distribute_variables() {
                 $val_list += $name
             },
             $vars_map.$name = $val_list,
+            if ($this_variable <: contains `max_in_flight: $max`) {
+              $max_in_flight = $max
+            }
         },
         // construct a template consisting of all the tasks not including the 
         // element defining all the variables
@@ -57,10 +60,16 @@ pattern distribute_variables() {
                 $accumulate = join(list = $new, separator = `\n`)
             }
         },
-        // TODO: insert steps
-        $across => raw`in_parallel:
+        if ($max_in_flight <: not undefined) {
+            $across => raw`in_parallel:
+  limit: $max_in_flight
   steps:
     $accumulate`
+        } else {
+            $across => raw`in_parallel:
+  steps:
+    $accumulate`
+        }
     }
 }
 
