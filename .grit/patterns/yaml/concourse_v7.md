@@ -206,6 +206,8 @@ jobs:
 
 ## From the concourse github issue
 
+On GitHub, [this case](https://github.com/concourse/concourse/issues/7577) was reported.
+
 ```yaml
 jobs:
   - across:
@@ -246,52 +248,52 @@ jobs:
       steps:
         - task: create-file-1
           config:
-              platform: linux
-              image_resource:
-                type: registry-image
-                source: { repository: busybox }
-              run:
-                path: touch
-                args:
-                  - manifests/file1
-              outputs:
-                - name: manifests
+            platform: linux
+            image_resource:
+              type: registry-image
+              source: { repository: busybox }
+            run:
+              path: touch
+              args:
+                - manifests/file1
+            outputs:
+              - name: manifests
         - task: create-file-2
           config:
-              platform: linux
-              image_resource:
-                type: registry-image
-                source: { repository: busybox }
-              run:
-                path: touch
-                args:
-                  - manifests/file2
-              outputs:
-                - name: manifests
+            platform: linux
+            image_resource:
+              type: registry-image
+              source: { repository: busybox }
+            run:
+              path: touch
+              args:
+                - manifests/file2
+            outputs:
+              - name: manifests
         - task: create-file-3
           config:
-              platform: linux
-              image_resource:
-                type: registry-image
-                source: { repository: busybox }
-              run:
-                path: touch
-                args:
-                  - manifests/file3
-              outputs:
-                - name: manifests
-      - task: list-file
-        config:
-          platform: linux
-          image_resource:
-            type: registry-image
-            source: { repository: busybox }
-          inputs:
-            - name: manifests
-          run:
-            path: ls
-            args:
-              - manifests
+            platform: linux
+            image_resource:
+              type: registry-image
+              source: { repository: busybox }
+            run:
+              path: touch
+              args:
+                - manifests/file3
+            outputs:
+              - name: manifests
+  - task: list-file
+    config:
+      platform: linux
+      image_resource:
+        type: registry-image
+        source: { repository: busybox }
+      inputs:
+        - name: manifests
+      run:
+        path: ls
+        args:
+          - manifests
 ```
 
 ## Out of order
@@ -397,27 +399,27 @@ jobs:
   - in_parallel:
       steps:
         - do:
-        - file: deploy.yml
-          task: deploy-1
-          params:
-            TARGET: eu-west-1
-            other_value: 42
-        - file: test.yml
-          task: smoke-test-1
-          params:
-            TARGET: eu-west-1
-            only_test: true
-    - do:
-        - file: deploy.yml
-          task: deploy-2
-          params:
-            TARGET: us-east-1
-            other_value: 42
-        - file: test.yml
-          task: smoke-test-2
-          params:
-            TARGET: us-east-1
-            only_test: true
+          - file: deploy.yml
+            task: deploy-1
+            params:
+              TARGET: eu-west-1
+              other_value: 42
+          - file: test.yml
+            task: smoke-test-1
+            params:
+              TARGET: eu-west-1
+              only_test: true
+        - do:
+            - file: deploy.yml
+              task: deploy-2
+              params:
+                TARGET: us-east-1
+                other_value: 42
+            - file: test.yml
+              task: smoke-test-2
+              params:
+                TARGET: us-east-1
+                only_test: true
   - task: other-task
     config:
       platform: linux
@@ -477,27 +479,27 @@ jobs:
   - in_parallel:
       steps:
         - do:
-        - file: deploy.yml
-          task: deploy-1
-          params:
-            TARGET: eu-west-1
-            other_value: 42
-        - file: test.yml
-          task: smoke-test-1
-          params:
-            TARGET: eu-west-1
-            only_test: true
-    - do:
-        - file: deploy.yml
-          task: deploy-2
-          params:
-            TARGET: us-east-1
-            other_value: 42
-        - file: test.yml
-          task: smoke-test-2
-          params:
-            TARGET: us-east-1
-            only_test: true
+          - file: deploy.yml
+            task: deploy-1
+            params:
+              TARGET: eu-west-1
+              other_value: 42
+          - file: test.yml
+            task: smoke-test-1
+            params:
+              TARGET: eu-west-1
+              only_test: true
+        - do:
+          - file: deploy.yml
+            task: deploy-2
+            params:
+              TARGET: us-east-1
+              other_value: 42
+          - file: test.yml
+            task: smoke-test-2
+            params:
+              TARGET: us-east-1
+              only_test: true
   - task: other-task
     config:
       platform: linux
