@@ -26,6 +26,10 @@ pattern convert_cypress_queries() {
     or {
         `cy.visit($loc)` => `await page.goto($loc)`,
         `cy.get($locator)` => `page.locator($locator)`,
+        `Cypress.env($var)` => `process.env.$var`,
+        `cy.onlyOn($var === $cond)` => `if ($var !== $cond) {
+  test.skip();
+}`,
     }
 }
 
