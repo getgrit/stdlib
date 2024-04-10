@@ -19,6 +19,13 @@ pattern convert_cypress_assertions() {
             },
             $should => `await expect($locator).$condition`,
         },
+        `$locator.should($cond1, $cond2)` as $should where {
+            $pw_cond = "",
+            $cond1 <: `'contain'` where {
+                $pw_cond += `toContainText($cond2)`,
+            },
+            $should => `await expect($locator).$pw_cond`,
+        }
     }
 }
 
