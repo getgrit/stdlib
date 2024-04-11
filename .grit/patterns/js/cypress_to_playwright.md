@@ -41,6 +41,24 @@ pattern convert_cypress_queries() {
         `cy.onlyOn($var === $cond)` => `if ($var !== $cond) {
   test.skip();
 }`,
+        `cy.request({ $opts })` as $req where {
+            or {
+                $opts <: contains pair(key=`method`, value=`"$method"`),
+                $method = `get`,
+            },
+            $opts <: contains pair(key=`url`, value=$url),
+            $method = lowercase($method),
+            $other_opts = [],
+            $opts <: some bubble($other_opts) $opt where {
+                $opt <: not contains or {
+                    `method`,
+                    `url`,
+                },
+                $other_opts += $opt,
+            },
+            $other_opts = join($other_opts, `,`),
+            $req => `await request.$method($url, { $other_opts })`
+        }
     }
 }
 
@@ -94,4 +112,30 @@ test.describe('A mock test', () => {
     await expect(page.locator('.button')).toContainText('Hello world');
   });
 });
+```
+
+## Converts requests
+
+```js
+cy.request({
+  method: 'POST',
+  url: '/submit',
+  body: JSON.stringify({
+    content: 'Hello world',
+  }),
+  failOnStatusCode: false,
+});
+cy.contains('Submitted', { timeout: 10000 });
+```
+
+```ts
+import { expect, test } from '@playwright/test';
+
+await request.post('/submit', {
+  body: JSON.stringify({
+    content: 'Hello world',
+  }),
+  failOnStatusCode: false,
+});
+await expect(page.getByText('Submitted')).toBeVisible({ timeout: 10000 });
 ```
