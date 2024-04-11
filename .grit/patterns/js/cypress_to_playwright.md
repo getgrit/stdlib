@@ -64,7 +64,14 @@ pattern convert_cypress_queries() {
 
 pattern convert_cypress_test() {
     or {
-        `describe($description, $suite)` => `test.describe($description, $suite)`,
+        `describe($description, $suite)` => `test.describe($description, $suite)` where {
+            $suite <: maybe contains bubble or {
+                `before($hook)` => `test.beforeAll(async $hook)`,
+                `beforeEach($hook)` => `test.beforeEach(async $hook)`,
+                `after($hook)` => `test.afterAll(async $hook)`,
+                `afterEach($hook)` => `test.afterEach(async $hook)`,
+            },
+        },
         or {
             `it($description, () => { $body })`,
             `test($description, () => { $body })`
