@@ -37,6 +37,7 @@ pattern convert_cypress_queries() {
         `cy.contains($text, $options)` => `await expect(page.getByText($text)).toBeVisible($options)`,
         `cy.contains($text)` => `await expect(page.getByText($text)).toBeVisible()`,
         `cy.log($log)` => `console.log($log)`,
+        `cy.wait($timeout)` => `await page.waitForTimeout($timeout)`,
         `Cypress.env('$var')` => `process.env.$var`,
         `cy.onlyOn($var === $cond)` => `if ($var !== $cond) {
   test.skip();
@@ -145,4 +146,34 @@ await request.post('/submit', {
   failOnStatusCode: false,
 });
 await expect(page.getByText('Submitted')).toBeVisible({ timeout: 10000 });
+```
+
+## Converts hooks
+
+```js
+describe('Grouping', function () {
+  before(function () {
+    setup();
+  });
+
+  afterEach(function () {
+    cy.wait(1000);
+    teardown();
+  });
+});
+```
+
+```ts
+import { expect, test } from '@playwright/test';
+
+test.describe('Grouping', function () {
+  test.beforeAll(async function () {
+    setup();
+  });
+
+  test.afterEach(async function () {
+    await page.waitForTimeout(1000);
+    teardown();
+  });
+});
 ```
