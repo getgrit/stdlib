@@ -19,7 +19,13 @@ pattern loop_like() {
     `$arr.forEach(($condition) => {$body})`,
     `while($condition){$body}`,
     `do {$body} while($condition)`
-  } 
+  }
+}
+
+
+// Clean up artifacts
+private pattern after_each_file_cleaning() {
+  maybe file(body= contains bubble arrow_function($body) where $body <: $_ => `{BODY IS$body}`)
 }
 
 // All core stdlib functions can be done here
@@ -28,7 +34,8 @@ private pattern before_each_file_stdlib() {
 }
 
 private pattern after_each_file_stdlib() {
-  after_each_file_handle_imports()
+    // after_each_file_cleaning()
+    after_each_file_handle_imports()
 }
 
 

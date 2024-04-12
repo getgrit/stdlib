@@ -7,7 +7,7 @@ language js
 
 sequential {
   file(body= contains bubble `console.log($_)` => .),
-  file(body= contains bubble arrow_function($body) where $body <: . => `{}`)
+  // file(body= contains bubble arrow_function($body) where $body <: . => `{}`)
 }
 ```
 
