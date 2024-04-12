@@ -5,7 +5,10 @@ The `after_each_file` hooks are used to clean up the output code in some cases. 
 ```grit
 language js
 
-`console.log($_)` => .
+sequential {
+  file(body= contains bubble `console.log($_)` => .),
+  file(body= contains bubble arrow_function($body) where $body <: . => `{}`)
+}
 ```
 
 ## Arrow functions
@@ -25,7 +28,7 @@ const other = () => {
 ```
 
 ```javascript
-const fn = () => ;
+const fn = () => {};
 
 const foo = () => {
 };
