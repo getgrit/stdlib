@@ -2,8 +2,6 @@
 title: Ether Transfer
 ---
 
-# {{ page.title }}
-
 ```grit
 language sol
 
