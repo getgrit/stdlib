@@ -13,8 +13,12 @@ The `import_from($source)` pattern is used to *find* an import statement. The `$
 For example, you can use the following pattern to remove all imports from the `pydantic` module:
 
 ```grit
+language python
+
 import_from(source="pydantic") => .
 ```
+
+### Example
 
 ```python
 from typing import List
