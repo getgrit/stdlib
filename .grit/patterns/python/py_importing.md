@@ -1,35 +1,25 @@
 ---
 title: Import management for Python
+tags:
+  - docs
+  # full-examples renders the full example in the documentation
+  - full-examples
 ---
 
-Grit includes standard patterns for declaratively adding and updating imports.
+Grit includes standard patterns for declaratively finding, adding, and updating imports in Python.
+
+
+## `import_from($source)` pattern
+
+The `import_from` pattern is used to *find* an import statement. The `$source` metavariable can be used to specify the module that is being imported. This pattern will match any import statement that imports from the specified module.
+
+For example, you can use the following pattern to remove all imports from the `pydantic` module:
 
 ```grit
-engine marzano(0.1)
 language python
 
-contains bubble or {
-  import_from(source="pydantic") => .,
-  `$testlib.TestCase` where {
-      $newtest = `newtest`,
-      $testlib <: `unittest` => `$newtest`,
-      $newtest <: ensure_import_from(source=`testing`),
-  },
-  `othermodule` as $other where {
-      $other <: ensure_bare_import()
-  },
-  `$bob.caller` where {
-    $newbob = `newbob`,
-    $bob <: `thingbob` => `$newbob`,
-    $newbob <: ensure_import_from(source=`ourlib.goodlib`),
-  },
-  `$badimport.remove_parent()` where {
-    $badimport <: remove_import()
-  }
-}
+import_from(source="pydantic") => .
 ```
-
-## Base import statement
 
 ```python
 from typing import List
@@ -39,166 +29,108 @@ from pydantic import More
 
 ```python
 from typing import List
-
-
 ```
 
-## ensure_import_from
 
-```python
-import somewhere
+## `imported_from($source)` pattern
 
-unittest.TestCase()
+The `imported_from($source)` pattern is used to filter an identifier to cases that are imported from a specific module `$source`. This is useful for narrowing commonly used names.
+
+For example, you can use the following pattern to replace the `model` parameter for `completion` calls, but only when it is imported from the `litellm` module:
+
+```grit
+language python
+
+`$completion($params)` where {
+  $completion <: imported_from(source="litellm"),
+
+  $completion <: `completion`,
+  $params <: contains `model=$_` => `model="gpt-4-turbo"`,
+}
 ```
 
-```python
-from testing import newtest
-
-import somewhere
-
-newtest.TestCase()
-```
-
-## Ensure no duplicate imports
+Here it changes the parameters:
 
 ```python
-from testing import newtest, unittest
+from litellm import completion
 
-unittest.TestCase()
-```
-
-```python
-from testing import newtest, unittest
-
-newtest.TestCase()
-```
-
-## Ensure we don't append to the same import
-
-```python
-from testing import unittest, newtest
-
-unittest.TestCase()
+completion(model="gpt-3")
 ```
 
 ```python
-from testing import unittest, newtest
+from litellm import completion
 
-newtest.TestCase()
+completion(model="gpt-4-turbo")
 ```
 
-## Ensure we handle nested modules correctly
+But if `completion` is imported from another module, it will not be changed:
 
 ```python
-from ourlib.goodlib import thingbob, newbob
+from openai import completion
 
-newbob.caller()
-
-thingbob.caller()
+completion(model="gpt-3")
 ```
 
-```python
-from ourlib.goodlib import thingbob, newbob
+## `add_import($source, $name)` predicate
 
-newbob.caller()
+The `add_import($source, $name)` predicate can be used inside a [where clause](https://docs.grit.io/language/conditions#where-clause) to add an import statement to the top of the file. If `$name` isn't already imported from `$source`, the import statement will be added.
 
-newbob.caller()
-```
+Note this is idempotent, so it will not add the import if it is already present and you can safely call it multiple times.
 
-## Add a bare import
+For example, this pattern can be used to add a `completion` import from the `litellm` package:
 
-```python
-othermodule.TestCase()
-```
+```grit
+language python
 
-```python
-import othermodule
-
-othermodule.TestCase()
-```
-
-## Do not add duplicate bare imports
-
-```python
-import othermodule
-
-othermodule.TestCase()
+`completion($params)` where {
+  add_import(source="litellm", name="completion")
+}
 ```
 
 ```python
-import othermodule
-
-othermodule.TestCase()
-```
-
-## Remove imports - base case
-
-Grit can handle removing single imports from packages, and the entire package if no imports are left.
-
-```python
-from somewhere import somelib
-from elsewhere import foolib, keeplib
-from otherlib import keepthis
-
-somelib.remove_parent()
-foolib.remove_parent()
-
+completion(model="gpt-3")
 ```
 
 ```python
-from elsewhere import keeplib
-from otherlib import keepthis
+from litellm import completion
 
-somelib.remove_parent()
-foolib.remove_parent()
+completion(model="gpt-3")
 ```
 
-## Remove imports - complex cases
+If the import is already present, the pattern will not change the file.
 
 ```python
-import entirelib
-import elselib as hiddenlib
-import secretlib as aliasedlib
-from complicated_alias import coolstuff as badlib
-# Keep this, even though it *looks* like it could be related
-from confusing_lib import somelib as otherlib
+from openai import other
+from litellm import completion
 
-entirelib.remove_parent()
-aliasedlib.remove_parent()
-badlib.remove_parent()
-hiddenlib.keep_parent()
-
+completion(model="gpt-3")
 ```
 
 ```python
-import elselib as hiddenlib
-# Keep this, even though it *looks* like it could be related
-from confusing_lib import somelib as otherlib
+from openai import other
+from litellm import completion
 
-entirelib.remove_parent()
-aliasedlib.remove_parent()
-badlib.remove_parent()
-hiddenlib.keep_parent()
-
+completion(model="gpt-3")
 ```
 
-## Remove multiple imports from the same package
+### Bare imports
 
-```python
-from elsewhere import foolib, badlib
-from otherlib import keepthis
+If you want to add a bare import (e.g. `import openai`), use `add_import($source)` without specifying a name:
 
-keepthis.keep_parent()
-foolib.remove_parent()
-badlib.remove_parent()
+```grit
+language python
 
+`completion($params)` => `openai.completion($params)` where {
+  add_import(source="openai")
+}
 ```
 
 ```python
-from otherlib import keepthis
+completion(model="gpt-3")
+```
 
-keepthis.keep_parent()
-foolib.remove_parent()
-badlib.remove_parent()
+```python
+import openai
 
+openai.completion(model="gpt-3")
 ```
