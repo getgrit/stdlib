@@ -68,9 +68,9 @@ from openai import completion
 completion(model="gpt-3")
 ```
 
-## `add_import($name, $package)` predicate
+## `add_import($source, $name)` predicate
 
-The `add_import($name, $package)` predicate can be used inside a [where clause](https://docs.grit.io/language/conditions#where-clause) to add an import statement to the top of the file. If `$name` isn't already imported from `$package`, the import statement will be added.
+The `add_import($source, $name)` predicate can be used inside a [where clause](https://docs.grit.io/language/conditions#where-clause) to add an import statement to the top of the file. If `$name` isn't already imported from `$source`, the import statement will be added.
 
 Note this is idempotent, so it will not add the import if it is already present and you can safely call it multiple times.
 
@@ -80,7 +80,7 @@ For example, this pattern can be used to add a `completion` import from the `lit
 language python
 
 `completion($params)` where {
-  add_import(name="completion", source="litellm")
+  add_import(source="litellm", name="completion")
 }
 ```
 
@@ -108,4 +108,26 @@ from openai import other
 from litellm import completion
 
 completion(model="gpt-3")
+```
+
+### Bare imports
+
+If you want to add a bare import (e.g. `import openai`), use `add_import($source)` without specifying a name:
+
+```grit
+language python
+
+`completion($params)` => `openai.completion($params)` where {
+  add_import(source="openai")
+}
+```
+
+```python
+completion(model="gpt-3")
+```
+
+```python
+import openai
+
+openai.completion(model="gpt-3")
 ```
