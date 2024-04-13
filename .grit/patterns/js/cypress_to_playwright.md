@@ -42,7 +42,8 @@ pattern convert_cypress_queries() {
         `cy.visit($loc)` => `await page.goto($loc)`,
         `cy.get($locator)` => `page.locator($locator)`,
         `cy.contains($text, $options)` => `await expect(page.getByText($text)).toBeVisible($options)`,
-        `cy.get($locator).contains($text).$action()` => `await page.locator($locator, { hasText: $text }).click()`,
+        `cy.get($locator).contains($text).$action()` => `await page.locator($locator, { hasText: $text }).$action()`,
+        `cy.get($locator).contains($text)` => `page.locator($locator, { hasText: $text })`,
         `cy.contains($text)` => `await expect(page.getByText($text)).toBeVisible()`,
         `cy.log($log)` => `console.log($log)`,
         `cy.wait($timeout)` => `await page.waitForTimeout($timeout)`,
@@ -53,6 +54,15 @@ pattern convert_cypress_queries() {
         `cy.onlyOn($var === $cond)` => `if ($var !== $cond) {
   test.skip();
 }`,
+        `cy.$_($selector).each(($locator) => {
+            $body
+        })` as $loop where {
+            $var = `$[locator]s`,
+            $loop => `const $var = await page.locator($selector).all();
+for (const $locator of $var) {
+    $body
+}`
+        },
         `cy.request({ $opts })` as $req where {
             or {
                 $opts <: contains pair(key=`method`, value=`"$method"`),
