@@ -11,6 +11,13 @@ Future migrations will be more seamless as we will be automatically generating t
 {% /note %}
 
 
+This migration can be applied automatically using the [Grit CLI](https://docs.grit.io/cli/quickstart):
+
+```
+grit apply cloudflare_go_v2
+```
+
+
 ```grit
 language go
 
@@ -649,12 +656,6 @@ file($body) where {
     cloudflare_method_renaming()
   }
 }
-```
-
-This migration can be applied automatically using the [Grit CLI](https://docs.grit.io/cli/quickstart):
-
-```
-grit apply cloudflare_go_v2
 ```
 
 ## Client construction with API key and email

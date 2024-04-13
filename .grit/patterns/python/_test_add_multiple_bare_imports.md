@@ -21,6 +21,7 @@ language python
 
 
 ```python
+# This is an empty block
 ```
 
 ```python
@@ -28,7 +29,7 @@ import math
 import re
 import json
 
-
+# This is an empty block
 ```
 
 ## Add missing imports
