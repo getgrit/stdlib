@@ -140,3 +140,7 @@ pattern ensure_bare_import() {
         }
     }
 }
+
+predicate add_import($name, $source) {
+    $name <: ensure_import_from(source=$source)
+}

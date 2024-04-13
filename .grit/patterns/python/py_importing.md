@@ -93,3 +93,19 @@ from litellm import completion
 
 completion(model="gpt-3")
 ```
+
+If the import is already present, the pattern will not change the file.
+
+```python
+from openai import other
+from litellm import completion
+
+completion(model="gpt-3")
+```
+
+```python
+from openai import other
+from litellm import completion
+
+completion(model="gpt-3")
+```
