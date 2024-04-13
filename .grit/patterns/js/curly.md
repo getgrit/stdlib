@@ -37,7 +37,7 @@ if (x > 0) {
 }
 ```
 
-##else 
+## else 
 ```js 
 if (x > 0)
   doStuff();
