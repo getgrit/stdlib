@@ -2,8 +2,6 @@
 title: Convert Styled JSX to CSS Modules
 ---
 
-# {{ page.title }}
-
 Extract all Styled JSX from a particular file and move it to CSS Module files.
 
 - If there are multiple components in a given file, we create separate CSS Module file for each one.

@@ -1,5 +1,5 @@
 ---
-title: Oracle to PG: Dollar quote stored procedure body
+title: "Oracle to PG: Dollar quote stored procedure body"
 ---
 
 In Postgres, function and procedure bodies need to be wrapped in $$dollar quotes$$.

@@ -2,8 +2,6 @@
 title: Non-trivial math
 ---
 
-# {{ page.title }}
-
 ```grit
 or {
   // ds-math
