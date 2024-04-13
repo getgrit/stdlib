@@ -11,7 +11,7 @@ language python
 `$completion($params)` where {
   $completion <: `completion`,
   $params <: contains `model=$_` => `model="gpt-4-turbo"`,
-  $completion <: imported_from("litellm")
+  $completion <: imported_from(source="litellm")
 }
 ```
 

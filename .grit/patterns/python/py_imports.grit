@@ -100,7 +100,7 @@ pattern insert_imports() {
     }
 }
 
-pattern is_imported_from($source) {
+pattern imported_from($source) {
     $name where {
         $program <: module($statements),
         $statements <: some bubble($name, $source) import_from($source, $names) where {
@@ -111,7 +111,7 @@ pattern is_imported_from($source) {
 
 pattern ensure_import_from($source) {
     $name where {
-        if ($name <: not is_imported_from($source)) {
+        if ($name <: not imported_from($source)) {
             if ($GLOBAL_NEW_FROM_IMPORT_SOURCES <: not some [$program, $source]) {
                 $GLOBAL_NEW_FROM_IMPORT_SOURCES += [$program, $source]
             },
