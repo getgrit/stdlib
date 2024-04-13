@@ -200,7 +200,7 @@ test.describe('Grouping', function () {
 });
 ```
 
-## Converts complex queries
+## Converts composite queries
 
 ```js
 describe('Grouping', function () {
