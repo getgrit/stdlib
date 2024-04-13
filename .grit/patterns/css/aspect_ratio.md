@@ -2,8 +2,6 @@
 title: Aspect ratio
 ---
 
-# {{ page.title }}
-
 ```grit
 language css
 

@@ -3,10 +3,9 @@ title: Hoist assignment out of `return` statement
 tags: [good, se]
 ---
 
-# {{ page.title }}
+This rule hoists the assignments out of `return`. Because an assignment, `=` is easy to confuse with a comparison, `==`, The best practice is not to use any assignments in return statements.
 
-This rule hoists the assignments out of `return`. Does not apply when assignment is wrapped in parentheses.
-
+This does not apply when assignment is wrapped in parentheses.
 
 ```grit
 engine marzano(0.1)
@@ -19,10 +18,6 @@ language js
       augmented_assignment_expression($left)
     } as $assignment
 } => `$assignment;\n  return $left;`
-```
-
-```
-An assignment, `=`, is easy to confuse with a comparison, `==`. The best practice is not to use any assignments in return statements.
 ```
 
 ## Hoist `=` from `return` statement

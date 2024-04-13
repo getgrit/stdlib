@@ -1,9 +1,7 @@
 ---
-title: "BigDecimal(double)" should not be used
+title: "`BigDecimal(double)` should not be used"
 tags: [java]
 ---
-
-# "BigDecimal(double)" should not be used
 
 Because of floating point imprecision, the `BigDecimal(double)` constructor can be somewhat unpredictable. It is better to use `BigDecimal.valueOf(double)`.
 

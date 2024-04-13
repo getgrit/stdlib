@@ -3,8 +3,6 @@ title: Upgradable Proxy Pattern
 tags: [reentrancy, vulnerability]
 ---
 
-# {{ page.title }}
-
 Looking for variations of the upgradable proxy pattern.
 
 
