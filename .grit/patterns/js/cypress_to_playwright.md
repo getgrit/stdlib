@@ -1,6 +1,6 @@
 ---
 title: Convert Cypress to Playwright
-tags: [hidden]
+tags: [migration]
 ---
 
 Migrate from Cypress to Playwright.
