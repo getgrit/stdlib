@@ -1,5 +1,6 @@
 ---
 title: Convert CodeceptJS to Playwright
+tags: [migration]
 ---
 
 Migrate from CodeceptJS to Playwright.
@@ -17,7 +18,7 @@ predicate convert_tags($scenario, $description) {
           $tags += `@$fragment`,
       },
     },
-  
+
     $tags = join($tags, ` `),
     $description => trim(`$description $tags`, " "),
 }
