@@ -46,7 +46,9 @@ pattern convert_cypress_queries() {
         `cy.contains($text)` => `await expect(page.getByText($text)).toBeVisible()`,
         `cy.log($log)` => `console.log($log)`,
         `cy.wait($timeout)` => `await page.waitForTimeout($timeout)`,
+        `$locator.find($inner)` => `$locator.locator($inner)`,
         `$locator.eq($n)` => `$locator.nth($n)`,
+        `$locator.click()` => `await $locator.click()`,
         `Cypress.env('$var')` => `process.env.$var`,
         `cy.onlyOn($var === $cond)` => `if ($var !== $cond) {
   test.skip();
