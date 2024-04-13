@@ -15,6 +15,8 @@ language python
 }
 ```
 
+## OK
+
 Here it changes the parameters:
 
 ```python
@@ -26,8 +28,10 @@ completion(model="gpt-3")
 ```python
 from litellm import completion
 
-completion()
+completion(model="gpt-4-turbo")
 ```
+
+## Counterexample
 
 But if `completion` is imported from another module, it will not be changed:
 
@@ -36,9 +40,3 @@ from openai import completion
 
 completion(model="gpt-3")
 ```
-
-```python
-from openai import completion
-
-completion(model="gpt-3")
-```git ad
