@@ -3,7 +3,7 @@ title: Find useless ternary operator
 tags: [fix]
 ---
 
-If $condition ? `$answer`:`$answer` then this expression returns $answer. This is probably a human error
+If $condition ? `$answer`:`$answer` then this expression returns $answer. This is probably a human error.
 
 
 ```grit
