@@ -1,6 +1,9 @@
 ---
 title: Import management for Python
-tags: [docs, testing-only, full-examples]
+tags:
+  - docs
+  # full-examples renders the full example in the documentation
+  - full-examples
 ---
 
 Grit includes standard patterns for declaratively finding, adding, and updating imports in Python.
