@@ -13,10 +13,17 @@ pattern convert_cypress_assertions() {
     or {
         `expect($arg).to.not.be.null` => `expect($arg).not.toBeNull()`,
         `expect($arg).to.not.be.undefined` => `expect($arg).not.toBeUndefined()`,
+        `expect($arg).to.include($item)` => `expect($arg).toContain($item)`,
+        `expect($arg).to.eql($item)` => `expect($arg).toEqual($item)`,
         `$locator.should($cond1, $cond2)` as $should where {
             $pw_cond = "",
-            $cond1 <: `'contain'` where {
-                $pw_cond += `toContainText($cond2)`,
+            $cond1 <: or {
+                `'contain'` where {
+                    $pw_cond += `toContainText($cond2)`,
+                },
+                `'have.attr'` where {
+                    $pw_cond += `toHaveAttribute($cond2)`,
+                },
             },
             $should => `await expect($locator).$pw_cond`,
         },
@@ -35,9 +42,11 @@ pattern convert_cypress_queries() {
         `cy.visit($loc)` => `await page.goto($loc)`,
         `cy.get($locator)` => `page.locator($locator)`,
         `cy.contains($text, $options)` => `await expect(page.getByText($text)).toBeVisible($options)`,
+        `cy.get($locator).contains($text).$action()` => `await page.locator($locator, { hasText: $text }).click()`,
         `cy.contains($text)` => `await expect(page.getByText($text)).toBeVisible()`,
         `cy.log($log)` => `console.log($log)`,
         `cy.wait($timeout)` => `await page.waitForTimeout($timeout)`,
+        `$locator.eq($n)` => `$locator.nth($n)`,
         `Cypress.env('$var')` => `process.env.$var`,
         `cy.onlyOn($var === $cond)` => `if ($var !== $cond) {
   test.skip();
