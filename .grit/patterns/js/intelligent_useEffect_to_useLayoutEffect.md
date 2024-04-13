@@ -1,5 +1,5 @@
 ---
-title: [React2Hooks] Intelligent useEffect vs useLayoutEffect
+title: "[React2Hooks] Intelligent useEffect vs useLayoutEffect"
 tags: [fix]
 ---
 

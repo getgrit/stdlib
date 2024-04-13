@@ -3,8 +3,6 @@ title: PreferEarlyReturn
 tags: [lint, style]
 ---
 
-# {{ page.title }}
-
 Prefer to use early returns to keep functions flat.
 
 

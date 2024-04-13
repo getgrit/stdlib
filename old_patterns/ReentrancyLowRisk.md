@@ -2,8 +2,6 @@
 title: Reentrancy, not last line
 ---
 
-# {{ page.title }}
-
 Member assignemnt just before the transfer, but transfer not on the last line
 
 See case 3 here: https://github.com/runtimeverification/amp/issues/39#issuecomment-1137314683

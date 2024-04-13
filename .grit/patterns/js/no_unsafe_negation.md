@@ -3,8 +3,6 @@ title: Rewrite `!key in col` ⇒ `!(key in col)`
 tags: [fix]
 ---
 
-# {{ page.title }}
-
 Negates `key` instead of the entire expression, which is likely a bug.
 
 The intent is usually to negate the entire relation expression.

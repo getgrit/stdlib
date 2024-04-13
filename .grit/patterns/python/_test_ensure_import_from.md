@@ -17,12 +17,13 @@ language python
 
 
 ```python
+# Empty block
 ```
 
 ```python
 from math import prod
 
-
+# Empty block
 ```
 
 ## Add one more name to source

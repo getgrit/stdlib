@@ -2,8 +2,6 @@
 title: Reentrancy, assignments both before and after
 ---
 
-# {{ page.title }}
-
 A transfer with member assignments both before and after the transfer.
 
 See case 2 here: https://github.com/runtimeverification/amp/issues/39#issuecomment-1137314683

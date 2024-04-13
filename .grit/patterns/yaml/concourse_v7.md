@@ -136,6 +136,7 @@ jobs:
               code: one-js
           output_mapping:
               code: a-js
+
         - task: create-file-2
           params:
               FUNCTION: file2-js
@@ -143,6 +144,7 @@ jobs:
               code: one-js
           output_mapping:
               code: a-js
+
         - task: create-file-3
           params:
               FUNCTION: file3-js
@@ -150,6 +152,7 @@ jobs:
               code: one-js
           output_mapping:
               code: a-js
+
         - task: create-file-4
           params:
               FUNCTION: file1-js
@@ -157,6 +160,7 @@ jobs:
               code: two-js
           output_mapping:
               code: a-js
+
         - task: create-file-5
           params:
               FUNCTION: file2-js
@@ -164,6 +168,7 @@ jobs:
               code: two-js
           output_mapping:
               code: a-js
+
         - task: create-file-6
           params:
               FUNCTION: file3-js
@@ -171,6 +176,7 @@ jobs:
               code: two-js
           output_mapping:
               code: a-js
+
         - task: create-file-7
           params:
               FUNCTION: file1-js
@@ -178,6 +184,7 @@ jobs:
               code: one-js
           output_mapping:
               code: b-js
+
         - task: create-file-8
           params:
               FUNCTION: file2-js
@@ -185,6 +192,7 @@ jobs:
               code: one-js
           output_mapping:
               code: b-js
+
         - task: create-file-9
           params:
               FUNCTION: file3-js
@@ -192,6 +200,7 @@ jobs:
               code: one-js
           output_mapping:
               code: b-js
+
         - task: create-file-10
           params:
               FUNCTION: file1-js
@@ -199,6 +208,7 @@ jobs:
               code: two-js
           output_mapping:
               code: b-js
+
         - task: create-file-11
           params:
               FUNCTION: file2-js
@@ -206,6 +216,7 @@ jobs:
               code: two-js
           output_mapping:
               code: b-js
+
         - task: create-file-12
           params:
               FUNCTION: file3-js
