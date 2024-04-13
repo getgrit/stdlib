@@ -142,5 +142,9 @@ pattern ensure_bare_import() {
 }
 
 predicate add_import($name, $source) {
-    $name <: ensure_import_from(source=$source)
+    if ($name <: undefined) {
+      $source <: ensure_bare_import(),
+    } else {
+      $name <: ensure_import_from(source=$source)
+    }
 }
