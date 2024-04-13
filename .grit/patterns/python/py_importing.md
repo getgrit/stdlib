@@ -39,9 +39,10 @@ For example, you can use the following pattern to replace the `model` parameter 
 language python
 
 `$completion($params)` where {
+  $completion <: imported_from(source="litellm"),
+
   $completion <: `completion`,
   $params <: contains `model=$_` => `model="gpt-4-turbo"`,
-  $completion <: imported_from(source="litellm")
 }
 ```
 
@@ -63,6 +64,32 @@ But if `completion` is imported from another module, it will not be changed:
 
 ```python
 from openai import completion
+
+completion(model="gpt-3")
+```
+
+## `add_import($name, $package)` predicate
+
+The `add_import($name, $package)` predicate can be used inside a [where clause](https://docs.grit.io/language/conditions#where-clause) to add an import statement to the top of the file. If `$name` isn't already imported from `$package`, the import statement will be added.
+
+Note this is idempotent, so it will not add the import if it is already present and you can safely call it multiple times.
+
+For example, this pattern can be used to add a `completion` import from the `litellm` package:
+
+```grit
+language python
+
+`completion($params)` where {
+  add_import(name="completion", source="litellm")
+}
+```
+
+```python
+completion(model="gpt-3")
+```
+
+```python
+from litellm import completion
 
 completion(model="gpt-3")
 ```
