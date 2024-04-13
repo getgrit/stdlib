@@ -49,7 +49,8 @@ pattern convert_cypress_queries() {
         `cy.wait($timeout)` => `await page.waitForTimeout($timeout)`,
         `$locator.find($inner)` => `$locator.locator($inner)`,
         `$locator.eq($n)` => `$locator.nth($n)`,
-        `$locator.click()` => `await $locator.click()`,
+        `$locator.click($opts)` => `await $locator.click($opts)`,
+        `$locator.text()` => `await $locator.textContent()`,
         `Cypress.env('$var')` => `process.env.$var`,
         `cy.onlyOn($var === $cond)` => `if ($var !== $cond) {
   test.skip();
@@ -195,6 +196,37 @@ test.describe('Grouping', function () {
   test.afterEach(async function () {
     await page.waitForTimeout(1000);
     teardown();
+  });
+});
+```
+
+## Converts complex queries
+
+```js
+describe('Grouping', function () {
+  it('my test', async () => {
+    cy.get('.header').find('.button').eq(1).click({ force: true });
+    cy.get('.sidebar').contains('Files').click();
+    cy.get('.header').find('.button').eq(1).should('have.attr', 'disabled');
+    cy.get('.button').each((button) => {
+      expect(button.text()).to.eql('Submit');
+    });
+  });
+});
+```
+
+```ts
+import { expect, test } from '@playwright/test';
+
+test.describe('Grouping', function () {
+  test('my test', async ({ page, request }) => {
+    await page.locator('.header').locator('.button').nth(1).click({ force: true });
+    await page.locator('.sidebar', { hasText: 'Files' }).click();
+    await expect(page.locator('.header').locator('.button').nth(1)).toHaveAttribute('disabled');
+    const buttons = await page.locator('.button').all();
+    for (const button of buttons) {
+      expect(await button.textContent()).toEqual('Submit');
+    }
   });
 });
 ```
