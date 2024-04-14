@@ -8,7 +8,7 @@ pattern import_from($source, $names) {
 
 pattern before_each_file_prep_imports() {
     $_ where {
-        $GLOBAL_NEW_BARE_IMPORT_NAMES = [],
+        $GLOBAL_NEW_BARE_IMPORTS = [],
         $GLOBAL_NEW_FROM_IMPORTS = [],
         $GLOBAL_IMPORTS_TO_REMOVE = [],
     }
@@ -86,7 +86,7 @@ pattern insert_imports() {
     $body where {
         $all_imports = "",
         $GLOBAL_NEW_FROM_IMPORTS <: maybe some process_one_source($all_imports),
-        $GLOBAL_NEW_BARE_IMPORT_NAMES <: maybe some bubble($all_imports) $name where {
+        $GLOBAL_NEW_BARE_IMPORTS <: maybe some bubble($all_imports) $name where {
             $all_imports += `import $name\n`,
         },
         if (!$all_imports <: "") {
@@ -129,8 +129,8 @@ pattern is_bare_imported() {
 pattern ensure_bare_import() {
     $name where {
         if ($name <: not is_bare_imported()) {
-            if ($GLOBAL_NEW_FROM_IMPORTS <: not some $name) {
-                $GLOBAL_NEW_FROM_IMPORTS += [$name]
+            if ($GLOBAL_NEW_BARE_IMPORTS <: not some $name) {
+                $GLOBAL_NEW_BARE_IMPORTS += [$name]
             }
         }
     }
