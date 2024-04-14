@@ -9,8 +9,7 @@ pattern import_from($source, $names) {
 pattern before_each_file_prep_imports() {
     $_ where {
         $GLOBAL_NEW_BARE_IMPORT_NAMES = [],
-        $GLOBAL_NEW_FROM_IMPORT_SOURCES = [],
-        $GLOBAL_NEW_FROM_IMPORT_NAMES = [],
+        $GLOBAL_NEW_FROM_IMPORTS = [],
         $GLOBAL_IMPORTS_TO_REMOVE = [],
     }
 }
@@ -22,13 +21,9 @@ pattern after_each_file_handle_imports() {
   }
 }
 
-pattern process_one_source($p, $all_imports) {
-    [$p, $source] where {
-        $new_names = [],
-        $GLOBAL_NEW_FROM_IMPORT_NAMES <: some bubble($new_names) [$p, $name, $source] where {
-            $new_names += $name,
-        },
-        if ($p <: module(statements = some import_from($source, $names))) {
+pattern process_one_source($all_imports) {
+    [$program, $source, $new_names] where {
+        if ($program <: module(statements = some import_from($source, $names))) {
             $names_to_add = "",
             $new_names <: some $name where {
                 if (!$names <: some $name) {
@@ -90,7 +85,7 @@ pattern remove_import() {
 pattern insert_imports() {
     $body where {
         $all_imports = "",
-        $GLOBAL_NEW_FROM_IMPORT_SOURCES <: maybe some process_one_source($p, $all_imports),
+        $GLOBAL_NEW_FROM_IMPORTS <: maybe some process_one_source($all_imports),
         $GLOBAL_NEW_BARE_IMPORT_NAMES <: maybe some bubble($all_imports) $name where {
             $all_imports += `import $name\n`,
         },
@@ -112,11 +107,11 @@ pattern imported_from($source) {
 pattern ensure_import_from($source) {
     $name where {
         if ($name <: not imported_from($source)) {
-            if ($GLOBAL_NEW_FROM_IMPORT_SOURCES <: not some [$program, $source]) {
-                $GLOBAL_NEW_FROM_IMPORT_SOURCES += [$program, $source]
-            },
-            if ($GLOBAL_NEW_FROM_IMPORT_NAMES <: not some [$program, $name, $source]) {
-                $GLOBAL_NEW_FROM_IMPORT_NAMES += [$program, $name, $source]
+            or {
+              $GLOBAL_NEW_FROM_IMPORTS <: some [$program, $source, $existing] where {
+                $existing += $name
+              },
+              $GLOBAL_NEW_FROM_IMPORTS += [$program, $source, [$name]]
             }
         }
     }
@@ -134,8 +129,8 @@ pattern is_bare_imported() {
 pattern ensure_bare_import() {
     $name where {
         if ($name <: not is_bare_imported()) {
-            if ($GLOBAL_NEW_BARE_IMPORT_NAMES <: not some $name) {
-                $GLOBAL_NEW_BARE_IMPORT_NAMES += [$name]
+            if ($GLOBAL_NEW_FROM_IMPORTS <: not some $name) {
+                $GLOBAL_NEW_FROM_IMPORTS += [$name]
             }
         }
     }
