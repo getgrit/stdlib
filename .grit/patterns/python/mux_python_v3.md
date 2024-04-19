@@ -14,8 +14,6 @@ An automated migration is available using the [Grit CLI](https://docs.grit.io/cl
 grit apply mux_python_v3
 ```
 
-Alternatively, review this migration guide and apply the changes manually.
-
 ```grit
 language python
 
@@ -174,6 +172,8 @@ file($body) where {
 }
 ```
 
+Alternatively, review this migration guide and apply the changes manually.
+
 ## Configuration and authentication
 
 Previously, you needed to create a `Configuration` object and set the `username` and `password` fields.
@@ -232,28 +232,29 @@ Many API methods have been renamed and restructured.
 - Required path parameters like `asset_id` are passed as positional arguments
 - Return types are now the resource objects directly instead of response wrappers
 
-
 ### Assets API
 
 Methods are now accessed through `video.assets` instead of an `AssetsApi` class
 
 Method names have been simplified and standardized:
-  - `create_asset()` -> `create()`
-  - `get_asset()` -> `retrieve()`
-  - `update_asset()` -> `update()`
-  - `list_assets()` -> `list()`
-  - `delete_asset()` -> `delete()`
-  - `create_asset_playback_id()` -> `create_playback_id()`
-  - `create_asset_track()` -> `create_track()`
-  - `delete_asset_playback_id()` -> `delete_playback_id()`
-  - `delete_asset_track()` -> `delete_track()`
-  - `generate_asset_track_subtitles()` -> `generate_subtitles()`
-  - `get_asset_input_info()` -> `retrieve_input_info()`
-  - `get_asset_playback_id()` -> `retrieve_playback_id()`
-  - `update_asset_master_access()` -> `update_master_access()`
-  - `update_asset_mp4_support()` -> `update_mp4_support()`
+
+- `create_asset()` -> `create()`
+- `get_asset()` -> `retrieve()`
+- `update_asset()` -> `update()`
+- `list_assets()` -> `list()`
+- `delete_asset()` -> `delete()`
+- `create_asset_playback_id()` -> `create_playback_id()`
+- `create_asset_track()` -> `create_track()`
+- `delete_asset_playback_id()` -> `delete_playback_id()`
+- `delete_asset_track()` -> `delete_track()`
+- `generate_asset_track_subtitles()` -> `generate_subtitles()`
+- `get_asset_input_info()` -> `retrieve_input_info()`
+- `get_asset_playback_id()` -> `retrieve_playback_id()`
+- `update_asset_master_access()` -> `update_master_access()`
+- `update_asset_mp4_support()` -> `update_mp4_support()`
 
 Old example:
+
 ```python
 import mux_python
 client = mux_python.Configuration()
@@ -266,8 +267,8 @@ assets_page = assets_api.list_assets()
 playback_id = assets_api.create_asset_playback_id(asset_id, params)
 ```
 
-
 New example:
+
 ```python
 import mux_python
 client = mux_python.Mux()
@@ -319,6 +320,7 @@ The `LiveStreamsApi` Methods have been renamed and reorganized under `client.vid
 - `update_live_stream_generated_subtitles()` is now `update_generated_subtitles()`.
 
 Old example:
+
 ```python
 import mux_python
 client = mux_python.Configuration()
@@ -330,6 +332,7 @@ live_streams_api.delete_live_stream(live_stream_id)
 ```
 
 New example:
+
 ```python
 import mux_python
 client = mux_python.Mux()
@@ -367,6 +370,7 @@ The playback restrictions methods have been updated:
 - `update_referrer_domain_restriction()` is now `client.video.playback_restrictions.update_referrer()`
 
 Old example:
+
 ```python
 import mux_python
 client = mux_python.Configuration()
@@ -379,6 +383,7 @@ playback_restriction = playback_restrictions_api.update_referrer_domain_restrict
 ```
 
 New example:
+
 ```python
 import mux_python
 client = mux_python.Mux()
@@ -404,6 +409,7 @@ The `SpacesApi` API has been moved to `client.video.space` and the methods have 
 - `stop_space_broadcast()` is now `stop_broadcast()`
 
 Old example:
+
 ```python
 import mux_python
 client = mux_python.Configuration()
@@ -424,6 +430,7 @@ spaces_api.stop_space_broadcast(space_id, broadcast_id)
 ```
 
 New example:
+
 ```python
 import mux_python
 client = mux_python.Mux()
@@ -453,6 +460,7 @@ The `TranscriptionVocabulariesApi` class has been moved to `client.video.transcr
 - `delete_transcription_vocabulary()` is now `video.transaction_vocabularies.delete()`
 
 Old example:
+
 ```python
 import mux_python
 client = mux_python.Configuration()
@@ -464,6 +472,7 @@ transcription_vocabulary = transcription_vocabularies_api.delete_transcription_v
 ```
 
 New example:
+
 ```python
 import mux_python
 client = mux_python.Mux()
