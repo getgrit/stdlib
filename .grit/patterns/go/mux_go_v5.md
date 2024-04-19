@@ -1,5 +1,6 @@
 ---
 title: Upgrade to Mux v5
+tags: [mux, stainless, sdk]
 ---
 
 The Go SDK has been rewritten for v5 and contains significant changes.
