@@ -174,8 +174,6 @@ file($body) where {
 }
 ```
 
-# SDK changes
-
 ## Configuration and authentication
 
 Previously, you needed to create a `Configuration` object and set the `username` and `password` fields.
