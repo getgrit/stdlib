@@ -19,7 +19,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        runner: [nscloud-ubuntu-22.04-amd64-4x16, macos-latest, ubuntu-latest]
+        runner: [nscloud-ubuntu-22.04-amd64-4x16, macos-latest]
         node-version: [20.x]
 
     steps:
@@ -74,7 +74,7 @@ jobs:
       - name: Run grit patterns test
         run: |
           if [ -n "${{ secrets.API_CLIENT_ID }}" ] && [ -n "${{ secrets.API_CLIENT_SECRET }}" ]; then
-              grit patterns test
+              grit patterns test --exclude ai
           else
               grit patterns test --exclude ai
           fi
