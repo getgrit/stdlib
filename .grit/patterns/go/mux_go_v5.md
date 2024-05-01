@@ -88,6 +88,7 @@ The client initialization method has renamed to `NewClient` and configuration is
 Basic Auth has been replaced with `WithTokenID` and `WithTokenSecret` options.
 
 Old:
+
 ```go
 package main
 
@@ -101,6 +102,7 @@ func main() {
 ```
 
 New:
+
 ```go
 package main
 
@@ -137,9 +139,10 @@ func main() {
 
 All request parameters are now wrapped in a generic Field type, which helps to distinguish zero values from null or omitted fields. In most cases, primitive values should simply be wrapped in `muxgo.F()`.
 
-Fields which you want to be null *must* now be sent and should be specified using `muxgo.Null[<type>]()`.
+Fields which you want to be null _must_ now be sent and should be specified using `muxgo.Null[<type>]()`.
 
 Before:
+
 ```go
 package main
 
@@ -151,6 +154,7 @@ func main() {
 ```
 
 After:
+
 ```go
 package main
 
@@ -163,11 +167,10 @@ func main() {
 ```
 
 ## Video API
-The Video API has been moved under the `Video` namespace of the client and methods have been renamed:
-- `AssetsApi.CreateAsset` -> `Video.Assets.New`
 
-Request parameters must be imported from the `video` package, and some have been renamed:
-- `MasterAccess` -> `PlaybackPolicy`
+The Video API has been moved under the `Video` namespace of the client and methods have been renamed:
+
+- `AssetsApi.CreateAsset` -> `Video.Assets.New`
 
 ```go
 package main
