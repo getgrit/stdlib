@@ -213,7 +213,7 @@ any {
   $new = `"@hathora/cloud-sdk-typescript"`,
   // update constructors
   `new $class($_)` as $constructor where {
-    $class <: remove_import(from=`"@hathora/hathora-cloud-sdk"`),
+    $class <: remove_import(from=contains `"@hathora/hathora-cloud-sdk"`),
     $class <: sdk_member(),
     $cloud = `HathoraCloud`,
     $cloud <: ensure_import_from(source=$new),
@@ -224,7 +224,7 @@ any {
       imported_from(from=`"@hathora/hathora-cloud-sdk"`),
       not within `new $_`,
       not within `import $_`,
-      remove_import(from=`"@hathora/hathora-cloud-sdk"`)
+      remove_import(from=contains `"@hathora/hathora-cloud-sdk"`)
     },
     $replacement_import = new_resource_name(old_name=$x),
     $x => $replacement_import,

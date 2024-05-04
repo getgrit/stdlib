@@ -23,14 +23,15 @@ pattern imported_from($from) {
 
 pattern ensure_import_from($source) {
     $name where {
-        if ($name <: not imported_from(from = $source)) {
-            if ($GLOBAL_IMPORTED_SOURCES <: not some [$program, $source]) {
-                $GLOBAL_IMPORTED_SOURCES += [$program, $source]
+        $source <: r"['\"](.*)['\"]"($raw_source),
+        if ($name <: not imported_from(from=$source)) {
+            if ($GLOBAL_IMPORTED_SOURCES <: not some [$program, $raw_source]) {
+                $GLOBAL_IMPORTED_SOURCES += [$program, $raw_source]
             } else {
                 true
             },
-            if ($GLOBAL_IMPORTED_NAMES <: not some [$program, $name, $source]) {
-                $GLOBAL_IMPORTED_NAMES += [$program, $name, $source]
+            if ($GLOBAL_IMPORTED_NAMES <: not some [$program, $name, $raw_source]) {
+                $GLOBAL_IMPORTED_NAMES += [$program, $name, $raw_source]
             } else {
                 true
             }
@@ -41,16 +42,20 @@ pattern ensure_import_from($source) {
 }
 
 private pattern process_one_source($p, $all_imports) {
-    [$p, $source] where {
+    [$p, $our_source] where {
         $imported_names = [],
-        $GLOBAL_IMPORTED_NAMES <: some bubble($p, $source, $imported_names, $all_imports) [$p, $name, $source] where {
+        $GLOBAL_IMPORTED_NAMES <: some bubble($p, $our_source, $imported_names, $all_imports) [$p, $name, $our_source] where {
             $imported_names += $name,
         },
         $joined_imported_names = text(string=join(list = $imported_names, separator = ", ")),
-        if ($p <: program(statements = some the_import_statement($imports, $source))) {
-            $imports => `$imports, $joined_imported_names`
-        } else {
-            $all_imports += `import { $joined_imported_names } from $source;\n`
+        or {
+            $p <: contains bubble($our_source, $joined_imported_names) the_import_statement($imports, $source) as $statement where {
+                // Exclude typed imports
+                $statement <: not includes "import type",
+                $source <: contains $our_source,
+                $imports => `$imports, $joined_imported_names`
+            },
+            $all_imports += `import { $joined_imported_names } from "$our_source";\n`
         }
     }
 }
@@ -87,7 +92,7 @@ pattern remove_import($from) {
     $name where {
         // Handle named imports
         $program <: maybe contains bubble($name, $from) `import $clause from $raw_source` as $import where {
-          $raw_source <: contains $from,
+          $raw_source <: $from,
           $clause <: or {
             // Handle module import
             import_clause(default=$name) where {
@@ -112,11 +117,16 @@ pattern remove_import($from) {
 
 pattern replace_import($old, $new) {
     $name where {
-        $name <: remove_import(from=$old),
+        $name <: remove_import(from=contains $old),
         $name <: ensure_import_from(source=$new)
     }
 }
 
 predicate add_import($name, $source) {
     $name <: ensure_import_from(source=$source)
+}
+
+predicate move_import($name, $new_source) {
+    $name <: remove_import(from=not contains $new_source),
+    $name <: ensure_import_from(source=$new_source)
 }
