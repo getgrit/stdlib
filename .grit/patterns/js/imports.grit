@@ -122,5 +122,5 @@ predicate add_import($name, $source) {
 }
 
 predicate move_import($name, $new_source) {
-    $name <: replace_import(old=$_, $new=$new_source)
+    $name <: replace_import(old=$_, new=$new_source)
 }
