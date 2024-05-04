@@ -53,7 +53,7 @@ private pattern process_one_source($p, $all_imports) {
                 $source <: contains $our_source,
                 $imports => `$imports, $joined_imported_names`
             },
-            $all_imports += `import { $joined_imported_names } from $our_source;\n`
+            $all_imports += `import { $joined_imported_names } from "$our_source";\n`
         }
     }
 }
