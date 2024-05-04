@@ -49,7 +49,9 @@ private pattern process_one_source($p, $all_imports) {
         },
         $joined_imported_names = text(string=join(list = $imported_names, separator = ", ")),
         or {
-            $p <: contains bubble($our_source, $joined_imported_names) the_import_statement($imports, $source) where {
+            $p <: contains bubble($our_source, $joined_imported_names) the_import_statement($imports, $source) as $statement where {
+                // Exclude typed imports
+                $statement <: not includes "import type",
                 $source <: contains $our_source,
                 $imports => `$imports, $joined_imported_names`
             },
