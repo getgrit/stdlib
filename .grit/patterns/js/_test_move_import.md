@@ -28,10 +28,11 @@ import { ApplicationFailure } from '@temporalio/workflow';
 
 ```js
 import { posthog } from '../../services/flags';
+import { sanitizeFilePath } from '@getgrit/universal';
+
 import { InternalServiceAccount } from '../../services/auth/sa';
 import type { MarzanoResolvedPattern } from '@getgrit/sdk';
 import { marzanoResolvedPatternToResolvedGritPattern } from '@getgrit/sdk';
-import { sanitizeFilePath } from '@getgrit/universal';
 import path from 'path';
 import { ApplicationFailure } from '@temporalio/workflow';
 ```
