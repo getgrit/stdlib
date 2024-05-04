@@ -87,10 +87,7 @@ pattern remove_import($from) {
     $name where {
         // Handle named imports
         $program <: maybe contains bubble($name, $from) `import $clause from $raw_source` as $import where {
-          $raw_source <: or {
-            $from,
-            contains $from
-          },
+          $raw_source <: $from,
           $clause <: or {
             // Handle module import
             import_clause(default=$name) where {
@@ -115,7 +112,7 @@ pattern remove_import($from) {
 
 pattern replace_import($old, $new) {
     $name where {
-        $name <: remove_import(from=$old),
+        $name <: remove_import(from=contains $old),
         $name <: ensure_import_from(source=$new)
     }
 }
@@ -125,6 +122,6 @@ predicate add_import($name, $source) {
 }
 
 predicate move_import($name, $new_source) {
-    $name <: remove_import(from=`"@getgrit/sdk"`),
+    $name <: remove_import(from=not contains $new_source),
     $name <: ensure_import_from(source=$new_source)
 }

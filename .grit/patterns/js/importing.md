@@ -20,7 +20,7 @@ contains or {
   `fetch` as $fetch where {
       $from = `node-fetch`,
       // Use remove_import to remove an import entirely
-      $fetch <: remove_import($from)
+      $fetch <: remove_import(from = contains $from)
   },
   `class $_ extends $comp { $_ }` where {
     $comp <: "Component",
