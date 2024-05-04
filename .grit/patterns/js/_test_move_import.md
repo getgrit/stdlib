@@ -9,7 +9,7 @@ tags: [private]
 language js
 
 `sanitizeFilePath` as $s where {
-  move_import(`sanitizeFilePath`, `"@getgrit/universal"`)
+  move_import(`sanitizeFilePath`, `'@getgrit/universal'`)
 }
 ```
 

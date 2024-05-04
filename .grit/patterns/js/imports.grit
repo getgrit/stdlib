@@ -23,14 +23,15 @@ pattern imported_from($from) {
 
 pattern ensure_import_from($source) {
     $name where {
+        $source <: r"['\"](.*)['\"]"($raw_source),
         if ($name <: not imported_from(from=$source)) {
-            if ($GLOBAL_IMPORTED_SOURCES <: not some [$program, $source]) {
-                $GLOBAL_IMPORTED_SOURCES += [$program, $source]
+            if ($GLOBAL_IMPORTED_SOURCES <: not some [$program, $raw_source]) {
+                $GLOBAL_IMPORTED_SOURCES += [$program, $raw_source]
             } else {
                 true
             },
-            if ($GLOBAL_IMPORTED_NAMES <: not some [$program, $name, $source]) {
-                $GLOBAL_IMPORTED_NAMES += [$program, $name, $source]
+            if ($GLOBAL_IMPORTED_NAMES <: not some [$program, $name, $raw_source]) {
+                $GLOBAL_IMPORTED_NAMES += [$program, $name, $raw_source]
             } else {
                 true
             }
@@ -49,7 +50,7 @@ private pattern process_one_source($p, $all_imports) {
         $joined_imported_names = text(string=join(list = $imported_names, separator = ", ")),
         or {
             $p <: contains bubble($our_source, $joined_imported_names) the_import_statement($imports, $source) where {
-                $source <: contains `$our_source`,
+                $source <: contains $our_source,
                 $imports => `$imports, $joined_imported_names`
             },
             $all_imports += `import { $joined_imported_names } from $our_source;\n`
