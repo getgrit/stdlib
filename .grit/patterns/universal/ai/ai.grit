@@ -112,3 +112,33 @@ $match
   $answer <: includes r"(?:\s+)([\s\S]+)</replaced>"($final),
   return `$final`
 }
+
+// Generate new code using the provied instructions.
+function ai_generate($instruct, $pattern) {
+  $messages = [
+    {
+      role: "system",
+      content: raw`You are an expert developer working on refactoring code.
+
+You will be given an instruction on new code you want to generate. Follow the instruction precisely and put the generated code inside a <code> block.
+
+Your response should follow this format:
+
+<code>
+...
+</code>
+`
+    },
+    {
+      role: "user",
+      content: `<instruction>
+$instruct
+</instruction>`
+    },
+  ],
+
+
+  $answer = llm_chat($messages, $pattern, model="claude-3-haiku-20240307", stop_sequences=["</code>"]),
+  $answer <: includes r"<code>(?:\s+)([\s\S]+)(?:\n)</code>"($final),
+  return `$final`
+}
