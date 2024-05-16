@@ -10,13 +10,14 @@ pattern py_find_replace_import($from_package, $from_name, $to_package, $to_name)
       $source <: includes $from_package,
       /// We might need to continue an alias here
       $replacement_name = $to_name,
+      // Look at each name in a loop
       $names <: some bubble($names, $has_other, $replacement_name, $to_name) $this_name where {
         or {
           $this_name <: aliased_import(name=$from_name, $alias) => . where {
             $replacement_name = `$to_name as $alias`
           },
           $this_name <: `$from_name` => .,
-          // $_ where $has_other = true,
+          $has_other = true,
         }
       },
       if ($has_other <: true) {
