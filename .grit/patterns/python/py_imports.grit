@@ -165,20 +165,23 @@ function list_prefix_matches($target, $prefix) {
 pattern py_find_replace_import($from_package, $from_name, $to_package, $to_name) {
     or {
         import_from($source, $names) as $anchor where {
+        $has_target = false,
         $has_other = false,
         $source <: includes $from_package,
         /// We might need to continue an alias here
         $replacement_name = $to_name,
         // Look at each name in a loop
-        $names <: some bubble($from_name, $has_other, $replacement_name, $to_name) $this_name where {
+        $names <: some bubble($from_name, $has_other, $has_target, $replacement_name, $to_name) $this_name where {
           or {
             $this_name <: aliased_import(name=contains $from_name, $alias) => . where {
-              $replacement_name = `$to_name as $alias`
+              $replacement_name = `$to_name as $alias`,
+              $has_target = true
             },
-            $this_name <: contains `$from_name` => .,
+            $this_name <: contains `$from_name` => . where $has_target = true,
             $has_other = true,
           }
         },
+        $has_target <: true,
         if ($has_other <: true) {
           $anchor += `\nfrom $to_package import $replacement_name`
         } else {
