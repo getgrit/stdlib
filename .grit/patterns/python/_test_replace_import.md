@@ -77,7 +77,7 @@ from langchain_community.chat_models import Filler, LeaveMeAlone
 from langchain_openai import ChatOpenAI as FoolMeOnce
 ```
 
-<!-- ## Basic imports
+## Basic imports
 
 ```py
 from otherthing import thing
@@ -91,4 +91,4 @@ from otherthing import thing
 import langchain_openai.ChatOpenAI
 import langchain_openai.ChatOpenAI as MyGPT3
 from langchain_community.chat_models import thing
-``` -->
+```
