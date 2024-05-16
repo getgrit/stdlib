@@ -97,6 +97,8 @@ from new_anthropic_place import SauceLinguist
 from new_anthropic_place import SauceLinguist as SauceLinguist
 ```
 
+<!--
+TODO: add a converge process
 ## Two models at once: Anthropic and Langchain
 
 ```py
@@ -108,4 +110,4 @@ from anthropic_place import EpicLinguist
 from extra_lc_models import MyBigModel, ChatOpenAI
 from extra_lc_models import MyBigModel
 from new_anthropic_place import SauceLinguist
-```
+``` -->
