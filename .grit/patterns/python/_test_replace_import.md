@@ -4,50 +4,6 @@ This file contains some additional tests for replacing Python imports.
 engine marzano(0.1)
 language python
 
-function list_prefix_matches($target, $prefix) {
-    $index = 0,
-    $prefix <: every bubble($target, $prefix, $index) $current where {
-        if ($prefix[$index] <: not undefined) {
-            $target[$index] <: $prefix[$index]
-        },
-        $index += 1
-    }
-}
-
-
-pattern py_find_replace_import($from_package, $from_name, $to_package, $to_name) {
-    or {
-        import_from($source, $names) as $anchor where {
-        $has_other = false,
-        $source <: includes $from_package,
-        /// We might need to continue an alias here
-        $replacement_name = $to_name,
-        // Look at each name in a loop
-        $names <: some bubble($from_name, $has_other, $replacement_name, $to_name) $this_name where {
-          or {
-            $this_name <: aliased_import(name=contains $from_name, $alias) => . where {
-              $replacement_name = `$to_name as $alias`
-            },
-            $this_name <: contains `$from_name` => .,
-            $has_other = true,
-          }
-        },
-        if ($has_other <: true) {
-          $anchor += `\nfrom $to_package import $replacement_name`
-        } else {
-          $anchor => `from $to_package import $replacement_name`
-        }
-      },
-      `import $name` as $anchor where {
-          $name <: dotted_name(name=$name_parts),
-          $search = split($from_package, "."),
-          $search += $from_name,
-          list_prefix_matches(target=$name_parts, prefix=$search),
-          $anchor => `import $to_package.$to_name`
-      }
-    }
-}
-
 file($body) where {
   $body <: contains py_find_replace_import(
     from_package=`langchain_community.chat_models`,
