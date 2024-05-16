@@ -41,6 +41,7 @@ pattern py_find_replace_import($from_package, $from_name, $to_package, $to_name)
       `import $name` as $anchor where {
           $name <: dotted_name(name=$name_parts),
           $search = split($from_package, "."),
+          $search += $from_name,
           list_prefix_matches(target=$name_parts, prefix=$search),
           $anchor => `import $to_package.$to_name`
       }
@@ -101,11 +102,15 @@ from langchain_openai import ChatOpenAI as FoolMeOnce
 ```py
 import lovelypeople.thingie
 from otherthing import thing
+import langchain_community.other_model
+import langchain_community.chat_models.GoodModel
 import langchain_community.chat_models.ChatOpenAI
 ```
 
 ```py
 import lovelypeople.thingie
 from otherthing import thing
+import langchain_community.other_model
+import langchain_community.chat_models.GoodModel
 import langchain_openai.ChatOpenAI
 ```
