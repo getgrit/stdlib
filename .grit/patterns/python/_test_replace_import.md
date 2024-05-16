@@ -11,12 +11,12 @@ pattern py_find_replace_import($from_package, $from_name, $to_package, $to_name)
       /// We might need to continue an alias here
       $replacement_name = $to_name,
       // Look at each name in a loop
-      $names <: some bubble($names, $has_other, $replacement_name, $to_name) $this_name where {
+      $names <: some bubble($from_name, $has_other, $replacement_name, $to_name) $this_name where {
         or {
-          $this_name <: aliased_import(name=$from_name, $alias) => . where {
+          $this_name <: aliased_import(name=contains $from_name, $alias) => . where {
             $replacement_name = `$to_name as $alias`
           },
-          $this_name <: `$from_name` => .,
+          $this_name <: contains `$from_name` => .,
           $has_other = true,
         }
       },
@@ -60,6 +60,7 @@ from langchain_community.chat_models import Filler, ChatOpenAI, LeaveMeAlone
 
 ```py
 from langchain_community.chat_models import Filler, LeaveMeAlone
+
 from langchain_openai import ChatOpenAI
 ```
 
@@ -67,10 +68,12 @@ from langchain_openai import ChatOpenAI
 
 ```py
 from langchain_community.chat_models import Filler, ChatOpenAI as FoolMeOnce, LeaveMeAlone
+
 ```
 
 ```py
 from langchain_community.chat_models import Filler, LeaveMeAlone
+
 from langchain_openai import ChatOpenAI as FoolMeOnce
 ```
 
