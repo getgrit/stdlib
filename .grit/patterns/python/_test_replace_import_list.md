@@ -5,8 +5,8 @@ engine marzano(0.1)
 language python
 
 find_replace_imports(list=[
-  [`langchain_community.chat_models`, `langchain_openai`, `langchain_openai`, `ChatOpenAI`],
-  [`anthropic_place`, `new_anthropic_place`, `new_anthropic_place`, `SauceLinguist`],
+  [`langchain_community.chat_models`, `ChatOpenAI`, `langchain_openai`, `ChatOpenAI`],
+  [`anthropic_place`, `EpicLinguist`, `new_anthropic_place`, `SauceLinguist`],
   [`langchain_community.chat_models`, `MyLittleModel`, `extra_lc_models`, `MyBigModel`]
 ])
 ```
@@ -79,18 +79,3 @@ from anthropic_place import EpicLinguist as SauceLinguist
 from new_anthropic_place import SauceLinguist
 from new_anthropic_place import SauceLinguist as SauceLinguist
 ```
-
-<!--
-TODO: add a converge process
-## Two models at once: Anthropic and Langchain
-
-```py
-from langchain_community.chat_models import MyLittleModel, ChatOpenAI
-from anthropic_place import EpicLinguist
-```
-
-```py
-from extra_lc_models import MyBigModel, ChatOpenAI
-from extra_lc_models import MyBigModel
-from new_anthropic_place import SauceLinguist
-``` -->

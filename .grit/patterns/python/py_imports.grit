@@ -205,7 +205,7 @@ pattern py_find_replace_import($from_package, $from_name, $to_package, $to_name)
 
 pattern find_replace_imports($list) {
   $node where {
-    $list <: some bubble($node) `[$from_package, $from_name, $to_package, $to_name]` where {
+    $list <: some bubble($node) [$from_package, $from_name, $to_package, $to_name] where {
       $node <: py_find_replace_import($from_package, $from_name, $to_package, $to_name)
     }
   }
