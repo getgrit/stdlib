@@ -5,9 +5,9 @@ engine marzano(0.1)
 language python
 
 find_replace_imports(list=[
-  ["langchain_community.chat_models", "langchain_openai", "langchain_openai", "ChatOpenAI"],
-  ["anthropic_place", "new_anthropic_place", "new_anthropic_place", "SauceLinguist"],
-  ["langchain_community.chat_models", "extra_lc_models", "extra_lc_models", "MyBigModel"]
+  [`langchain_community.chat_models`, `langchain_openai`, `langchain_openai`, `ChatOpenAI`],
+  [`anthropic_place`, `new_anthropic_place`, `new_anthropic_place`, `SauceLinguist`],
+  [`langchain_community.chat_models`, `MyLittleModel`, `extra_lc_models`, `MyBigModel`]
 ])
 ```
 
