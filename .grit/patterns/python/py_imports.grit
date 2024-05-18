@@ -196,20 +196,24 @@ pattern find_replace_imports($list) {
         }
       }      
     },
-    // `import $name` as $anchor where {
-    //     $name <: dotted_name(name=$name_parts),
-    //     $target = $name_parts,
-    //     $prefix = split($from_package, "."),
-    //     $prefix += $from_name,
-    //     // TODO: extract into a universal function
-    //     $index = 0,
-    //     $prefix <: every bubble($target, $prefix, $index) $current where {
-    //         if ($prefix[$index] <: not undefined) {
-    //             $target[$index] <: $prefix[$index]
-    //         },
-    //         $index += 1
-    //     },
-    //     $anchor => `import $to_package.$to_name`
-    // }
+    `import $name` as $anchor where {
+      // Split the name into its constituent parts
+      $name <: dotted_name(name=$name_parts),
+      $target = $name_parts,
+      $list <: some bubble($target, $anchor) [$from_package, $from_name, $to_package, $to_name] where {
+        $prefix = split($from_package, "."),
+        $prefix += $from_name,
+        // TODO: extract into a universal function
+        $index = 0,
+        $prefix <: every bubble($target, $prefix, $index) $current where {
+          if ($prefix[$index] <: not undefined) {
+              $target[$index] <: $prefix[$index]
+          },
+          $index += 1
+        },
+        /// Ok, we found an overlap
+        $anchor => `import $to_package.$to_name`
+      }
+    }
   }
 }
