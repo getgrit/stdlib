@@ -98,3 +98,23 @@ from langchain_community.chains import convert_to_ernie_function
 
 from langchain_community.chains import create_ernie_fn_chain
 ```
+
+## If there is an unchanged import in the middle, keep it
+
+```py
+from langchain.chains.ernie_functions.base import (
+  convert_to_ernie_function,
+  keep_this,
+  create_ernie_fn_chain
+)
+```
+
+```py
+from langchain.chains.ernie_functions.base import (
+  keep_this
+)
+
+from langchain_community.chains import convert_to_ernie_function
+
+from langchain_community.chains import create_ernie_fn_chain
+```
