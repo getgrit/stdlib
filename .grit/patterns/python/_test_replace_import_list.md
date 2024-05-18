@@ -95,5 +95,6 @@ from langchain.chains.ernie_functions.base import (
 
 ```py
 from langchain_community.chains import convert_to_ernie_function
+
 from langchain_community.chains import create_ernie_fn_chain
 ```
