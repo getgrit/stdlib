@@ -162,7 +162,7 @@ function list_prefix_matches($target, $prefix) {
 }
 
 pattern py_find_replace_import($from_package, $from_name, $to_package, $to_name) {
-  find_replace_imports([$from_package, $from_name, $to_package, $to_name])
+  find_replace_imports(list=[[$from_package, $from_name, $to_package, $to_name]])
 }
 
 /// List: [[$from_package, $from_name, $to_package, $to_name]]
