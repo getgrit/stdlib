@@ -82,23 +82,6 @@ from new_anthropic_place import SauceLinguist
 from new_anthropic_place import SauceLinguist as SauceLinguist
 ```
 
-## Multiple from imports
-
-It should handle cleaning up two different ones:
-
-```py
-from langchain.chains.ernie_functions.base import (
-  convert_to_ernie_function,
-  create_ernie_fn_chain,
-)
-```
-
-```py
-from langchain_community.chains import convert_to_ernie_function
-
-from langchain_community.chains import create_ernie_fn_chain
-```
-
 ## If there is an unchanged import in the middle, keep it
 
 ```py
@@ -118,3 +101,20 @@ from langchain_community.chains import convert_to_ernie_function
 
 from langchain_community.chains import create_ernie_fn_chain
 ```
+
+<!-- ## Multiple from imports
+
+It should handle cleaning up two different ones:
+
+```py
+from langchain.chains.ernie_functions.base import (
+  convert_to_ernie_function,
+  create_ernie_fn_chain,
+)
+```
+
+```py
+from langchain_community.chains import convert_to_ernie_function
+
+from langchain_community.chains import create_ernie_fn_chain
+``` -->
