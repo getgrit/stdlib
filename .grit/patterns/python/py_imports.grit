@@ -161,15 +161,22 @@ function list_prefix_matches($target, $prefix) {
     }
 }
 
-
 pattern py_find_replace_import($from_package, $from_name, $to_package, $to_name) {
-    or {
-        import_from($source, $names) as $anchor where {
+  find_replace_imports(list=[[$from_package, $from_name, $to_package, $to_name]])
+}
+
+/// List: [[$from_package, $from_name, $to_package, $to_name]]
+pattern find_replace_imports($list) {
+  or {
+    import_from($source, $names) as $anchor where {
+      $list <: some bubble($source, $names, $anchor) [$from_package, $from_name, $to_package, $to_name] where {
+        $source <: includes $from_package,
+        // We might need to preserve an alias here
+        $replacement_name = $to_name,
+        // Did we find at least one true case where the name matched?
         $has_target = false,
         $has_other = false,
-        $source <: includes $from_package,
-        /// We might need to continue an alias here
-        $replacement_name = $to_name,
+
         // Look at each name in a loop
         $names <: some bubble($from_name, $has_other, $has_target, $replacement_name, $to_name) $this_name where {
           or {
@@ -187,29 +194,26 @@ pattern py_find_replace_import($from_package, $from_name, $to_package, $to_name)
         } else {
           $anchor => `from $to_package import $replacement_name`
         }
-      },
-      `import $name` as $anchor where {
-          $name <: dotted_name(name=$name_parts),
-          $target = $name_parts,
-          $prefix = split($from_package, "."),
-          $prefix += $from_name,
-          // TODO: extract into a universal function
-          $index = 0,
-          $prefix <: every bubble($target, $prefix, $index) $current where {
-              if ($prefix[$index] <: not undefined) {
-                  $target[$index] <: $prefix[$index]
-              },
-              $index += 1
+      }      
+    },
+    `import $name` as $anchor where {
+      // Split the name into its constituent parts
+      $name <: dotted_name(name=$name_parts),
+      $target = $name_parts,
+      $list <: some bubble($target, $anchor) [$from_package, $from_name, $to_package, $to_name] where {
+        $prefix = split($from_package, "."),
+        $prefix += $from_name,
+        // TODO: extract into a universal function
+        $index = 0,
+        $prefix <: every bubble($target, $prefix, $index) $current where {
+          if ($prefix[$index] <: not undefined) {
+              $target[$index] <: $prefix[$index]
           },
-          $anchor => `import $to_package.$to_name`
+          $index += 1
+        },
+        /// Ok, we found an overlap
+        $anchor => `import $to_package.$to_name`
       }
-    }
-}
-
-pattern find_replace_imports($list) {
-  $node where {
-    $list <: some bubble($node) [$from_package, $from_name, $to_package, $to_name] where {
-      $node <: py_find_replace_import($from_package, $from_name, $to_package, $to_name)
     }
   }
 }
