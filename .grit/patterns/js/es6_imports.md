@@ -21,6 +21,7 @@ function transformProps($imports) {
 }
 
 function make_import($whole, $if_root, $if_not_root) {
+  // Not sure if this is the best check. Ideally I would like to look at $whole.parent and confirm it is program()
   if ($whole <: within statement_block()) {
     // TODO: we might need to make the outer block async
     return $if_not_root
