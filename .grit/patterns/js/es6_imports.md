@@ -53,6 +53,7 @@ or {
             `{ $transformValue } = require($specifier)` where { $transformed = transformProps($transformValue) },
             `$id = require($specifier)`
         } where {
+            $specifier <: `"$_"`,
             if ($named <: not undefined) {
                 if($named <: $id) {
                   $new_declarations += make_import($whole, `import { $id } from $specifier;`, `const { $id } = await import($specifier);`)
@@ -98,10 +99,7 @@ or {
             }
         },
         $whole => join($new_declarations, `;\n`)
-    },
-
-     // this relies on healing for correctness:
-    `const $id = require($specifier)` => `import * as $id from $specifier`
+    }
 }
 ```
 
@@ -276,4 +274,13 @@ const command = initUtil({
     var proc = require('child_process').spawn('ls', ['-l']);
   },
 });
+```
+
+## Ignore dynamically generated requires
+
+Template literals and other computed requires cannot use import.
+
+```js
+const mybrand = 'grit';
+const { something } = require(`./${mybrand}/lib`);
 ```
