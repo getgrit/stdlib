@@ -44,12 +44,20 @@ or {
         } where {
             if ($named <: not undefined) {
                 if($named <: $id) {
-                  $new_declarations += `import { $id } from $specifier;`
+                  $new_declarations += make_import($whole, `import { $id } from $specifier;`, `const { $id } = await import($specifier);`)
                 } else {
-                  $new_declarations += `import { $named as $id } from $specifier;`
+                  $new_declarations += make_import(
+                    $whole,
+                    `import { $named as $id } from $specifier;`,
+                    `const { $named: $id } = await import($specifier);`
+                  )
                 }
             } else if ($keepObj <: not undefined) {
-                $new_declarations += `import { $id } from $specifier;\nconst { $keepObj } = $id`
+                $new_declarations += make_import(
+                  $whole,
+                  `import { $id } from $specifier;\nconst { $keepObj } = $id;`,
+                  `const { $id: { $keepObj } } = await import($specifier);`
+                ),
             } else if ($transformed <: not undefined) {
                 $new_declarations += make_import($whole, `import { $transformed } from $specifier;`, `const { $transformed } = await import($specifier);`)
             } else if ($rest <: not undefined) {
@@ -193,6 +201,11 @@ async function doStuff() {
 
   // Handle sentry correctly too
   const Sentry = require('@sentry/node');
+
+  // Destructure
+  const {
+    somethingElse: { finalThing },
+  } = require('another');
 }
 ```
 
@@ -204,5 +217,10 @@ async function doStuff() {
 
   // Handle sentry correctly too
   const Sentry = await import('@sentry/node');
+
+  // Destructure
+  const {
+    somethingElse: { finalThing },
+  } = await import('another');
 }
 ```
