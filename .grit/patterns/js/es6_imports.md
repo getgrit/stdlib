@@ -20,13 +20,21 @@ function transformProps($imports) {
     return join(list = $import_list, separator = ", "),
 }
 
+function make_import($whole, $if_root, $if_not_root) {
+  if ($whole <: within statement_block()) {
+    // TODO: we might need to make the outer block async
+    return $if_not_root
+  },
+  return $if_root
+}
+
 or {
     `const $sentry = require('@sentry/node')` => `import * as $sentry from '@sentry/node'`,
     // see https://github.com/motdotla/dotenv#how-do-i-use-dotenv-with-import
     `require("dotenv").config($config)` => `import * as dotenv from 'dotenv';\ndotenv.config($config)`,
     `const $declarations` as $whole where {
         $new_declarations = [],
-        $declarations <: contains bubble($new_declarations) or {
+        $declarations <: contains bubble($whole, $new_declarations) or {
             `$id = require($specifier).default`,
             `$id = require($specifier).$named`,
             `$id = $rest` where { $rest <: contains `require($specifier).$suffix` => $suffix },
@@ -43,7 +51,7 @@ or {
             } else if ($keepObj <: not undefined) {
                 $new_declarations += `import { $id } from $specifier;\nconst { $keepObj } = $id`
             } else if ($transformed <: not undefined) {
-                $new_declarations += `import { $transformed } from $specifier;`
+                $new_declarations += make_import($whole, `import { $transformed } from $specifier;`, `const { $transformed } = await import($specifier);`)
             } else if ($rest <: not undefined) {
                 $new_declarations += `import __$id from $specifier;\nconst $id = __$id.$rest`
             } else {
@@ -54,7 +62,7 @@ or {
     },
 
      // this relies on healing for correctness:
-    `const $id = require($specifier)` => `import $id from $specifier`
+    `const $id = require($specifier)` => `import * as $id from $specifier`
 }
 ```
 
@@ -180,8 +188,11 @@ Require statements that are not at the root of the program are converted to dyna
 ```js
 const { something } = require('./lib');
 
-function doStuff() {
+async function doStuff() {
   const { another } = require('another');
+
+  // Handle sentry correctly too
+  const Sentry = require('@sentry/node');
 }
 ```
 
@@ -190,5 +201,8 @@ import { something } from './lib';
 
 async function doStuff() {
   const { another } = await import('another');
+
+  // Handle sentry correctly too
+  const Sentry = await import('@sentry/node');
 }
 ```
