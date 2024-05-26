@@ -3,10 +3,7 @@ title: Prefer imports over require
 tags: [js, es6, migration, cjs, commonjs]
 ---
 
-# ES6 imports
-
 Converts `require` statements to ES6-style `import`.
-
 
 ```grit
 engine marzano(0.1)
@@ -174,4 +171,24 @@ const {
 
 import __proxyquire from 'proxyquire';
 const proxyquire = __proxyquire.noCallThru().noPreserveCache();
+```
+
+## Dynamic imports
+
+Require statements that are not at the root of the program are converted to dynamic imports, using `await import()`.
+
+```js
+const { something } = require('./lib');
+
+function doStuff() {
+  const { another } = require('another');
+}
+```
+
+```ts
+import { something } from './lib';
+
+async function doStuff() {
+  const { another } = await import('another');
+}
 ```
