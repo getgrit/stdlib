@@ -42,10 +42,13 @@ or {
     `require("dotenv").config($config)` => `import * as dotenv from 'dotenv';\ndotenv.config($config)`,
     `const $declarations` as $whole where {
         $new_declarations = [],
-        $declarations <: contains bubble($whole, $new_declarations) or {
+        $declarations <: some bubble($whole, $new_declarations) or {
             `$id = require($specifier).default`,
             `$id = require($specifier).$named`,
-            `$id = $rest` where { $rest <: contains `require($specifier).$suffix` => $suffix },
+            `$id = $rest` where {
+              $rest <: contains `require($specifier).$suffix` => $suffix,
+              $rest <: r"require.+"
+            },
             `{ $id: { $keepObj } } = require($specifier)`,
             `{ $transformValue } = require($specifier)` where { $transformed = transformProps($transformValue) },
             `$id = require($specifier)`
@@ -253,4 +256,12 @@ async function doStuff() {
     somethingElse: { finalThing },
   } = await import('another');
 }
+```
+
+## Inline require usage
+
+Require statements that are used without being assigned to a variable are ignored.
+
+```js
+const input = await fs.readFile(require('path').resolve(__dirname, 'test.txt'), 'utf8');
 ```
