@@ -265,3 +265,15 @@ Require statements that are used without being assigned to a variable are ignore
 ```js
 const input = await fs.readFile(require('path').resolve(__dirname, 'test.txt'), 'utf8');
 ```
+
+## Function usage
+
+Requires inside a code block should also be ignored.
+
+```js
+const command = initUtil({
+  async run() {
+    var proc = require('child_process').spawn('ls', ['-l']);
+  },
+});
+```
