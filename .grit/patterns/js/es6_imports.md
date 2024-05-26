@@ -28,8 +28,15 @@ function make_import($whole, $if_root, $if_not_root) {
   return $if_root
 }
 
+/// Track specifiers that are known wildcard imports
+/// In theory we should look at the source to determine this
+pattern known_wildcard_import() {
+  or {
+    `"@sentry/node"`
+  }
+}
+
 or {
-    `const $sentry = require('@sentry/node')` => `import * as $sentry from '@sentry/node'`,
     // see https://github.com/motdotla/dotenv#how-do-i-use-dotenv-with-import
     `require("dotenv").config($config)` => `import * as dotenv from 'dotenv';\ndotenv.config($config)`,
     `const $declarations` as $whole where {
@@ -59,11 +66,31 @@ or {
                   `const { $id: { $keepObj } } = await import($specifier);`
                 ),
             } else if ($transformed <: not undefined) {
-                $new_declarations += make_import($whole, `import { $transformed } from $specifier;`, `const { $transformed } = await import($specifier);`)
+                $new_declarations += make_import(
+                  $whole,
+                  `import { $transformed } from $specifier;`,
+                  `const { $transformed } = await import($specifier);`
+                )
             } else if ($rest <: not undefined) {
-                $new_declarations += `import __$id from $specifier;\nconst $id = __$id.$rest`
+                $new_declarations += make_import(
+                  $whole,
+                  `import __$id from $specifier;\nconst $id = __$id.$rest`,
+                  `const { $rest: $id } = await import($specifier);`
+                )
             } else {
-                $new_declarations += `import $id from $specifier;`
+              if ($specifier <: known_wildcard_import()) {
+                $new_declarations += make_import(
+                  $whole,
+                  `import * as $id from $specifier;`,
+                  `const $id = await import($specifier);`
+                )
+              } else {
+                $new_declarations += make_import(
+                  $whole,
+                  `import $id from $specifier;`,
+                  `const $id = await import($specifier);`
+                )
+              }
             }
         },
         $whole => join($new_declarations, `;\n`)
@@ -127,6 +154,8 @@ function doStuff() {
 ```js
 const Sentry = require('@sentry/node');
 ```
+
+This appears to be correct based on [open source examples](https://github.com/search?type=code&q=import%28%22%40sentry%2Fnode).
 
 ```ts
 import * as Sentry from '@sentry/node';
