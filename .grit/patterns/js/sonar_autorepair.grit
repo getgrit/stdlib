@@ -1,0 +1,21 @@
+pattern sonar_autorepair() {
+    or {
+    `class App extends $comp { $props }` where {
+      $props <: contains bubble or {
+        `static $var = $value` => `static readonly $var = $value`,
+        comment() => .,
+        `await alert($alert)` => `alert($alert)`
+      },
+    },
+    `function MyApp($_) { $_}` as $base where {
+        $base += `MyApp.propTypes = {
+    Component: PropTypes.elementType.isRequired,
+    pageProps: PropTypes.object
+  }`,
+        $propTypes = `PropTypes`,
+        $program <: contains import_statement() as $import where {
+          $import += `import PropTypes from 'prop-types'`
+        }
+    }
+  }
+}
