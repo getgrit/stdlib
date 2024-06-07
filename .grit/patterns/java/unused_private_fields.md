@@ -92,8 +92,14 @@ public class Test {
     private static final String HELLO_WORLD = HELLO + WORLD;
     private static final String REMOVE_THIS = "Remove this";
 
+    private final String GREETING = "Hello, ";
+    private final String NAME = "John";
+
+    private final String GREETING_NAME = GREETING + NAME;
+
     public static void main(String[] args) {
         System.out.println(HELLO_WORLD);
+        System.out.println(GREETING_NAME);
     }
 }
 ```
@@ -106,8 +112,14 @@ public class Test {
 
     private static final String HELLO_WORLD = HELLO + WORLD;
 
+    private final String GREETING = "Hello, ";
+    private final String NAME = "John";
+
+    private final String GREETING_NAME = GREETING + NAME;
+
     public static void main(String[] args) {
         System.out.println(HELLO_WORLD);
+        System.out.println(GREETING_NAME);
     }
 }
 ```
