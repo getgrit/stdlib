@@ -7,7 +7,6 @@ tags: [java]
 
 Unused private fields constitute dead code and should therefore be removed.
 
-
 ```grit
 language java
 
@@ -15,7 +14,7 @@ class_body($declarations) where {
     $declarations <: contains bubble($declarations) {
         field_declaration($modifiers) as $field where {
             $field <: contains variable_declarator($name) where {
-                $declarations <: not contains $name until field_declaration(),
+                $declarations <: not contains $name until $field,
                 $name <: not or {
                     `serialVersionUID`,
                     `serialPersistentFields`,
@@ -79,5 +78,48 @@ public class MyClass {
 ```java
 public class MyClass {
   private native static void doSomethingNative();
+}
+```
+
+## Does not remove fields used in other fields
+
+```java
+public class Test {
+
+    private static final String HELLO = "Hello, ";
+    private static final String WORLD = "World";
+
+    private static final String HELLO_WORLD = HELLO + WORLD;
+    private static final String REMOVE_THIS = "Remove this";
+
+    private final String GREETING = "Hello, ";
+    private final String NAME = "John";
+
+    private final String GREETING_NAME = GREETING + NAME;
+
+    public static void main(String[] args) {
+        System.out.println(HELLO_WORLD);
+        System.out.println(GREETING_NAME);
+    }
+}
+```
+
+```java
+public class Test {
+
+    private static final String HELLO = "Hello, ";
+    private static final String WORLD = "World";
+
+    private static final String HELLO_WORLD = HELLO + WORLD;
+
+    private final String GREETING = "Hello, ";
+    private final String NAME = "John";
+
+    private final String GREETING_NAME = GREETING + NAME;
+
+    public static void main(String[] args) {
+        System.out.println(HELLO_WORLD);
+        System.out.println(GREETING_NAME);
+    }
 }
 ```
