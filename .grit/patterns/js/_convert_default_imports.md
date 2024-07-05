@@ -12,7 +12,13 @@ language js
 
 pattern replace_default_import($source, $new_name) {
   or {
-    `import * as $alias from $source` => `import { $new_name as $alias } from $source`,
+    `import * as $alias from $source` as $import where {
+      if ($alias <: $new_name) {
+        $import => `import { $new_name } from $source`
+      } else {
+        $import => `import { $new_name as $alias } from $source`
+      }
+    },
     `import { $imports } from $source` where {
       $imports <: contains `default` => $new_name
     },
@@ -23,7 +29,13 @@ pattern replace_default_import($source, $new_name) {
         $imports += `, $new_name as $alias`
       }
     },
-    `import $alias from $source` => `import { $new_name as $alias } from $source`,
+    `import $alias from $source` as $import where {
+      if ($alias <: contains $new_name) {
+        $import => `import { $new_name } from $source`
+      } else {
+        $import => `import { $new_name as $alias } from $source`
+      }
+    }
   }
 }
 
@@ -127,4 +139,28 @@ import myAlias, { otherImport } from 'star';
 ```ts
 // @filename: here.js
 import { otherImport, myImport as myAlias } from 'star';
+```
+
+## Handle standalone import without alias
+
+```ts
+// @filename: here.js
+import myImport from 'star';
+```
+
+```ts
+// @filename: here.js
+import { myImport } from 'star';
+```
+
+## Handle standalone import with alias
+
+```ts
+// @filename: here.js
+import myAlias from 'star';
+```
+
+```ts
+// @filename: here.js
+import { myImport as myAlias } from 'star';
 ```
