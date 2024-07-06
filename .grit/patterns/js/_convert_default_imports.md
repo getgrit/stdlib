@@ -6,27 +6,45 @@ tags: [js, es6, cjs, commonjs]
 
 Replaces default
 
-
 ```grit
 engine marzano(0.1)
 language js
 
 pattern replace_default_import($source, $new_name) {
   or {
-    `import * as $alias from $source` => `import { $new_name as $alias } from $source`,
+    `import * as $alias from $source` as $import where {
+      if ($alias <: $new_name) {
+        $import => `import { $new_name } from $source`
+      } else {
+        $import => `import { $new_name as $alias } from $source`
+      }
+    },
     `import { $imports } from $source` where {
       $imports <: contains `default` => $new_name
     },
     `import $alias, { $imports } from $source` => `import { $imports } from $source` where {
-      $imports += `$new_name as $alias`
+      if ($alias <: $new_name) {
+        $imports += `, $new_name`,
+      } else {
+        $imports += `, $new_name as $alias`
+      }
     },
-    `import $alias from $source` => `import { $new_name as $alias } from $source`,
+    `import $alias from $source` as $import where {
+      if ($alias <: contains $new_name) {
+        $import => `import { $new_name } from $source`
+      } else {
+        $import => `import { $new_name as $alias } from $source`
+      }
+    }
   }
 }
 
 
 // Test it
-replace_default_import(`'here'`, `namedImport`)
+or {
+  replace_default_import(`'here'`, `namedImport`),
+  replace_default_import(source=$_, new_name=`myImport`) where $filename <: includes "here.js"
+}
 ```
 
 ## Handle the base case
@@ -97,4 +115,52 @@ import otherImport from 'foobar';
 import starImport from 'star';
 import { namedImport as alias, sibling } from 'here';
 import otherImport from 'foobar';
+```
+
+## Handle wildcard source
+
+```ts
+// @filename: here.js
+import myImport, { otherImport } from 'star';
+```
+
+```ts
+// @filename: here.js
+import { otherImport, myImport } from 'star';
+```
+
+## Handle wildcard source with alias
+
+```ts
+// @filename: here.js
+import myAlias, { otherImport } from 'star';
+```
+
+```ts
+// @filename: here.js
+import { otherImport, myImport as myAlias } from 'star';
+```
+
+## Handle standalone import without alias
+
+```ts
+// @filename: here.js
+import myImport from 'star';
+```
+
+```ts
+// @filename: here.js
+import { myImport } from 'star';
+```
+
+## Handle standalone import with alias
+
+```ts
+// @filename: here.js
+import myAlias from 'star';
+```
+
+```ts
+// @filename: here.js
+import { myImport as myAlias } from 'star';
 ```
