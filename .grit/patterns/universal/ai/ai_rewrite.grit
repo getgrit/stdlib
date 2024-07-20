@@ -1,9 +1,12 @@
 
 // Transform the provided code to match the given instructions
 function ai_rewrite($match, $instruct) {
-  // TODO: detect collisions
-  $GLOBAL_REWRITE_INSTRUCTION = $instruct,
-  return `<MODIFY_THIS>$match</MODIFY_THIS>`
+  if ($GLOBAL_REWRITE_INSTRUCTION <: not or { $instruct, $undefined }) {
+    $match => `"Only a single ai_rewrite can be used per pattern."`
+  } else {
+    $GLOBAL_REWRITE_INSTRUCTION = $instruct,
+    return `<MODIFY_THIS>$match</MODIFY_THIS>`
+  }
 }
 
 pattern after_each_file_global_rewrites() {
