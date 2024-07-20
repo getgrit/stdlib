@@ -9,7 +9,7 @@ function ai_rewrite($match, $instruct) {
 pattern after_each_file_global_rewrites() {
   if ($GLOBAL_REWRITE_INSTRUCTION <: not undefined) {
     file($body) where {
-      $code_with_markers = $body,
+      $code_with_markers = text($body, true),
       $instruct = $GLOBAL_REWRITE_INSTRUCTION,
       $messages = [
         {
@@ -19,12 +19,6 @@ pattern after_each_file_global_rewrites() {
         You will be given a file which has been annotated with specific ranges to modify.
 
         The target ranges will be marked with <MODIFY_THIS> tags.
-
-        \`\`\`code
-        <file>
-        // file content here
-        </file>
-        \`\`\`
 
         Given the instructions, you should return a full copy of the file with the appropriate modifications applied based on the user instructions.
 
@@ -47,9 +41,6 @@ pattern after_each_file_global_rewrites() {
         <file>`
             }
           ],
-
-          // log($messages),
-
 
           $answer = llm_chat($messages, $pattern, model="claude-3-5-sonnet-20240620", stop_sequences=["</file>"]),
           // log($answer)
