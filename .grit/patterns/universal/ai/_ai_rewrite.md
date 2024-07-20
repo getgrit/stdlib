@@ -2,9 +2,10 @@
 tags: [ai, sample, util, hidden, example]
 ---
 
-# AI file transform
+# AI rewrites
 
-GritQL can use AI to transform a target variable based on some instruction using the `ai_smart_transform` function.
+Use `ai_rewrite($match, $instruct)` to rewrite a target variable based on some instruction.
+Edits might be made to other parts of the file if necessary to fulfill the intent of your instruction.
 
 ```grit
 language yaml
@@ -16,7 +17,7 @@ pattern pair($key, $value) {
 or {
   `- $task` where {
     $task <: block_mapping(items=some pair(key=`across`)),
-    $task => ai_transform(match=$task, instruct="Replace this `across` task with `in_parallel` tasks, distributing the values across each child like `in_parallel:
+    $task => ai_rewrite(match=$task, instruct="Replace this `across` task with `in_parallel` tasks, distributing the values across each child like `in_parallel:
 
   - task: task-1
   - task: task-2`")

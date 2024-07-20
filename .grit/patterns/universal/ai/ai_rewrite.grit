@@ -1,3 +1,4 @@
+language universal
 
 // Transform the provided code to match the given instructions
 function ai_rewrite($match, $instruct) {
