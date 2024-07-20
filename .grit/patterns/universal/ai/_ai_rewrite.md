@@ -69,7 +69,7 @@ jobs:
   - name: build-and-use-image
     plan:
       - in_parallel:
-          - task: task-1
+          - task: create-file
             config:
               platform: linux
               image_resource:
@@ -82,7 +82,7 @@ jobs:
               outputs:
                 - name: manifests
             file: input.yaml
-          - task: task-2
+          - task: create-file
             config:
               platform: linux
               image_resource:
@@ -93,9 +93,9 @@ jobs:
                 args:
                   - manifests/file2
               outputs:
-                - name: manifestsd
+                - name: manifests
             file: input.yaml
-          - task: task-3
+          - task: create-file
             config:
               platform: linux
               image_resource:
@@ -108,7 +108,6 @@ jobs:
               outputs:
                 - name: manifests
             file: input.yaml
-
       - task: list-file
         config:
           platform: linux
@@ -121,7 +120,8 @@ jobs:
             path: ls
             args:
               - manifests
-```
+
+        ```
 
 ## Handles a basic transform with two tasks
 
@@ -176,7 +176,7 @@ jobs:
   - name: build-and-use-image
     plan:
       - in_parallel:
-          - task: task-1
+          - task: create-file
             config:
               platform: linux
               image_resource:
@@ -189,7 +189,7 @@ jobs:
               outputs:
                 - name: manifests
             file: input.yaml
-          - task: task-2
+          - task: create-file
             config:
               platform: linux
               image_resource:
@@ -200,9 +200,9 @@ jobs:
                 args:
                   - manifests/file2
               outputs:
-                - name: manifestsd
+                - name: manifests
             file: input.yaml
-          - task: task-3
+          - task: create-file
             config:
               platform: linux
               image_resource:
@@ -215,19 +215,6 @@ jobs:
               outputs:
                 - name: manifests
             file: input.yaml
-
-      - task: list-file
-        config:
-          platform: linux
-          image_resource:
-            type: registry-image
-            source: { repository: busybox }
-          inputs:
-            - name: manifests
-          run:
-            path: ls
-            args:
-              - manifests
   - name: deploy-stuff
     plan:
       - in_parallel:
@@ -241,6 +228,9 @@ jobs:
                 path: deploy
                 args:
                   - aws/us-east-1
+              outputs:
+                - name: manifests
+            file: input.yaml
           - task: deploy-code
             config:
               platform: linux
@@ -251,6 +241,9 @@ jobs:
                 path: deploy
                 args:
                   - aws/us-east-2
+              outputs:
+                - name: manifests
+            file: input.yaml
           - task: deploy-code
             config:
               platform: linux
@@ -261,4 +254,7 @@ jobs:
                 path: deploy
                 args:
                   - aws/us-west-3
-```
+              outputs:
+                - name: manifests
+            file: input.yaml
+        ```
