@@ -7,7 +7,7 @@ This is a simple test transformation to convert arrow functions to traditional f
 ```grit
 language js
 
-`($_) => { $_ }` as $arrow => ai_file_transform($arrow, "Convert all arrow function to traditional function syntax using `function`")
+`($_) => $_` as $arrow => ai_rewrite($arrow, instruct="Convert all arrow function to traditional function syntax using `function`")
 ```
 
 ## Simple test case
@@ -31,13 +31,13 @@ const myArrow2 = (foo: string) => {
 const MY_VAR = 9;
 
 // This is my arrow function
-const myArrow = function (a, b) {
+function myArrow(a, b) {
   return a + b;
-};
+}
 
 // This is my second arrow function
-const myArrow2 = function (foo: string) {
+function myArrow2(foo: string) {
   console.log('Checking foo', foo);
   return foo.length;
-};
+}
 ```

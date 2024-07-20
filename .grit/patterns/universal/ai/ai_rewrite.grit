@@ -1,50 +1,62 @@
 
 // Transform the provided code to match the given instructions
 function ai_rewrite($match, $instruct) {
-  $messages = [
-    {
-      role: "system",
-      content: raw`Your job is to help rewrite code based on user instructions.
-
-You will be given a file which has been annotated with specific ranges to modify.
-
-The target ranges will be marked with <MODIFY_THIS> tags.
-
-\`\`\`code
-<file>
-// file content here
-</file>
-\`\`\`
-
-Given the instructions, you should return a full copy of the file with the appropriate modifications applied based on the user instructions.
-
-The file should be surrounded by <file> tags. You should include the full, modified file, in your response.
-`
-    },
-    {
-      role: "user",
-      content: `<instruction>
-$instruct
-</instruction>
-<file>
-// some context here
-<snippet>
-$match
-</snippet>
-</file>`
-    },
-    {
-      role: "assistant",
-      content: `Here is the file, with modifications made per your instructions.
-
-<file>`
-    }
-  ],
-
-  log($messages),
-
-
-  $answer = llm_chat($messages, $pattern, model="claude-3-haiku-20240307", stop_sequences=["</replaced>"]),
-  $answer <: includes r"(?:\s+)([\s\S]+)</replaced>"($final),
-  return `$final`
+  // TODO: detect collisions
+  $GLOBAL_REWRITE_INSTRUCTION = $instruct,
+  return `<MODIFY_THIS>$match</MODIFY_THIS>`
 }
+
+pattern after_each_file_global_rewrites() {
+  if ($GLOBAL_REWRITE_INSTRUCTION <: not undefined) {
+    file($body) where {
+      $code_with_markers = $body,
+      $instruct = $GLOBAL_REWRITE_INSTRUCTION,
+      $messages = [
+        {
+              role: "system",
+              content: raw`Your job is to help rewrite code based on user instructions.
+
+        You will be given a file which has been annotated with specific ranges to modify.
+
+        The target ranges will be marked with <MODIFY_THIS> tags.
+
+        \`\`\`code
+        <file>
+        // file content here
+        </file>
+        \`\`\`
+
+        Given the instructions, you should return a full copy of the file with the appropriate modifications applied based on the user instructions.
+
+        The file should be surrounded by <file> tags. You should include the full, modified file, in your response.
+        `
+            },
+            {
+              role: "user",
+              content: `<instruction>
+        $instruct
+        </instruction>
+        <file>
+        $code_with_markers
+        </file>`
+            },
+            {
+              role: "assistant",
+              content: `Here is the file, with modifications made per your instructions.
+
+        <file>`
+            }
+          ],
+
+          // log($messages),
+
+
+          $answer = llm_chat($messages, $pattern, model="claude-3-5-sonnet-20240620", stop_sequences=["</file>"]),
+          // log($answer)
+  $answer <: includes r"(?:\s+)([\s\S]+)</file>"($final),
+        $body => $final
+    }
+  }
+}
+
+
