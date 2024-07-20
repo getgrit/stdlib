@@ -17,10 +17,14 @@ pattern pair($key, $value) {
 or {
   `- $task` where {
     $task <: block_mapping(items=some pair(key=`across`)),
-    $task => ai_rewrite(match=$task, instruct="Replace this `across` task with `in_parallel` tasks, distributing the values across each child like `in_parallel:
+    $task => ai_rewrite(match=$task, instruct="Replace this `across` task with `in_parallel` tasks, distributing the values across each child like this:
 
+Note that each replacement task will have the same name as the original task, but with `-1`, `-2`, etc. appended to it.
+
+in_parallel:
   - task: task-1
-  - task: task-2`")
+  - task: task-2
+")
   }
 }
 ```
@@ -69,7 +73,7 @@ jobs:
   - name: build-and-use-image
     plan:
       - in_parallel:
-          - task: create-file
+          - task: create-file-1
             config:
               platform: linux
               image_resource:
@@ -82,7 +86,7 @@ jobs:
               outputs:
                 - name: manifests
             file: input.yaml
-          - task: create-file
+          - task: create-file-2
             config:
               platform: linux
               image_resource:
@@ -95,7 +99,7 @@ jobs:
               outputs:
                 - name: manifests
             file: input.yaml
-          - task: create-file
+          - task: create-file-3
             config:
               platform: linux
               image_resource:
@@ -120,8 +124,7 @@ jobs:
             path: ls
             args:
               - manifests
-
-        ```
+```
 
 ## Handles a basic transform with two tasks
 
@@ -176,7 +179,7 @@ jobs:
   - name: build-and-use-image
     plan:
       - in_parallel:
-          - task: create-file
+          - task: create-file-1
             config:
               platform: linux
               image_resource:
@@ -189,7 +192,7 @@ jobs:
               outputs:
                 - name: manifests
             file: input.yaml
-          - task: create-file
+          - task: create-file-2
             config:
               platform: linux
               image_resource:
@@ -202,7 +205,7 @@ jobs:
               outputs:
                 - name: manifests
             file: input.yaml
-          - task: create-file
+          - task: create-file-3
             config:
               platform: linux
               image_resource:
@@ -218,7 +221,7 @@ jobs:
   - name: deploy-stuff
     plan:
       - in_parallel:
-          - task: deploy-code
+          - task: deploy-code-1
             config:
               platform: linux
               image_resource:
@@ -231,7 +234,7 @@ jobs:
               outputs:
                 - name: manifests
             file: input.yaml
-          - task: deploy-code
+          - task: deploy-code-2
             config:
               platform: linux
               image_resource:
@@ -244,7 +247,7 @@ jobs:
               outputs:
                 - name: manifests
             file: input.yaml
-          - task: deploy-code
+          - task: deploy-code-3
             config:
               platform: linux
               image_resource:
@@ -257,4 +260,4 @@ jobs:
               outputs:
                 - name: manifests
             file: input.yaml
-        ```
+```
