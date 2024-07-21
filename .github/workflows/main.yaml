@@ -51,8 +51,8 @@ jobs:
         with:
           go-version: '^1.22.0'
 
-      - name: Install @getgrit/launcher
-        run: npm install -g @getgrit/launcher
+      - name: Install Grit
+        run: npm install -g @getgrit/cli
 
       - name: Run doctor
         run: grit doctor
