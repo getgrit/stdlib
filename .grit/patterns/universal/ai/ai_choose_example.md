@@ -1,5 +1,5 @@
 ---
-tags: [ai, sample, util, hidden, flaky]
+tags: [ai, sample, util, hidden]
 ---
 
 # Ask an AI
@@ -7,6 +7,7 @@ tags: [ai, sample, util, hidden, flaky]
 GritQL includes built-in support for querying an AI to answer questions in patterns via the `ai_choose` function.
 
 For example, you can use the `ai_choose` function to choose a name for a function.
+
 
 ```grit
 language js

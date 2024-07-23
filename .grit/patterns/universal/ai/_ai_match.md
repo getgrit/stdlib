@@ -1,10 +1,11 @@
 ---
-tags: [ai, sample, util, hidden, flaky]
+tags: [ai, sample, util, hidden]
 ---
 
 # AI conditions.
 
 GritQL can use an AI for fuzzy matching. Just match the node you wish to analyze against the `ai_is` pattern.
+
 
 ```grit
 `console.log($msg)` => `// REDACTED: $msg` where {
