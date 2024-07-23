@@ -51,8 +51,8 @@ jobs:
         with:
           go-version: '^1.22.0'
 
-      - name: Install Grit
-        run: npm install -g @getgrit/cli
+      - name: Install @getgrit/launcher
+        run: npm install -g @getgrit/launcher
 
       - name: Run doctor
         run: grit doctor
@@ -74,7 +74,7 @@ jobs:
       - name: Run grit patterns test
         run: |
           if [ -n "${{ secrets.API_CLIENT_ID }}" ] && [ -n "${{ secrets.API_CLIENT_SECRET }}" ]; then
-              grit patterns test --exclude flaky
+              grit patterns test --exclude ai
           else
               grit patterns test --exclude ai
           fi

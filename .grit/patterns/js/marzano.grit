@@ -28,10 +28,7 @@ private pattern before_each_file_stdlib() {
 }
 
 private pattern after_each_file_stdlib() {
-  and {
-    after_each_file_handle_imports(),
-    after_each_file_global_rewrites()
-  }
+  after_each_file_handle_imports()
 }
 
 
