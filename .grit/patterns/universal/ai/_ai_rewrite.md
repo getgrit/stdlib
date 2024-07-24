@@ -1,5 +1,5 @@
 ---
-tags: [ai, sample, util, hidden, example]
+tags: [ai, sample, util, hidden, example, flaky]
 ---
 
 # AI rewrites
