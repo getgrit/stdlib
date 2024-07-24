@@ -1,5 +1,5 @@
 ---
-tags: [ai, sample, util, hidden, example, flaky]
+tags: [ai, sample, util, hidden, example]
 ---
 
 This is a simple test transformation to convert arrow functions to traditional functions
