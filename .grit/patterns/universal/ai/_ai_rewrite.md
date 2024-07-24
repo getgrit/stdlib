@@ -2,9 +2,10 @@
 tags: [ai, sample, util, hidden, example, flaky]
 ---
 
-# AI transform
+# AI rewrites
 
-GritQL can use AI to transform a target variable based on some instruction using the `ai_transform` function.
+Use `ai_rewrite($match, $instruct)` to rewrite a target variable based on some instruction.
+Edits might be made to other parts of the file if necessary to fulfill the intent of your instruction.
 
 ```grit
 language yaml
@@ -16,10 +17,14 @@ pattern pair($key, $value) {
 or {
   `- $task` where {
     $task <: block_mapping(items=some pair(key=`across`)),
-    $task => ai_transform(match=$task, instruct="Replace this `across` task with `in_parallel` tasks, distributing the values across each child like `in_parallel:
+    $task => ai_rewrite(match=$task, instruct="Replace this `across` task with `in_parallel` tasks, distributing the values across each child like this:
 
+Note that each replacement task will have the same name as the original task, but with `-1`, `-2`, etc. appended to it.
+
+in_parallel:
   - task: task-1
-  - task: task-2`")
+  - task: task-2
+")
   }
 }
 ```
@@ -68,7 +73,7 @@ jobs:
   - name: build-and-use-image
     plan:
       - in_parallel:
-          - task: task-1
+          - task: create-file-1
             config:
               platform: linux
               image_resource:
@@ -81,7 +86,7 @@ jobs:
               outputs:
                 - name: manifests
             file: input.yaml
-          - task: task-2
+          - task: create-file-2
             config:
               platform: linux
               image_resource:
@@ -92,9 +97,9 @@ jobs:
                 args:
                   - manifests/file2
               outputs:
-                - name: manifestsd
+                - name: manifests
             file: input.yaml
-          - task: task-3
+          - task: create-file-3
             config:
               platform: linux
               image_resource:
@@ -107,7 +112,6 @@ jobs:
               outputs:
                 - name: manifests
             file: input.yaml
-
       - task: list-file
         config:
           platform: linux
@@ -175,7 +179,7 @@ jobs:
   - name: build-and-use-image
     plan:
       - in_parallel:
-          - task: task-1
+          - task: create-file-1
             config:
               platform: linux
               image_resource:
@@ -188,7 +192,7 @@ jobs:
               outputs:
                 - name: manifests
             file: input.yaml
-          - task: task-2
+          - task: create-file-2
             config:
               platform: linux
               image_resource:
@@ -199,9 +203,9 @@ jobs:
                 args:
                   - manifests/file2
               outputs:
-                - name: manifestsd
+                - name: manifests
             file: input.yaml
-          - task: task-3
+          - task: create-file-3
             config:
               platform: linux
               image_resource:
@@ -214,23 +218,10 @@ jobs:
               outputs:
                 - name: manifests
             file: input.yaml
-
-      - task: list-file
-        config:
-          platform: linux
-          image_resource:
-            type: registry-image
-            source: { repository: busybox }
-          inputs:
-            - name: manifests
-          run:
-            path: ls
-            args:
-              - manifests
   - name: deploy-stuff
     plan:
       - in_parallel:
-          - task: deploy-code
+          - task: deploy-code-1
             config:
               platform: linux
               image_resource:
@@ -240,7 +231,10 @@ jobs:
                 path: deploy
                 args:
                   - aws/us-east-1
-          - task: deploy-code
+              outputs:
+                - name: manifests
+            file: input.yaml
+          - task: deploy-code-2
             config:
               platform: linux
               image_resource:
@@ -250,7 +244,10 @@ jobs:
                 path: deploy
                 args:
                   - aws/us-east-2
-          - task: deploy-code
+              outputs:
+                - name: manifests
+            file: input.yaml
+          - task: deploy-code-3
             config:
               platform: linux
               image_resource:
@@ -260,4 +257,7 @@ jobs:
                 path: deploy
                 args:
                   - aws/us-west-3
+              outputs:
+                - name: manifests
+            file: input.yaml
 ```
