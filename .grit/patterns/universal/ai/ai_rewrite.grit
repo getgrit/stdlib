@@ -46,9 +46,8 @@ pattern after_each_file_global_rewrites() {
             }
           ],
 
-          $answer = llm_chat($messages, $pattern, model="claude-3-5-sonnet-20240620", stop_sequences=["</file>"]),
-          // log($answer)
-  $answer <: includes r"(?:\s+)([\s\S]+)</file>"($final),
+        $answer = llm_chat($messages, $pattern, model="claude-3-5-sonnet-20240620", stop_sequences=["</file>"]),
+        $answer <: includes r"(?:\s+)([\s\S]+?)\s*</file>"($final),
         $body => $final
     }
   }
