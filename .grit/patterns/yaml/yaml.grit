@@ -6,7 +6,7 @@ private pattern before_each_file_stdlib() {
 }
 
 private pattern after_each_file_stdlib() {
-  file()
+  after_each_file_global_rewrites()
 }
 
 // These could be redefined in the future (not presently supported)
