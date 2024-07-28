@@ -10,6 +10,8 @@ find_replace_imports(list=[
   [`langchain_community.chat_models`, `MyLittleModel`, `extra_lc_models`, `MyBigModel`],
   [`langchain.chains.ernie_functions.base`, `convert_to_ernie_function`, `langchain_community.chains`, `convert_to_ernie_function`],
   [`langchain.chains.ernie_functions.base`, `create_ernie_fn_chain`, `langchain_community.chains`, `create_ernie_fn_chain`],
+  [`langchain.chains.graph_qa.cypher_utils`, `CypherQueryCorrector`, `lc_new`, `CypherQueryCorrector`],
+  [`langchain.chains.graph_qa.cypher_utils`, `Schema`, `lc_new`, `Schema`],
 ])
 ```
 
@@ -100,6 +102,18 @@ from langchain.chains.ernie_functions.base import (
 from langchain_community.chains import convert_to_ernie_function
 
 from langchain_community.chains import create_ernie_fn_chain
+```
+
+## Multiple from imports
+
+```py
+from langchain.chains.graph_qa.cypher_utils import CypherQueryCorrector, Schema
+```
+
+```py
+from lc_new import CypherQueryCorrector
+
+from lc_new import Schema
 ```
 
 <!-- ## Multiple from imports
