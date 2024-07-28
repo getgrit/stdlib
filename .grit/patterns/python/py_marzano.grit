@@ -7,7 +7,10 @@ pattern before_each_file_stdlib() {
 }
 
 pattern after_each_file_stdlib() {
-  after_each_file_handle_imports()
+  any {
+    after_each_file_handle_imports(),
+    after_each_file_global_rewrites()
+  }
 }
 
 
