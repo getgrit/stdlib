@@ -1,0 +1,19 @@
+language yaml
+
+// All core stdlib functions can be done here
+private pattern before_each_file_stdlib() {
+  file()
+}
+
+private pattern after_each_file_stdlib() {
+  after_each_file_global_rewrites()
+}
+
+// These could be redefined in the future (not presently supported)
+pattern before_each_file() {
+  before_each_file_stdlib()
+}
+
+pattern after_each_file() {
+  after_each_file_stdlib()
+}

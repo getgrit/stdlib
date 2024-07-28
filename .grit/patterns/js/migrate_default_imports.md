@@ -6,7 +6,6 @@ tags: [migration, js, imports, default, multifile]
 
 This pattern combines [convert_default_exports](https://github.com/getgrit/stdlib/blob/9dfce85d25977e08bbd476f693e6cbc07ef08316/.grit/patterns/js/_convert_default_exports.md) and [\_convert_default_imports](https://github.com/getgrit/stdlib/blob/9dfce85d25977e08bbd476f693e6cbc07ef08316/.grit/patterns/js/_convert_default_imports.md#L4) to replace default exports to named exports and replace default imports with named imports.
 
-
 ```grit
 language js
 
@@ -55,7 +54,7 @@ export function name() {
 }
 
 // @filename: foo/module_user.ts
-import { name as name } from 'mymodule';
+import { name } from 'mymodule';
 import other from 'othermodule';
 ```
 
@@ -82,7 +81,7 @@ export function name() {
 }
 
 // @filename: folder2/bar.js
-import { name as name } from '../folder1/foo';
+import { name } from '../folder1/foo';
 
 // @filename: folder3/baz
 // This is a different folder - ignore it
