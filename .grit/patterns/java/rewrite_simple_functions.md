@@ -1,6 +1,10 @@
-# Rewrite Java with AI
+---
+tags: [ai, java, inline, quality]
+---
 
-This sample uses AI to inline private methods.
+# Inline methods that are only used once
+
+This pattern uses static analysis to find private methods that are only used once, then uses AI to inline them.
 
 ```grit
 language java
