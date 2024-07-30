@@ -17,7 +17,13 @@ class_body($declarations) where {
                 `writeObject`,
                 `readObject`,
             },
-            $method => ai_rewrite($method, "Inline the use of the private method $name in the class.")
+            $method => ai_rewrite($method, "Inline the use of the private method $name in the class."),
+            $uses = 0,
+            $declarations <: contains bubble($uses, $name, $method) `$name` where {
+                $name <: not within $method,
+                $uses += 1,
+            },
+            $uses <: 1
         }
     }
 }
@@ -54,6 +60,26 @@ public class Calculator {
 
     public int multiply(int a, int b) {
         return a * b;
+    }
+}
+```
+
+## Ignore reuse
+
+If a method is used multiple times, it should not be inlined.
+
+```java
+public class Calculator {
+    public String add(int a, int b) {
+        return humanize(a + b);
+    }
+
+    public String multiply(int a, int b) {
+        return humanize(a * b);
+    }
+
+    private String humanize(int result) {
+        return result.toString();
     }
 }
 ```
