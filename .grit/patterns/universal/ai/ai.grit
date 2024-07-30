@@ -142,5 +142,5 @@ $instruct
 
   $answer = llm_chat($messages, $pattern, model="claude-3-haiku-20240307", stop_sequences=["</code>"]),
   $answer <: includes r"<code>(?:\s+)([\s\S]+)(?:\n)</code>"($final),
-  return `$final\n`
+  return `$final`
 }
