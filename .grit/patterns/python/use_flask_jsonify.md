@@ -35,10 +35,10 @@ def user():
 ```
 
 ```python
-from flask import jsonify
-
 import flask
 import json
+from flask import jsonify
+
 app = flask.Flask(__name__)
 
 @app.route("/user")
@@ -60,9 +60,8 @@ def user():
 ```
 
 ```python
-from flask import jsonify
-
 from json import dumps
+from flask import jsonify
 
 @app.route("/user")
 def user():

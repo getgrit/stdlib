@@ -95,7 +95,20 @@ pattern insert_imports() {
             $all_imports += `import $name\n`,
         },
         if (!$all_imports <: "") {
+          $body <: module($statements),
+          $last_import = false,
+          $statements <: maybe some bubble($last_import) or {
+              future_import_statement(),
+              import_statement(),
+              import_from_statement(),
+            } as $this_import where {
+            $last_import = $this_import
+          },
+          if ($last_import <: false) {
             $body => `$all_imports\n$body`
+          } else {
+            $last_import += `\n$all_imports`
+          }
         }
     }
 }

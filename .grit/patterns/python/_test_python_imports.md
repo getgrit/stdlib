@@ -25,7 +25,6 @@ contains bubble or {
 }
 ```
 
-
 ## ensure_import_from
 
 ```python
@@ -35,9 +34,9 @@ unittest.TestCase()
 ```
 
 ```python
+import somewhere
 from testing import newtest
 
-import somewhere
 
 newtest.TestCase()
 ```
@@ -129,11 +128,13 @@ foolib.remove_parent()
 ```
 
 ```python
+
 from elsewhere import keeplib
 from otherlib import keepthis
 
 somelib.remove_parent()
 foolib.remove_parent()
+
 ```
 
 ## Remove imports - complex cases
@@ -154,6 +155,7 @@ hiddenlib.keep_parent()
 ```
 
 ```python
+
 import elselib as hiddenlib
 # Keep this, even though it *looks* like it could be related
 from confusing_lib import somelib as otherlib
@@ -183,5 +185,26 @@ from otherlib import keepthis
 keepthis.keep_parent()
 foolib.remove_parent()
 badlib.remove_parent()
+```
 
+## Appends after existing imports
+
+In order to avoid conflicts with module docstrings, inserted imports are appended after existing imports.
+
+```python
+"""Module doc-string."""
+from __future__ import annotations
+import unrelated
+
+othermodule.TestCase()
+```
+
+```python
+"""Module doc-string."""
+from __future__ import annotations
+import unrelated
+import othermodule
+
+
+othermodule.TestCase()
 ```

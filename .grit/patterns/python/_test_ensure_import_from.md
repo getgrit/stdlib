@@ -15,7 +15,6 @@ language python
 
 ## Add missing import
 
-
 ```python
 # Empty block
 ```
@@ -53,7 +52,6 @@ import math
 ```
 
 ```python
-from math import prod
-
 import math
+from math import prod
 ```
