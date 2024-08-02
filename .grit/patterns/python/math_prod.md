@@ -69,9 +69,9 @@ for x in range(10):
 ```
 
 ```python
+from math import log
 import math
 
-from math import log
 
 math.prod(range(10))
 

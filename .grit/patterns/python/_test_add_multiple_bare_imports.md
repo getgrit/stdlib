@@ -19,7 +19,6 @@ language python
 
 ## Add all imports if none is imported
 
-
 ```python
 # This is an empty block
 ```
@@ -40,10 +39,9 @@ import re
 ```
 
 ```python
-import json
-
 import math
 import re
+import json
 ```
 
 ## Add missing imports
@@ -54,10 +52,9 @@ import re
 ```
 
 ```python
-import math
-
 import json
 import re
+import math
 ```
 
 ## Add missing import, all in one line
@@ -67,11 +64,9 @@ import json, math
 ```
 
 ```python
-import re
-
 import json, math
+import re
 ```
-
 
 ## Don't add duplicate imports
 
