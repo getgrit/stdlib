@@ -6,14 +6,6 @@ pattern import_from($source, $names) {
     import_from_statement(name=$names, module_name=dotted_name(name=$source)),
 }
 
-pattern any_import_statement() {
-  or {
-    import_from_statement(),
-    future_import_statement(),
-    import_statement()
-  }
-}
-
 pattern before_each_file_prep_imports() {
     $_ where {
         $GLOBAL_NEW_BARE_IMPORT_NAMES = [],

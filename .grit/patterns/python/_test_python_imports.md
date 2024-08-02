@@ -129,7 +129,7 @@ foolib.remove_parent()
 
 ```python
 
-from elsewhere import  keeplib
+from elsewhere import keeplib
 from otherlib import keepthis
 
 somelib.remove_parent()
