@@ -68,7 +68,6 @@ class UserInfo(BaseModel):
     name: str
     age: int
 
-
 # Patch the OpenAI client
 client = instructor.from_openai(OpenAI())
 
@@ -78,11 +77,10 @@ user_info = client.chat.completions.parse(
     response_format=UserInfo,
     messages=[{"role": "user", "content": "John Doe is 30 years old."}],
 )
-if user_info.parsed:
-    print(user_info.parsed.name)
-    print(user_info.parsed.age)
-else:
-    print(user_info.refusal)
+
+if user_info.choices[0].message.refusal:
+    raise Exception(f"GPT refused to comply! {user_info.choices[0].message.refusal}")
+user_info = user_info.choices[0].message.parsed
 
 print(user_info.name)
 #> John Doe
