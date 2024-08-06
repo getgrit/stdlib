@@ -21,6 +21,17 @@ contains bubble or {
   },
   `$badimport.remove_parent()` where {
     $badimport <: remove_from_imports()
+  },
+  class_definition($name, $body) as $C where {
+    $name <: `Config`,
+    $body <: block($statements),
+    $t = "",
+    $statements <: some bubble($t) assignment(left=$x, right=$y) as $A where {
+        $t += `$x=$y,`
+
+    },
+    $C => `ConfigDict($t)`,
+    add_import(source="pydantic", name="ConfigDict")
   }
 }
 ```
@@ -207,4 +218,22 @@ import othermodule
 
 
 othermodule.TestCase()
+```
+
+### Ensure we can add an import to a single-node file
+
+Tracks https://github.com/getgrit/gritql/issues/447
+
+```python
+class Config:
+  a: int = 2
+  b: float = 5
+```
+
+```python
+import pydantic
+
+class Config:
+  a: int = 2
+  b: float = 5
 ```
