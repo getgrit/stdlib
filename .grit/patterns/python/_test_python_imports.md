@@ -20,7 +20,7 @@ contains bubble or {
     $newbob <: ensure_import_from(source=`ourlib.goodlib`),
   },
   `$badimport.remove_parent()` where {
-    $badimport <: remove_import()
+    $badimport <: remove_from_imports()
   }
 }
 ```

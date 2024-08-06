@@ -5,7 +5,6 @@ tags: [python, upgrade, langfuse, migration]
 
 Upgrade the Langfuse SDK to v2 following [this guide](https://langfuse.com/docs/sdk/python#upgrading-from-v1xx-to-v2xx).
 
-
 ```grit
 engine marzano(0.1)
 language python
@@ -36,7 +35,7 @@ pattern convert_snake_case() {
 pattern convert_pydantic_enum() {
     maybe some `level=$obs_level.$level` => `level="$level"` where {
         $obs_level <: `ObservationLevel`,
-        $obs_level <: remove_import()
+        $obs_level <: remove_from_imports()
     }
 }
 
@@ -65,7 +64,7 @@ pattern prune_langfuse_imports() {
         `CreateDatasetRequest`,
         `Usage`,
     } as $deprecated where {
-        $deprecated <: remove_import()
+        $deprecated <: remove_from_imports()
     }
 }
 
