@@ -1,3 +1,7 @@
+---
+tags: [openai, instructor, structured, outputs]
+---
+
 # Switch from Instructor to OpenAI Structured Outputs
 
 OpenAI recently released [structured outputs](https://openai.com/index/introducing-structured-outputs-in-the-api/), which removes some of the complexity of using [Instructor](https://github.com/jxnl/instructor) or other structured output libraries.
@@ -16,6 +20,7 @@ file($body) where {
       $args <: contains `response_model=$model` => `response_format=$model`,
       // We need to actually extract the parsed value
       $call <: maybe within `$var = $_` as $assignment where {
+          $assignment <: maybe contains `chat` => `beta.chat`,
           $assignment += `
 if $var.choices[0].message.refusal:
     raise Exception(f"GPT refused to comply! {$var.choices[0].message.refusal}")
@@ -73,7 +78,7 @@ class UserInfo(BaseModel):
 client = OpenAI()
 
 # Extract structured data from natural language
-user_info = client.chat.completions.parse(
+user_info = client.beta.chat.completions.parse(
     model="gpt-3.5-turbo",
     response_format=UserInfo,
     messages=[{"role": "user", "content": "John Doe is 30 years old."}],
