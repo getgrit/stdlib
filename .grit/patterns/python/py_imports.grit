@@ -79,7 +79,7 @@ pattern handle_remove_imports() {
   }
 }
 
-pattern remove_import() {
+pattern remove_from_imports() {
   $name where {
     if ($GLOBAL_IMPORTS_TO_REMOVE <: not some $name) {
       $GLOBAL_IMPORTS_TO_REMOVE += $name
