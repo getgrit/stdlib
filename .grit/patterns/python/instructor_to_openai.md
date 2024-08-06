@@ -8,18 +8,22 @@ This pattern will transform your existing code to use the new structured outputs
 engine marzano(0.1)
 language python
 
-`$call.$create($args)` where {
-    // Change the method
-    $create <: `create` => `parse`,
-    // Change the arg
-    $args <: contains `response_model=$model` => `response_format=$model`,
-    // We need to actually extract the parsed value
-    $call <: maybe within `$var = $_` as $assignment where {
-        $assignment += `
+file($body) where {
+  $body <: contains bubble `$call.$create($args)` where {
+      // Change the method
+      $create <: `create` => `parse`,
+      // Change the arg
+      $args <: contains `response_model=$model` => `response_format=$model`,
+      // We need to actually extract the parsed value
+      $call <: maybe within `$var = $_` as $assignment where {
+          $assignment += `
 if $var.choices[0].message.refusal:
     raise Exception(f"GPT refused to comply! {$var.choices[0].message.refusal}")
 $var = $var.choices[0].message.parsed`
-    }
+      }
+  },
+  $body <: maybe contains `$client = instructor.from_openai(OpenAI())` => `$client = OpenAI()`,
+  remove_import(`instructor`)
 }
 ```
 
@@ -39,7 +43,6 @@ class UserInfo(BaseModel):
     age: int
 
 
-# Patch the OpenAI client
 client = instructor.from_openai(OpenAI())
 
 # Extract structured data from natural language
@@ -58,7 +61,6 @@ print(user_info.age)
 Now you just need to use the `parse` method directly on the OpenAI client.
 
 ```python
-import instructor
 from pydantic import BaseModel
 from openai import OpenAI
 
@@ -68,8 +70,7 @@ class UserInfo(BaseModel):
     name: str
     age: int
 
-# Patch the OpenAI client
-client = instructor.from_openai(OpenAI())
+client = OpenAI()
 
 # Extract structured data from natural language
 user_info = client.chat.completions.parse(
