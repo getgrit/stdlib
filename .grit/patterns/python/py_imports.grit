@@ -87,6 +87,12 @@ pattern remove_import() {
   }
 }
 
+predicate remove_import($source) {
+  if ($GLOBAL_IMPORTS_TO_REMOVE <: not some $source) {
+    $GLOBAL_IMPORTS_TO_REMOVE += $source
+  }
+}
+
 pattern insert_imports() {
     $body where {
         $all_imports = "",

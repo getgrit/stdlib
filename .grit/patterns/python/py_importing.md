@@ -8,10 +8,9 @@ tags:
 
 Grit includes standard patterns for declaratively finding, adding, and updating imports in Python.
 
-
 ## `import_from($source)` pattern
 
-The `import_from` pattern is used to *find* an import statement. The `$source` metavariable can be used to specify the module that is being imported. This pattern will match any import statement that imports from the specified module.
+The `import_from` pattern is used to _find_ an import statement. The `$source` metavariable can be used to specify the module that is being imported. This pattern will match any import statement that imports from the specified module.
 
 For example, you can use the following pattern to remove all imports from the `pydantic` module:
 
@@ -30,7 +29,6 @@ from pydantic import More
 ```python
 from typing import List
 ```
-
 
 ## `imported_from($source)` pattern
 
@@ -133,4 +131,28 @@ completion(model="gpt-3")
 import openai
 
 openai.completion(model="gpt-3")
+```
+
+## `remove_import($source)` predicate
+
+The `remove_import($source)` predicate can be used inside a [where clause](https://docs.grit.io/language/conditions#where-clause) to remove an import statement, if it is present.
+
+For example, you can use the following pattern to remove all imports from the `pydantic` module:
+
+```grit
+language python
+
+import_from(source="pydantic") => . where {
+  remove_import(source="pydantic")
+}
+```
+
+```python
+from typing import List
+from pydantic import BaseModel
+from pydantic import More
+```
+
+```python
+from typing import List
 ```
