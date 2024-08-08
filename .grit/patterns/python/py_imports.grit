@@ -81,20 +81,17 @@ pattern process_one_source($all_imports) {
                 $new_names += $name
             }
         },
-        // if ($program <: module(statements = some import_from($source, $names))) {
-        //     $names_to_add = "",
-        //     $new_names <: some $name where {
-        //         if (!$names <: some $name) {
-        //             $names_to_add += `, $name`
-        //         }
-        //     },
-        //     $names => `$names$names_to_add`,
-        // } else {
+        if ($program <: module(statements = some import_from($source, $names))) {
+            $names_to_add = "",
+            $new_names <: some bubble($names_to_add, $names) $new_name where {
+              $names <: not some $new_name,
+              $names_to_add += `, $new_name`
+            },
+            $names => `$names$names_to_add`,
+        } else {
             $joined_names = join(list = $new_names, separator = ", "),
             $all_imports += `from $source import $joined_names\n`,
-        // },
-        // $joined_names = join(list = $new_names, separator = ", "),
-        // $all_imports += `from $source import $joined_names\n`,
+        }
     }
 }
 
