@@ -100,12 +100,11 @@ pattern insert_imports() {
         $all_imports = "",
         $sources = [],
         // First make sure we have an enty for each import
-        $GLOBAL_NEW_FROM_IMPORTS <: some bubble($sources) [$source, $name] where {
+        $GLOBAL_NEW_FROM_IMPORTS <: maybe some bubble($sources) [$source, $name] where {
           $sources += $source
         },
         $unique_sources = distinct(list=$sources),
         $unique_sources <: maybe some process_one_source($all_imports),
-        // $program => `$all_imports`
         $GLOBAL_NEW_BARE_IMPORT_NAMES <: maybe some bubble($all_imports) $name where {
             $all_imports += `import $name\n`,
         },
