@@ -75,12 +75,13 @@ predicate remove_import($source) {
 
 pattern process_one_source($all_imports) {
     $source where {
-        $new_names = [],
-        $GLOBAL_NEW_FROM_IMPORTS <: some bubble($new_names, $source) [$candidate_source, $name] where {
+        $maybe_new_names = [],
+        $GLOBAL_NEW_FROM_IMPORTS <: some bubble($maybe_new_names, $source) [$candidate_source, $name] where {
             if ($source <: $candidate_source) {
-                $new_names += $name
+                $maybe_new_names += $name
             }
         },
+        $new_names = distinct(list=$maybe_new_names),
         if ($program <: module(statements = some import_from($source, $names))) {
             $names_to_add = "",
             $new_names <: some bubble($names_to_add, $names) $new_name where {
