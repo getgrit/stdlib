@@ -43,12 +43,12 @@ import defaultImport from '../../shared/default';
 ```
 
 ```ts
-const { something, another } = require('./lib');
-const { assert } = require('chai');
-const { config: conf } = require('chai');
-const { mixed: mixie, foo } = require('life');
-const starImport = require('star');
+const { something, another } = require("./lib")
+const { assert } = require("chai")
+const { config: conf } = require("chai")
+const { mixed: mixie, foo } = require("life")
+const starImport = require("star")
 
 // no special handling for default. Also, comments get removed.
-const defaultImport = require('../../shared/default');
+const defaultImport = require("../../shared/default")
 ```

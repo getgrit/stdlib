@@ -57,7 +57,7 @@ public class Calculator {
 With the rewrite applied, Grit will output:
 
 ```java
-public class Calculator {
+class Calculator {
     public int add(int a, int b) {
         return a + b;
     }
