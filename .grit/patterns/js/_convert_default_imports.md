@@ -4,7 +4,7 @@ tags: [js, es6, cjs, commonjs]
 
 # Replace default imports with a named import
 
-Replaces default
+Replaces a default import with a named import, including for re-exported default imports.
 
 ```grit
 engine marzano(0.1)
@@ -35,7 +35,10 @@ pattern replace_default_import($source, $new_name) {
       } else {
         $import => `import { $new_name as $alias } from $source`
       }
-    }
+    },
+    `export { $imports } from $source` as $import where {
+      $imports <: contains `default` => $new_name
+    },
   }
 }
 
@@ -163,4 +166,30 @@ import myAlias from 'star';
 ```ts
 // @filename: here.js
 import { myImport as myAlias } from 'star';
+```
+
+## Handle re-exported default import
+
+```ts
+export { default } from 'here';
+export { default } from 'elsewhere';
+```
+
+```ts
+export { namedImport } from 'here';
+export { default } from 'elsewhere';
+```
+
+## Handle re-exported default import with alias
+
+```ts
+export { default as name1 } from 'here';
+export { default, otherImport } from 'here';
+export { otherImport, default as name2 } from 'here';
+```
+
+```ts
+export { namedImport as name1 } from 'here';
+export { namedImport, otherImport } from 'here';
+export { otherImport, namedImport as name2 } from 'here';
 ```
