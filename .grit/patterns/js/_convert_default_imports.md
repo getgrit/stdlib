@@ -23,14 +23,17 @@ pattern replace_default_import($source, $new_name) {
       $imports <: contains `default` => $new_name
     },
     `import $alias, { $imports } from $source` => `import { $imports } from $source` where {
+      $alias <: not .,
       if ($alias <: $new_name) {
         $imports += `, $new_name`,
       } else {
         $imports += `, $new_name as $alias`
       }
     },
-    `import $alias from $source` as $import where {
-      if ($alias <: contains $new_name) {
+    `import $clause from $source` as $import where {
+      $clause <: import_clause(default=$alias),
+      $alias <: not .,
+      if ($alias <: $new_name) {
         $import => `import { $new_name } from $source`
       } else {
         $import => `import { $new_name as $alias } from $source`
@@ -192,4 +195,11 @@ export { otherImport, default as name2 } from 'here';
 export { namedImport as name1 } from 'here';
 export { namedImport, otherImport } from 'here';
 export { otherImport, namedImport as name2 } from 'here';
+```
+
+## Leave non-default imports unchanged
+
+```ts
+import { namedImport } from 'here';
+import { twoPartImport, namedImport as alias } from 'here';
 ```
