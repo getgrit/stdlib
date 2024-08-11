@@ -171,27 +171,25 @@ import { myImport as myAlias } from 'star';
 ## Handle re-exported default import
 
 ```ts
-// @filename: here.js
-export { default } from 'star';
+export { default } from 'here';
+export { default } from 'elsewhere';
 ```
 
 ```ts
-// @filename: here.js
-export { myImport } from 'star';
+export { namedImport } from 'here';
+export { default } from 'elsewhere';
 ```
 
 ## Handle re-exported default import with alias
 
 ```ts
-// @filename: here.js
-export { default as name1 } from 'module-name';
-export { default, otherImport } from 'module-name';
-export { otherImport, default as name2 } from 'module-name';
+export { default as name1 } from 'here';
+export { default, otherImport } from 'here';
+export { otherImport, default as name2 } from 'here';
 ```
 
 ```ts
-// @filename: here.js
-export { myImport as name1 } from 'module-name';
-export { myImport, otherImport } from 'module-name';
-export { otherImport, myImport as name2 } from 'module-name';
+export { namedImport as name1 } from 'here';
+export { namedImport, otherImport } from 'here';
+export { otherImport, namedImport as name2 } from 'here';
 ```
