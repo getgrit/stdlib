@@ -1,11 +1,10 @@
 ---
-tags: [angularjs, angular, upgrade, wip, hidden, ai]
+tags: [angularjs, angular, upgrade, wip, hidden, ai, flaky]
 ---
 
 # Upgrade from AngularJS to Angular
 
 [WIP] This pattern provides a basic build configuration for upgrading from AngularJS to Angular. It is still a work in progress.
-
 
 ```grit
 language js
@@ -30,7 +29,7 @@ angular.module('phoneList').component('phoneList', {
     'Phone',
     function PhoneListController(Phone) {
       this.phones = Phone.query();
-      this.orderProp = 'age';
+      this.orderProp = 'brand';
     },
   ],
 });
@@ -47,15 +46,14 @@ import { Phone } from './phone.service';
 @Component({
   selector: 'app-phone-list',
   templateUrl: './phone-list.component.html',
-  providers: [Phone]
+  providers: [Phone],
 })
 export class PhoneListComponent {
   phones: any[];
-  orderProp = 'age';
+  orderProp = 'brand';
 
   constructor(private phoneService: Phone) {
     this.phones = this.phoneService.query();
   }
 }
-
 ```
