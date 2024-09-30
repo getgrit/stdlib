@@ -123,12 +123,17 @@ pattern insert_imports() {
         if (!$all_imports <: "") {
           $body <: module($statements),
           $last_import = false,
-          $statements <: maybe some bubble($last_import) or {
+          $hit_a_non_import = false,
+          $statements <: maybe some bubble($last_import, $hit_a_non_import) or {
+            or {
               future_import_statement(),
               import_statement(),
               import_from_statement(),
             } as $this_import where {
-            $last_import = $this_import
+              $hit_a_non_import <: false,
+              $last_import = $this_import,
+            },
+            $_ where $hit_a_non_import = true
           },
           if ($last_import <: false) {
             $body => `$all_imports\n$body`
