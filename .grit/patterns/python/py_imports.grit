@@ -82,17 +82,22 @@ pattern process_one_source($all_imports) {
             }
         },
         $new_names = distinct(list=$maybe_new_names),
-        if ($program <: module(statements = some import_from($source, $names))) {
-            $names_to_add = "",
-            $new_names <: some bubble($names_to_add, $names) $new_name where {
-              $names <: not some $new_name,
-              $names_to_add += `, $new_name`
-            },
-            $names => `$names$names_to_add`,
-        } else {
-            $joined_names = join(list = $new_names, separator = ", "),
-            $all_imports += `from $source import $joined_names\n`,
-        }
+        // Once we hit a non-import statement, we should stop iterating
+        $non_import_statement = false,
+        $program <: maybe module(statements = some or {
+          import_from($source, $names)
+        }),
+        // if ($program <: module(statements = some import_from($source, $names))) {
+        //     $names_to_add = "",
+        //     $new_names <: some bubble($names_to_add, $names) $new_name where {
+        //       $names <: not some $new_name,
+        //       $names_to_add += `, $new_name`
+        //     },
+        //     $names => `$names$names_to_add`,
+        // } else {
+        $joined_names = join(list = $new_names, separator = ", "),
+        $all_imports += `from $source import $joined_names\n`,
+        // }
     }
 }
 
@@ -100,7 +105,7 @@ pattern insert_imports() {
     $body where {
         $all_imports = "",
         $sources = [],
-        // First make sure we have an enty for each import
+        // First make sure we have an entry for each import
         $GLOBAL_NEW_FROM_IMPORTS <: maybe some bubble($sources) [$source, $name] where {
           $sources += $source
         },
