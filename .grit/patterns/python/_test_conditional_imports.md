@@ -7,10 +7,15 @@ The solution is to ignore "late" imports when considering imports to attach ours
 ```grit
 language python
 
-`TypedDict` as $X where {
+or {
+  `nowhere` as $nothing where {
+    add_import(source="nowhere", name="nothing"),
+  },
+  `TypedDict` as $X where {
       $X <: within `from typing import $_`,
       add_import(source="typing_extensions", name="TypedDict"),
       $X => .
+  }
 }
 ```
 
@@ -58,5 +63,36 @@ from typing_extensions import TypedDict, Annotated
 
 def foo(x: TypedDict):
   pass
+
+```
+
+## Insert new imports at the last safe position
+
+```python
+from elsewhere import something
+
+def foo(x: TypedDict):
+  pass
+
+# This is unsafe
+from danger import foobar
+
+def bar():
+  print(nowhere)
+
+```
+
+```python
+from elsewhere import something
+from nowhere import nothing
+
+def foo(x: TypedDict):
+  pass
+
+# This is unsafe
+from danger import foobar
+
+def bar():
+  print(nowhere)
 
 ```
