@@ -2,6 +2,17 @@ language python
 
 /** This is a utility file, you do not need to implement it yourself */
 
+// Safe import statements are things we want to consider as part of the "block" of imports at the top of the file
+private pattern statement_in_import_block() {
+  or {
+    future_import_statement(),
+    import_statement(),
+    import_from_statement(),
+    // Module docstrings
+    string()
+  }
+}
+
 pattern import_from($source, $names) {
     import_from_statement(name=$names, module_name=dotted_name(name=$source)),
 }
@@ -88,8 +99,7 @@ pattern process_one_source($all_imports) {
           // The one we are actually looking for
           import_from($source, $names) where $non_import_statement <: false,
           // Any other import statement is fine to keep processing with
-          import_statement(),
-          import_from_statement(),
+          statement_in_import_block(),
           // Any other statement should cause us to terminate
           $_ where $non_import_statement = true
         }),
@@ -125,11 +135,7 @@ pattern insert_imports() {
           $last_import = false,
           $hit_a_non_import = false,
           $statements <: maybe some bubble($last_import, $hit_a_non_import) or {
-            or {
-              future_import_statement(),
-              import_statement(),
-              import_from_statement(),
-            } as $this_import where {
+            statement_in_import_block() as $this_import where {
               $hit_a_non_import <: false,
               $last_import = $this_import,
             },
