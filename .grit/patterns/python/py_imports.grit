@@ -86,24 +86,24 @@ pattern process_one_source($all_imports) {
         $non_import_statement = false,
         $program <: maybe module(statements = some or {
           // The one we are actually looking for
-          import_from($source, $names) where $non_import_statement <: true,
+          import_from($source, $names) where $non_import_statement <: false,
           // Any other import statement is fine to keep processing with
           import_statement(),
           import_from_statement(),
           // Any other statement should cause us to terminate
           $_ where $non_import_statement = true
         }),
-        // if ($program <: module(statements = some import_from($source, $names))) {
-        //     $names_to_add = "",
-        //     $new_names <: some bubble($names_to_add, $names) $new_name where {
-        //       $names <: not some $new_name,
-        //       $names_to_add += `, $new_name`
-        //     },
-        //     $names => `$names$names_to_add`,
-        // } else {
-        $joined_names = join(list = $new_names, separator = ", "),
-        $all_imports += `from $source import $joined_names\n`,
-        // }
+        if ($names <: not undefined) {
+            $names_to_add = "",
+            $new_names <: some bubble($names_to_add, $names) $new_name where {
+              $names <: not some $new_name,
+              $names_to_add += `, $new_name`
+            },
+            $names => `$names$names_to_add`,
+        } else {
+          $joined_names = join(list = $new_names, separator = ", "),
+          $all_imports += `from $source import $joined_names\n`,
+        }
     }
 }
 
