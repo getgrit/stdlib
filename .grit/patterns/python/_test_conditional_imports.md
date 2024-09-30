@@ -14,7 +14,7 @@ language python
 }
 ```
 
-## Sample code
+## Preserve the order of multiple cells
 
 ```python
 from typing import TypedDict
@@ -41,4 +41,22 @@ from typing_extensions import Annotated
 
 def bar():
   pass
+```
+
+## But consolidate imports when there is only one cell
+
+```python
+from typing import TypedDict
+from typing_extensions import Annotated
+
+def foo(x: TypedDict):
+  pass
+```
+
+```python
+from typing_extensions import TypedDict, Annotated
+
+def foo(x: TypedDict):
+  pass
+
 ```
