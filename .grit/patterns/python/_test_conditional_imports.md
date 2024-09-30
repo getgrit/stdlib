@@ -59,11 +59,10 @@ def foo(x: TypedDict):
 ```
 
 ```python
-from typing_extensions import TypedDict, Annotated
+from typing_extensions import Annotated, TypedDict
 
 def foo(x: TypedDict):
   pass
-
 ```
 
 ## Insert new imports at the last safe position
