@@ -85,7 +85,13 @@ pattern process_one_source($all_imports) {
         // Once we hit a non-import statement, we should stop iterating
         $non_import_statement = false,
         $program <: maybe module(statements = some or {
-          import_from($source, $names)
+          // The one we are actually looking for
+          import_from($source, $names) where $non_import_statement <: true,
+          // Any other import statement is fine to keep processing with
+          import_statement(),
+          import_from_statement(),
+          // Any other statement should cause us to terminate
+          $_ where $non_import_statement = true
         }),
         // if ($program <: module(statements = some import_from($source, $names))) {
         //     $names_to_add = "",
