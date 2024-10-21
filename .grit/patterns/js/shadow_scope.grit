@@ -7,6 +7,9 @@ pattern shadows_identifier($name) {
         $declarations <: contains variable_declarator(name=$name)
       }
     },
+    function($parameters) where {
+      $parameters <: contains $name
+    },
     arrow_function($parameters) where {
       $parameters <: contains $name
     },
