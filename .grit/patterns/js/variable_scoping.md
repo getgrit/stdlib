@@ -4,30 +4,51 @@ tags:
   - full-examples
 ---
 
-# Variable Scoping
+# Variable Scoping with `identifier_scope`
 
-Default Grit patterns are not generally aware of variable scoping, but you can use the `
+Default Grit patterns are not generally aware of variable scoping, but you can use the `identifier_scope` pattern to find (or exclude) [scopes](https://developer.mozilla.org/en-US/docs/Glossary/Scope) where an identifier has been _locally_ defined.
 
-Grit includes standard patterns for declaratively finding, adding, and updating imports in Python.
+This is most often used when you want to target an import from a shared module but exclude scopes where the identifier is shadowed locally.
 
-## `import_from($source)` pattern
-
-The `import_from` pattern is used to _find_ an import statement. The `$source` metavariable can be used to specify the module that is being imported. This pattern will match any import statement that imports from the specified module.
-
-For example, you can use the following pattern to remove all imports from the `pydantic` module:
+For example, this pattern would rename `t` from the `translation` library to `translate` unless `t` is shadowed locally:
 
 ```grit
-language python
+language js
 
-import_from(source="pydantic") => .
+`t` as $t => `translate` where {
+  $t <: imported_from(from=`"translation"`),
+  $t <: not within identifier_scope(name=$t)
+}
 ```
 
-```python
-from typing import List
-from pydantic import BaseModel
-from pydantic import More
+Here is a simple example, note the excluded case:
+
+```js
+import { t } from 'translation';
+
+console.log(t('hello world'));
+
+function normal() {
+  console.log(t('hello world'));
+}
+
+// Note that t is an argument to this function, so the global t is not used.
+function shadowed(t) {
+  console.log(t('hello world'));
+}
 ```
 
-```python
-from typing import List
+```js
+import { translate } from 'translation';
+
+console.log(translate('hello world'));
+
+function normal() {
+  console.log(translate('hello world'));
+}
+
+// Note that t is an argument to this function, so the global t is not used.
+function shadowed(t) {
+  console.log(t('hello world'));
+}
 ```

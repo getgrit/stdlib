@@ -1,6 +1,5 @@
 
-// Implementation of scope_for_identifier pattern
-pattern scope_for_identifier($name) {
+pattern identifier_scope($name) {
   or {
     statement_block($statements) where {
       $statements <: some variable($declarations) where {
