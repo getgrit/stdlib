@@ -21,7 +21,7 @@ language js
 }
 ```
 
-Here is a simple example, note the excluded case:
+Here is a simple example file where `t` is shadowed locally:
 
 ```js
 import { t } from 'translation';
@@ -32,11 +32,13 @@ function normal() {
   console.log(t('hello world'));
 }
 
-// Note that t is an argument to this function, so the global t is not used and we should *not* rename it here.
+// t is an argument to this function, so the global t is not used and we should *not* rename it here.
 function shadowed(t) {
   console.log(t('hello world'));
 }
 ```
+
+When we rewrite it, the shadowed `t` is not renamed:
 
 ```js
 import { translate } from 'translation';
@@ -47,7 +49,7 @@ function normal() {
   console.log(translate('hello world'));
 }
 
-// Note that t is an argument to this function, so the global t is not used and we should *not* rename it here.
+// t is an argument to this function, so the global t is not used and we should *not* rename it here.
 function shadowed(t) {
   console.log(t('hello world'));
 }
