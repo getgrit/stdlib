@@ -1,6 +1,6 @@
 
-// Implementation of shadows_identifier pattern
-pattern shadows_identifier($name) {
+// Implementation of scope_for_identifier pattern
+pattern scope_for_identifier($name) {
   or {
     statement_block($statements) where {
       $statements <: some variable($declarations) where {

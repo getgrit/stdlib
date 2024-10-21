@@ -4,14 +4,14 @@ tags: [utility, test]
 
 ## Shadow Identifiers
 
-This tests the `shadows_identifier` pattern by finding all cases where a variable is shadowed.
+This tests the `scope_for_identifier` pattern by finding all cases where a variable is shadowed.
 
 ```grit
 language js
 
 // Test case
 file($body) where {
-  $body <: contains bubble shadows_identifier(`x`) as $scope where {
+  $body <: contains bubble scope_for_identifier(`x`) as $scope where {
     $scope <: contains `x` => `shadowed`
   }
 }

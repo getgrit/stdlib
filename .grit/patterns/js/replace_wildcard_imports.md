@@ -30,7 +30,7 @@ pattern replace_wildcard_import() {
   `import * as $alias from $src` as $import where {
     $refs = [],
     $kept_refs = [],
-    $program <: contains used_alias($alias, $refs, $kept_refs) until shadows_identifier(name=$alias),
+    $program <: contains used_alias($alias, $refs, $kept_refs) until scope_for_identifier(name=$alias),
     $refs = distinct($refs),
     $joined_refs = join($refs, `, `),
     // Try the different scenarios
