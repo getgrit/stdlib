@@ -17,7 +17,7 @@ language js
 
 `t` as $t => `translate` where {
   $t <: imported_from(from=`"translation"`),
-  $t <: not within identifier_scope(name=$t)
+  $t <: not within identifier_scope(name=`t`)
 }
 ```
 
@@ -32,7 +32,7 @@ function normal() {
   console.log(t('hello world'));
 }
 
-// Note that t is an argument to this function, so the global t is not used.
+// Note that t is an argument to this function, so the global t is not used and we should *not* rename it here.
 function shadowed(t) {
   console.log(t('hello world'));
 }
@@ -47,7 +47,7 @@ function normal() {
   console.log(translate('hello world'));
 }
 
-// Note that t is an argument to this function, so the global t is not used.
+// Note that t is an argument to this function, so the global t is not used and we should *not* rename it here.
 function shadowed(t) {
   console.log(t('hello world'));
 }
