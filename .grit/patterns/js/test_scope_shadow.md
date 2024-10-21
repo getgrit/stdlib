@@ -41,6 +41,28 @@ function notShadowingVar() {
 shadowingExample();
 ```
 
+## Anonymous function variable definition
+
+```js
+var shadowingExample = function (x) {
+  console.log(x);
+};
+var notShadowingVar = function (y) {
+  console.log(y);
+};
+shadowingExample();
+```
+
+```js
+var shadowingExample = function (shadowed) {
+  console.log(shadowed);
+};
+var notShadowingVar = function (y) {
+  console.log(y);
+};
+shadowingExample();
+```
+
 ## If statement
 
 ```js
