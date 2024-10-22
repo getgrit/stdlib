@@ -2,43 +2,16 @@
 tags: [utility, test]
 ---
 
-## Test shadow scope
+## Shadow Identifiers
 
-This tests the `shadows_identifier` pattern by finding all cases where a variable is shadowed.
-
+This tests the `scope_for_identifier` pattern by finding all cases where a variable is shadowed.
 
 ```grit
 language js
 
-// Implementation
-pattern shadows_identifier($name) {
-  or {
-    statement_block($statements) where {
-      $statements <: some variable($declarations) where {
-        $declarations <: contains variable_declarator(name=$name)
-      }
-    },
-    arrow_function($parameters) where {
-      $parameters <: contains $name
-    },
-    function_declaration($parameters) where {
-      $parameters <: contains $name
-    },
-    for_in_statement() as $statement where {
-      $statement <: contains $name
-    },
-    for_statement() as $statement where {
-      $statement <: contains $name
-    },
-    `try { $_ } catch($catch) { $_ }` where {
-      $catch <: contains $name
-    },
-  }
-}
-
 // Test case
 file($body) where {
-  $body <: contains bubble shadows_identifier(`x`) as $scope where {
+  $body <: contains bubble identifier_scope(`x`) as $scope where {
     $scope <: contains `x` => `shadowed`
   }
 }
@@ -65,6 +38,28 @@ function shadowingExample() {
 function notShadowingVar() {
   console.log(x);
 }
+shadowingExample();
+```
+
+## Anonymous function variable definition
+
+```js
+var shadowingExample = function (x) {
+  console.log(x);
+};
+var notShadowingVar = function (y) {
+  console.log(y);
+};
+shadowingExample();
+```
+
+```js
+var shadowingExample = function (shadowed) {
+  console.log(shadowed);
+};
+var notShadowingVar = function (y) {
+  console.log(y);
+};
 shadowingExample();
 ```
 
