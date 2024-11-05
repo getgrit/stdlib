@@ -15,6 +15,7 @@ The following pattern transforms JS traditional functions to arrow functions.
 To see how it works, follow the tutorial.
 */
 or {
+  // Rewrite traditional functions to arrow functions
   or {
     `async function ($args) { $body }` => `async ($args) => {
   $body
@@ -27,13 +28,17 @@ or {
       or { `this`, `arguments` }
     } until `function $_($_) { $_ }`
   },
-  `($args) => { return $value }` where {
-    if ($value <: object()) {
-      $result = `($value)`
+  // Rewrite arrow functions to remove unnecessary return statements
+  or {
+    `async ($args) => { return $value }` where $async = `async `,
+    `($args) => { return $value }` where $async = .,
+  } where {
+      if ($value <: object()) {
+        $result = `($value)`
     } else {
       $result = $value
     }
-  } => `($args) => $result`
+  } => `$async($args) => $result`
 }
 ```
 
@@ -123,4 +128,20 @@ const a = {
     return await Promise.resolve(1);
   },
 };
+```
+
+## Handles async return values
+
+When removing an unnecessary `return` statement, we still need to consider if the function is async.
+
+```js
+const a = async () => {
+  return await Promise.resolve(1);
+};
+```
+
+After:
+
+```js
+const a = async () => await Promise.resolve(1);
 ```
