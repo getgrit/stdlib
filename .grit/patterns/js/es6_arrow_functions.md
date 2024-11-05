@@ -15,9 +15,14 @@ The following pattern transforms JS traditional functions to arrow functions.
 To see how it works, follow the tutorial.
 */
 or {
+  or {
+    `async function ($args) { $body }` => `async ($args) => {
+  $body
+}`,
   `function ($args) { $body }` => `($args) => {
   $body
-}` where {
+}`,
+  } where {
     $body <: not contains {
       or { `this`, `arguments` }
     } until `function $_($_) { $_ }`
@@ -94,4 +99,28 @@ const dummyAnswer = (type) => ({
     return 1;
   },
 });
+```
+
+## Handles async functions correctly
+
+See [this issue](https://github.com/getgrit/stdlib/issues/243).
+
+Before:
+
+```js
+const a = {
+  set: async function () {
+    return await Promise.resolve(1);
+  },
+};
+```
+
+After:
+
+```js
+const a = {
+  set: async () => {
+    return await Promise.resolve(1);
+  },
+};
 ```
