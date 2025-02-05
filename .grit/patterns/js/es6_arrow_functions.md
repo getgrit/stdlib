@@ -9,11 +9,6 @@ Converts function expressions to ES6 arrow functions, including eliminating the 
 engine marzano(0.1)
 language js
 
-/*
-The following pattern transforms JS traditional functions to arrow functions.
-
-To see how it works, follow the tutorial.
-*/
 or {
   // Rewrite traditional functions to arrow functions
   or {

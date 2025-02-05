@@ -7,7 +7,6 @@ This pattern converts a serverless function to a spin function designed to run o
 
 Note: the full migration is packaged as a workflow. This is just a subcomponent.
 
-
 ```grit
 engine marzano(0.1)
 language js
@@ -16,7 +15,7 @@ predicate insert_statement($statement) {
     $program <: or {
         contains `export $_` as $old => `$statement\n\n$old`,
         contains `"use strict"` as $old => `$old\n\n$statement`,
-        $program => js"$statement\n\n$program"
+        $program => `$statement\n\n$program`
     }
 }
 
@@ -26,22 +25,22 @@ pattern spin_fix_response() {
             $properties <: contains bubble {
                 pair($key, $value) where {
                     $key <: "statusCode",
-                    $key => js"status"
+                    $key => `status`
                 }
             },
         },
         object() as $obj where {
-          $obj => js"{
+          $obj => `{
             status: 200,
             body: JSON.stringify($obj)
-          }"
+          }`
         }
     }
 }
 
 pattern spin_fix_request($event) {
     `$event.request.$prop` => `JSON.parse(decoder.decode($event.body)).$prop` where {
-        insert_statement(statement=js"const decoder = new TextDecoder('utf-8')")
+        insert_statement(statement=`const decoder = new TextDecoder('utf-8')`)
     }
 }
 
@@ -51,8 +50,8 @@ predicate spin_uses_ts() {
 
 pattern spin_main_fix_handler() {
   or {
-      js"module.exports.$_ = ($args) => { $body }",
-      js"export const $_ = ($args) => {$body }"
+      `module.exports.$_ = ($args) => { $body }`,
+      `export const $_ = ($args) => {$body }`
     } as $func where {
         $request = `request`,
         $args <: or { [$event_arg], [$event_arg, $context, $callback] },
@@ -73,13 +72,13 @@ pattern spin_main_fix_handler() {
             $req_type <: ensure_import_from(source=`"@fermyon/spin-sdk"`),
             $res_type = `HttpResponse`,
             $res_type <: ensure_import_from(source=`"@fermyon/spin-sdk"`),
-            $new = js"export async function handleRequest($event: $req_type): Promise<$res_type> {
+            $new = `export async function handleRequest($event: $req_type): Promise<$res_type> {
         $body
-    }",
+    }`,
         } else {
-            $new = js"export async function handleRequest($event) {
+            $new = `export async function handleRequest($event) {
         $body
-    }",
+    }`,
         }
     } => $new
 }
