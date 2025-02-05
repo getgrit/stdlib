@@ -7,7 +7,6 @@ This pattern converts a serverless function to a spin function designed to run o
 
 Note: the full migration is packaged as a workflow. This is just a subcomponent.
 
-
 ```grit
 engine marzano(0.1)
 language js
@@ -31,10 +30,10 @@ pattern spin_fix_response() {
             },
         },
         object() as $obj where {
-          $obj => js"{
+          $obj => `{
             status: 200,
             body: JSON.stringify($obj)
-          }"
+          }`
         }
     }
 }
