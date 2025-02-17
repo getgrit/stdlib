@@ -12,12 +12,12 @@ engine marzano(0.1)
 language js
 
 `$testlike.skip` => `$testlike` where {
-  $testlike <: not after comment(),
-  $testlike <: or {
-    `describe`,
-    `it`,
-    `test`
-  }
+	$testlike <: not after comment(),
+	$testlike <: or {
+		`describe`,
+		`it`,
+		`test`
+	}
 }
 ```
 

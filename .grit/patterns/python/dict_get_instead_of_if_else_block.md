@@ -17,10 +17,9 @@ if $key in $dict:
 else:
     $var = $default
 ` => `$var = $dict.get($key, $default)` where {
-    !$key <: contains call(),
-    !$default <: contains call(),
+	! $key <: contains call(),
+	! $default <: contains call()
 }
-
 ```
 
 ## Replace if-else with dict.get()

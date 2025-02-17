@@ -12,20 +12,17 @@ engine marzano(0.1)
 language js
 
 or {
-    `import { $import } from "$source"` where {
-        $newports = [],
-        $import <: some bubble($newports) {
-            import_specifier($name, $alias) where or {
-                and {
-                    $alias <: false,
-                    $newports += `$name`,
-                },
-                $newports += `$name: $alias`,
-            }
-        },
-        $transformed = join(list = $newports, separator = ", "),
-    } => `const { $transformed } = require("$source")`,
-    `import $import from "$source"` => `const $import = require("$source")`,
+	`import { $import } from "$source"` where {
+		$newports = [],
+		$import <: some bubble($newports) {
+			import_specifier($name, $alias) where or {
+				and { $alias <: false, $newports += `$name` },
+				$newports += `$name: $alias`
+			}
+		},
+		$transformed = join(list=$newports, separator=", ")
+	} => `const { $transformed } = require("$source")`,
+	`import $import from "$source"` => `const $import = require("$source")`
 }
 ```
 

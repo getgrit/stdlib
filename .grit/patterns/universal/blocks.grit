@@ -2,28 +2,25 @@ language universal
 
 // Implementation
 function group_blocks($target) {
-  $blocks = [],
-  $target <: some bubble($blocks, $block, $block_tail) $current where {
-        if ($block <: undefined) {
-            $block = [$current],
-            $block_tail = $current,
-        } else {
-            // Are we right after the same block?
-            if ($current <: after $block_tail) {
-                $block += $current,
-                $block_tail = $current
-            } else {
-                // Insert the previous block into the list
-                $blocks += $block,
-                $block = [$current],
-                $block_tail = $current
-            }
-        }
-    },
-    // Insert final block
-    if (not $block <: undefined) {
-        $blocks += $block
-    },
-    return $blocks
+	$blocks = [],
+	$target <: some bubble($blocks, $block, $block_tail) $current where {
+		if ($block <: undefined) {
+			$block = [$current],
+			$block_tail = $current
+		} else {
+			// Are we right after the same block?
+			if ($current <: after $block_tail) {
+				$block += $current,
+				$block_tail = $current
+			} else {
+				// Insert the previous block into the list
+				$blocks += $block,
+				$block = [$current],
+				$block_tail = $current
+			}
+		}
+	},
+	// Insert final block
+	if (not $block <: undefined) { $blocks += $block },
+	return $blocks
 }
-

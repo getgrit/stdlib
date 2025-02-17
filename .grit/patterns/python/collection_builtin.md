@@ -9,9 +9,9 @@ engine marzano(0.1)
 language python
 
 or {
-    `list($expr for $x in $arr)` => `[$expr for $x in $arr]`,
-    `set($expr for $x in $arr)` => `{$expr for $x in $arr}`,
-    `dict(($key, $expr) for $x in $arr)` => `{$key: $expr for $x in $arr}`,
+	`list($expr for $x in $arr)` => `[$expr for $x in $arr]`,
+	`set($expr for $x in $arr)` => `{$expr for $x in $arr}`,
+	`dict(($key, $expr) for $x in $arr)` => `{$key: $expr for $x in $arr}`
 }
 ```
 

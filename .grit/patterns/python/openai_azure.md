@@ -12,9 +12,7 @@ This is a variant of the [standard migration](https://github.com/getgrit/python/
 engine marzano(0.1)
 language python
 
-file($body) where {
-  $body <: openai_main(azure=true)
-}
+file($body) where { $body <: openai_main(azure=true) }
 ```
 
 ## Instantiate OpenAI client

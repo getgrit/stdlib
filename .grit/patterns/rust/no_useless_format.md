@@ -9,10 +9,10 @@ Checks for the use of `format!("string literal with no argument")` and `format!(
 language rust
 
 or {
-    `format!($content)` where {
-        $content <: string_literal(),
-    } => `$content.to_string()`,
-    `format!("{}", $arg)` => `$arg.to_string()`,
+	`format!($content)` where {
+		$content <: string_literal()
+	} => `$content.to_string()`,
+	`format!("{}", $arg)` => `$arg.to_string()`
 }
 ```
 

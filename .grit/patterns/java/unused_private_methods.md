@@ -12,26 +12,24 @@ Unused private methods, excepting methods with annotations and special methods o
 language java
 
 class_body($declarations) where {
-    $declarations <: contains bubble($declarations) {
-        method_declaration(name=$unused_method, $modifiers) as $unused_decl where {
-            $modifiers <: contains `private`,
-            $modifiers <: not contains or {
-                marker_annotation(),
-                `native`,
-            },
-            $unused_method <: not or {
-                `writeObject`,
-                `readObject`,
-            },
-            $declarations <: not contains $unused_method until method_declaration($name) where {
-                $name <: `$unused_method`,
-            },
-            $unused_decl => .,
-        }
-    }
+	$declarations <: contains bubble($declarations) {
+		method_declaration(name=$unused_method, $modifiers) as $unused_decl where {
+			$modifiers <: contains `private`,
+			$modifiers <: not contains or {
+				marker_annotation(),
+				`native`
+			},
+			$unused_method <: not or {
+				`writeObject`,
+				`readObject`
+			},
+			$declarations <: not contains $unused_method until method_declaration($name) where {
+				$name <: `$unused_method`
+			},
+			$unused_decl => .
+		}
+	}
 }
-
-
 ```
 
 ## Removes unused non-constructor method

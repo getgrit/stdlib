@@ -8,7 +8,7 @@ This is a simple test transformation to convert arrow functions to traditional f
 language js
 
 `($_) => $_` as $arrow where {
-  $arrow <: not contains `callOutside($_)`,
+	$arrow <: not contains `callOutside($_)`
 } => ai_rewrite($arrow, instruct="Convert all arrow function to traditional function syntax using `function`")
 ```
 

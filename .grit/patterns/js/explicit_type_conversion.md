@@ -11,9 +11,17 @@ engine marzano(0.1)
 language js
 
 or {
-  or {`+$value`, `1 * $value`} => `Number($value)`,
-  or { `"" + $value`, `$value + ""`, `'' + $value`, `$value + ''` } => `String($value)`,
-  or {`!!$value`} => `Boolean($value)`
+	or {
+		`+$value`,
+		`1 * $value`
+	} => `Number($value)`,
+	or {
+		`"" + $value`,
+		`$value + ""`,
+		`'' + $value`,
+		`$value + ''`
+	} => `String($value)`,
+	or { `!!$value` } => `Boolean($value)`
 }
 ```
 

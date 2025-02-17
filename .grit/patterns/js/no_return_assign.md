@@ -13,10 +13,10 @@ language js
 
 // We replace the `return` with two statements, the assignment and an updated `return`
 `return $something` where {
-    $something <: contains or {
-      assignment_expression($left),
-      augmented_assignment_expression($left)
-    } as $assignment
+	$something <: contains or {
+		assignment_expression($left),
+		augmented_assignment_expression($left)
+	} as $assignment
 } => `$assignment;\n  return $left;`
 ```
 

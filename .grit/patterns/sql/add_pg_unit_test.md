@@ -9,16 +9,15 @@ engine marzano(0.1)
 language sql
 
 pattern add_unit_tests_for_procedures() {
-   `CREATE PROCEDURE $proc_name($args) AS $decl $block;` where {
-    $program += `
+	`CREATE PROCEDURE $proc_name($args) AS $decl $block;` where {
+		$program += `
 
 -- Check that '$proc_name' has been translated into valid plpgsql
 SELECT has_function('$proc_name');
 SELECT is_procedure('$proc_name');
 SELECT function_lang_is('$proc_name', 'pgplsql' );
 `
-
-   }
+	}
 }
 
 add_unit_tests_for_procedures()

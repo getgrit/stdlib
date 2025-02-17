@@ -11,9 +11,9 @@ language js
 
 // Test case
 file($body) where {
-  $body <: contains bubble identifier_scope(`x`) as $scope where {
-    $scope <: contains `x` => `shadowed`
-  }
+	$body <: contains bubble identifier_scope(`x`) as $scope where {
+		$scope <: contains `x` => `shadowed`
+	}
 }
 ```
 

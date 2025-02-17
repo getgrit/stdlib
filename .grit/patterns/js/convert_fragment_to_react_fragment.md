@@ -10,7 +10,7 @@ engine marzano(0.1)
 language js
 
 `<$name>$body</>` => `<React.Fragment>$body</React.Fragment>` where {
-    $name <: false,
+	$name <: false
 }
 ```
 

@@ -8,7 +8,7 @@ GritQL can use an AI for fuzzy matching. Just match the node you wish to analyze
 
 ```grit
 `console.log($msg)` => `// REDACTED: $msg` where {
-  $msg <: ai_is("it references personally identifiable information")
+	$msg <: ai_is("it references personally identifiable information")
 }
 ```
 

@@ -16,7 +16,12 @@ references:
 ```grit
 language rust
 
-or { `Md2::new()`, `Md4::new()`, `Md5::new()`, `Sha1::new()`} => `Sha256::new()`
+or {
+	`Md2::new()`,
+	`Md4::new()`,
+	`Md5::new()`,
+	`Sha1::new()`
+} => `Sha256::new()`
 ```
 
 ## With Md2

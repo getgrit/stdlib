@@ -8,7 +8,6 @@ This pattern combines several smaller patterns
 engine marzano(0.1)
 language sql
 
-
 convert_oracle_to_pg()
 ```
 

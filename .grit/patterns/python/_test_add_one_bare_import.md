@@ -6,11 +6,7 @@ title: Test - add one bare import
 engine marzano(0.1)
 language python
 
-`$_` where {
-    $import = "math",
-    $import <: ensure_bare_import(),
-}
-
+`$_` where { $import = "math", $import <: ensure_bare_import() }
 ```
 
 ## Add one bare import

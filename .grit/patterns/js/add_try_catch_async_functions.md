@@ -5,14 +5,13 @@ engine marzano(0.1)
 language js
 
 `async ($args) => { $body }` where {
-    $body <: not contains `try`,
-    $body => ` try {
+	$body <: not contains `try`,
+	$body => ` try {
         $body
     }  catch (e) {
       console.log(e);
     }`
 }
-
 ```
 
 ## Wraps async call with try and catch

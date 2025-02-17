@@ -12,23 +12,148 @@ language js
 
 // The 'pattern' keyword is used to define custom named patterns at the top of this Grit snippet.
 // We use separate patterns for matching different groups of html tags to aid readability.
-pattern html_headings() { or { "h1" , "h2" , "h3" , "h4" , "h5" , "h6", "title" } }
-pattern html_containers() { or { "div" , "section" , "article" , "nav" , "main" , "aside" , "footer" , "header" , "hgroup" } }
-pattern html_block_text() { or { "address" , "blockquote" , "dl" , "dt" , "dd" , "ul" , "ol" , "li" , "figcaption" , "figure" , "p" , "pre" } }
-pattern html_inline_text() { or { "a" , "b" , "span" , "abbr" , "bdi" , "bdo" , "cite" , "code" , "data" , "dfn" , "em" , "i" , "kbd" , "mark" , "q" , "ruby" , "rp" , "rt" , "rtc" , "s" , "samp" , "small" , "strong" , "sub" , "sup" , "time" , "u" , "var" , "small" , "del" , "ins" } }
-pattern html_tables() { or { "table" , "tbody" , "thead" , "tfoot" , "tr" , "th" , "td" , "caption" , "optgroup" } }
-pattern html_forms() { or { "form" , "button" , "label" , "fieldset" , "legend" , "select" , "datalist" , "option" , "textarea" , "progress" , "output" , "meter" } }
-pattern html_web_components() { or { "content" , "element" , "shadow" , "slot" , "template" } }
-pattern html_interactive() { or { "dialog" , "details" , "summary" , "menu" , "menuitem" } }
+pattern html_headings() {
+	or {
+		"h1",
+		"h2",
+		"h3",
+		"h4",
+		"h5",
+		"h6",
+		"title"
+	}
+}
+pattern html_containers() {
+	or {
+		"div",
+		"section",
+		"article",
+		"nav",
+		"main",
+		"aside",
+		"footer",
+		"header",
+		"hgroup"
+	}
+}
+pattern html_block_text() {
+	or {
+		"address",
+		"blockquote",
+		"dl",
+		"dt",
+		"dd",
+		"ul",
+		"ol",
+		"li",
+		"figcaption",
+		"figure",
+		"p",
+		"pre"
+	}
+}
+pattern html_inline_text() {
+	or {
+		"a",
+		"b",
+		"span",
+		"abbr",
+		"bdi",
+		"bdo",
+		"cite",
+		"code",
+		"data",
+		"dfn",
+		"em",
+		"i",
+		"kbd",
+		"mark",
+		"q",
+		"ruby",
+		"rp",
+		"rt",
+		"rtc",
+		"s",
+		"samp",
+		"small",
+		"strong",
+		"sub",
+		"sup",
+		"time",
+		"u",
+		"var",
+		"small",
+		"del",
+		"ins"
+	}
+}
+pattern html_tables() {
+	or {
+		"table",
+		"tbody",
+		"thead",
+		"tfoot",
+		"tr",
+		"th",
+		"td",
+		"caption",
+		"optgroup"
+	}
+}
+pattern html_forms() {
+	or {
+		"form",
+		"button",
+		"label",
+		"fieldset",
+		"legend",
+		"select",
+		"datalist",
+		"option",
+		"textarea",
+		"progress",
+		"output",
+		"meter"
+	}
+}
+pattern html_web_components() {
+	or {
+		"content",
+		"element",
+		"shadow",
+		"slot",
+		"template"
+	}
+}
+pattern html_interactive() {
+	or {
+		"dialog",
+		"details",
+		"summary",
+		"menu",
+		"menuitem"
+	}
+}
 // Finally, the pattern HTMLTagsWithPair() is defined as the disjunction of all the above defined patterns
-pattern html_tags_pair() { or { html_headings() , html_containers() , html_block_text() , html_inline_text() , html_tables() , html_forms() , html_web_components(), html_interactive() } }
+pattern html_tags_pair() {
+	or {
+		html_headings(),
+		html_containers(),
+		html_block_text(),
+		html_inline_text(),
+		html_tables(),
+		html_forms(),
+		html_web_components(),
+		html_interactive()
+	}
+}
 
 `<$name $props>$body</$name>` => `<$name $props />` where {
-    // In order for a snippet of code to be rewritten, it must satisfy both of the where conditions below
-    // The r prefix causes the attached string to be interpreted as a regular expression, in this case matching any amount of whitespace
-    $body <: r"\s*",
-    // $name must NOT match one of the html_tags_pair defined at the top of the file
-    $name <: not html_tags_pair()
+	// In order for a snippet of code to be rewritten, it must satisfy both of the where conditions below
+	// The r prefix causes the attached string to be interpreted as a regular expression, in this case matching any amount of whitespace
+	$body <: r"\s*",
+	// $name must NOT match one of the html_tags_pair defined at the top of the file
+	$name <: not html_tags_pair()
 }
 ```
 

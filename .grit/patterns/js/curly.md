@@ -10,18 +10,12 @@ engine marzano(1.0)
 language js
 
 or {
-    if_statement(consequence = $body),
-    for_statement($body),
-    while_statement($body),
-    do_statement($body),
-    else_clause(else = $body) where {
-        $body <: ! if_statement()
-    }
-} where {
-    $body <: not statement_block(),
-    $body => `{$body}`,
-}
-
+	if_statement(consequence=$body),
+	for_statement($body),
+	while_statement($body),
+	do_statement($body),
+	else_clause(else = $body) where { $body <: ! if_statement() }
+} where { $body <: not statement_block(), $body => `{$body}` }
 ```
 
 Code examples:

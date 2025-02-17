@@ -10,9 +10,12 @@ If a useEffect depends on layout etc. it should switch to useLayoutEffect.
 engine marzano(0.1)
 language js
 
-or {`React.$effectHook($body)`,`$effectHook($body)` } where {
-     $effectHook <: `useEffect` => `useLayoutEffect`,
-    $body <: contains `document.$method`
+or {
+	`React.$effectHook($body)`,
+	`$effectHook($body)`
+} where {
+	$effectHook <: `useEffect` => `useLayoutEffect`,
+	$body <: contains `document.$method`
 }
 ```
 

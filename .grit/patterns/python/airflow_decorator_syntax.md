@@ -11,158 +11,140 @@ language python
 
 // matches an assignment where the LHS is a variable and the RHS is a `airflow.DAG` call.
 pattern dag_definition($var, $dag, $kwargs) {
-  `$var = $dag` where {
-      $dag <: `DAG($kwargs)`
-  }
+	`$var = $dag` where { $dag <: `DAG($kwargs)` }
 }
 
 // collect all kwargs from a function call, and return them in a list.
 // The following kwargs are ignored: `dag`, `python_callable`.
 pattern collect_kwargs($kwargs) {
-  call($arguments) where {
-    $kwargs = [],
-    $arguments <: contains bubble($kwargs) keyword_argument($name) as $kwarg where {
-      if (!$name <: or { `dag`, `python_callable` }) {
-        $kwargs += $kwarg
-      }
-    }
-  }
+	call($arguments) where {
+		$kwargs = [],
+		$arguments <: contains bubble($kwargs) keyword_argument($name) as $kwarg where {
+			if (! $name <: or {
+				`dag`,
+				`python_callable`
+			}) { $kwargs += $kwarg }
+		}
+	}
 }
 
 // Add @task decorators on any functions that are referenced as python_callables in task definitions,
 // and replace all references to the operator instantiation with the function itself.
 pattern add_task_decorators() {
-  `$parent_func` where {
-    // find all nested function defs that are referenced in a task instantiation.
-    // then: 1) add @task decorator, and 2) replace all task instances with the name of the function.
-    $parent_func <: contains bubble($parent_func) function_definition($name) as $task_func where {
-      $parent_func <: contains bubble($name, $task_func) call($arguments) as $call where {
-        $arguments <: contains keyword_argument(name=`python_callable`, value=$name),
-        $call <: collect_kwargs($kwargs),
-        $decorator_args = join(list=$kwargs, separator=", "),
-        $task_func => `@task($decorator_args)\n$task_func`,
-      },
-    }
-  }
+	`$parent_func` where {
+		// find all nested function defs that are referenced in a task instantiation.
+		// then: 1) add @task decorator, and 2) replace all task instances with the name of the function.
+		$parent_func <: contains bubble($parent_func) function_definition($name) as $task_func where {
+			$parent_func <: contains bubble($name, $task_func) call($arguments) as $call where {
+				$arguments <: contains keyword_argument(name=`python_callable`, value=$name),
+				$call <: collect_kwargs($kwargs),
+				$decorator_args = join(list=$kwargs, separator=", "),
+				$task_func => `@task($decorator_args)\n$task_func`
+			}
+		}
+	}
 }
 
 // matches any function that has a DAG return type.
-pattern function_returning_DAG(
-  $return_type,
-  $body,
-  $name,
-  $parameters,
-  $kwargs
-) {
-  function_definition($name, $parameters, $return_type, $body) as $function where {
-    $body <: contains dag_definition(var=$dag_varname, $dag, $kwargs) as $dag_decl,
-    // If there are any tasks that resolve to a python callable,
-    // then add a @task decorators to those callables.
-    $function <: maybe add_task_decorators(),
-    $function <: contains bubble($dag_varname) keyword_argument(name=`dag`) as $kwarg where {
-      $kwarg => .
-    },
-
-    // collect all references to the `dag` variable.
-    $dag_var_refs = [],
-    $function <: maybe contains bubble($dag_decl, $dag_varname, $dag_var_refs) identifier() as $ref where {
-      $ref <: and { !within assignment(left=$dag_varname), $dag_varname, !within keyword_argument() },
-      $dag_var_refs += $ref
-    },
-    // if there is no reference outside of a kwarg, remove the declaration
-    if ($dag_var_refs <: .) {
-      $dag_decl => .
-    }
-  }
+pattern function_returning_DAG($return_type, $body, $name, $parameters, $kwargs) {
+	function_definition($name, $parameters, $return_type, $body) as $function where {
+		$body <: contains dag_definition(var=$dag_varname, $dag, $kwargs) as $dag_decl,
+		// If there are any tasks that resolve to a python callable,
+		// then add a @task decorators to those callables.
+		$function <: maybe add_task_decorators(),
+		$function <: contains bubble($dag_varname) keyword_argument(name=`dag`) as $kwarg where {
+			$kwarg => .
+		},
+		// collect all references to the `dag` variable.
+		$dag_var_refs = [],
+		$function <: maybe contains bubble($dag_decl, $dag_varname, $dag_var_refs) identifier() as $ref where {
+			$ref <: and { ! within assignment(left=$dag_varname) ,
+			$dag_varname,
+			! within keyword_argument() },
+			$dag_var_refs += $ref
+		},
+		// if there is no reference outside of a kwarg, remove the declaration
+		if ($dag_var_refs <: .) { $dag_decl => . }
+	}
 }
 
 // add the @dag decorator to any function that returns a DAG
 pattern add_dag_decorator() {
-  function_returning_DAG($return_type, $body, $name, $parameters, $kwargs) =>
-    `@dag($kwargs)
+	function_returning_DAG($return_type, $body, $name, $parameters, $kwargs) => `@dag($kwargs)
 def $name($parameters):
     $body`
 }
 
-
 // Matches an assignment where the RHS is a call to `${_}Operator(python_callable=$task_func_name, ...)`,
 // and the LHS is $old_task_name.
 pattern task_decl_with_python_callable($old_task_name, $task_func_name) {
-  `$old_task_name = $_($args)` where {
-    $old_task_name <: identifier(),
-    $args <: contains keyword_argument(name=`python_callable`, value=$task_func_name) where {
-      $task_func_name <: identifier()
-    }
-  }
+	`$old_task_name = $_($args)` where {
+		$old_task_name <: identifier(),
+		$args <: contains keyword_argument(name=`python_callable`, value=$task_func_name) where {
+			$task_func_name <: identifier()
+		}
+	}
 }
-
 
 // Replace all python_callable tasks with their @task decorated functions.
 pattern replace_task_refs() {
-  function_definition() as $dag_func where {
-    // 1. find task declartions
-    $dag_func <: contains bubble($dag_func) task_decl_with_python_callable($old_task_name, $task_func_name) as $decl where {
-      $dag_func <: contains bubble($old_task_name, $decl, $task_func_name) identifier() as $ref where {
-        $ref <: $old_task_name,
-        $ref => $task_func_name
-      },
-      $decl => .
-    }
-  }
+	function_definition() as $dag_func where {
+		// 1. find task declartions
+		$dag_func <: contains bubble($dag_func) task_decl_with_python_callable($old_task_name, $task_func_name) as $decl where {
+			$dag_func <: contains bubble($old_task_name, $decl, $task_func_name) identifier() as $ref where {
+				$ref <: $old_task_name,
+				$ref => $task_func_name
+			},
+			$decl => .
+		}
+	}
 }
 
-
 pattern is_task_ref() {
-  identifier() as $ref where {
-    $ref <: within function_definition() as $dag_func where {
-      $dag_func <: or {
-        contains decorated_definition($decorators, $definition) where {
-          $decorators <: some { decorator(value=call(function=`task`)) },
-          $definition <: function_definition(name=$task_name),
-          $ref <: $task_name
-        },
-
-        contains `$taskname = $operator($_)` where {
-          // ref: https://airflow.apache.org/docs/apache-airflow/stable/_api/airflow/operators/weekday/index.html
-          $operator <: or {
-            `BashOperator`,
-            `BooleanOperator`,
-            `EmptyOperator`,
-            `BaseBranchOperator`,
-            `EmailOperator`,
-            `PythonOperator`,
-            `SmoothOperator`,
-            `BranchDayOfWeekOperator`
-          },
-          $ref <: $taskname
-        }
-      }
-
-    }
-  }
+	identifier() as $ref where {
+		$ref <: within function_definition() as $dag_func where {
+			$dag_func <: or {
+				contains decorated_definition($decorators, $definition) where {
+					$decorators <: some { decorator(value=call(function=`task`)) },
+					$definition <: function_definition(name=$task_name),
+					$ref <: $task_name
+				},
+				contains `$taskname = $operator($_)` where {
+					// ref: https://airflow.apache.org/docs/apache-airflow/stable/_api/airflow/operators/weekday/index.html
+					$operator <: or {
+						`BashOperator`,
+						`BooleanOperator`,
+						`EmptyOperator`,
+						`BaseBranchOperator`,
+						`EmailOperator`,
+						`PythonOperator`,
+						`SmoothOperator`,
+						`BranchDayOfWeekOperator`
+					},
+					$ref <: $taskname
+				}
+			}
+		}
+	}
 }
 
 pattern rewrite_chaining() {
-  binary_operator(operator=$op, left=$a, right=$b) where {
-    $op <: or { ">>", "<<" },
-    or {
-      $a <: is_task_ref(),
-      $b <: is_task_ref()
-    },
-    $out = `chain($a, $b)`,
-    if ($op <: "<<") {
-      $out = `chain($b, $a)`
-    }
-  } => `$out`
+	binary_operator(operator=$op, left=$a, right=$b) where {
+		$op <: or {
+			">>",
+			"<<"
+		},
+		or { $a <: is_task_ref(), $b <: is_task_ref() },
+		$out = `chain($a, $b)`,
+		if ($op <: "<<") { $out = `chain($b, $a)` }
+	} => `$out`
 }
-
 
 sequential {
-  contains add_dag_decorator(),
-  maybe contains replace_task_refs(),
-  maybe contains rewrite_chaining(),
+	contains add_dag_decorator(),
+	maybe contains replace_task_refs(),
+	maybe contains rewrite_chaining()
 }
-
 ```
 
 ## Works as expected on functions that represent DAGs

@@ -12,8 +12,8 @@ engine marzano(1.0)
 language js
 
 catch_clause($parameter, $type) where {
-    $type <: .,
-    $parameter => `$parameter: any`
+	$type <: .,
+	$parameter => `$parameter: any`
 }
 ```
 

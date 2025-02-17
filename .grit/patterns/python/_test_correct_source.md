@@ -5,8 +5,8 @@ engine marzano(0.1)
 language python
 
 `$x = 1` where {
-    add_import(source="typing_extensions", name="Self"),
-    add_import(source="pydantic", name="model_validator"),
+	add_import(source="typing_extensions", name="Self"),
+	add_import(source="pydantic", name="model_validator")
 }
 ```
 

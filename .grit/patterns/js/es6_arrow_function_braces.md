@@ -11,12 +11,15 @@ engine marzano(0.1)
 language js
 
 or {
-    `$params => ($obj)` => `($params) => {
+	`$params => ($obj)` => `($params) => {
         return $obj
     }`,
-    `$params => $exp` => `($params) => {
+	`$params => $exp` => `($params) => {
         return $exp
-    }` where $exp <: not contains or { return_statement(), statement_block()},
+    }` where $exp <: not contains or {
+		return_statement(),
+		statement_block()
+	}
 }
 ```
 

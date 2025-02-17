@@ -8,14 +8,12 @@ The solution is to ignore "late" imports when considering imports to attach ours
 language python
 
 or {
-  `nowhere` as $nothing where {
-    add_import(source="nowhere", name="nothing"),
-  },
-  `TypedDict` as $X where {
-      $X <: within `from typing import $_`,
-      add_import(source="typing_extensions", name="TypedDict"),
-      $X => .
-  }
+	`nowhere` as $nothing where { add_import(source="nowhere", name="nothing") },
+	`TypedDict` as $X where {
+		$X <: within `from typing import $_` ,
+		add_import(source="typing_extensions", name="TypedDict"),
+		$X => .
+	}
 }
 ```
 

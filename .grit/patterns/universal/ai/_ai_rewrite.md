@@ -10,9 +10,7 @@ Edits might be made to other parts of the file if necessary to fulfill the inten
 ```grit
 language yaml
 
-pattern pair($key, $value) {
-  block_mapping_pair(key=contains $key, $value)
-}
+pattern pair($key, $value) { block_mapping_pair(key=contains $key, $value) }
 
 or {
   `- $task` where {

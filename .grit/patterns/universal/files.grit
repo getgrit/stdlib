@@ -3,39 +3,32 @@ language universal
 // Useful utilities for working with files
 
 function current_filename() {
-    $parts = split($filename, "/"),
-    $final = $parts[-1],
-    return $final
+	$parts = split($filename, "/"),
+	$final = $parts[-1],
+	return $final
 }
 
 function strip_extension($original) {
-    $parts = [],
-    $original = split($original, "/"),
-    $original <: some bubble($parts, $original) $part where {
-      if ($part <: not $original[-1]) {
-        $parts += $part,
-      },
-    },
-    $last_parts = split($original[-1], "."),
-    $length = length($last_parts),
-    if ($length <: 1) {
-      $parts += $last_parts
-    } else {
-      $dot_parts = [],
-      $last_parts <: some $last_part where {
-        if ($last_part <: not $last_parts[-1]) {
-          $dot_parts += $last_part,
-        },
-      },
-      $dot_parts = join($dot_parts, "."),
-      $parts += $dot_parts,
-    },
-    return join($parts, "/")
+	$parts = [],
+	$original = split($original, "/"),
+	$original <: some bubble($parts, $original) $part where {
+		if ($part <: not $original[-1]) { $parts += $part }
+	},
+	$last_parts = split($original[-1], "."),
+	$length = length($last_parts),
+	if ($length <: 1) { $parts += $last_parts } else {
+		$dot_parts = [],
+		$last_parts <: some $last_part where {
+			if ($last_part <: not $last_parts[-1]) { $dot_parts += $last_part }
+		},
+		$dot_parts = join($dot_parts, "."),
+		$parts += $dot_parts
+	},
+	return join($parts, "/")
 }
 
 function current_filename_without_extension() {
-    $raw = current_filename(),
-    $stripped = strip_extension($raw),
-    return $stripped
+	$raw = current_filename(),
+	$stripped = strip_extension($raw),
+	return $stripped
 }
-

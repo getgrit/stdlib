@@ -12,7 +12,7 @@ Just call ai_generate with your instructions to assign a value to a variable. Me
 language js
 
 `console.log($msg)` where {
-  $level = ai_generate(`Based on this log message: $msg, generate a new log level of either "info", "warn", or "error" with only one word`),
+	$level = ai_generate(`Based on this log message: $msg, generate a new log level of either "info", "warn", or "error" with only one word`)
 } => `logger.level("$level", $msg)`
 ```
 

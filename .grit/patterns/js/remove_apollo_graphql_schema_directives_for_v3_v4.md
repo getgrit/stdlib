@@ -13,7 +13,7 @@ engine marzano(0.1)
 language js
 
 `new ApolloServer($props)` where {
-    $props <: contains `schemaDirectives: {$schema}` => .
+	$props <: contains `schemaDirectives: {$schema}` => .
 }
 ```
 

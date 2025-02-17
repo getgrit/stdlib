@@ -11,7 +11,7 @@ engine marzano(0.1)
 language js
 
 `<Link $props>$body</Link>` where {
-    $body <: contains `<a>$link</a>` => `$link`
+	$body <: contains `<a>$link</a>` => `$link`
 }
 ```
 

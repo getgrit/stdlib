@@ -13,13 +13,19 @@ Detected use of the `'none'` algorithm in a JWT token. The `'none'` algorithm as
 engine marzano(0.1)
 language python
 
-or {`jwt.encode($params)`, `jwt.decode($params)`} where {
-    or {
-        $params <: contains or {`algorithm='none'`, `algorithms=['none']`} => `algorithm='HS256'`,
-        $params <: contains `algorithms=[$algo]` where {
-            $algo <: contains `'none'` => .
-        },
-    }
+or {
+	`jwt.encode($params)`,
+	`jwt.decode($params)`
+} where {
+	or {
+		$params <: contains or {
+			`algorithm='none'`,
+			`algorithms=['none']`
+		} => `algorithm='HS256'`,
+		$params <: contains `algorithms=[$algo]` where {
+			$algo <: contains `'none'` => .
+		}
+	}
 }
 ```
 

@@ -9,8 +9,12 @@ language python
 
 `def $_($args):
   $_` where {
-    $args <: not or { [], [$_], [$_, $_] }
-  } => ai_rewrite($match, "Convert the function args to accept a single dictionary input.")
+	$args <: not or {
+		[],
+		[$_],
+		[$_, $_]
+	}
+} => ai_rewrite($match, "Convert the function args to accept a single dictionary input.")
 ```
 
 ## Rewrites a function with 3 arguments

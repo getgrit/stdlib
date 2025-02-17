@@ -10,16 +10,16 @@ engine marzano(0.1)
 language python
 
 or {
-    `$models.CharField($params)`,
-    `$models.TextField($params)`,
+	`$models.CharField($params)`,
+	`$models.TextField($params)`
 } where {
-    or {
-        and {
-            $params <: contains `null=True` => .,
-            $params <: contains `blank=True`
-        },
-        $params <: contains `null=True` => `blank=True`,
-    }
+	or {
+		and {
+			$params <: contains `null=True` => .,
+			$params <: contains `blank=True`
+		},
+		$params <: contains `null=True` => `blank=True`
+	}
 }
 ```
 

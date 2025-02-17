@@ -15,15 +15,15 @@ Detected public S3 bucket. This policy allows anyone to have some kind of access
 language json
 
 `{ $json }` where {
-    $json <: contains `"Type": "AWS::S3::Bucket"`,
-    $json <: contains `"PublicAccessBlockConfiguration": { $config }` where {
-        any {
-            $config <: contains `"RestrictPublicBuckets": false` => `"RestrictPublicBuckets": true`,
-            $config <: contains `"IgnorePublicAcls": false` => `"IgnorePublicAcls": true`,
-            $config <: contains `"BlockPublicAcls": false` => `"BlockPublicAcls": true`,
-            $config <: contains `"BlockPublicPolicy": false` => `"BlockPublicPolicy": true`
-        }
-    }
+	$json <: contains `"Type": "AWS::S3::Bucket"`,
+	$json <: contains `"PublicAccessBlockConfiguration": { $config }` where {
+		any {
+			$config <: contains `"RestrictPublicBuckets": false` => `"RestrictPublicBuckets": true`,
+			$config <: contains `"IgnorePublicAcls": false` => `"IgnorePublicAcls": true`,
+			$config <: contains `"BlockPublicAcls": false` => `"BlockPublicAcls": true`,
+			$config <: contains `"BlockPublicPolicy": false` => `"BlockPublicPolicy": true`
+		}
+	}
 }
 ```
 

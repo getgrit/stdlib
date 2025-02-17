@@ -10,11 +10,11 @@ Because of floating point imprecision, the `BigDecimal(double)` constructor can 
 language java
 
 `new BigDecimal($x)` => `BigDecimal.valueOf($x)` where or {
-    $program <: contains variable_declarator($name, $value) where {
-        $name <: `$x`,
-        $value <: decimal_floating_point_literal(),
-    },
-    $x <: decimal_floating_point_literal(),
+	$program <: contains variable_declarator($name, $value) where {
+		$name <: `$x`,
+		$value <: decimal_floating_point_literal()
+	},
+	$x <: decimal_floating_point_literal()
 }
 ```
 

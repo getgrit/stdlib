@@ -2,135 +2,114 @@ engine marzano(0.1)
 language js
 
 pattern before_each_file_prep_imports() {
-    $_ where {
-        $GLOBAL_IMPORTED_SOURCES = [],
-        $GLOBAL_IMPORTED_NAMES = [],
-    }
+	$_ where { $GLOBAL_IMPORTED_SOURCES = [], $GLOBAL_IMPORTED_NAMES = [] }
 }
 
 private pattern the_import_statement($imports, $source) {
-    import_statement(import = import_clause(name = named_imports($imports)), $source)
+	import_statement(import=import_clause(name=named_imports($imports)), $source)
 }
 
 pattern imported_from($from) {
-    $name where {
-        $program <: program($statements),
-        $statements <: some bubble($name, $from) the_import_statement($imports, source = $from) where {
-            $imports <: some $name,
-        }
-    }
+	$name where {
+		$program <: program($statements),
+		$statements <: some bubble($name, $from) the_import_statement($imports, source=$from) where {
+			$imports <: some $name
+		}
+	}
 }
 
 pattern ensure_import_from($source) {
-    $name where {
-        $source <: r"['\"](.*)['\"]"($raw_source),
-        if ($name <: not imported_from(from=$source)) {
-            if ($GLOBAL_IMPORTED_SOURCES <: not some [$program, $raw_source]) {
-                $GLOBAL_IMPORTED_SOURCES += [$program, $raw_source]
-            } else {
-                true
-            },
-            if ($GLOBAL_IMPORTED_NAMES <: not some [$program, $name, $raw_source]) {
-                $GLOBAL_IMPORTED_NAMES += [$program, $name, $raw_source]
-            } else {
-                true
-            }
-        } else {
-            true
-        }
-    }
+	$name where {
+		$source <: r"['\"](.*)['\"]"($raw_source),
+		if ($name <: not imported_from(from=$source)) {
+			if ($GLOBAL_IMPORTED_SOURCES <: not some [$program, $raw_source]) {
+				$GLOBAL_IMPORTED_SOURCES += [$program, $raw_source]
+			} else { true },
+			if ($GLOBAL_IMPORTED_NAMES <: not some [$program, $name, $raw_source]) {
+				$GLOBAL_IMPORTED_NAMES += [$program, $name, $raw_source]
+			} else { true }
+		} else { true }
+	}
 }
 
 private pattern process_one_source($p, $all_imports) {
-    [$p, $our_source] where {
-        $imported_names = [],
-        $GLOBAL_IMPORTED_NAMES <: some bubble($p, $our_source, $imported_names, $all_imports) [$p, $name, $our_source] where {
-            $imported_names += $name,
-        },
-        $joined_imported_names = text(string=join(list = $imported_names, separator = ", ")),
-        or {
-            $p <: contains bubble($our_source, $joined_imported_names) the_import_statement($imports, $source) as $statement where {
-                // Exclude typed imports
-                $statement <: not includes "import type",
-                $source <: contains $our_source,
-                $imports => `$imports, $joined_imported_names`
-            },
-            $all_imports += `import { $joined_imported_names } from "$our_source";\n`
-        }
-    }
+	[$p, $our_source] where {
+		$imported_names = [],
+		$GLOBAL_IMPORTED_NAMES <: some bubble($p, $our_source, $imported_names, $all_imports) [
+			$p, $name, $our_source
+		] where { $imported_names += $name },
+		$joined_imported_names = text(string=join(list=$imported_names, separator=", ")),
+		or {
+			$p <: contains bubble($our_source, $joined_imported_names) the_import_statement($imports, $source) as $statement where {
+				// Exclude typed imports
+				$statement <: not includes "import type",
+				$source <: contains $our_source,
+				$imports => `$imports, $joined_imported_names`
+			},
+			$all_imports += `import { $joined_imported_names } from "$our_source";\n`
+		}
+	}
 }
 
 predicate insert_after_imports($p, $insert) {
-    or {
-        // Try to find a shebang and insert after that
-        $p <: program(hash_bang=$h) where {
-            $h <: hash_bang_line() += `\n$insert`
-        },
-        // Find an import statement to anchor on
-        $p <: program($statements) where {
-            $statements <: some $anchor where { $anchor <: import_statement() },
-            $anchor += `\n$insert`
-        },
-        // Fall back to inserting at the start of the whole program
-        $p => `$insert\n$p`
-    }
+	or {
+		// Try to find a shebang and insert after that
+		$p <: program(hash_bang=$h) where { $h <: hash_bang_line() += `\n$insert` },
+		// Find an import statement to anchor on
+		$p <: program($statements) where {
+			$statements <: some $anchor where { $anchor <: import_statement() },
+			$anchor += `\n$insert`
+		},
+		// Fall back to inserting at the start of the whole program
+		$p => `$insert\n$p`
+	}
 }
 
 private pattern insert_imports() {
-    $p where {
-        $all_imports = [],
-        $GLOBAL_IMPORTED_SOURCES <: some process_one_source($p, $all_imports),
-        if ($all_imports <: not []) {
-            insert_after_imports($p, insert=$all_imports)
-        } else {
-            true
-        }
-    }
+	$p where {
+		$all_imports = [],
+		$GLOBAL_IMPORTED_SOURCES <: some process_one_source($p, $all_imports),
+		if ($all_imports <: not []) {
+			insert_after_imports($p, insert=$all_imports)
+		} else { true }
+	}
 }
 
 pattern after_each_file_handle_imports() {
-  file($body) where $body <: maybe insert_imports()
+	file($body) where $body <: maybe insert_imports()
 }
 
 pattern remove_import($from) {
-    $name where {
-        // Handle named imports
-        $program <: maybe contains bubble($name, $from) `import $clause from $raw_source` as $import where {
-          $raw_source <: $from,
-          $clause <: or {
-            // Handle module import
-            import_clause(default=$name) where {
-                $import => .
-            },
-            // Handle named import
-            import_clause($default, name=named_imports($imports)) as $clause where {
-                if ($imports <: [$name]) {
-                    if ($default <: .) {
-                        $import => .
-                    } else {
-                        $clause => $default
-                    }
-                } else {
-                    $imports <: some $name => .
-                }
-            }
-          }
-        }
-    }
+	$name where {
+		// Handle named imports
+		$program <: maybe contains bubble($name, $from) `import $clause from $raw_source` as $import where {
+			$raw_source <: $from,
+			$clause <: or {
+				// Handle module import
+				import_clause(default=$name) where { $import => . },
+				// Handle named import
+				import_clause($default, name=named_imports($imports)) as $clause where {
+					if ($imports <: [$name]) {
+						if ($default <: .) { $import => . } else { $clause => $default }
+					} else { $imports <: some $name => . }
+				}
+			}
+		}
+	}
 }
 
 pattern replace_import($old, $new) {
-    $name where {
-        $name <: remove_import(from=contains $old),
-        $name <: ensure_import_from(source=$new)
-    }
+	$name where {
+		$name <: remove_import(from=contains $old),
+		$name <: ensure_import_from(source=$new)
+	}
 }
 
 predicate add_import($name, $source) {
-    $name <: ensure_import_from(source=$source)
+	$name <: ensure_import_from(source=$source)
 }
 
 predicate move_import($name, $new_source) {
-    $name <: remove_import(from=not contains $new_source),
-    $name <: ensure_import_from(source=$new_source)
+	$name <: remove_import(from=not contains $new_source),
+	$name <: ensure_import_from(source=$new_source)
 }

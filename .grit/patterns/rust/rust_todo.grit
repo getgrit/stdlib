@@ -1,12 +1,11 @@
 language rust
 
-
 function todo($target, $message) {
-    if($message <: undefined) {
-        $message = "This requires manual intervention."
-    },
-    $log_message = `TODO: $message`,
-    log(message=$log_message, variable=$target),
-    return `todo!("$message");
+	if ($message <: undefined) {
+		$message = "This requires manual intervention."
+	},
+	$log_message = `TODO: $message`,
+	log(message=$log_message, variable=$target),
+	return `todo!("$message");
 $target`
 }

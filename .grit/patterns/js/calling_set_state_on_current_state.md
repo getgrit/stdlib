@@ -11,11 +11,11 @@ engine marzano(0.1)
 language js
 
 react_functional_component($props, $body) where {
-        or {
-            $body <: contains `const [$x, $y] = useState<boolean>($boolean)`,
-            $body <: contains `const [$x, $y] = React.useState<boolean>($boolean)`,
-        },
-        $body <: contains `$y($x)` => `$y(!$x)`
+	or {
+		$body <: contains `const [$x, $y] = useState<boolean>($boolean)`,
+		$body <: contains `const [$x, $y] = React.useState<boolean>($boolean)`
+	},
+	$body <: contains `$y($x)` => `$y(!$x)`
 }
 ```
 

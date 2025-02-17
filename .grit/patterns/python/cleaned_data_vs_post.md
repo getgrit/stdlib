@@ -14,7 +14,7 @@ engine marzano(0.1)
 language python
 
 `if $form.is_valid(): $conditionBody` where {
-    $conditionBody <: contains `$request.POST` => `$form.cleaned_data`
+	$conditionBody <: contains `$request.POST` => `$form.cleaned_data`
 }
 ```
 

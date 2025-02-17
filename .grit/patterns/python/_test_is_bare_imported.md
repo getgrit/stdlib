@@ -7,27 +7,18 @@ engine marzano(0.1)
 language python
 
 integer() as $int where {
-    $math = "math",
-    $re = "re",
-    $json = "json",
-    if ($math <: is_bare_imported()) {
-        $has_math = "true"
-    }
-    else {
-        $has_math = "false"
-    },
-    if ($re <: is_bare_imported()) {
-        $has_re = "true"
-    }
-    else {
-        $has_re = "false"
-    },
-    if ($json <: is_bare_imported()) {
-        $has_json = "true"
-    }
-    else {
-        $has_json = "false"
-    }
+	$math = "math",
+	$re = "re",
+	$json = "json",
+	if ($math <: is_bare_imported()) { $has_math = "true" } else {
+		$has_math = "false"
+	},
+	if ($re <: is_bare_imported()) { $has_re = "true" } else {
+		$has_re = "false"
+	},
+	if ($json <: is_bare_imported()) { $has_json = "true" } else {
+		$has_json = "false"
+	}
 } => `$has_math, $has_re, $has_json`
 ```
 

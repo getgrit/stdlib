@@ -12,21 +12,21 @@ engine marzano(0.1)
 language js
 
 or {
-  `$vm = function($args) { $body }` where {
-    $vm <: `ViewModel` => `ViewComponent`,
-    $args => `props`,
-    $body <: maybe contains bubble or {
-      `this.$name = ko.observable($original)` where {
-        $capitalized = capitalize(string=$name),
-        $importable = `useState`,
-        $source = `"react"`,
-        $importable <: ensure_import_from($source)
-      } => `const [$name, set$capitalized] = useState(props.$name)`,
-      `this.$name = ko.computed($func, $_)` => `const name = useMemo($func)` where {
-        $func <: maybe contains bubble { `this.$name()` => `$name`}
-      }
-    }
-  }
+	`$vm = function($args) { $body }` where {
+		$vm <: `ViewModel` => `ViewComponent`,
+		$args => `props`,
+		$body <: maybe contains bubble or {
+			`this.$name = ko.observable($original)` where {
+				$capitalized = capitalize(string=$name),
+				$importable = `useState`,
+				$source = `"react"`,
+				$importable <: ensure_import_from($source)
+			} => `const [$name, set$capitalized] = useState(props.$name)`,
+			`this.$name = ko.computed($func, $_)` => `const name = useMemo($func)` where {
+				$func <: maybe contains bubble { `this.$name()` => `$name` }
+			}
+		}
+	}
 }
 ```
 

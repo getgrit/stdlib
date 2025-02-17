@@ -13,8 +13,8 @@ engine marzano(0.1)
 language js
 
 class_declaration($heritage, $body) where {
-    $heritage <: contains "PureComponent",
-    $body <: contains `shouldComponentUpdate($_) { $_ }` => .
+	$heritage <: contains "PureComponent",
+	$body <: contains `shouldComponentUpdate($_) { $_ }` => .
 }
 ```
 

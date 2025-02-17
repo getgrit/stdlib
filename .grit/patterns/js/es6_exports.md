@@ -11,45 +11,41 @@ engine marzano(0.1)
 language js
 
 or {
-    and {
-        // handle a default export of an object by exporting the individual original definitions
-        `module.exports = { $vals }` where {
-            $new_export = "",
-            // it's only safe to remove the overall export if every property is individually exported
-            $vals <: some bubble($new_export) $prop where {
-                $prop <: or {
-                    method_definition(name=$method_name) as $name,
-                    shorthand_property_identifier() as $name where { $value = $name },
-                    pair(key=$name, $value)
-                },
-                or {
-                    $program <: contains or {
-                        // does not handle difficult trying to match a sublist of the module.exports
-                        `const $name = require($val).$foo` => `export { $foo as $name } from $val`,
-                        `const $name = require($val)` => `export { default as $name } from $val`,
-                        `const $name = require($val).default` => `export { default as $name } from $val`,
-                        or {
-                            `let $name = $val`,
-                            `var $name = $val`,
-                            `const $name = $val`,
-                            function_declaration($name)
-                        } as $match => `export $match`
-                    },
-                    if($method_name <: not undefined) {
-                        $new_export += `export function $name;\n`
-                    } else if ($value <: $name) {
-                        $new_export += `export { $name };\n`
-                    } else {
-                        $new_export += `export const $name = $value;\n`
-                    }
-                }
-            }
-        } => `$new_export`
-    },
-    // handle other default exports
-    `module.exports = $export` => `export default $export`,
-    // Handle individually named exports
-    `module.exports.$name = $export` => `export const $name = $export;\n`
+	and { // handle a default export of an object by exporting the individual original definitions
+	`module.exports = { $vals }` where {
+		$new_export = "",
+		// it's only safe to remove the overall export if every property is individually exported
+		$vals <: some bubble($new_export) $prop where {
+			$prop <: or {
+				method_definition(name=$method_name) as $name,
+				shorthand_property_identifier() as $name where { $value = $name },
+				pair(key=$name, $value)
+			},
+			or {
+				$program <: contains or {
+					// does not handle difficult trying to match a sublist of the module.exports
+					`const $name = require($val).$foo` => `export { $foo as $name } from $val`,
+					`const $name = require($val)` => `export { default as $name } from $val`,
+					`const $name = require($val).default` => `export { default as $name } from $val`,
+					or {
+						`let $name = $val`,
+						`var $name = $val`,
+						`const $name = $val`,
+						function_declaration($name)
+					} as $match => `export $match`
+				},
+				if ($method_name <: not undefined) {
+					$new_export += `export function $name;\n`
+				} else if ($value <: $name) {
+					$new_export += `export { $name };\n`
+				} else { $new_export += `export const $name = $value;\n` }
+			}
+		}
+	} => `$new_export` },
+	// handle other default exports
+	`module.exports = $export` => `export default $export`,
+	// Handle individually named exports
+	`module.exports.$name = $export` => `export const $name = $export;\n`
 }
 ```
 

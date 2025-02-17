@@ -11,10 +11,10 @@ engine marzano(0.1)
 language js
 
 or {
-    `new Octokit({ auth: "$token"})`,
-    `$name = "$token"`
+	`new Octokit({ auth: "$token"})`,
+	`$name = "$token"`
 } where {
-    $token <: contains r"gh[pousr]_[A-Za-z0-9_]{36,251}" => `$token // risky token`
+	$token <: contains r"gh[pousr]_[A-Za-z0-9_]{36,251}" => `$token // risky token`
 }
 ```
 

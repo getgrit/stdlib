@@ -7,23 +7,32 @@ Migrate the Drizzle DB schema from MySQL to PostgreSQL.
 
 ```grit
 `import $alias from "drizzle-orm/mysql-core"` => `import $alias from "drizzle-orm/pg-core"` where {
-    $alias <: contains "mysqlTable" => `pgTable`,
-    $alias <: contains or {
-         or { `mediumint`, `int` } as $i => `integer`,
-         or { `tinyint`, `smallint` } as $i => `smallint`,
-         `mediumint` => .,
-         `double` => `doublePrecision`,
-         `tinyint` => .
-    },
-    $program <: contains bubble($alias) or {
-        `mysqlTable($name, $schema)` => `pgTable($name, $schema)` where {
-            $schema <: contains or {
-                or {`int`, `mediumint`} => `integer`,
-                `double` => `doublePrecision`,
-                `tinyint` => `smallint`
-            }
-        }
-    }
+	$alias <: contains "mysqlTable" => `pgTable`,
+	$alias <: contains or {
+		or {
+			`mediumint`,
+			`int`
+		} as $i => `integer`,
+		or {
+			`tinyint`,
+			`smallint`
+		} as $i => `smallint`,
+		`mediumint` => .,
+		`double` => `doublePrecision`,
+		`tinyint` => .
+	},
+	$program <: contains bubble($alias) or {
+		`mysqlTable($name, $schema)` => `pgTable($name, $schema)` where {
+			$schema <: contains or {
+				or {
+					`int`,
+					`mediumint`
+				} => `integer`,
+				`double` => `doublePrecision`,
+				`tinyint` => `smallint`
+			}
+		}
+	}
 }
 ```
 

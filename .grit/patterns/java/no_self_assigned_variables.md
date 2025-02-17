@@ -12,16 +12,11 @@ It is redundant and usually a bug when a variable is assigned to itself.
 language java
 
 assignment_expression($left, $right) as $assignment where {
-    $left <: `$right`,
-    or {
-        and {
-            $left <: not contains `this`,
-            $left => `this.$left`,
-        },
-        $assignment <: within expression_statement() as $exp where {
-            $exp => .,
-        }
-    },
+	$left <: `$right`,
+	or {
+		and { $left <: not contains `this`, $left => `this.$left` },
+		$assignment <: within expression_statement() as $exp where { $exp => . }
+	}
 }
 ```
 

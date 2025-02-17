@@ -14,9 +14,9 @@ if $cond:
 else:
     $else_body
 ` as $cond_body where {
-    $if_body <: block(statements = [`$var = $if_value`]),
-    $else_body <: block(statements = [`$var = $else_value`]),
-    $cond_body => `$var = $if_value if $cond else $else_value`,
+	$if_body <: block(statements=[`$var = $if_value`]),
+	$else_body <: block(statements=[`$var = $else_value`]),
+	$cond_body => `$var = $if_value if $cond else $else_value`
 }
 ```
 

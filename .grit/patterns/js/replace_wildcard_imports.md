@@ -7,44 +7,39 @@ engine marzano(0.1)
 language js
 
 pattern used_alias($alias, $refs, $kept_refs) {
-    or {
-        `$alias.$name` as $call ,
-        or {
-          `<$call $...>$...</$call>`,
-          `<$call $.../>`
-        } where {
-            $call <: member_expression(object=$alias, property=$name),
-        }
-    } where {
-      if ($program <: contains identifier() as $i where {$i <: $name, $i <: not within $call }) {
-        $kept_refs += $name,
-      } else {
-        $refs += $name,
-        $call => `$name`
-      }
-    },
+	or {
+		`$alias.$name` as $call,
+		or {
+			`<$call $...>$...</$call>`,
+			`<$call $.../>`
+		} where { $call <: member_expression(object=$alias, property=$name) }
+	} where {
+		if ($program <: contains identifier() as $i where {
+			$i <: $name,
+			$i <: not within $call
+		}) { $kept_refs += $name } else { $refs += $name, $call => `$name` }
+	}
 }
 
-
 pattern replace_wildcard_import() {
-  `import * as $alias from $src` as $import where {
-    $refs = [],
-    $kept_refs = [],
-    $program <: contains used_alias($alias, $refs, $kept_refs) until identifier_scope(name=$alias),
-    $refs = distinct($refs),
-    $joined_refs = join($refs, `, `),
-    // Try the different scenarios
-    if ($refs <: []) {
-      // Found nothing, leave the wildcard
-    } else if (and { !$refs <: [], $kept_refs <: [] }) {
-      // Found just refs we can replace, replace them
-      $import => `import { $joined_refs } from $src`
-    } else {
-      // Found both kinds, leave the import and add named exports
-      // This is required, because they cannot be on the same line.
-      $import += `\nimport { $joined_refs } from $src`
-    }
-  }
+	`import * as $alias from $src` as $import where {
+		$refs = [],
+		$kept_refs = [],
+		$program <: contains used_alias($alias, $refs, $kept_refs) until identifier_scope(name=$alias),
+		$refs = distinct($refs),
+		$joined_refs = join($refs, `, `),
+		// Try the different scenarios
+		if ($refs <: []) {}
+			// Found nothing, leave the wildcard
+		else if (and { ! $refs <: [], $kept_refs <: [] }) {
+			// Found just refs we can replace, replace them
+			$import => `import { $joined_refs } from $src`
+		} else {
+			// Found both kinds, leave the import and add named exports
+			// This is required, because they cannot be on the same line.
+			$import += `\nimport { $joined_refs } from $src`
+		}
+	}
 }
 
 replace_wildcard_import()

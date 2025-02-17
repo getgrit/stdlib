@@ -9,27 +9,25 @@ engine marzano(0.1)
 language js
 
 contains or {
-    `v4` as $v4 where {
-      $source = `"uuid"`,
-      // Use ensure_import_from to ensure a metavariable is imported.
-      $v4 <: ensure_import_from($source),
-  },
-  `orderBy` as $orderBy where {
-      $orderBy <: replace_import(old=`"underscore"`, new=`"lodash"`)
-  },
-  `fetch` as $fetch where {
-      $from = `node-fetch`,
-      // Use remove_import to remove an import entirely
-      $fetch <: remove_import(from = contains $from)
-  },
-  `class $_ extends $comp { $_ }` where {
-    $comp <: "Component",
-    $source = `"React"`,
-    $comp <: ensure_import_from($source),
-  },
-  `final_case` where {
-    add_import("just_ensure", `"this_place"`)
-  }
+	`v4` as $v4 where {
+		$source = `"uuid"`,
+		// Use ensure_import_from to ensure a metavariable is imported.
+		$v4 <: ensure_import_from($source)
+	},
+	`orderBy` as $orderBy where {
+		$orderBy <: replace_import(old=`"underscore"`, new=`"lodash"`)
+	},
+	`fetch` as $fetch where {
+		$from = `node-fetch`,
+		// Use remove_import to remove an import entirely
+		$fetch <: remove_import(from=contains $from)
+	},
+	`class $_ extends $comp { $_ }` where {
+		$comp <: "Component",
+		$source = `"React"`,
+		$comp <: ensure_import_from($source)
+	},
+	`final_case` where { add_import("just_ensure", `"this_place"`) }
 }
 ```
 

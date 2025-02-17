@@ -9,9 +9,9 @@ Assignment inside a condition like this `$x = false` is usually accidental, this
 language java
 
 `$var = false` => `$var == false` where {
-	  $var <: within `if ($cond) { $body }`,
-	  $var <: within $cond,
-	}
+	$var <: within `if ($cond) { $body }` ,
+	$var <: within $cond
+}
 ```
 
 ## $x = true

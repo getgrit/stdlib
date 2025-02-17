@@ -13,10 +13,10 @@ Detected a channel guarded with a `mutex`. Channels already have an internal `mu
 language go
 
 `{ $body } ` where {
-    $body <: contains `$channel := make(chan $dataType)`,
-    $body <: contains `var $mutax sync.Mutex` => .,
-    $body <: contains `$mutax.Lock()` => .,
-    $body <: contains `$mutax.Unlock()` => .,
+	$body <: contains `$channel := make(chan $dataType)`,
+	$body <: contains `var $mutax sync.Mutex` => .,
+	$body <: contains `$mutax.Lock()` => .,
+	$body <: contains `$mutax.Unlock()` => .
 }
 ```
 

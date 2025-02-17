@@ -11,31 +11,31 @@ engine marzano(0.1)
 language js
 
 pattern openrouter_fix_init() {
-    `new OpenAI($params)` where {
-        $params <: upsert(key=`"baseURL"`, value=`"https://openrouter.ai/api/v1"`),
-        or {
-          $params <: contains `defaultHeaders: $headers` where {
-            $headers <: upsert(key=`"HTTP-Referer"`, value=`YOUR_SITE_URL`),
-            $headers <: upsert(key=`"X-Title"`, value=`YOUR_SITE_NAME`)
-          },
-          $params <: upsert(key=`"defaultHeaders"`, value=`{
+	`new OpenAI($params)` where {
+		$params <: upsert(key=`"baseURL"`, value=`"https://openrouter.ai/api/v1"`),
+		or {
+			$params <: contains `defaultHeaders: $headers` where {
+				$headers <: upsert(key=`"HTTP-Referer"`, value=`YOUR_SITE_URL`),
+				$headers <: upsert(key=`"X-Title"`, value=`YOUR_SITE_NAME`)
+			},
+			$params <: upsert(key=`"defaultHeaders"`, value=`{
             "HTTP-Referer": YOUR_SITE_URL,
             "X-Title": YOUR_SITE_NAME // Optional. Shows on openrouter.ai
           }`)
-        }
-    },
+		}
+	}
 }
 
 pattern openrouter_completions() {
-    `openai.chat.completions.create($opts)` where {
-        $opts <: contains `model: "$model"`,
-        $model => `openai/$model`
-    }
+	`openai.chat.completions.create($opts)` where {
+		$opts <: contains `model: "$model"`,
+		$model => `openai/$model`
+	}
 }
 
 or {
-  openrouter_fix_init(),
-  openrouter_completions()
+	openrouter_fix_init(),
+	openrouter_completions()
 }
 ```
 

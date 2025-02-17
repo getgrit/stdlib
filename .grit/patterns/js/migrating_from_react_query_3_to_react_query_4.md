@@ -11,20 +11,18 @@ engine marzano(0.1)
 language js
 
 or {
-    `"react-query"` => `"@tanstack/react-query"`,
-    `"react-query/devtools"` => `"@tanstack/react-query-devtools"`,
-    `useQuery($params)` where {
-        $params <: contains `'$param'` => `['$param']`
-    },
-    `useQueries([$param])` => `useQueries({queries: [$param]})`,
-    `"react-query/persistQueryClient-experimental"` => `"@tanstack/react-query-persist-client"`,
-    `"react-query/createWebStoragePersistor-experimental"` => `"@tanstack/query-sync-storage-persister"`,
-    `"react-query/createAsyncStoragePersistor-experimental"` => `"@tanstack/query-async-storage-persister"`,
-    `setLogger($customLogger)` => `` where {
-        $program <: contains `new QueryClient()` => `new QueryClient({logger: $customLogger});`
-    },
-    `"react-query/hydration"` => `"@tanstack/react-query"`,
-    `"react-query/react"` => `"@tanstack/react-query/reactjs"`,
+	`"react-query"` => `"@tanstack/react-query"`,
+	`"react-query/devtools"` => `"@tanstack/react-query-devtools"`,
+	`useQuery($params)` where { $params <: contains `'$param'` => `['$param']` },
+	`useQueries([$param])` => `useQueries({queries: [$param]})`,
+	`"react-query/persistQueryClient-experimental"` => `"@tanstack/react-query-persist-client"`,
+	`"react-query/createWebStoragePersistor-experimental"` => `"@tanstack/query-sync-storage-persister"`,
+	`"react-query/createAsyncStoragePersistor-experimental"` => `"@tanstack/query-async-storage-persister"`,
+	`setLogger($customLogger)` => `` where {
+		$program <: contains `new QueryClient()` => `new QueryClient({logger: $customLogger});`
+	},
+	`"react-query/hydration"` => `"@tanstack/react-query"`,
+	`"react-query/react"` => `"@tanstack/react-query/reactjs"`
 }
 ```
 

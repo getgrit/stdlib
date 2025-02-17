@@ -5,9 +5,7 @@ title: Aspect ratio
 ```grit
 language css
 
-`a { $props }` where {
-  $props <: contains `aspect-ratio: $x`
-}
+`a { $props }` where { $props <: contains `aspect-ratio: $x` }
 ```
 
 ## Matches the right selector and declaration block

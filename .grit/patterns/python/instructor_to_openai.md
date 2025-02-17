@@ -13,22 +13,22 @@ engine marzano(0.1)
 language python
 
 file($body) where {
-  $body <: contains bubble `$call.$create($args)` where {
-      // Change the method
-      $create <: `create` => `parse`,
-      // Change the arg
-      $args <: contains `response_model=$model` => `response_format=$model`,
-      // We need to actually extract the parsed value
-      $call <: maybe within `$var = $_` as $assignment where {
-          $assignment <: maybe contains `chat` => `beta.chat`,
-          $assignment += `
+	$body <: contains bubble `$call.$create($args)` where {
+		// Change the method
+		$create <: `create` => `parse`,
+		// Change the arg
+		$args <: contains `response_model=$model` => `response_format=$model`,
+		// We need to actually extract the parsed value
+		$call <: maybe within `$var = $_` as $assignment where {
+			$assignment <: maybe contains `chat` => `beta.chat`,
+			$assignment += `
 if $var.choices[0].message.refusal:
     raise Exception(f"GPT refused to comply! {$var.choices[0].message.refusal}")
 $var = $var.choices[0].message.parsed`
-      }
-  },
-  $body <: maybe contains `$client = instructor.from_openai(OpenAI())` => `$client = OpenAI()`,
-  remove_import(`instructor`)
+		}
+	},
+	$body <: maybe contains `$client = instructor.from_openai(OpenAI())` => `$client = OpenAI()`,
+	remove_import(`instructor`)
 }
 ```
 

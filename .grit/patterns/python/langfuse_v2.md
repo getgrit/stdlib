@@ -10,102 +10,96 @@ engine marzano(0.1)
 language python
 
 predicate imports_langfuse() {
-    $program <: contains or {
-        import_from_statement(),
-        import_statement()
-    } as $import where {
-        $import <: contains `langfuse`,
-    },
+	$program <: contains or {
+		import_from_statement(),
+		import_statement()
+	} as $import where { $import <: contains `langfuse` }
 }
 
 pattern convert_snake_case() {
-    maybe contains any {
-        `traceId` => `trace_id`,
-        `startTime` => `start_time`,
-        `endTime` => `end_time`,
-        `completionStartTime` => `completion_start_time`,
-        `statusMessage` => `status_message`,
-        `userId` => `user_id`,
-        `sessionId` => `session_id`,
-        `parentObservationId` => `parent_observation_id`,
-        `modelParameters` => `model_parameters`,
-    }
+	maybe contains any {
+		`traceId` => `trace_id`,
+		`startTime` => `start_time`,
+		`endTime` => `end_time`,
+		`completionStartTime` => `completion_start_time`,
+		`statusMessage` => `status_message`,
+		`userId` => `user_id`,
+		`sessionId` => `session_id`,
+		`parentObservationId` => `parent_observation_id`,
+		`modelParameters` => `model_parameters`
+	}
 }
 
 pattern convert_pydantic_enum() {
-    maybe some `level=$obs_level.$level` => `level="$level"` where {
-        $obs_level <: `ObservationLevel`,
-        $obs_level <: remove_from_imports()
-    }
+	maybe some `level=$obs_level.$level` => `level="$level"` where {
+		$obs_level <: `ObservationLevel`,
+		$obs_level <: remove_from_imports()
+	}
 }
 
 pattern rename_generation_params() {
-    maybe some bubble keyword_argument($name) where {
-        $name <: or {
-            `prompt` => `input`,
-            `completion` => `output`,
-        }
-    },
+	maybe some bubble keyword_argument($name) where {
+		$name <: or {
+			`prompt` => `input`,
+			`completion` => `output`
+		}
+	}
 }
 
 pattern prune_langfuse_imports() {
-    maybe contains bubble or {
-        `InitialGeneration`,
-        `CreateGeneration`,
-        `InitialScore`,
-        `InitialSpan`,
-        `CreateScore`,
-        `CreateTrace`,
-        `CreateSpan`,
-        `CreateEvent`,
-        `UpdateGeneration`,
-        `UpdateSpan`,
-        `CreateDatasetItemRequest`,
-        `CreateDatasetRequest`,
-        `Usage`,
-    } as $deprecated where {
-        $deprecated <: remove_from_imports()
-    }
+	maybe contains bubble or {
+		`InitialGeneration`,
+		`CreateGeneration`,
+		`InitialScore`,
+		`InitialSpan`,
+		`CreateScore`,
+		`CreateTrace`,
+		`CreateSpan`,
+		`CreateEvent`,
+		`UpdateGeneration`,
+		`UpdateSpan`,
+		`CreateDatasetItemRequest`,
+		`CreateDatasetRequest`,
+		`Usage`
+	} as $deprecated where { $deprecated <: remove_from_imports() }
 }
 
 or {
-    or {
-        `$langfuse.generation(InitialGeneration($params))` => `$langfuse.generation($params)`,
-        `$langfuse.generation(CreateGeneration($params))` => `$langfuse.generation($params)`,
-        `$langfuse.generation($params)`,
-    } where {
-        $params <: rename_generation_params(),
-    },
-    `$langfuse.score(InitialScore($params))` => `$langfuse.score($params)`,
-    `$langfuse.span(InitialSpan($params))` => `$langfuse.span($params)`,
-    `$langfuse.score(CreateScore($params))` => `$langfuse.score($params)`,
-    `$langfuse.trace(CreateTrace($params))` => `$langfuse.trace($params)`,
-    `$langfuse.span(CreateSpan($params))`=> `$langfuse.span($params)`,
-    `$langfuse.event(CreateEvent($params))` => `$langfuse.event($params)`,
-    `$generation.update(UpdateGeneration($params))` => `$generation.update($params)`,
-    `$span.update(UpdateSpan($params))` => `$span.update($params)`,
-    `$langfuse.create_dataset_item(CreateDatasetItemRequest($params))` => `$langfuse.create_dataset_item($params)`,
-    `$langfuse.create_dataset(CreateDatasetRequest($params))` => `$langfuse.create_dataset($params)`,
-    `usage=Usage($params)` as $usage where {
-        $props = [],
-        $params <: some bubble($props) keyword_argument($name, $value) where {
-            $props += `"$name": $value`,
-        },
-        $props = join($props, `, `),
-        $usage => `usage={ $props }`,
-    },
-    `$langfuse.score($params)`,
-    `$langfuse.span($params)`,
-    `$langfuse.trace($params)`,
-    `$langfuse.event($params)`,
-    `$generation.update($params)`,
-    `$langfuse.create_dataset_item($params)`,
-    `$langfuse.create_dataset($params)`,
+	or {
+		`$langfuse.generation(InitialGeneration($params))` => `$langfuse.generation($params)`,
+		`$langfuse.generation(CreateGeneration($params))` => `$langfuse.generation($params)`,
+		`$langfuse.generation($params)`
+	} where { $params <: rename_generation_params() },
+	`$langfuse.score(InitialScore($params))` => `$langfuse.score($params)`,
+	`$langfuse.span(InitialSpan($params))` => `$langfuse.span($params)`,
+	`$langfuse.score(CreateScore($params))` => `$langfuse.score($params)`,
+	`$langfuse.trace(CreateTrace($params))` => `$langfuse.trace($params)`,
+	`$langfuse.span(CreateSpan($params))` => `$langfuse.span($params)`,
+	`$langfuse.event(CreateEvent($params))` => `$langfuse.event($params)`,
+	`$generation.update(UpdateGeneration($params))` => `$generation.update($params)`,
+	`$span.update(UpdateSpan($params))` => `$span.update($params)`,
+	`$langfuse.create_dataset_item(CreateDatasetItemRequest($params))` => `$langfuse.create_dataset_item($params)`,
+	`$langfuse.create_dataset(CreateDatasetRequest($params))` => `$langfuse.create_dataset($params)`,
+	`usage=Usage($params)` as $usage where {
+		$props = [],
+		$params <: some bubble($props) keyword_argument($name, $value) where {
+			$props += `"$name": $value`
+		},
+		$props = join($props, `, `),
+		$usage => `usage={ $props }`
+	},
+	`$langfuse.score($params)`,
+	`$langfuse.span($params)`,
+	`$langfuse.trace($params)`,
+	`$langfuse.event($params)`,
+	`$generation.update($params)`,
+	`$langfuse.create_dataset_item($params)`,
+	`$langfuse.create_dataset($params)`
 } as $lf_func where {
-    $lf_func <: prune_langfuse_imports(),
-    $params <: convert_snake_case(),
-    $params <: convert_pydantic_enum(),
-    imports_langfuse(),
+	$lf_func <: prune_langfuse_imports(),
+	$params <: convert_snake_case(),
+	$params <: convert_pydantic_enum(),
+	imports_langfuse()
 }
 ```
 

@@ -10,12 +10,12 @@ engine marzano(1.0)
 language js
 
 pattern expect($last, $value, $containing) {
-    `expect($value).toEqual(expect.arrayContaining([$x]));` as $current where {
-        // put a DELETE marker, use it to delete in the next sequential step
-        $x => `DELETE`,
-        $last = $current,
-        $containing += $x
-    }
+	`expect($value).toEqual(expect.arrayContaining([$x]));` as $current where {
+		// put a DELETE marker, use it to delete in the next sequential step
+		$x => `DELETE`,
+		$last = $current,
+		$containing += $x
+	}
 }
 sequential {
     contains `it($_, $body)` where {

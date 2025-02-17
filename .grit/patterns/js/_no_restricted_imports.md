@@ -8,7 +8,10 @@ You _must_ provide a pattern that will match the imports you want to restrict.
 language js
 
 // Example use to prevent importing from the `lodash` package or anything from inside `@shared/internal/`
-no_restricted_imports($modules=or {"lodash", r"@shared/internal/(.*)"($_)})
+no_restricted_imports($modules = or {
+	"lodash",
+	r"@shared/internal/(.*)"($_)
+})
 ```
 
 ## Lodash example

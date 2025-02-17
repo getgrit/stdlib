@@ -11,18 +11,16 @@ engine marzano(0.1)
 language js
 
 `$_.generation({ $params })` where {
-    $params <: contains bubble pair($key) where {
-        $key <: or {
-            `prompt` => `input`,
-            `completion` => `output`,
-        }
-    },
-    $program <: contains or {
-        import_statement($source) where {
-            $source <: `'langfuse'`,
-        },
-        `$_ = require('langfuse')`,
-    }
+	$params <: contains bubble pair($key) where {
+		$key <: or {
+			`prompt` => `input`,
+			`completion` => `output`
+		}
+	},
+	$program <: contains or {
+		import_statement($source) where { $source <: `'langfuse'` },
+		`$_ = require('langfuse')`
+	}
 }
 ```
 

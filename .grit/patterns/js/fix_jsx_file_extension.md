@@ -7,11 +7,14 @@ engine marzano(0.1)
 language js
 
 file($name, $body) where {
-    $body <: contains or {jsx_element(), jsx_self_closing_element()},
-    $name <: or {
-        r"(.+).js"($base) => `$base.jsx`,
-        r"(.+).ts"($base) => `$base.tsx`,
-    }
+	$body <: contains or {
+		jsx_element(),
+		jsx_self_closing_element()
+	},
+	$name <: or {
+		r"(.+).js"($base) => `$base.jsx`,
+		r"(.+).ts"($base) => `$base.tsx`
+	}
 }
 ```
 

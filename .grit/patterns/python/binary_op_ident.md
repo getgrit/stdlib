@@ -9,13 +9,13 @@ engine marzano(0.1)
 language python
 
 or {
-    `$var | $var` => `$var`,
-    `$var & $var` => `$var`,
-    `$var ^ $var` => `0`,
-    `$var - $var` => `0`,
-    `$var % $var` => `0`,
-    `$var / $var` => `1`,
-    `$var // $var` => `1`,
+	`$var | $var` => `$var`,
+	`$var & $var` => `$var`,
+	`$var ^ $var` => `0`,
+	`$var - $var` => `0`,
+	`$var % $var` => `0`,
+	`$var / $var` => `1`,
+	`$var // $var` => `1`
 }
 ```
 

@@ -12,91 +12,89 @@ engine marzano(0.1)
 language js
 
 predicate insert_statement($statement) {
-    $program <: or {
-        contains `export $_` as $old => `$statement\n\n$old`,
-        contains `"use strict"` as $old => `$old\n\n$statement`,
-        $program => `$statement\n\n$program`
-    }
+	$program <: or {
+		contains `export $_` as $old => `$statement\n\n$old`,
+		contains `"use strict"` as $old => `$old\n\n$statement`,
+		$program => `$statement\n\n$program`
+	}
 }
 
 pattern spin_fix_response() {
-     or {
-         object($properties) where {
-            $properties <: contains bubble {
-                pair($key, $value) where {
-                    $key <: "statusCode",
-                    $key => `status`
-                }
-            },
-        },
-        object() as $obj where {
-          $obj => `{
+	or {
+		object($properties) where {
+			$properties <: contains bubble {
+				pair($key, $value) where { $key <: "statusCode", $key => `status` }
+			}
+		},
+		object() as $obj where {
+			$obj => `{
             status: 200,
             body: JSON.stringify($obj)
           }`
-        }
-    }
+		}
+	}
 }
 
 pattern spin_fix_request($event) {
-    `$event.request.$prop` => `JSON.parse(decoder.decode($event.body)).$prop` where {
-        insert_statement(statement=`const decoder = new TextDecoder('utf-8')`)
-    }
+	`$event.request.$prop` => `JSON.parse(decoder.decode($event.body)).$prop` where {
+		insert_statement(statement=`const decoder = new TextDecoder('utf-8')`)
+	}
 }
 
-predicate spin_uses_ts() {
-    $program <: contains type_annotation()
-}
+predicate spin_uses_ts() { $program <: contains type_annotation() }
 
 pattern spin_main_fix_handler() {
-  or {
-      `module.exports.$_ = ($args) => { $body }`,
-      `export const $_ = ($args) => {$body }`
-    } as $func where {
-        $request = `request`,
-        $args <: or { [$event_arg], [$event_arg, $context, $callback] },
-        $event_arg <: contains identifier() as $event,
-        $body <: maybe contains $event => `request`,
-        $body <: contains or {
-            `return $response`,
-            `callback(null, $response)` => `return $response`
-        } where {
-            $response <: or {
-                spin_fix_response(),
-                identifier() where { $body <: contains `$response = $def` where $def <: spin_fix_response() }
-            }
-        },
-        $event => `request`,
-        if (spin_uses_ts()) {
-            $req_type = `HttpRequest`,
-            $req_type <: ensure_import_from(source=`"@fermyon/spin-sdk"`),
-            $res_type = `HttpResponse`,
-            $res_type <: ensure_import_from(source=`"@fermyon/spin-sdk"`),
-            $new = `export async function handleRequest($event: $req_type): Promise<$res_type> {
+	or {
+		`module.exports.$_ = ($args) => { $body }`,
+		`export const $_ = ($args) => {$body }`
+	} as $func where {
+		$request = `request`,
+		$args <: or {
+			[$event_arg],
+			[$event_arg, $context, $callback]
+		},
+		$event_arg <: contains identifier() as $event,
+		$body <: maybe contains $event => `request`,
+		$body <: contains or {
+			`return $response`,
+			`callback(null, $response)` => `return $response`
+		} where {
+			$response <: or {
+				spin_fix_response(),
+				identifier() where {
+					$body <: contains `$response = $def` where $def <: spin_fix_response()
+				}
+			}
+		},
+		$event => `request`,
+		if (spin_uses_ts()) {
+			$req_type = `HttpRequest`,
+			$req_type <: ensure_import_from(source=`"@fermyon/spin-sdk"`),
+			$res_type = `HttpResponse`,
+			$res_type <: ensure_import_from(source=`"@fermyon/spin-sdk"`),
+			$new = `export async function handleRequest($event: $req_type): Promise<$res_type> {
         $body
-    }`,
-        } else {
-            $new = `export async function handleRequest($event) {
+    }`
+		} else {
+			$new = `export async function handleRequest($event) {
         $body
-    }`,
-        }
-    } => $new
+    }`
+		}
+	} => $new
 }
 
-pattern spin_remove_lambda() {
-    `import $_ from "aws-lambda"` => .
-}
+pattern spin_remove_lambda() { `import $_ from "aws-lambda"` => . }
 
 pattern spin_main_fix_request() {
-    `function handleRequest($request) { $body }` where {
-        $body <: contains spin_fix_request(event=`request`)
-    }
+	`function handleRequest($request) { $body }` where {
+		$body <: contains spin_fix_request(event=`request`)
+	}
 }
 
 sequential {
-    contains spin_main_fix_handler(),
-    maybe contains spin_main_fix_request(),
-    maybe contains spin_remove_lambda(),
+	contains spin_main_fix_handler(),
+	maybe contains spin_main_fix_request(),
+	maybe contains spin_remove_lambda()
 }
 ```
 

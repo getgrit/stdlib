@@ -13,7 +13,7 @@ engine marzano(0.1)
 language js
 
 `new ApolloServer($config)` where {
-    $config <: contains `csrfPrevention: false` => `csrfPrevention: true`
+	$config <: contains `csrfPrevention: false` => `csrfPrevention: true`
 }
 ```
 

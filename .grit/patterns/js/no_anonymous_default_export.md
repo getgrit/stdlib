@@ -11,11 +11,11 @@ engine marzano(0.1)
 language js
 
 or {
-  `export default async function($args) { $body }` => `export default async function main($args) { $body }`,
-  `export default function($args) { $body }` => `export default function main($args) { $body }`,
-  `export default $f` => `const main = $f;\nexport default main` where {
-    $f <: `($args) => { $body }`
-  }
+	`export default async function($args) { $body }` => `export default async function main($args) { $body }`,
+	`export default function($args) { $body }` => `export default function main($args) { $body }`,
+	`export default $f` => `const main = $f;\nexport default main` where {
+		$f <: `($args) => { $body }`
+	}
 }
 ```
 

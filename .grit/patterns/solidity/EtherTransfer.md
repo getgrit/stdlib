@@ -6,14 +6,14 @@ title: Ether Transfer
 language sol
 
 pattern ether_transfer($amount) {
-  bubble($amount) or {
-      `$sender.call{value: $amount}($_)`,
-      `$sender.call.value($amount)($_)`,
-      `$call($amount)` where {
-          $call <: `$address.$functionName`,
-          $functionName <: r".*transfer.*"
-      }
-  }
+	bubble($amount) or {
+		`$sender.call{value: $amount}($_)`,
+		`$sender.call.value($amount)($_)`,
+		`$call($amount)` where {
+			$call <: `$address.$functionName`,
+			$functionName <: r".*transfer.*"
+		}
+	}
 }
 
 ether_transfer(amount=$_)

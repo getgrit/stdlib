@@ -18,157 +18,158 @@ grit apply mux_python_v3
 language python
 
 pattern mux_v3_config() {
-  `$mp.Configuration($_)` as $config where {
-    $args = [],
-    $program <: maybe contains bubble($config, $args) binding_access(binding=$config) as $one_case where {
-      $one_case <: within or {
-        `$one_case.username = $username` => . where $args += `token_id=$username`,
-        `$one_case.password = $password` => . where $args += `token_secret=$password`,
-      }
-    },
-    $joined_args = join($args, ", "),
-  } => `$mp.Mux($joined_args)`
+	`$mp.Configuration($_)` as $config where {
+		$args = [],
+		$program <: maybe contains bubble($config, $args) binding_access(binding=$config) as $one_case where {
+			$one_case <: within or {
+				`$one_case.username = $username` => . where $args += `token_id=$username`,
+				`$one_case.password = $password` => . where $args += `token_secret=$password`
+			}
+		},
+		$joined_args = join($args, ", ")
+	} => `$mp.Mux($joined_args)`
 }
 
-
 pattern mux_v3_api_client() {
-  mux_api_constructor($args) as $constructor where {
-    $client = `client`,
-    $args <: maybe contains `mux_python.ApiClient($config)` where { $client = $config },
-    $program <: contains bubble($constructor, $client) binding_access(binding=$constructor) as $access where {
-      $access <: or {
-        within `$access = $_` => .,
-        $access => `$client` where {
-          $access <: maybe within mux_v3_api_remaps(),
-        }
-      }
-    },
-  }
+	mux_api_constructor($args) as $constructor where {
+		$client = `client`,
+		$args <: maybe contains `mux_python.ApiClient($config)` where {
+			$client = $config
+		},
+		$program <: contains bubble($constructor, $client) binding_access(binding=$constructor) as $access where {
+			$access <: or {
+				within `$access = $_` => . ,
+				$access => `$client` where {
+					$access <: maybe within mux_v3_api_remaps()
+				}
+			}
+		}
+	}
 }
 
 pattern mux_api_constructor($args) {
-  or {
-    `$mp.AssetsApi($args)`,
-    `$mp.DeliveryUsageApi($args)`,
-    `$mp.LiveStreamsApi($args)`,
-    `$mp.PlaybackIdApi($args)`,
-    `$mp.PlaybackRestrictionsApi($args)`,
-    `$mp.SpacesApi($args)`,
-    `$mp.TranscriptionVocabulariesApi($args)`,
-    `$mp.WebInputsApi($args)`,
-    `$mp.DimensionsApi($args)`,
-    `$mp.MonitoringApi($args)`,
-    `$mp.MetricsApi($args)`,
-    `$mp.ErrorsApi($args)`,
-    `$mp.FiltersApi($args)`,
-    `$mp.IncidentsApi($args)`,
-    `$mp.RealTimeApi($args)`,
-  }
+	or {
+		`$mp.AssetsApi($args)`,
+		`$mp.DeliveryUsageApi($args)`,
+		`$mp.LiveStreamsApi($args)`,
+		`$mp.PlaybackIdApi($args)`,
+		`$mp.PlaybackRestrictionsApi($args)`,
+		`$mp.SpacesApi($args)`,
+		`$mp.TranscriptionVocabulariesApi($args)`,
+		`$mp.WebInputsApi($args)`,
+		`$mp.DimensionsApi($args)`,
+		`$mp.MonitoringApi($args)`,
+		`$mp.MetricsApi($args)`,
+		`$mp.ErrorsApi($args)`,
+		`$mp.FiltersApi($args)`,
+		`$mp.IncidentsApi($args)`,
+		`$mp.RealTimeApi($args)`
+	}
 }
 
 pattern mux_v3_api_remaps() {
-  or {
-    // Video
-    `$api.list_assets($args)` => `$api.video.assets.list($args)`,
-    `$api.create_asset($args)` => `$api.video.assets.create($args)`,
-    `$api.get_asset($args)` => `$api.video.assets.retrieve($args)`,
-    `$api.update_asset($args)` => `$api.video.assets.update($args)`,
-    `$api.delete_asset($args)` => `$api.video.assets.delete($args)`,
-    `$api.create_asset_playback_id($args)` => `$api.video.assets.create_playback_id($args)`,
-    `$api.create_asset_track($args)` => `$api.video.assets.create_track($args)`,
-    `$api.delete_asset_playback_id($args)` => `$api.video.assets.delete_playback_id($args)`,
-    `$api.delete_asset_track($args)` => `$api.video.assets.delete_track($args)`,
-    `$api.generate_asset_track_subtitles($args)` => `$api.video.assets.generate_subtitles($args)`,
-    `$api.get_asset_input_info($args)` => `$api.video.assets.retrieve_input_info($args)`,
-    `$api.get_asset_playback_id($args)` => `$api.video.assets.retrieve_playback_id($args)`,
-    `$api.update_asset_master_access($args)` => `$api.video.assets.update_master_access($args)`,
-    `$api.update_asset_mp4_support($args)` => `$api.video.assets.update_mp4_support($args)`,
-    // Delivery
-    `$api.list_delivery_usage($args)` => `$api.video.delivery_usage.list($args)`,
-    // Live streams
-    `$api.create_live_stream($args)` => `$api.video.live_streams.create($args)`,
-    `$api.get_live_stream($args)` => `$api.video.live_streams.retrieve($args)`,
-    `$api.update_live_stream($args)` => `$api.video.live_streams.update($args)`,
-    `$api.list_live_streams($args)` => `$api.video.live_streams.list($args)`,
-    `$api.delete_live_stream($args)` => `$api.video.live_streams.delete($args)`,
-    `$api.signal_live_stream_complete($args)` => `$api.video.live_streams.complete($args)`,
-    `$api.create_live_stream_playback_id($args)` => `$api.video.live_streams.create_playback_id($args)`,
-    `$api.create_live_stream_simulcast_target($args)` => `$api.video.live_streams.create_simulcast_target($args)`,
-    `$api.delete_live_stream_playback_id($args)` => `$api.video.live_streams.delete_playback_id($args)`,
-    `$api.delete_live_stream_simulcast_target($args)` => `$api.video.live_streams.delete_simulcast_target($args)`,
-    `$api.disable_live_stream($args)` => `$api.video.live_streams.disable($args)`,
-    `$api.enable_live_stream($args)` => `$api.video.live_streams.enable($args)`,
-    `$api.reset_stream_key($args)` => `$api.video.live_streams.reset_stream_key($args)`,
-    `$api.get_live_stream_playback_id($args)` => `$api.video.live_streams.retrieve_playback_id($args)`,
-    `$api.get_live_stream_simulcast_target($args)` => `$api.video.live_streams.retrieve_simulcast_target($args)`,
-    `$api.update_live_stream_embedded_subtitles($args)` => `$api.video.live_streams.update_embedded_subtitles($args)`,
-    `$api.update_live_stream_generated_subtitles($args)` => `$api.video.live_streams.update_generated_subtitles($args)`,
-    // Playback ID
-    `$api.get_playback_id($args)` => `$api.video.playback_ids.retrieve($args)`,
-    // PlaybackRestrictions
-    `$api.create_playback_restriction($args)` => `$api.video.playback_restrictions.create($args)`,
-    `$api.get_playback_restriction($args)` => `$api.video.playback_restrictions.retrieve($args)`,
-    `$api.list_playback_restrictions($args)` => `$api.video.playback_restrictions.list($args)`,
-    `$api.delete_playback_restriction($args)` => `$api.video.playback_restrictions.delete($args)`,
-    `$api.update_referrer_domain_restriction($args)` => `$api.video.playback_restrictions.update_referrer($args)`,
-    // Spaces
-    `$api.create_space($args)` => `$api.video.space.create($args)`,
-    `$api.get_space($args)` => `$api.video.space.retrieve($args)`,
-    `$api.list_spaces($args)` => `$api.video.space.list($args)`,
-    `$api.delete_space($args)` => `$api.video.space.delete($args)`,
-    `$api.create_space_broadcast($args)` => `$api.video.space.create_broadcast($args)`,
-    `$api.delete_space_broadcast($args)` => `$api.video.space.delete_broadcast($args)`,
-    `$api.retrieve_space_broadcast($args)` => `$api.video.space.retrieve_broadcast($args)`,
-    `$api.start_space_broadcast($args)` => `$api.video.space.start_broadcast($args)`,
-    `$api.stop_space_broadcast($args)` => `$api.video.space.stop_broadcast($args)`,
-    // TranscriptionVocabularies
-    `$api.create_transcription_vocabulary($args)` => `$api.video.transcription_vocabularies.create($args)`,
-    `$api.get_transcription_vocabulary($args)` => `$api.video.transcription_vocabularies.retrieve($args)`,
-    `$api.update_transcription_vocabulary($args)` => `$api.video.transcription_vocabularies.update($args)`,
-    `$api.list_transcription_vocabularies($args)` => `$api.video.transcription_vocabularies.list($args)`,
-    `$api.delete_transcription_vocabulary($args)` => `$api.video.transcription_vocabularies.delete($args)`,
-    // WebInputs
-    `$api.create_web_input($args)` => `$api.web_inputs.assets.create($args)`,
-    `$api.get_web_input($args)` => `$api.web_inputs.assets.retrieve($args)`,
-    `$api.list_web_inputs($args)` => `$api.web_inputs.assets.list($args)`,
-    `$api.delete_web_input($args)` => `$api.web_inputs.assets.delete($args)`,
-    `$api.launch_web_input($args)` => `$api.web_inputs.assets.launch($args)`,
-    `$api.reload_web_input($args)` => `$api.web_inputs.assets.reload($args)`,
-    `$api.shutdown_web_input($args)` => `$api.web_inputs.assets.shutdown($args)`,
-    `$api.update_web_input_url($args)` => `$api.web_inputs.assets.update_url($args)`,
-    // Dimensions
-    `$api.list_dimensions($args)` => `$api.data.dimensions.list($args)`,
-    `$api.list_dimension_values($args)` => `$api.data.dimensions.list_values($args)`,
-    // Monitoring
-    `$api.list_monitoring_dimensions($args)` => `$api.data.monitoring.list_dimensions($args)`,
-    // Metrics
-    `$api.list_all_metric_values($args)` => `$api.data.monitoring.metrics.list($args)`,
-    `$api.list_breakdown_values($args)` => `$api.data.monitoring.metrics.get_breakdown($args)`,
-    `$api.get_metric_timeseries_data($args)` => `$api.data.monitoring.metrics.get_breakdown_timeseries($args)`,
-    `$api.get_metric_values($args)` => `$api.data.monitoring.metrics.get_breakdown_values($args)`,
-    `$api.get_metric_timeseries_data($args)` => `$api.data.monitoring.metrics.get_timeseries($args)`,
-    // Errors
-    `$api.list_errors($args)` => `$api.data.errors.list($args)`,
-    // Filters
-    `$api.list_values($args)` => `$api.data.filters.list_values($args)`,
-    // Incidents
-    `$api.list_incidents($args)` => `$api.data.incidents.list($args)`,
-    `$api.get_incident($args)` => `$api.data.incidents.retrieve($args)`,
-    `$api.list_related_incidents($args)` => `$api.data.incidents.list_related($args)`,
-    // RealTime
-    `$api.get_realtime_breakdown($args)` => `$api.data.real_time.retrieve_breakdown($args)`,
-    `$api.list_realtime_dimensions($args)` => `$api.data.real_time.list_dimensions($args)`,
-    `$api.list_realtime_metrics($args)` => `$api.data.real_time.list_metrics($args)`,
-    `$api.get_realtime_histogram_timeseries($args)` => `$api.data.real_time.retrieve_histogram_timeseries($args)`,
-    `$api.get_realtime_timeseries($args)` => `$api.data.real_time.retrieve_timeseries($args)`,
-  }
+	or {
+		// Video
+		`$api.list_assets($args)` => `$api.video.assets.list($args)`,
+		`$api.create_asset($args)` => `$api.video.assets.create($args)`,
+		`$api.get_asset($args)` => `$api.video.assets.retrieve($args)`,
+		`$api.update_asset($args)` => `$api.video.assets.update($args)`,
+		`$api.delete_asset($args)` => `$api.video.assets.delete($args)`,
+		`$api.create_asset_playback_id($args)` => `$api.video.assets.create_playback_id($args)`,
+		`$api.create_asset_track($args)` => `$api.video.assets.create_track($args)`,
+		`$api.delete_asset_playback_id($args)` => `$api.video.assets.delete_playback_id($args)`,
+		`$api.delete_asset_track($args)` => `$api.video.assets.delete_track($args)`,
+		`$api.generate_asset_track_subtitles($args)` => `$api.video.assets.generate_subtitles($args)`,
+		`$api.get_asset_input_info($args)` => `$api.video.assets.retrieve_input_info($args)`,
+		`$api.get_asset_playback_id($args)` => `$api.video.assets.retrieve_playback_id($args)`,
+		`$api.update_asset_master_access($args)` => `$api.video.assets.update_master_access($args)`,
+		`$api.update_asset_mp4_support($args)` => `$api.video.assets.update_mp4_support($args)`,
+		// Delivery
+		`$api.list_delivery_usage($args)` => `$api.video.delivery_usage.list($args)`,
+		// Live streams
+		`$api.create_live_stream($args)` => `$api.video.live_streams.create($args)`,
+		`$api.get_live_stream($args)` => `$api.video.live_streams.retrieve($args)`,
+		`$api.update_live_stream($args)` => `$api.video.live_streams.update($args)`,
+		`$api.list_live_streams($args)` => `$api.video.live_streams.list($args)`,
+		`$api.delete_live_stream($args)` => `$api.video.live_streams.delete($args)`,
+		`$api.signal_live_stream_complete($args)` => `$api.video.live_streams.complete($args)`,
+		`$api.create_live_stream_playback_id($args)` => `$api.video.live_streams.create_playback_id($args)`,
+		`$api.create_live_stream_simulcast_target($args)` => `$api.video.live_streams.create_simulcast_target($args)`,
+		`$api.delete_live_stream_playback_id($args)` => `$api.video.live_streams.delete_playback_id($args)`,
+		`$api.delete_live_stream_simulcast_target($args)` => `$api.video.live_streams.delete_simulcast_target($args)`,
+		`$api.disable_live_stream($args)` => `$api.video.live_streams.disable($args)`,
+		`$api.enable_live_stream($args)` => `$api.video.live_streams.enable($args)`,
+		`$api.reset_stream_key($args)` => `$api.video.live_streams.reset_stream_key($args)`,
+		`$api.get_live_stream_playback_id($args)` => `$api.video.live_streams.retrieve_playback_id($args)`,
+		`$api.get_live_stream_simulcast_target($args)` => `$api.video.live_streams.retrieve_simulcast_target($args)`,
+		`$api.update_live_stream_embedded_subtitles($args)` => `$api.video.live_streams.update_embedded_subtitles($args)`,
+		`$api.update_live_stream_generated_subtitles($args)` => `$api.video.live_streams.update_generated_subtitles($args)`,
+		// Playback ID
+		`$api.get_playback_id($args)` => `$api.video.playback_ids.retrieve($args)`,
+		// PlaybackRestrictions
+		`$api.create_playback_restriction($args)` => `$api.video.playback_restrictions.create($args)`,
+		`$api.get_playback_restriction($args)` => `$api.video.playback_restrictions.retrieve($args)`,
+		`$api.list_playback_restrictions($args)` => `$api.video.playback_restrictions.list($args)`,
+		`$api.delete_playback_restriction($args)` => `$api.video.playback_restrictions.delete($args)`,
+		`$api.update_referrer_domain_restriction($args)` => `$api.video.playback_restrictions.update_referrer($args)`,
+		// Spaces
+		`$api.create_space($args)` => `$api.video.space.create($args)`,
+		`$api.get_space($args)` => `$api.video.space.retrieve($args)`,
+		`$api.list_spaces($args)` => `$api.video.space.list($args)`,
+		`$api.delete_space($args)` => `$api.video.space.delete($args)`,
+		`$api.create_space_broadcast($args)` => `$api.video.space.create_broadcast($args)`,
+		`$api.delete_space_broadcast($args)` => `$api.video.space.delete_broadcast($args)`,
+		`$api.retrieve_space_broadcast($args)` => `$api.video.space.retrieve_broadcast($args)`,
+		`$api.start_space_broadcast($args)` => `$api.video.space.start_broadcast($args)`,
+		`$api.stop_space_broadcast($args)` => `$api.video.space.stop_broadcast($args)`,
+		// TranscriptionVocabularies
+		`$api.create_transcription_vocabulary($args)` => `$api.video.transcription_vocabularies.create($args)`,
+		`$api.get_transcription_vocabulary($args)` => `$api.video.transcription_vocabularies.retrieve($args)`,
+		`$api.update_transcription_vocabulary($args)` => `$api.video.transcription_vocabularies.update($args)`,
+		`$api.list_transcription_vocabularies($args)` => `$api.video.transcription_vocabularies.list($args)`,
+		`$api.delete_transcription_vocabulary($args)` => `$api.video.transcription_vocabularies.delete($args)`,
+		// WebInputs
+		`$api.create_web_input($args)` => `$api.web_inputs.assets.create($args)`,
+		`$api.get_web_input($args)` => `$api.web_inputs.assets.retrieve($args)`,
+		`$api.list_web_inputs($args)` => `$api.web_inputs.assets.list($args)`,
+		`$api.delete_web_input($args)` => `$api.web_inputs.assets.delete($args)`,
+		`$api.launch_web_input($args)` => `$api.web_inputs.assets.launch($args)`,
+		`$api.reload_web_input($args)` => `$api.web_inputs.assets.reload($args)`,
+		`$api.shutdown_web_input($args)` => `$api.web_inputs.assets.shutdown($args)`,
+		`$api.update_web_input_url($args)` => `$api.web_inputs.assets.update_url($args)`,
+		// Dimensions
+		`$api.list_dimensions($args)` => `$api.data.dimensions.list($args)`,
+		`$api.list_dimension_values($args)` => `$api.data.dimensions.list_values($args)`,
+		// Monitoring
+		`$api.list_monitoring_dimensions($args)` => `$api.data.monitoring.list_dimensions($args)`,
+		// Metrics
+		`$api.list_all_metric_values($args)` => `$api.data.monitoring.metrics.list($args)`,
+		`$api.list_breakdown_values($args)` => `$api.data.monitoring.metrics.get_breakdown($args)`,
+		`$api.get_metric_timeseries_data($args)` => `$api.data.monitoring.metrics.get_breakdown_timeseries($args)`,
+		`$api.get_metric_values($args)` => `$api.data.monitoring.metrics.get_breakdown_values($args)`,
+		`$api.get_metric_timeseries_data($args)` => `$api.data.monitoring.metrics.get_timeseries($args)`,
+		// Errors
+		`$api.list_errors($args)` => `$api.data.errors.list($args)`,
+		// Filters
+		`$api.list_values($args)` => `$api.data.filters.list_values($args)`,
+		// Incidents
+		`$api.list_incidents($args)` => `$api.data.incidents.list($args)`,
+		`$api.get_incident($args)` => `$api.data.incidents.retrieve($args)`,
+		`$api.list_related_incidents($args)` => `$api.data.incidents.list_related($args)`,
+		// RealTime
+		`$api.get_realtime_breakdown($args)` => `$api.data.real_time.retrieve_breakdown($args)`,
+		`$api.list_realtime_dimensions($args)` => `$api.data.real_time.list_dimensions($args)`,
+		`$api.list_realtime_metrics($args)` => `$api.data.real_time.list_metrics($args)`,
+		`$api.get_realtime_histogram_timeseries($args)` => `$api.data.real_time.retrieve_histogram_timeseries($args)`,
+		`$api.get_realtime_timeseries($args)` => `$api.data.real_time.retrieve_timeseries($args)`
+	}
 }
 
 file($body) where {
-  $body <: contains or {
-    mux_v3_config(),
-    mux_v3_api_client(),
-  }
+	$body <: contains or {
+		mux_v3_config(),
+		mux_v3_api_client()
+	}
 }
 ```
 

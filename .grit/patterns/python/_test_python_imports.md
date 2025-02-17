@@ -5,23 +5,19 @@ engine marzano(0.1)
 language python
 
 contains bubble or {
-  import_from(source="pydantic") => .,
-  `$testlib.TestCase` where {
-      $newtest = `newtest`,
-      $testlib <: `unittest` => `$newtest`,
-      $newtest <: ensure_import_from(source=`testing`),
-  },
-  `othermodule` as $other where {
-      $other <: ensure_bare_import()
-  },
-  `$bob.caller` where {
-    $newbob = `newbob`,
-    $bob <: `thingbob` => `$newbob`,
-    $newbob <: ensure_import_from(source=`ourlib.goodlib`),
-  },
-  `$badimport.remove_parent()` where {
-    $badimport <: remove_from_imports()
-  }
+	import_from(source="pydantic") => .,
+	`$testlib.TestCase` where {
+		$newtest = `newtest`,
+		$testlib <: `unittest` => `$newtest`,
+		$newtest <: ensure_import_from(source=`testing`)
+	},
+	`othermodule` as $other where { $other <: ensure_bare_import() },
+	`$bob.caller` where {
+		$newbob = `newbob`,
+		$bob <: `thingbob` => `$newbob`,
+		$newbob <: ensure_import_from(source=`ourlib.goodlib`)
+	},
+	`$badimport.remove_parent()` where { $badimport <: remove_from_imports() }
 }
 ```
 

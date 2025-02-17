@@ -14,8 +14,8 @@ tags: [fix, correctness]
 language go
 
 `for _, $val := range $values { $body }` where {
-    $body <: not contains `$val := $val`,
-    $body <: contains `&$val`
+	$body <: not contains `$val := $val`,
+	$body <: contains `&$val`
 } => `for _, $val := range $values { 
         $val := $val \n $body 
     }`

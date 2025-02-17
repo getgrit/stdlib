@@ -15,8 +15,8 @@ Utilize `filepath.Join(...)` instead of `path.Join(...)` as it accommodates OS-s
 language go
 
 or {
-    `path.Join($params)` => `filepath.Join($params)`,
-    ensure_import(`"path/filepath"`)
+	`path.Join($params)` => `filepath.Join($params)`,
+	ensure_import(`"path/filepath"`)
 }
 ```
 

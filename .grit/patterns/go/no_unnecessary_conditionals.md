@@ -11,7 +11,7 @@ language go
 
 or {
 	`if(false){ $body }` => .,
-	`if(true){ $body }`  => $body
+	`if(true){ $body }` => $body
 }
 ```
 

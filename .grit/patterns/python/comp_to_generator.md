@@ -10,22 +10,22 @@ language python
 
 // Helper to check for functions that accept generators
 pattern accept_generator() {
-    or {
-        `all`,
-        `any`,
-        `enumerate`,
-        `frozenset`,
-        `list`,
-        `max`,
-        `min`,
-        `set`,
-        `sum`,
-        `tuple`,
-    }
+	or {
+		`all`,
+		`any`,
+		`enumerate`,
+		`frozenset`,
+		`list`,
+		`max`,
+		`min`,
+		`set`,
+		`sum`,
+		`tuple`
+	}
 }
 
 `$func([$expr for $x in $arr])` => `$func($expr for $x in $arr)` where {
-    $func <: accept_generator(),
+	$func <: accept_generator()
 }
 ```
 

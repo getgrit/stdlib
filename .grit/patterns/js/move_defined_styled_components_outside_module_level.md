@@ -13,16 +13,16 @@ engine marzano(0.1)
 language js
 
 or {
-    react_functional_component($props, $body) as $comp,
-    react_class_component($props, $body) as $comp
+	react_functional_component($props, $body) as $comp,
+	react_class_component($props, $body) as $comp
 } where {
-     $body <: contains or {
-        js"const $componentName = styled($component)`$style`",
-        js"const $componentName = styled.$tag`$style`"
-    } as $styledComponent,
-    $copy = text($styledComponent),
-    $styledComponent => .,
-    $comp => `$copy\n\n$comp`,
+	$body <: contains or {
+		js"const $componentName = styled($component)`$style`",
+		js"const $componentName = styled.$tag`$style`"
+	} as $styledComponent,
+	$copy = text($styledComponent),
+	$styledComponent => .,
+	$comp => `$copy\n\n$comp`
 }
 ```
 

@@ -11,108 +11,103 @@ engine marzano(0.1)
 language js
 
 pattern adjust_imports_vitest() {
-  $body where {
-    $body <: or {
-      `$sym.$_($_)`,
-      `$sym($_)`,
-    } where {
-      $program <: program($statements),
-      $mocha = `'mocha'`,
-      $sym <: or {
-        `test`,
-        `expect`,
-        `describe`,
-        `it`,
-        `beforeEach`,
-        `afterEach`,
-        `beforeAll`,
-        `afterAll`,
-        `jest`,
-        `vi`
-      } where {
-        // Filter out methods which are imported from mocha
-        $sym <: not imported_from(from = $mocha),
-        // Filter out methods which are imported as default from any module
-        $statements <: not contains or {
-          `import $sym from $_`,
-        }
-      },
-      $source = `'vitest'`,
-      $vi = `vi`,
-      if ($sym <: not `jest`) {
-        $sym <: ensure_import_from($source)
-      } else {
-        $vi <: ensure_import_from($source)
-      }
-    }
-  }
+	$body where {
+		$body <: or {
+			`$sym.$_($_)`,
+			`$sym($_)`
+		} where {
+			$program <: program($statements),
+			$mocha = `'mocha'`,
+			$sym <: or {
+				`test`,
+				`expect`,
+				`describe`,
+				`it`,
+				`beforeEach`,
+				`afterEach`,
+				`beforeAll`,
+				`afterAll`,
+				`jest`,
+				`vi`
+			} where {
+				// Filter out methods which are imported from mocha
+				$sym <: not imported_from(from=$mocha),
+				// Filter out methods which are imported as default from any module
+				$statements <: not contains or { `import $sym from $_` }
+			},
+			$source = `'vitest'`,
+			$vi = `vi`,
+			if ($sym <: not `jest`) { $sym <: ensure_import_from($source) } else {
+				$vi <: ensure_import_from($source)
+			}
+		}
+	}
 }
 
 pattern main_jest_to_vitest_migration() {
-  file($body) where {
-    $body <: contains bubble or {
-      `JEST_WORKER_ID` => `VITEST_POOL_ID`,
-
-      // Imports
-      `import $_ from 'jest'` => .,
-
-      // MODLE MOCKS
-      // default literal mocking
-      `jest.mock($module, $mockImplementation)` where {
-        $mockImplementation <: or {
-          arrow_function($body) where {
-            // still waiting for default mock confirmation
-            $body <: literal_value() => `({
+	file($body) where {
+		$body <: contains bubble or {
+			`JEST_WORKER_ID` => `VITEST_POOL_ID`,
+			// Imports
+			`import $_ from 'jest'` => .,
+			// MODLE MOCKS
+			// default literal mocking
+			`jest.mock($module, $mockImplementation)` where {
+				$mockImplementation <: or {
+					arrow_function($body) where {
+						// still waiting for default mock confirmation
+						$body <: literal_value() => `({
               default: $body
             })`
-          },
-          `function($_) { $body }` where {
-            $body <: contains `return $return` where {
-              $return <: literal_value() => `{ default: $return }`
-            }
-          }
-        }
-        } => `vi.mock($module, $mockImplementation)`,
-
-      `...jest.requireActual($module)` => `...(await vi.importActual($module))`,
-      `jest.requireActual($module)` => `await vi.importActual($module)`,
-      `jest.$sym` => `vi.$sym`,
-
-      // done callback
-      or {
-        `$sym.$_($description, $callback)`,
-        `$sym($description, $callback)`,
-      } where {
-        $sym <: or { `it`, `test` },
-        $callback <: or {
-          // For matching `xxx => { ... }` & `(xxx) => { ... }`
-          `$parameter => { $_ }` where {
-            $parameter <: not .
-          },
-          // For matching `function (xxx) { ... }`
-          `function($parameters) { $_ }` where {
-            $parameters <: [$one, ...]
-          }
-        } => `() => new Promise($callback)`,
-      },
-
-      // beforeAll, beforeEach, afterAll, afterEach hooks
-      `$sym($callback)` where {
-        and {
-          $sym <: or { `beforeAll`, `beforeEach`, `afterAll`, `afterEach` },
-          $callback <: arrow_function($body) where {
-            $body <: call_expression() => `{ $body }`
-          },
-          // when `callback` is already a function, we don't need to do the migration
-        }
-      },
-    },
-  },
+					},
+					`function($_) { $body }` where {
+						$body <: contains `return $return` where {
+							$return <: literal_value() => `{ default: $return }`
+						}
+					}
+				}
+			} => `vi.mock($module, $mockImplementation)`,
+			`...jest.requireActual($module)` => `...(await vi.importActual($module))`,
+			`jest.requireActual($module)` => `await vi.importActual($module)`,
+			`jest.$sym` => `vi.$sym`,
+			// done callback
+			or {
+				`$sym.$_($description, $callback)`,
+				`$sym($description, $callback)`
+			} where {
+				$sym <: or {
+					`it`,
+					`test`
+				},
+				$callback <: or {
+					// For matching `xxx => { ... }` & `(xxx) => { ... }`
+					`$parameter => { $_ }` where { $parameter <: not . },
+					// For matching `function (xxx) { ... }`
+					`function($parameters) { $_ }` where { $parameters <: [$one, ...] }
+				} => `() => new Promise($callback)`
+			},
+			// beforeAll, beforeEach, afterAll, afterEach hooks
+			`$sym($callback)` where {
+				and {
+					$sym <: or {
+						`beforeAll`,
+						`beforeEach`,
+						`afterAll`,
+						`afterEach`
+					},
+					$callback <: arrow_function($body) where {
+						$body <: call_expression() => `{ $body }`
+					}
+					// when `callback` is already a function, we don't need to do the migration
+				}
+			}
+		}
+	}
 }
 
 sequential {
-  maybe main_jest_to_vitest_migration(),
-  maybe contains adjust_imports_vitest(),
+	maybe main_jest_to_vitest_migration(),
+	maybe contains adjust_imports_vitest()
 }
 ```
 

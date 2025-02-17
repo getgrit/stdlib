@@ -9,21 +9,21 @@ engine marzano(0.1)
 language python
 
 or {
-    `if $cond: $_`,
-    elif_clause(condition=$cond),
-    `while $cond: $_`,
+	`if $cond: $_`,
+	elif_clause(condition=$cond),
+	`while $cond: $_`
 } where $cond <: or {
-    `[$elms]` as $arr where {
-        $elms <: or {
-            [$_, ...] where $arr => `True`,
-            . where $arr => `False`,
-        }
-    },
-    `{}` => `False`,
-    `{$_}` => `True`,
-    r"\{.*:.*(?:,.*:.*)*\}" => `True`,
-    r"\(\)" => `False`,
-    r"\(.+\)"=> `True`,
+	`[$elms]` as $arr where {
+		$elms <: or {
+			[$_, ...] where $arr => `True`,
+			. where $arr => `False`
+		}
+	},
+	`{}` => `False`,
+	`{$_}` => `True`,
+	r"\{.*:.*(?:,.*:.*)*\}" => `True`,
+	r"\(\)" => `False`,
+	r"\(.+\)" => `True`
 }
 ```
 

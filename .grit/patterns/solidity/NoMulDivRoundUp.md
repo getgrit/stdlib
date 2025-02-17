@@ -8,7 +8,6 @@ Say we do not want `mulDivRoundUp`.
 language sol
 
 `$_.mulDivRoundUp($amount, $_)`
-
 ```
 
 ## Matches a simple mulDivRoundUp

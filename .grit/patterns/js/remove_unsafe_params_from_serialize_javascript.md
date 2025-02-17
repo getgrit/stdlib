@@ -12,9 +12,7 @@ tags: [fix, security]
 engine marzano(0.1)
 language js
 
-`serialize($config)` where {
-    $config <: contains `unsafe: true` => .
-}
+`serialize($config)` where { $config <: contains `unsafe: true` => . }
 ```
 
 ## Apollo Graphql Schema Directives while migrating from v2 to v3 or v4

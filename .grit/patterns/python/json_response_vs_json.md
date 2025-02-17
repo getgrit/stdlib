@@ -10,10 +10,10 @@ engine marzano(0.1)
 language python
 
 `def $funcName($params): $funcBody` where {
-    $import = "JsonResponse",
-    $import <: ensure_import_from(source=`django.http`),
-    $funcBody <: contains `$json_data = json.dumps($data)` => .,
-    $funcBody <: contains `return HttpResponse($json_data, content_type='application/json')` => `return JsonResponse($data)`
+	$import = "JsonResponse",
+	$import <: ensure_import_from(source=`django.http`),
+	$funcBody <: contains `$json_data = json.dumps($data)` => .,
+	$funcBody <: contains `return HttpResponse($json_data, content_type='application/json')` => `return JsonResponse($data)`
 }
 ```
 

@@ -14,50 +14,46 @@ engine marzano(0.1)
 language python
 
 pattern re_match_function() {
-    or {
-        `search`,
-        `match`,
-        `fullmatch`,
-    }
+	or {
+		`search`,
+		`match`,
+		`fullmatch`
+	}
 }
 
 pattern imported_match_function() {
-    $func where {
-        $func <: re_match_function(),
-        $func <: imported_from(source = "re"),
-    },
+	$func where {
+		$func <: re_match_function(),
+		$func <: imported_from(source="re")
+	}
 }
 
 pattern explicit_match_function() {
-    `re.$func` where {
-        $func <: re_match_function()
-    },
+	`re.$func` where { $func <: re_match_function() }
 }
 
 pattern match_function() {
-    or {
-        imported_match_function(),
-        explicit_match_function(),
-    }
+	or {
+		imported_match_function(),
+		explicit_match_function()
+	}
 }
 
 if_statement($alternative, $condition, $consequence) as $if where {
-    $if <: after `$var = $match_func($regex)` => . where {
-        $match_func <: match_function()
-    },
-    $condition <: `$var` => `$var := $match_func($regex)`,
-    if ($alternative <: "") {
-        $if => `if $condition:
+	$if <: after `$var = $match_func($regex)` => . where {
+		$match_func <: match_function()
+	},
+	$condition <: `$var` => `$var := $match_func($regex)`,
+	if ($alternative <: "") {
+		$if => `if $condition:
     $consequence`
-    }
-    else {
-        $separator = `\n`,
-        $if => `if $condition:
+	} else {
+		$separator = `\n`,
+		$if => `if $condition:
     $consequence
 $alternative`
-    }
+	}
 }
-
 ```
 
 ## Simple match and if

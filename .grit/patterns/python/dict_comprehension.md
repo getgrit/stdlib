@@ -8,9 +8,11 @@ Replaces dictionaries created with `for` loops with dictionary comprehensions.
 engine marzano(0.1)
 language python
 
-for_statement(body=block(statements=[`$var[$key_expr] = $expr`]), left=$key, right=$iter) as $assign where {
-    $assign <: after `$var = {}` => .,
-    $assign => `$var = {$key_expr: $expr for $key in $iter}`
+for_statement(body=block(statements=[
+	`$var[$key_expr] = $expr`
+]), left=$key, right=$iter) as $assign where {
+	$assign <: after `$var = {}` => .,
+	$assign => `$var = {$key_expr: $expr for $key in $iter}`
 }
 ```
 

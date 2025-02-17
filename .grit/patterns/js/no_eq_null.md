@@ -13,10 +13,12 @@ language js
 // We use the syntax-tree node binary_expression to capture all expressions where $a and $b are operated on by "==" or "!=".
 // This code takes advantage of Grit's allowing us to nest rewrites inside match conditions and to match syntax-tree fields on patterns.
 binary_expression($operator, $left, $right) where {
-    $operator <: or  { "==" => `===` , "!=" => `!==` },
-    or { $left <: `null`, $right <: `null`}
+	$operator <: or {
+		"==" => `===`,
+		"!=" => `!==`
+	},
+	or { $left <: `null`, $right <: `null` }
 }
-
 ```
 
 ```

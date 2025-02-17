@@ -10,7 +10,7 @@ JavaScript’s prompt function is widely considered to be obtrusive as UI elemen
 engine marzano(0.1)
 language js
 
-call_expression(function=`prompt`) => . 
+call_expression(function=`prompt`) => .
 ```
 
 ## Remove alert, confirm and prompt

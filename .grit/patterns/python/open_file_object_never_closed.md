@@ -13,19 +13,19 @@ engine marzano(0.1)
 language python
 
 `def $func(): $_` as $function where {
-    and {
-        $function <: contains or {
-                `$f = open($parms)`,
-                `$f = io.open($parms)`,
-                `$f = tarfile.open($parms)`,
-                `$f = ZipFile.open($parms)`,
-                `$f = tempfile.TemporaryFile($parms)`,
-                `$f = tempfile.NamedTemporaryFile($parms)`,
-                `$f = tempfile.SpooledTemporaryFile($parms)`,
-            },
-        $function <: not contains `$f.close()`
-    },
-    $function => `$function \n    $f.close()`
+	and {
+		$function <: contains or {
+			`$f = open($parms)`,
+			`$f = io.open($parms)`,
+			`$f = tarfile.open($parms)`,
+			`$f = ZipFile.open($parms)`,
+			`$f = tempfile.TemporaryFile($parms)`,
+			`$f = tempfile.NamedTemporaryFile($parms)`,
+			`$f = tempfile.SpooledTemporaryFile($parms)`
+		},
+		$function <: not contains `$f.close()`
+	},
+	$function => `$function \n    $f.close()`
 }
 ```
 

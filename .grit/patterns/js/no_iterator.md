@@ -11,12 +11,12 @@ engine marzano(1.0)
 language js
 
 or {
-  `$obj.prototype.__iterator__` => `$obj._iterator_`,
-  `$obj.prototype["__iterator__"]` => `$obj._iterator_`,
-  `$obj.prototype['__iterator__']` => `$obj._iterator_`,
-  `$obj.__iterator__` => `$obj._iterator_`,
-  `$obj["__iterator__"]` => `$obj._iterator_`,
-  `$obj['__iterator__']` => `$obj._iterator_`
+	`$obj.prototype.__iterator__` => `$obj._iterator_`,
+	`$obj.prototype["__iterator__"]` => `$obj._iterator_`,
+	`$obj.prototype['__iterator__']` => `$obj._iterator_`,
+	`$obj.__iterator__` => `$obj._iterator_`,
+	`$obj["__iterator__"]` => `$obj._iterator_`,
+	`$obj['__iterator__']` => `$obj._iterator_`
 }
 ```
 

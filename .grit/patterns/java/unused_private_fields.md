@@ -11,23 +11,23 @@ Unused private fields constitute dead code and should therefore be removed.
 language java
 
 class_body($declarations) where {
-    $declarations <: contains bubble($declarations) {
-        field_declaration($modifiers) as $field where {
-            $field <: contains variable_declarator($name) where {
-                $declarations <: not contains $name until $field,
-                $name <: not or {
-                    `serialVersionUID`,
-                    `serialPersistentFields`,
-                },
-                $field => .,
-            },
-            $modifiers <: contains `private`,
-            $modifiers <: not contains or {
-                marker_annotation(),
-                `native`,
-            },
-        }
-    }
+	$declarations <: contains bubble($declarations) {
+		field_declaration($modifiers) as $field where {
+			$field <: contains variable_declarator($name) where {
+				$declarations <: not contains $name until $field,
+				$name <: not or {
+					`serialVersionUID`,
+					`serialPersistentFields`
+				},
+				$field => .
+			},
+			$modifiers <: contains `private`,
+			$modifiers <: not contains or {
+				marker_annotation(),
+				`native`
+			}
+		}
+	}
 }
 ```
 

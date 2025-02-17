@@ -9,16 +9,16 @@ language python
 
 // Define it
 pattern binding_access($binding) {
-  identifier() as $identifier where {
-    $binding <: within `$identifier = $binding`,
-  }
+	identifier() as $identifier where {
+		$binding <: within `$identifier = $binding`
+	}
 }
 
 // Test it
 `{ "x": "y" }` as $original where {
-  $program <: maybe contains binding_access(binding=$original) as $one_case where {
-    $one_case <: within `$one_case.zoo` => `$one_case.boo`
-  }
+	$program <: maybe contains binding_access(binding=$original) as $one_case where {
+		$one_case <: within `$one_case.zoo` => `$one_case.boo`
+	}
 }
 ```
 

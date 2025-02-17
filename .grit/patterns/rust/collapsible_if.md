@@ -10,13 +10,13 @@ Redundant layers of nesting add undesirable complexity.
 language rust
 
 if_expression($condition, $consequence) where {
-    $consequence <: block($content) where {
-        $content <: [$inner],
-        $inner <: expression_statement(expression=if_expression(condition=$inner_condition, consequence=block(content=$inner_content)) as $inner_if) where {
-            $condition += ` && $inner_condition`,
-            $inner_if => $inner_content,
-        }
-    }
+	$consequence <: block($content) where {
+		$content <: [$inner],
+		$inner <: expression_statement(expression=if_expression(condition=$inner_condition, consequence=block(content=$inner_content)) as $inner_if) where {
+			$condition += ` && $inner_condition`,
+			$inner_if => $inner_content
+		}
+	}
 }
 ```
 

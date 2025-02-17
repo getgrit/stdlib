@@ -21,9 +21,7 @@ function add_prefixes($description) js {
     return words.join(' ');
 }
 
-`test($description, $_)` where {
-    $description => add_prefixes($description),
-}
+`test($description, $_)` where { $description => add_prefixes($description) }
 ```
 
 ## Adds tags properly

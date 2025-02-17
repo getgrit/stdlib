@@ -11,19 +11,19 @@ engine marzano(0.1)
 language js
 
 pattern prototype_to_class() {
-    function_declaration(body=$body, name=$class, parameters=$args) as $root where {
-        ! $root <: within `$_ = $_`,
-        $methods = [],
-        if ($body <: contains expression_statement() ) {
-            $methods += `constructor($args) $body`
-        },
-        $program <: contains bubble($methods) `$class.prototype.$method = function ($args) { $method_body }` where {
-            $methods += `$method($args) { $method_body }`
-        } => .,
-        $methods = join($methods, `
+	function_declaration(body=$body, name=$class, parameters=$args) as $root where {
+		! $root <: within `$_ = $_` ,
+		$methods = [],
+		if ($body <: contains expression_statement()) {
+			$methods += `constructor($args) $body`
+		},
+		$program <: contains bubble($methods) `$class.prototype.$method = function ($args) { $method_body }` where {
+			$methods += `$method($args) { $method_body }`
+		} => .,
+		$methods = join($methods, `
 
 `)
-    } => `class $class {
+	} => `class $class {
         $methods
     }`
 }

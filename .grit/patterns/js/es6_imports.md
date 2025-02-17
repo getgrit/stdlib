@@ -10,96 +10,70 @@ engine marzano(0.1)
 language js
 
 function transformProps($imports) {
-    $import_list = [],
-    $imports <: some bubble($import_list) {
-        or {
-            shorthand_property_identifier_pattern() as $key where $import_list += $key,
-            pair_pattern($key, $value) where $import_list += `$key as $value`
-        }
-    },
-    return join(list = $import_list, separator = ", "),
+	$import_list = [],
+	$imports <: some bubble($import_list) {
+		or {
+			shorthand_property_identifier_pattern() as $key where $import_list += $key,
+			pair_pattern($key, $value) where $import_list += `$key as $value`
+		}
+	},
+	return join(list=$import_list, separator=", ")
 }
 
 function make_import($whole, $if_root, $if_not_root) {
-  // Not sure if this is the best check. Ideally I would like to look at $whole.parent and confirm it is program()
-  if ($whole <: within statement_block()) {
-    // TODO: we might need to make the outer block async
-    return $if_not_root
-  },
-  return $if_root
+	// Not sure if this is the best check. Ideally I would like to look at $whole.parent and confirm it is program()
+	if ($whole <: within statement_block() ) {
+		// TODO: we might need to make the outer block async
+		return $if_not_root
+	},
+	return $if_root
 }
 
 /// Track specifiers that are known wildcard imports
 /// In theory we should look at the source to determine this
-pattern known_wildcard_import() {
-  or {
-    `"@sentry/node"`
-  }
-}
+pattern known_wildcard_import() { or { `"@sentry/node"` } }
 
 or {
-    // see https://github.com/motdotla/dotenv#how-do-i-use-dotenv-with-import
-    `require("dotenv").config($config)` => `import * as dotenv from 'dotenv';\ndotenv.config($config)`,
-    `const $declarations` as $whole where {
-        $new_declarations = [],
-        $declarations <: some bubble($whole, $new_declarations) or {
-            `$id = require($specifier).default`,
-            `$id = require($specifier).$named`,
-            `$id = $rest` where {
-              $rest <: contains `require($specifier).$suffix` => $suffix,
-              $rest <: r"require.+"
-            },
-            `{ $id: { $keepObj } } = require($specifier)`,
-            `{ $transformValue } = require($specifier)` where { $transformed = transformProps($transformValue) },
-            `$id = require($specifier)`
-        } where {
-            $specifier <: `"$_"`,
-            if ($named <: not undefined) {
-                if($named <: $id) {
-                  $new_declarations += make_import($whole, `import { $id } from $specifier;`, `const { $id } = await import($specifier);`)
-                } else {
-                  $new_declarations += make_import(
-                    $whole,
-                    `import { $named as $id } from $specifier;`,
-                    `const { $named: $id } = await import($specifier);`
-                  )
-                }
-            } else if ($keepObj <: not undefined) {
-                $new_declarations += make_import(
-                  $whole,
-                  `import { $id } from $specifier;\nconst { $keepObj } = $id;`,
-                  `const { $id: { $keepObj } } = await import($specifier);`
-                ),
-            } else if ($transformed <: not undefined) {
-                $new_declarations += make_import(
-                  $whole,
-                  `import { $transformed } from $specifier;`,
-                  `const { $transformed } = await import($specifier);`
-                )
-            } else if ($rest <: not undefined) {
-                $new_declarations += make_import(
-                  $whole,
-                  `import __$id from $specifier;\nconst $id = __$id.$rest`,
-                  `const { $rest: $id } = await import($specifier);`
-                )
-            } else {
-              if ($specifier <: known_wildcard_import()) {
-                $new_declarations += make_import(
-                  $whole,
-                  `import * as $id from $specifier;`,
-                  `const $id = await import($specifier);`
-                )
-              } else {
-                $new_declarations += make_import(
-                  $whole,
-                  `import $id from $specifier;`,
-                  `const $id = await import($specifier);`
-                )
-              }
-            }
-        },
-        $whole => join($new_declarations, `;\n`)
-    }
+	// see https://github.com/motdotla/dotenv#how-do-i-use-dotenv-with-import
+	`require("dotenv").config($config)` => `import * as dotenv from 'dotenv';\ndotenv.config($config)`,
+	`const $declarations` as $whole where {
+		$new_declarations = [],
+		$declarations <: some bubble($whole, $new_declarations) or {
+			`$id = require($specifier).default`,
+			`$id = require($specifier).$named`,
+			`$id = $rest` where {
+				$rest <: contains `require($specifier).$suffix` => $suffix,
+				$rest <: r"require.+"
+			},
+			`{ $id: { $keepObj } } = require($specifier)`,
+			`{ $transformValue } = require($specifier)` where {
+				$transformed = transformProps($transformValue)
+			},
+			`$id = require($specifier)`
+		} where {
+			$specifier <: `"$_"`,
+			if ($named <: not undefined) {
+				if ($named <: $id) {
+					$new_declarations += make_import($whole, `import { $id } from $specifier;`, `const { $id } = await import($specifier);`)
+				} else {
+					$new_declarations += make_import($whole, `import { $named as $id } from $specifier;`, `const { $named: $id } = await import($specifier);`)
+				}
+			} else if ($keepObj <: not undefined) {
+				$new_declarations += make_import($whole, `import { $id } from $specifier;\nconst { $keepObj } = $id;`, `const { $id: { $keepObj } } = await import($specifier);`)
+			} else if ($transformed <: not undefined) {
+				$new_declarations += make_import($whole, `import { $transformed } from $specifier;`, `const { $transformed } = await import($specifier);`)
+			} else if ($rest <: not undefined) {
+				$new_declarations += make_import($whole, `import __$id from $specifier;\nconst $id = __$id.$rest`, `const { $rest: $id } = await import($specifier);`)
+			} else {
+				if ($specifier <: known_wildcard_import()) {
+					$new_declarations += make_import($whole, `import * as $id from $specifier;`, `const $id = await import($specifier);`)
+				} else {
+					$new_declarations += make_import($whole, `import $id from $specifier;`, `const $id = await import($specifier);`)
+				}
+			}
+		},
+		$whole => join($new_declarations, `;\n`)
+	}
 }
 ```
 

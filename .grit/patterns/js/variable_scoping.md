@@ -16,8 +16,8 @@ For example, this pattern would rename `t` from the `translation` library to `tr
 language js
 
 `t` as $t => `translate` where {
-  $t <: imported_from(from=`"translation"`),
-  $t <: not within identifier_scope(name=`t`)
+	$t <: imported_from(from=`"translation"`),
+	$t <: not within identifier_scope(name=`t`)
 }
 ```
 

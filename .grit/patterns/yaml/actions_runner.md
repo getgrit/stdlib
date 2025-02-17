@@ -6,10 +6,10 @@ Standardize on a GitHub Actions runner.
 language yaml
 
 `runs-on: $runner` where {
-  $runner <: or {
-    r"ubuntu.+" => `nscloud-ubuntu-22.04-amd64-4x16`,
-    r"macos.+" => `nscloud-macos-4x16`,
-  }
+	$runner <: or {
+		r"ubuntu.+" => `nscloud-ubuntu-22.04-amd64-4x16`,
+		r"macos.+" => `nscloud-macos-4x16`
+	}
 }
 ```
 

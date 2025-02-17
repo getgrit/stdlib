@@ -12,15 +12,13 @@ Creating a new Throwable without actually throwing or binding it is useless and 
 language java
 
 object_creation_expression($type) as $x where {
-    $type <: or {
-        r".*Exception",
-        r".*Error",
-    },
-    $x <: not within throw_statement(),
-    $x <: not within variable_declarator($value) where {
-        $value <: $x,
-    },
-    $x => `throw $x`,
+	$type <: or {
+		r".*Exception",
+		r".*Error"
+	},
+	$x <: not within throw_statement() ,
+	$x <: not within variable_declarator($value) where { $value <: $x } ,
+	$x => `throw $x`
 }
 ```
 

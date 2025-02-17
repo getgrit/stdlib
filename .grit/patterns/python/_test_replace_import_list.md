@@ -5,13 +5,34 @@ engine marzano(0.1)
 language python
 
 find_replace_imports(list=[
-  [`langchain_community.chat_models`, `ChatOpenAI`, `langchain_openai`, `ChatOpenAI`],
-  [`anthropic_place`, `EpicLinguist`, `new_anthropic_place`, `SauceLinguist`],
-  [`langchain_community.chat_models`, `MyLittleModel`, `extra_lc_models`, `MyBigModel`],
-  [`langchain.chains.ernie_functions.base`, `convert_to_ernie_function`, `langchain_community.chains`, `convert_to_ernie_function`],
-  [`langchain.chains.ernie_functions.base`, `create_ernie_fn_chain`, `langchain_community.chains`, `create_ernie_fn_chain`],
-  [`langchain.chains.graph_qa.cypher_utils`, `CypherQueryCorrector`, `lc_new`, `CypherQueryCorrector`],
-  [`langchain.chains.graph_qa.cypher_utils`, `Schema`, `lc_new`, `Schema`],
+	[
+		`langchain_community.chat_models`, `ChatOpenAI`, `langchain_openai`,
+		`ChatOpenAI`
+	],
+
+	[`anthropic_place`, `EpicLinguist`, `new_anthropic_place`, `SauceLinguist`],
+
+	[
+		`langchain_community.chat_models`, `MyLittleModel`, `extra_lc_models`,
+		`MyBigModel`
+	],
+
+	[
+		`langchain.chains.ernie_functions.base`, `convert_to_ernie_function`,
+		`langchain_community.chains`, `convert_to_ernie_function`
+	],
+
+	[
+		`langchain.chains.ernie_functions.base`, `create_ernie_fn_chain`,
+		`langchain_community.chains`, `create_ernie_fn_chain`
+	],
+
+	[
+		`langchain.chains.graph_qa.cypher_utils`, `CypherQueryCorrector`, `lc_new`,
+		`CypherQueryCorrector`
+	],
+
+	[`langchain.chains.graph_qa.cypher_utils`, `Schema`, `lc_new`, `Schema`]
 ])
 ```
 

@@ -10,25 +10,19 @@ Wrap string literal locators in Playwright-style `page.locator`.
 language js
 
 pattern concatenated_string() {
-    `$a + $b` where {
-        $a <: contains base_string(),
-        $b <: contains base_string(),
-    }
+	`$a + $b` where { $a <: contains base_string(), $b <: contains base_string() }
 }
 
 or {
-    concatenated_string(),
-    base_string() as $base where $base <: not within concatenated_string(),
+	concatenated_string(),
+	base_string() as $base where $base <: not within concatenated_string()
 } as $bare where {
-    or {
-        and {
-            $program <: contains `test.describe`,
-            $page = `page`,
-        },
-        $page = `this.page`,
-    },
-    $bare <: not within `$page.$_($_)`,
-    $bare => `$page.locator($bare)`,
+	or {
+		and { $program <: contains `test.describe`, $page = `page` },
+		$page = `this.page`
+	},
+	$bare <: not within `$page.$_($_)` ,
+	$bare => `$page.locator($bare)`
 }
 ```
 

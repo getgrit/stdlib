@@ -10,27 +10,27 @@ This pattern combines [convert_default_exports](https://github.com/getgrit/stdli
 language js
 
 multifile {
-  $modules = [],
-  // First collect the exports
-  bubble($modules) maybe file($name, $body) where {
-    $body <: contains convert_default_exports($export_name),
-    $canonical_path = $absolute_filename,
-    $modules += [$canonical_path, $export_name]
-  },
-  // Then replace the imports, if they match
-  bubble($modules) maybe file($name, $body) where {
-    $modules <: some bubble($body) $module where {
-      $candidate_path = $module[0],
-      $candidate_path = strip_extension($candidate_path),
-      $new_name = $module[1],
-      $body <: contains bubble($candidate_path, $new_name, $body) replace_default_import($source, $new_name) where {
-        $source <: `"$candidate_source"`,
-        $this_canonical = resolve($candidate_source),
-        $this_stripped = strip_extension($this_canonical),
-        $this_stripped <: $candidate_path
-      }
-    }
-  }
+	$modules = [],
+	// First collect the exports
+	bubble($modules) maybe file($name, $body) where {
+		$body <: contains convert_default_exports($export_name),
+		$canonical_path = $absolute_filename,
+		$modules += [$canonical_path, $export_name]
+	},
+	// Then replace the imports, if they match
+	bubble($modules) maybe file($name, $body) where {
+		$modules <: some bubble($body) $module where {
+			$candidate_path = $module[0],
+			$candidate_path = strip_extension($candidate_path),
+			$new_name = $module[1],
+			$body <: contains bubble($candidate_path, $new_name, $body) replace_default_import($source, $new_name) where {
+				$source <: `"$candidate_source"`,
+				$this_canonical = resolve($candidate_source),
+				$this_stripped = strip_extension($this_canonical),
+				$this_stripped <: $candidate_path
+			}
+		}
+	}
 }
 ```
 
