@@ -15,21 +15,31 @@ engine marzano(0.1)
 language js
 
 pattern any_equals($a, $b) {
-  or { `$a == $b` , `$a === $b` , `$b == $a` , `$b === $a` }
+	or {
+		`$a == $b`,
+		`$a === $b`,
+		`$b == $a`,
+		`$b === $a`
+	}
 }
 
 pattern any_not_equals($a, $b) {
-  or {
-      binary_expression(operator = or { `!==` , `!=` }, left = $a, right = $b),
-      binary_expression(operator = or { `!==` , `!=` }, left = $b, right = $a)
-  }
+	or {
+		binary_expression(operator=or {
+			`!==`,
+			`!=`
+		}, left=$a, right=$b),
+		binary_expression(operator=or {
+			`!==`,
+			`!=`
+		}, left=$b, right=$a)
+	}
 }
 
 or {
-  any_equals(a = `NaN`, $b) => `isNaN($b)`,
-  any_not_equals(a = `NaN`, $b) => `!isNaN($b)`
+	any_equals(a=`NaN`, $b) => `isNaN($b)`,
+	any_not_equals(a=`NaN`, $b) => `!isNaN($b)`
 }
-
 ```
 
 ## Converts double equality check

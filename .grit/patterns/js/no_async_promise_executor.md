@@ -13,15 +13,17 @@ engine marzano(0.1)
 language js
 
 or {
-  `new Promise($promise)` where {
-    $promise <: contains { `async ($args) => $body` => `($args) => $body`},
-    $body <: not contains await_expression()
-  },
-
-  `new Promise(async ($resolve, $reject) => $body)` => `(async () => $body)()` where {
-    $body <: contains { await_expression() },
-    $body <: contains bubble or { `resolve($a)` =>  `return $a;` , `reject($a)`  =>  `throw $a;` }
-  }
+	`new Promise($promise)` where {
+		$promise <: contains { `async ($args) => $body` => `($args) => $body` },
+		$body <: not contains await_expression()
+	},
+	`new Promise(async ($resolve, $reject) => $body)` => `(async () => $body)()` where {
+		$body <: contains { await_expression() },
+		$body <: contains bubble or {
+			`resolve($a)` => `return $a;`,
+			`reject($a)` => `throw $a;`
+		}
+	}
 }
 ```
 

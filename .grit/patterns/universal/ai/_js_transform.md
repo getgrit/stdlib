@@ -10,14 +10,14 @@ GritQL can use AI to transform a target variable based on some instruction using
 language js
 
 or {
-    // It can replace constructs
-  `console.log($_)` as $log where {
-    $log => ai_transform(match=$log, instruct="Use console.error instead")
-  },
-  // Inline replacements also work
-  `function $_($args) { $_ }` where {
-    $args => ai_transform(match=$args, instruct="Make the arguments uppercase")
-  }
+	// It can replace constructs
+	`console.log($_)` as $log where {
+		$log => ai_transform(match=$log, instruct="Use console.error instead")
+	},
+	// Inline replacements also work
+	`function $_($args) { $_ }` where {
+		$args => ai_transform(match=$args, instruct="Make the arguments uppercase")
+	}
 }
 ```
 

@@ -40,10 +40,9 @@ For example, you can use the following pattern to replace the `model` parameter 
 language python
 
 `$completion($params)` where {
-  $completion <: imported_from(source="litellm"),
-
-  $completion <: `completion`,
-  $params <: contains `model=$_` => `model="gpt-4-turbo"`,
+	$completion <: imported_from(source="litellm"),
+	$completion <: `completion`,
+	$params <: contains `model=$_` => `model="gpt-4-turbo"`
 }
 ```
 
@@ -80,9 +79,7 @@ For example, this pattern can be used to add a `completion` import from the `lit
 ```grit
 language python
 
-`completion($params)` where {
-  add_import(source="litellm", name="completion")
-}
+`completion($params)` where { add_import(source="litellm", name="completion") }
 ```
 
 ```python
@@ -119,7 +116,7 @@ If you want to add a bare import (e.g. `import openai`), use `add_import($source
 language python
 
 `completion($params)` => `openai.completion($params)` where {
-  add_import(source="openai")
+	add_import(source="openai")
 }
 ```
 
@@ -142,9 +139,7 @@ For example, you can use the following pattern to remove all imports from the `p
 ```grit
 language python
 
-import_from(source="pydantic") => . where {
-  remove_import(source="pydantic")
-}
+import_from(source="pydantic") => . where { remove_import(source="pydantic") }
 ```
 
 ```python

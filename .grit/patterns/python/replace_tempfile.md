@@ -13,10 +13,8 @@ engine marzano(0.1)
 language python
 
 `$tempfile.mktemp($params)` => `$tempfile.NamedTemporaryFile($[params]delete=False)` where {
-    // If $params is present, add the comma
-    if ($params <: not .) {
-        $params => `$params, `
-    }
+	// If $params is present, add the comma
+	if ($params <: not .) { $params => `$params, ` }
 }
 ```
 

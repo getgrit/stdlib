@@ -11,8 +11,14 @@ engine marzano(0.1)
 language js
 
 `throw $e` => `throw new Error($e)` where {
- // We don't care what the precise $a and $b are as long as they are both string literals, which makes $a + $b a string concatenation.
-  $e <: or { `undefined`, string(), number(), `$a + $b` where or { $a <: string(), $b <: string() }, `null` }
+	// We don't care what the precise $a and $b are as long as they are both string literals, which makes $a + $b a string concatenation.
+	$e <: or {
+		`undefined`,
+		string(),
+		number(),
+		`$a + $b` where or { $a <: string(), $b <: string() },
+		`null`
+	}
 }
 ```
 

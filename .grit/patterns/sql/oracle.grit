@@ -2,52 +2,52 @@ engine marzano(0.1)
 language sql
 
 pattern convert_types() {
-    file($body) where {
-      // $body <: contains or {
-      //   column_definition($name) as $col where {
-      //     $col <: contains `INTERVAL` => `$name INTERVAL`,
-      //   }
-      // },
-      $body <: contains or {
-        `RAW` => `BYTEA`,
-          `BINARY_DOUBLE` => `NUMERIC`,
-          `BINARY_FLOAT` => `REAL`,
-          `BINARY_INTEGER` => `INTEGER`,
-          `BLOB` => `BYTEA`,
-          `CLOB` => `TEXT`,
-          `DEC` => `DECIMAL`,
-          `DATE` => `TIMESTAMP`,
-          `FLOAT` => `DOUBLE PRECISION`,
-          `LONG` => `TEXT`,
-          "INTERVAL DAY TO SECOND" => `INTERVAL`,
-          // `NUMBER($N)` => `NUMERIC($N)`,
-          `NUMBER` => `NUMERIC`,
-          `PLS_INTEGER` => `INTEGER`,
-          `SDO_GEOMETRY` => `GEOMETRY`,
-          `ST_GEOMETRY` => `GEOMETRY`,
-          `STRING` => `VARCHAR`,
-          `TIMESTAMP WITH LOCAL TIME ZONE` => `TIMESTAMPTZ`,
-          `TIMESTAMP($P)` => `TIMESTAMP($P)`,
-          `VARCHAR2($N CHAR)` => `VARCHAR($N)`,
-          `VARCHAR2` => `VARCHAR`,
-          `XMLTYPE` => `XML`,
-      }
-  }
+	file($body) where {
+		// $body <: contains or {
+		//   column_definition($name) as $col where {
+		//     $col <: contains `INTERVAL` => `$name INTERVAL`,
+		//   }
+		// },
+		$body <: contains or {
+			`RAW` => `BYTEA`,
+			`BINARY_DOUBLE` => `NUMERIC`,
+			`BINARY_FLOAT` => `REAL`,
+			`BINARY_INTEGER` => `INTEGER`,
+			`BLOB` => `BYTEA`,
+			`CLOB` => `TEXT`,
+			`DEC` => `DECIMAL`,
+			`DATE` => `TIMESTAMP`,
+			`FLOAT` => `DOUBLE PRECISION`,
+			`LONG` => `TEXT`,
+			"INTERVAL DAY TO SECOND" => `INTERVAL`,
+			// `NUMBER($N)` => `NUMERIC($N)`,
+			`NUMBER` => `NUMERIC`,
+			`PLS_INTEGER` => `INTEGER`,
+			`SDO_GEOMETRY` => `GEOMETRY`,
+			`ST_GEOMETRY` => `GEOMETRY`,
+			`STRING` => `VARCHAR`,
+			`TIMESTAMP WITH LOCAL TIME ZONE` => `TIMESTAMPTZ`,
+			`TIMESTAMP($P)` => `TIMESTAMP($P)`,
+			`VARCHAR2($N CHAR)` => `VARCHAR($N)`,
+			`VARCHAR2` => `VARCHAR`,
+			`XMLTYPE` => `XML`
+		}
+	}
 }
 
 pattern convert_builtins() {
-    or {
-        `:NEW` => `NEW`,
-        `:OLD` => `OLD`,
-        `sysdate` => `NOW()`,
-        `SYS_GUID()` => `uuid_generate_v1()`
-    }
+	or {
+		`:NEW` => `NEW`,
+		`:OLD` => `OLD`,
+		`sysdate` => `NOW()`,
+		`SYS_GUID()` => `uuid_generate_v1()`
+	}
 }
 
 pattern add_unit_tests_for_datetime() {
-   `CREATE PROCEDURE $proc_name($args) AS $decl $block;` where {
-      $proc_name <: `BOOK_TAXI`,
-   $file += `
+	`CREATE PROCEDURE $proc_name($args) AS $decl $block;` where {
+		$proc_name <: `BOOK_TAXI`,
+		$file += `
 
    CREATE EXTENSION IF NOT EXISTS pgtap;
    BEGIN;
@@ -57,12 +57,12 @@ pattern add_unit_tests_for_datetime() {
    SELECT finish();
    ROLLBACK;
    `
-   }
+	}
 }
 pattern convert_trigger() {
-    create_trigger() as $trigger where {
-        or {
-            $trigger <: contains `update_driver_rating`  => `
+	create_trigger() as $trigger where {
+		or {
+			$trigger <: contains `update_driver_rating` => `
 CREATE OR REPLACE FUNCTION update_driver_rating() RETURNS TRIGGER AS $$
 DECLARE
    v_driver_id INT;
@@ -79,7 +79,7 @@ CREATE TRIGGER update_driver_rating_trigger
 AFTER INSERT ON FEEDBACK
 FOR EACH ROW EXECUTE FUNCTION update_driver_rating();
 `,
-            $trigger <: contains `add_no_of_cars`  => `
+			$trigger <: contains `add_no_of_cars` => `
             CREATE OR REPLACE FUNCTION add_no_of_cars() RETURNS TRIGGER AS $$
 DECLARE
    v_no_of_cars INT;
@@ -94,16 +94,16 @@ CREATE TRIGGER add_no_of_cars_trigger
 BEFORE INSERT OR UPDATE ON OWNS
 FOR EACH ROW EXECUTE FUNCTION add_no_of_cars()
 `
-        }
-    }
+		}
+	}
 }
 pattern convert_oracle_to_pg() {
-    sequential {
-        maybe contains convert_types(),
-        maybe contains convert_builtins(),
-        maybe contains add_unit_tests_for_procedures(),
-        maybe contains dollar_quote_procedure_body(),
-        maybe contains add_unit_tests_for_datetime(),
-        maybe contains convert_trigger()
-    }
+	sequential {
+		maybe contains convert_types(),
+		maybe contains convert_builtins(),
+		maybe contains add_unit_tests_for_procedures(),
+		maybe contains dollar_quote_procedure_body(),
+		maybe contains add_unit_tests_for_datetime(),
+		maybe contains convert_trigger()
+	}
 }

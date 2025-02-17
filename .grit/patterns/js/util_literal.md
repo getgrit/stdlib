@@ -11,14 +11,12 @@ engine marzano(0.1)
 language js
 
 pattern literal($value) {
-  or {
-    number() as $candidate,
-    string(fragment=$candidate),
-    `null` as $candidate,
-    `undefined` as $candidate
-  } where {
-    $candidate <: $value
-  }
+	or {
+		number() as $candidate,
+		string(fragment=$candidate),
+		`null` as $candidate,
+		`undefined` as $candidate
+	} where { $candidate <: $value }
 }
 
 // This is just an example to test the pattern.

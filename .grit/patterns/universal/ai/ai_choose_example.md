@@ -12,10 +12,13 @@ For example, you can use the `ai_choose` function to choose a name for a functio
 language js
 
 `function ($args) { $body }` as $func where {
-  $name = ai_ask(question=`Should this function be an adder, divider, or remover? $func`, choices=or {`adder`, `divider`, `remover`})
+	$name = ai_ask(question=`Should this function be an adder, divider, or remover? $func`, choices=or {
+		`adder`,
+		`divider`,
+		`remover`
+	})
 } => `// This function: $name
 $func`
-
 ```
 
 # WIP - not working yet

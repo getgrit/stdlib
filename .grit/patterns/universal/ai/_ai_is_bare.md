@@ -8,7 +8,7 @@ Test `ai_is` with no counter-examples.
 
 ```grit
 `console.log($msg)` => `// REDACTED: $msg` where {
-  $msg <: ai_is("references personally identifiable information")
+	$msg <: ai_is("references personally identifiable information")
 }
 ```
 

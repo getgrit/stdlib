@@ -12,9 +12,9 @@ engine marzano(0.1)
 language python
 
 decorated_definition($decorators, $definition) where {
-    $decorators <: contains `@pytest.mark.skip($info)` => . where {
-        $info <: not includes `reason`
-    }
+	$decorators <: contains `@pytest.mark.skip($info)` => . where {
+		$info <: not includes `reason`
+	}
 }
 ```
 

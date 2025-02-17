@@ -10,30 +10,29 @@ engine marzano(0.1)
 language js
 
 or {
-  // Rewrite traditional functions to arrow functions
-  or {
-    `async function ($args) { $body }` => `async ($args) => {
+	// Rewrite traditional functions to arrow functions
+	or {
+		`async function ($args) { $body }` => `async ($args) => {
   $body
 }`,
-  `function ($args) { $body }` => `($args) => {
+		`function ($args) { $body }` => `($args) => {
   $body
-}`,
-  } where {
-    $body <: not contains {
-      or { `this`, `arguments` }
-    } until `function $_($_) { $_ }`
-  },
-  // Rewrite arrow functions to remove unnecessary return statements
-  or {
-    `async ($args) => { return $value }` where $async = `async `,
-    `($args) => { return $value }` where $async = .,
-  } where {
-      if ($value <: object()) {
-        $result = `($value)`
-    } else {
-      $result = $value
-    }
-  } => `$async($args) => $result`
+}`
+	} where {
+		$body <: not contains {
+			or {
+				`this`,
+				`arguments`
+			}
+		} until `function $_($_) { $_ }`
+	},
+	// Rewrite arrow functions to remove unnecessary return statements
+	or {
+		`async ($args) => { return $value }` where $async = `async `,
+		`($args) => { return $value }` where $async = .
+	} where {
+		if ($value <: object()) { $result = `($value)` } else { $result = $value }
+	} => `$async($args) => $result`
 }
 ```
 

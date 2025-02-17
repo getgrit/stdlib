@@ -10,9 +10,7 @@ Convert OpenAI from openai version to the v1 version, while continuing to use th
 engine marzano(0.1)
 language python
 
-file($body) where {
-  $body <: openai_main(client=`openai`)
-}
+file($body) where { $body <: openai_main(client=`openai`) }
 ```
 
 ## Rewrite completions

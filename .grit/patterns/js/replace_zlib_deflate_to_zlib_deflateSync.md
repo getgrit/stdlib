@@ -13,7 +13,7 @@ engine marzano(0.1)
 language js
 
 `zlib.deflate` as $zlib => `zlib.deflateSync` where {
-    $zlib <: within loop_like()
+	$zlib <: within loop_like()
 }
 ```
 

@@ -8,18 +8,33 @@ Replaces 2 individual bound checks with a single combined bound check.
 engine marzano(0.1)
 language python
 
-or {`$c1 and $c2`, `$c2 and $c1`} as $all where {
-    $upper_strict = "",
-    $lower_strict = "",
-    $c1 <:  or {
-        or {`$x < $upper`, `$upper > $x`},
-        or {`$x <= $upper`, `$upper >= $x`} where { $upper_strict = "=" }
-    },
-    $c2 <:  or {
-        or {`$x > $lower`, `$lower < $x`},
-        or {`$x >= $lower`, `$lower <= $x`} where { $lower_strict = "="}
-    },
-    $all => `$lower <$lower_strict $x <$upper_strict $upper`
+or {
+	`$c1 and $c2`,
+	`$c2 and $c1`
+} as $all where {
+	$upper_strict = "",
+	$lower_strict = "",
+	$c1 <: or {
+		or {
+			`$x < $upper`,
+			`$upper > $x`
+		},
+		or {
+			`$x <= $upper`,
+			`$upper >= $x`
+		} where { $upper_strict = "=" }
+	},
+	$c2 <: or {
+		or {
+			`$x > $lower`,
+			`$lower < $x`
+		},
+		or {
+			`$x >= $lower`,
+			`$lower <= $x`
+		} where { $lower_strict = "=" }
+	},
+	$all => `$lower <$lower_strict $x <$upper_strict $upper`
 }
 ```
 

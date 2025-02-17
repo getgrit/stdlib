@@ -8,7 +8,7 @@ This pattern replaces Markdown links with their bare text.
 language markdown
 
 inline_link(identifier=link_text($text)) where {
-    $text <: contains link_text($element)
+	$text <: contains link_text($element)
 } => $element
 ```
 

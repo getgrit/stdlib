@@ -2,10 +2,10 @@ language universal
 
 // Concat two lists together
 function concat($list_a, $list_b) {
-  $new_list = [],
-  $list_a <: some bubble($new_list) $item where $new_list += $item,
-  $list_b <: some bubble($new_list) $item where $new_list += $item,
-  return $new_list
+	$new_list = [],
+	$list_a <: some bubble($new_list) $item where $new_list += $item,
+	$list_b <: some bubble($new_list) $item where $new_list += $item,
+	return $new_list
 }
 
 function sort_internal($values) js {
@@ -13,11 +13,10 @@ function sort_internal($values) js {
     return q.sort().join("|||GRIT_SORT_SEP|||")
 }
 
-
 // Sort a list
 function sort($list) {
-  $new_list = join($list, "|||GRIT_SORT_SEP|||"),
-  $sorted = sort_internal($new_list),
-  $split = split($sorted, "|||GRIT_SORT_SEP|||"),
-  return $split
+	$new_list = join($list, "|||GRIT_SORT_SEP|||"),
+	$sorted = sort_internal($new_list),
+	$split = split($sorted, "|||GRIT_SORT_SEP|||"),
+	return $split
 }

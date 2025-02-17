@@ -10,127 +10,124 @@ engine marzano(0.1)
 language js
 
 pattern convert_config() {
-    object($properties) => $properties where {
-        $properties <: contains bubble pair($key, $value) where or {
-            $key <: `baseUrl` => `baseURL`,
-            $key <: `platform` => `fetch` where {
-                $name = raw``,
-                $version = raw``,
-                $value <: contains bubble($name, $version) or {
-                   pair(key=`name`, value=string(fragment=$val)) where { $name = $val },
-                   pair(key=`version`, value=string(fragment=$val)) where { $version = $val }
-                },
-                $value => `(url, opts) => {
+	object($properties) => $properties where {
+		$properties <: contains bubble pair($key, $value) where or {
+			$key <: `baseUrl` => `baseURL`,
+			$key <: `platform` => `fetch` where {
+				$name = raw``,
+				$version = raw``,
+				$value <: contains bubble($name, $version) or {
+					pair(key=`name`, value=string(fragment=$val)) where { $name = $val },
+					pair(key=`version`, value=string(fragment=$val)) where {
+						$version = $val
+					}
+				},
+				$value => `(url, opts) => {
                     let opts = opts ?? { headers: {} };
 
                     opts.headers['x-source-platform'] = '$name | $version';
 
                     return fetch(url, opts)
                 }`
-            }
-        },
-    }
+			}
+		}
+	}
 }
 
 pattern change_constructors() {
-    `$destruct = new Mux($params)` where {
-        $destruct <: contains `{ $props }` => `mux`,
-        $props <: maybe some change_destructured_property_call(),
-        $params <: or {
-            [$tokenId, $tokenSecret, $config] where {
-                $config <: convert_config() as $parsed_config where {
-                    $params => `{
+	`$destruct = new Mux($params)` where {
+		$destruct <: contains `{ $props }` => `mux`,
+		$props <: maybe some change_destructured_property_call(),
+		$params <: or {
+			[$tokenId, $tokenSecret, $config] where {
+				$config <: convert_config() as $parsed_config where {
+					$params => `{
                         tokenId: $tokenId,
                         tokenSecret: $tokenSecret,
                         $parsed_config
                     }`
-                }
-            },
-            [$tokenId, $tokenSecret] => `{
+				}
+			},
+			[$tokenId, $tokenSecret] => `{
                 tokenId: $tokenId,
                 tokenSecret: $tokenSecret,
             }`,
-            convert_config() as $config => $config,
-            . => .,
-        },
-    },
+			convert_config() as $config => $config,
+			. => .
+		}
+	}
 }
 
 pattern as_lower_camel_case($formatted) {
-    r"([A-Z])([a-zA-Z]*)"($first_char, $rest) where {
-        $first_char = lowercase(string = $first_char),
-        $formatted = join(list = [$first_char, $rest], separator = ""),
-    }
+	r"([A-Z])([a-zA-Z]*)"($first_char, $rest) where {
+		$first_char = lowercase(string=$first_char),
+		$formatted = join(list=[$first_char, $rest], separator="")
+	}
 }
 
 pattern change_destructured_property_call() {
-    $prop where {
-        $program <: contains bubble($prop) or {
-            `$prop.$field.$action($arg)` => `mux.$prop.$field.$action($arg)`,
-            `$prop.$field.$action($arg, $opt)` => `mux.$prop.$field.$action($arg, $opt)`,
-        } where {
-            $prop <: as_lower_camel_case($formatted) where {
-                $prop => `$formatted`
-            },
-            $field <: as_lower_camel_case($formatted) where {
-                $field => `$formatted`
-            },
-            $prop <: maybe `Video` where {
-              or {
-                $field <: `Assets`,
-                $field <: `DeliveryUsage`,
-                $field <: `LiveStreams`,
-                $field <: `PlaybackIDs`,
-                $field <: `PlaybackRestrictions`,
-                $field <: `Spaces`,
-                $field <: `TranscriptionVocabularies`,
-                $field <: `Uploads`,
-              },
-              $action <: or {
-                `get` => `retrieve`,
-                `del` => `delete`,
-              }
-            },
-            $prop <: maybe `Video` where {
-                $field <: or {
-                    `Assets`,
-                    `LiveStreams`,
-                    `Uploads`
-                } where {
-                    $arg <: $data where {
-                        $data <: maybe contains `new_asset_settings: $new_asset_settings` where {
-                            $new_asset_settings <: contains `playback_policy: $playback_policy`,
-                            $playback_policy <: string(fragment=$_) => `[$playback_policy]`,
-                        },
-                        $data <: contains `playback_policy: $playback_policy`,
-                        $playback_policy <: string(fragment=$_) => `[$playback_policy]`,
-                    }
-                },
-            },
-        }
-    }
+	$prop where {
+		$program <: contains bubble($prop) or {
+			`$prop.$field.$action($arg)` => `mux.$prop.$field.$action($arg)`,
+			`$prop.$field.$action($arg, $opt)` => `mux.$prop.$field.$action($arg, $opt)`
+		} where {
+			$prop <: as_lower_camel_case($formatted) where { $prop => `$formatted` },
+			$field <: as_lower_camel_case($formatted) where {
+				$field => `$formatted`
+			},
+			$prop <: maybe `Video` where {
+				or {
+					$field <: `Assets`,
+					$field <: `DeliveryUsage`,
+					$field <: `LiveStreams`,
+					$field <: `PlaybackIDs`,
+					$field <: `PlaybackRestrictions`,
+					$field <: `Spaces`,
+					$field <: `TranscriptionVocabularies`,
+					$field <: `Uploads`
+				},
+				$action <: or {
+					`get` => `retrieve`,
+					`del` => `delete`
+				}
+			},
+			$prop <: maybe `Video` where {
+				$field <: or {
+					`Assets`,
+					`LiveStreams`,
+					`Uploads`
+				} where {
+					$arg <: $data where {
+						$data <: maybe contains `new_asset_settings: $new_asset_settings` where {
+							$new_asset_settings <: contains `playback_policy: $playback_policy`,
+							$playback_policy <: string(fragment=$_) => `[$playback_policy]`
+						},
+						$data <: contains `playback_policy: $playback_policy`,
+						$playback_policy <: string(fragment=$_) => `[$playback_policy]`
+					}
+				}
+			}
+		}
+	}
 }
 
 pattern replace_verify_headers() {
-  $mux = `mux`,
-  or {
-    `Mux.Webhooks.verifyHeader($body, $headers['mux-signature'], $secret)`,
-    `Mux.Webhooks.verifyHeader($body, $headers['mux-signature'] as $_, $secret)`
-  } where {
-    // If there is no Mux instance in the file, we need to create one
-    if ($program <: contains `$mux = $_`) {
-      $prefix = .
-    } else {
-      $prefix = `const $mux = new Mux()\n`,
-    }
-  } => `$prefix$mux.webhooks.verifyHeader(Buffer.isBuffer($body) ? $body.toString('utf8') : $body, $headers, $secret)`
+	$mux = `mux`,
+	or {
+		`Mux.Webhooks.verifyHeader($body, $headers['mux-signature'], $secret)`,
+		`Mux.Webhooks.verifyHeader($body, $headers['mux-signature'] as $_, $secret)`
+	} where {
+		// If there is no Mux instance in the file, we need to create one
+		if ($program <: contains `$mux = $_`) { $prefix = . } else {
+			$prefix = `const $mux = new Mux()\n`
+		}
+	} => `$prefix$mux.webhooks.verifyHeader(Buffer.isBuffer($body) ? $body.toString('utf8') : $body, $headers, $secret)`
 }
 
 sequential {
-    maybe contains change_constructors(),
-    maybe contains replace_verify_headers(),
+	maybe contains change_constructors(),
+	maybe contains replace_verify_headers()
 }
-
 ```
 
 ## Creating Mux instance

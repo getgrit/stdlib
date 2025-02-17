@@ -11,8 +11,8 @@ language python
 // IMPROVEMENT: Could be more intelligent here and figure out if the expression is
 // boolean in itself and therefore does not need the bool() wrapper
 or {
-    `True if $expr else False` => `bool($expr)`,
-    `False if $expr else True` => `not bool($expr)`
+	`True if $expr else False` => `bool($expr)`,
+	`False if $expr else True` => `not bool($expr)`
 }
 ```
 

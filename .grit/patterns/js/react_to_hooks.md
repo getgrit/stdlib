@@ -14,24 +14,22 @@ language js
 // https://github.com/getgrit/js/blob/main/.grit/patterns/react_hooks.grit
 
 pattern regular_first_step() {
-  $use_ref_from = .,
-  $handler_callback_suffix = "Handler",
-  first_step($use_ref_from, $handler_callback_suffix)
+	$use_ref_from = .,
+	$handler_callback_suffix = "Handler",
+	first_step($use_ref_from, $handler_callback_suffix)
 }
 
 sequential {
-    file(body = program(statements = some bubble($program) regular_first_step())),
-    // Run it 3 times to converge
-    file(body = second_step(handler_callback_suffix = "Handler")),
-    file(body = second_step(handler_callback_suffix = "Handler")),
-    file(body = second_step(handler_callback_suffix = "Handler")),
-    file($body) where {
-      $body <: program($statements),
-      $statements <: bubble($body, $program) and {
-        maybe adjust_imports(),
-        add_more_imports(),
-      }
-    }
+	file(body=program(statements=some bubble($program) regular_first_step())),
+	// Run it 3 times to converge
+	file(body=second_step(handler_callback_suffix="Handler")),
+	file(body=second_step(handler_callback_suffix="Handler")),
+	file(body=second_step(handler_callback_suffix="Handler")),
+	file($body) where {
+		$body <: program($statements),
+		$statements <: bubble($body, $program) and { maybe adjust_imports(),
+		add_more_imports() }
+	}
 }
 ```
 

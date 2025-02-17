@@ -14,25 +14,23 @@ language js
 // https://github.com/getgrit/js/blob/main/.grit/patterns/react_hooks.grit
 
 pattern special_first_step() {
-  $use_ref_from = `useRefFrom`,
-  // Avoid inserting the "Handler" suffix
-  $handler_callback_suffix = .,
-  first_step($use_ref_from, $handler_callback_suffix)
+	$use_ref_from = `useRefFrom`,
+	// Avoid inserting the "Handler" suffix
+	$handler_callback_suffix = .,
+	first_step($use_ref_from, $handler_callback_suffix)
 }
 
 sequential {
-    file(body = program(statements = some bubble($program) special_first_step())),
-    // Run it 3 times to converge
-    file(body = second_step(handler_callback_suffix = .)),
-    file(body = second_step(handler_callback_suffix = .)),
-    file(body = second_step(handler_callback_suffix = .)),
-    file($body) where {
-      $body <: program($statements),
-      $statements <: bubble($body, $program) and {
-        maybe adjust_imports(),
-        add_more_imports(use_ref_from=`"~/hooks/myhooks"`),
-      }
-    }
+	file(body=program(statements=some bubble($program) special_first_step())),
+	// Run it 3 times to converge
+	file(body=second_step(handler_callback_suffix=.)),
+	file(body=second_step(handler_callback_suffix=.)),
+	file(body=second_step(handler_callback_suffix=.)),
+	file($body) where {
+		$body <: program($statements),
+		$statements <: bubble($body, $program) and { maybe adjust_imports(),
+		add_more_imports(use_ref_from=`"~/hooks/myhooks"`) }
+	}
 }
 ```
 

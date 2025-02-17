@@ -11,115 +11,107 @@ engine marzano(0.1)
 language js
 
 pattern process_route($imports, $refs, $dir, $main_file_imports) {
-    pair($key, $value) where {
-        $route_name = `$[key]Route`,
-        $value => `$route_name`,
-        $file_name = `$dir/$key.route.ts`,
-        $new_file_statements = [`import { proc } from "./middleware"`],
-        $imports <: maybe some filter_used_imports(local_imports = $new_file_statements, content = $value),
-
-        $refs <: maybe some bubble($value, $new_file_statements) named_thing($name) as $s where {
-            $value <: contains $name,
-            $new_file_statements += $s
-        },
-
-        $new_file_statements += `export const $route_name = $value`,
-
-        $separator = `;\n`,
-        $body = join(list = $new_file_statements, $separator),
-        $main_file_imports += `import { $route_name } from './$key.route'`,
-        $new_files += file(name = $file_name, $body)
-    }
+	pair($key, $value) where {
+		$route_name = `$[key]Route`,
+		$value => `$route_name`,
+		$file_name = `$dir/$key.route.ts`,
+		$new_file_statements = [`import { proc } from "./middleware"`],
+		$imports <: maybe some filter_used_imports(local_imports=$new_file_statements, content=$value),
+		$refs <: maybe some bubble($value, $new_file_statements) named_thing($name) as $s where {
+			$value <: contains $name,
+			$new_file_statements += $s
+		},
+		$new_file_statements += `export const $route_name = $value`,
+		$separator = `;\n`,
+		$body = join(list=$new_file_statements, $separator),
+		$main_file_imports += `import { $route_name } from './$key.route'`,
+		$new_files += file(name=$file_name, $body)
+	}
 }
 
 pattern filter_used_imports($local_imports, $content) {
-    import_statement($source) as $import where {
-        $used_list = [],
-        $separator = `, `,
-        or {
-          and {
-            $import <: contains bubble($used_list, $content) import_specifier($name) as $i where {
-                // replace `includes` below with `contains` once we
-                // do contains matching on rhs snippet parts
-                $content <: includes $name,
-                $used_list += $i
-            },
-            $used = join(list = $used_list, $separator),
-            $local_imports += `import { $used } from $source`
-          },
-          and {
-            $import <: contains bubble($content, $local_imports, $source) namespace_import(namespace = $name) where {
-              $content <: includes $name,
-              $local_imports += `import * as $name from $source`
-            }
-          }
-        }
-    }
+	import_statement($source) as $import where {
+		$used_list = [],
+		$separator = `, `,
+		or {
+			and {
+				$import <: contains bubble($used_list, $content) import_specifier($name) as $i where {
+					// replace `includes` below with `contains` once we
+					// do contains matching on rhs snippet parts
+					$content <: includes $name,
+					$used_list += $i
+				},
+				$used = join(list=$used_list, $separator),
+				$local_imports += `import { $used } from $source`
+			},
+			and {
+				$import <: contains bubble($content, $local_imports, $source) namespace_import(namespace=$name) where {
+					$content <: includes $name,
+					$local_imports += `import * as $name from $source`
+				}
+			}
+		}
+	}
 }
 
 pattern named_thing($name) {
-    or {
-        lexical_declaration(declarations = [variable_declarator($name)]),
-        function_declaration($name)
-    }
+	or {
+		lexical_declaration(declarations=[variable_declarator($name)]),
+		function_declaration($name)
+	}
 }
 
 pattern process_one_statement($imports, $middlewares, $refs, $dir, $main_file_imports) {
-    or {
-        import_statement() as $import where {
-            $import => .,
-            $imports += $import
-        },
-        export_statement(declaration = lexical_declaration(declarations = [variable_declarator($name, $value)])) as $s where or {
-            and {
-                $value <: `t.router($routes_object)`,
-                $routes_object <: [object($properties)],
-                $properties <: some process_route($imports, $refs, $dir, $main_file_imports) // todo: drop comma after fixing bug
-            },
-            and {
-                $middlewares += $s,
-                if ($s <: not contains `initTRPC`) {
-                    $s => .
-                }
-            }
-        },
-        lexical_declaration(declarations = [variable_declarator($value)]) as $s => . where {
-            $value <: or { `t.middleware($_)`, `t.procedure.use($_)` },
-            $middlewares += `export $s`
-        },
-        named_thing() as $s => . where $refs += $s
-    }
+	or {
+		import_statement() as $import where { $import => ., $imports += $import },
+		export_statement(declaration=lexical_declaration(declarations=[
+			variable_declarator($name, $value)
+		])) as $s where or {
+			and {
+				$value <: `t.router($routes_object)`,
+				$routes_object <: [object($properties)],
+				$properties <: some process_route($imports, $refs, $dir, $main_file_imports) // todo: drop comma after fixing bug
+			},
+			and { $middlewares += $s, if ($s <: not contains `initTRPC`) { $s => . } }
+		},
+		lexical_declaration(declarations=[
+			variable_declarator($value)
+		]) as $s => . where {
+			$value <: or {
+				`t.middleware($_)`,
+				`t.procedure.use($_)`
+			},
+			$middlewares += `export $s`
+		},
+		named_thing() as $s => . where $refs += $s
+	}
 }
 
-file($name, body = program($statements) as $p) where {
-    $name <: r"(.*)/[^/]*"($dir),
-    $statements <: contains `t.router($_)`,
-    $imports = [],
-    $middlewares = [],
-    $refs = [],
-    $main_file_imports = [],
-    $statements <: some process_one_statement($imports, $middlewares, $refs, $dir, $main_file_imports),
+file($name, body=program($statements) as $p) where {
+	$name <: r"(.*)/[^/]*"($dir),
+	$statements <: contains `t.router($_)`,
+	$imports = [],
+	$middlewares = [],
+	$refs = [],
+	$main_file_imports = [],
+	$statements <: some process_one_statement($imports, $middlewares, $refs, $dir, $main_file_imports),
+	// construct the middleware file
 
-    // construct the middleware file
-
-    $middleware_statements = [],
-    $imports <: maybe some filter_used_imports(local_imports = $middleware_statements, content = $middlewares),
-
-    // we can simplify this traversal to list concatenation once we implement that
-    $middlewares <: some bubble($middleware_statements) $s where $middleware_statements += $s,
-
-    $separator = `;\n`,
-    $middleware_body = join(list = $middleware_statements, $separator),
-    $middleware_file = `$dir/middleware.ts`,
-    $new_files += file(name = $middleware_file, body = $middleware_body),
-
-    $main_file_imports += `import { t } from './middleware'`,
-    $main_file_imports_merged = join(list = $main_file_imports, $separator),
-    $statements <: some bubble ($main_file_imports_merged) $s where {
-        $s <: contains `initTRPC`,
-        $s <: not import_statement(),
-        $s => `$main_file_imports_merged;`
-    }
+	$middleware_statements = [],
+	$imports <: maybe some filter_used_imports(local_imports=$middleware_statements, content=$middlewares),
+	// we can simplify this traversal to list concatenation once we implement that
+	$middlewares <: some bubble($middleware_statements) $s where $middleware_statements += $s,
+	$separator = `;\n`,
+	$middleware_body = join(list=$middleware_statements, $separator),
+	$middleware_file = `$dir/middleware.ts`,
+	$new_files += file(name=$middleware_file, body=$middleware_body),
+	$main_file_imports += `import { t } from './middleware'`,
+	$main_file_imports_merged = join(list=$main_file_imports, $separator),
+	$statements <: some bubble($main_file_imports_merged) $s where {
+		$s <: contains `initTRPC`,
+		$s <: not import_statement(),
+		$s => `$main_file_imports_merged;`
+	}
 }
 ```
 

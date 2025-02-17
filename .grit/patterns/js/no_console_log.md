@@ -10,9 +10,7 @@ Remove `console.log` statements.
 engine marzano(0.1)
 language js
 
-`console.log($arg)` => . where {
-  $arg <: not within catch_clause()
-}
+`console.log($arg)` => . where { $arg <: not within catch_clause() }
 ```
 
 ## Removes a simple `console.log` statement

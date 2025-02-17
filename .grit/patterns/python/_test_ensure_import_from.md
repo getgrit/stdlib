@@ -6,11 +6,7 @@ title: Test - ensure import from
 engine marzano(0.1)
 language python
 
-`$_` where {
-    $import = "prod",
-    $import <: ensure_import_from(source = `math`),
-}
-
+`$_` where { $import = "prod", $import <: ensure_import_from(source=`math`) }
 ```
 
 ## Add missing import

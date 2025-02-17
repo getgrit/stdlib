@@ -10,17 +10,17 @@ engine marzano(0.1)
 language js
 
 statement_block($statements) where {
-    $deleting = "false",
-    $statements <: some bubble($deleting) $s where {
-        if ($deleting <: "true") {
-            $s => .
-        } else {
-            // we start deleting
-            if ($s <: or { throw_statement() , continue_statement() , return_statement() }) {
-                $deleting = "true",
-            }
-        }
-    }
+	$deleting = "false",
+	$statements <: some bubble($deleting) $s where {
+		if ($deleting <: "true") { $s => . } else {
+			// we start deleting
+			if ($s <: or {
+				throw_statement(),
+				continue_statement(),
+				return_statement()
+			}) { $deleting = "true" }
+		}
+	}
 }
 ```
 

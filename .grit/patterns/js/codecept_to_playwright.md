@@ -10,17 +10,13 @@ engine marzano(0.1)
 language js
 
 predicate convert_tags($scenario, $description) {
-    $tags = [],
-
-    $scenario <: within bubble($scenario, $tags) `$fn.tag($arguments)` as $tagger where {
-      $tagger => $scenario,
-      $arguments <: string($fragment) where {
-          $tags += `@$fragment`,
-      },
-    },
-
-    $tags = join($tags, ` `),
-    $description => trim(`$description $tags`, " "),
+	$tags = [],
+	$scenario <: within bubble($scenario, $tags) `$fn.tag($arguments)` as $tagger where {
+		$tagger => $scenario,
+		$arguments <: string($fragment) where { $tags += `@$fragment` }
+	} ,
+	$tags = join($tags, ` `),
+	$description => trim(`$description $tags`, " ")
 }
 
 function extract_quote_kind($scenario, $description) js {
@@ -29,313 +25,303 @@ function extract_quote_kind($scenario, $description) js {
 }
 
 pattern convert_test() {
-    or {
-        `Scenario('$description', async ({ $params }) => { $body })`,
-        `Scenario('$description', $_, async ({ $params }) => { $body })`,
-        js"Scenario(`$description`, async ({ $params }) => { $body })",
-        js"Scenario(`$description`, $_, async ({ $params }) => { $body })",
-    } as $scenario where {
-        $quote = extract_quote_kind($scenario, $description),
-        $params <: contains `I`,
-        or {convert_tags($scenario, $description), true},
-        $body <: maybe contains bubble or {
-            `I.updateField` => `this.updateField`,
-            `I.selectInDropdownByLocators` => `this.selectInDropdownByLocators`,
-            `I.selectInDropdown` => `this.selectInDropdown`,
-            expression_statement($expression) where {
-                $expression <: call_expression(),
-                $expression <: not `console.log($_)`,
-                $expression => `await $expression`,
-            },
-            `I.haveWithCachePing($client)` => `factory.create($client)`,
-            convert_locators(page=`page`),
-        },
-        $pages = [],
-        $body <: maybe contains bubble($pages) or {
-          r"[a-zA-Z]*Page",
-          r"[a-zA-Z]*_page",
-        } as $page where {
-            $page <: identifier(),
-            or {
-              and {
-                $page <: r"([a-zA-Z]*)_page"($orig_name),
-                $page_class = capitalize(string=`$[orig_name]Page`),
-              },
-              $page_class = capitalize(string=$page),
-            },
-            $pages += `var $page = new $page_class(page, context)`,
-        },
-        $body <: maybe contains bubble($pages) r"[a-zA-Z]*Modal" as $modal where {
-            $modal <: identifier(),
-            $modal_class = capitalize(string=$modal),
-            $pages += `var $modal = new $modal_class(page, context)`,
-        },
-         $body <: maybe contains bubble($pages) r"[a-zA-Z]*List" as $list where {
-            $list <: identifier(),
-            $list_class = capitalize(string=$list),
-            $pages += `var $list = new $list_class(page, context)`,
-        },
-        $pages = distinct(list=$pages),
-        $pages = join(list=$pages, separator=`;\n`),
-        $body => `$pages\n$body`,
-    } => `test($quote$description$quote, async ({ page, factory, context }) => {
+	or {
+		`Scenario('$description', async ({ $params }) => { $body })`,
+		`Scenario('$description', $_, async ({ $params }) => { $body })`,
+		js"Scenario(`$description`, async ({ $params }) => { $body })",
+		js"Scenario(`$description`, $_, async ({ $params }) => { $body })"
+	} as $scenario where {
+		$quote = extract_quote_kind($scenario, $description),
+		$params <: contains `I`,
+		or { convert_tags($scenario, $description), true },
+		$body <: maybe contains bubble or {
+			`I.updateField` => `this.updateField`,
+			`I.selectInDropdownByLocators` => `this.selectInDropdownByLocators`,
+			`I.selectInDropdown` => `this.selectInDropdown`,
+			expression_statement($expression) where {
+				$expression <: call_expression(),
+				$expression <: not `console.log($_)`,
+				$expression => `await $expression`
+			},
+			`I.haveWithCachePing($client)` => `factory.create($client)`,
+			convert_locators(page=`page`)
+		},
+		$pages = [],
+		$body <: maybe contains bubble($pages) or {
+			r"[a-zA-Z]*Page",
+			r"[a-zA-Z]*_page"
+		} as $page where {
+			$page <: identifier(),
+			or {
+				and {
+					$page <: r"([a-zA-Z]*)_page"($orig_name),
+					$page_class = capitalize(string=`$[orig_name]Page`)
+				},
+				$page_class = capitalize(string=$page)
+			},
+			$pages += `var $page = new $page_class(page, context)`
+		},
+		$body <: maybe contains bubble($pages) r"[a-zA-Z]*Modal" as $modal where {
+			$modal <: identifier(),
+			$modal_class = capitalize(string=$modal),
+			$pages += `var $modal = new $modal_class(page, context)`
+		},
+		$body <: maybe contains bubble($pages) r"[a-zA-Z]*List" as $list where {
+			$list <: identifier(),
+			$list_class = capitalize(string=$list),
+			$pages += `var $list = new $list_class(page, context)`
+		},
+		$pages = distinct(list=$pages),
+		$pages = join(list=$pages, separator=`;\n`),
+		$body => `$pages\n$body`
+	} => `test($quote$description$quote, async ({ page, factory, context }) => {
         $body
     })`
 }
 
 pattern convert_parameterized_test() {
-    or {
-        `Data($params).Scenario('$description', $func)`,
-        `Data($params).Scenario('$description', $_, $func)`,
-        js"Data($params).Scenario(`$description`, $func)",
-        js"Data($params).Scenario(`$description`, $_, $func)",
-    } as $data_scenario where {
-        $quote = extract_quote_kind($data_scenario, $description),
-        convert_tags($data_scenario, $description),
-        $data_scenario => `for (const current of $params) {
+	or {
+		`Data($params).Scenario('$description', $func)`,
+		`Data($params).Scenario('$description', $_, $func)`,
+		js"Data($params).Scenario(`$description`, $func)",
+		js"Data($params).Scenario(`$description`, $_, $func)"
+	} as $data_scenario where {
+		$quote = extract_quote_kind($data_scenario, $description),
+		convert_tags($data_scenario, $description),
+		$data_scenario => `for (const current of $params) {
         Scenario($quote$description$quote, $func)
-    }`,
-    },
+    }`
+	}
 }
 
 pattern convert_data_table() {
-    variable_declarator($name, $value) where {
-        $data_objects = [],
-        $value <: or {
-            `new DataTable([$first, $second])`,
-            `new DataTable([$first, $second, $third])`,
-            `new DataTable([$first, $second, $third, $fourth])`,
-            `new DataTable([$first, $second, $third, $fourth, $fifth])`,
-        } where {
-            $program <: contains bubble($name, $data_objects, $first, $second, $third, $fourth, $fifth) `$name.add([$element])` as $adder where {
-                $data_object = [],
-                $first_val = $element[0],
-                $data_object += `$first: $first_val`,
-                $second_val = $element[1],
-                $data_object += `$second: $second_val`,
-                $third_val = $element[2],
-                if (! $third_val <: undefined) {
-                    $data_object += `$third: $third_val`,
-                },
-                $fourth_val = $element[3],
-                if (! $fourth_val <: undefined) {
-                    $data_object += `$fourth: $fourth_val`,
-                },
-                $fifth_val = $element[4],
-                if (! $fifth_val <: undefined) {
-                    $data_object += `$fifth: $fifth_val`,
-                },
-                $data_object = join($data_object, `, `),
-                $data_objects += `{ $data_object }`,
-                $adder => .,
-            },
-            $data_objects = join($data_objects, `,\n`),
-            $value => `[$data_objects]`,
-        },
-    },
+	variable_declarator($name, $value) where {
+		$data_objects = [],
+		$value <: or {
+			`new DataTable([$first, $second])`,
+			`new DataTable([$first, $second, $third])`,
+			`new DataTable([$first, $second, $third, $fourth])`,
+			`new DataTable([$first, $second, $third, $fourth, $fifth])`
+		} where {
+			$program <: contains bubble($name, $data_objects, $first, $second, $third, $fourth, $fifth) `$name.add([$element])` as $adder where {
+				$data_object = [],
+				$first_val = $element[0],
+				$data_object += `$first: $first_val`,
+				$second_val = $element[1],
+				$data_object += `$second: $second_val`,
+				$third_val = $element[2],
+				if (! $third_val <: undefined) { $data_object += `$third: $third_val` },
+				$fourth_val = $element[3],
+				if (! $fourth_val <: undefined) {
+					$data_object += `$fourth: $fourth_val`
+				},
+				$fifth_val = $element[4],
+				if (! $fifth_val <: undefined) { $data_object += `$fifth: $fifth_val` },
+				$data_object = join($data_object, `, `),
+				$data_objects += `{ $data_object }`,
+				$adder => .
+			},
+			$data_objects = join($data_objects, `,\n`),
+			$value => `[$data_objects]`
+		}
+	}
 }
 
 function get_as_string($val) {
-  or {
-      and {
-          $val <: string(),
-          return $val,
-      },
-      return `'$val'`,
-  }
+	or { and { $val <: string(), return $val }, return `'$val'` }
 }
 
 pattern convert_locators($page) {
-    or {
-        `locate($locator).as($_)` => `$page.locator($locator)`,
-        `locate($locator).find($sub)` => `$page.locator($locator).locator($sub)`,
-        `locate($locator)` => `$page.locator($locator)`,
-        `$target.withChild($descendant)` => `$target.filter({ has: $page.locator($descendant) })`,
-        `$target.withDescendant($descendant)` => `$target.filter({ has: $page.locator($descendant) })`,
-        `I.waitInUrl($url)` => `await $page.waitForURL(new RegExp($url))`,
-        `I.waitForLoader()` => `await this.waitForLoader()`,
-        `I.waitForText($text, $timeout, $target)` => `await expect($target).toHaveText($text, {
+	or {
+		`locate($locator).as($_)` => `$page.locator($locator)`,
+		`locate($locator).find($sub)` => `$page.locator($locator).locator($sub)`,
+		`locate($locator)` => `$page.locator($locator)`,
+		`$target.withChild($descendant)` => `$target.filter({ has: $page.locator($descendant) })`,
+		`$target.withDescendant($descendant)` => `$target.filter({ has: $page.locator($descendant) })`,
+		`I.waitInUrl($url)` => `await $page.waitForURL(new RegExp($url))`,
+		`I.waitForLoader()` => `await this.waitForLoader()`,
+		`I.waitForText($text, $timeout, $target)` => `await expect($target).toHaveText($text, {
             timeout: $timeout * 1000,
             ignoreCase: true,
         })`,
-        `I.waitForText($text, $target)` => `await expect($target).toHaveText($text, {
+		`I.waitForText($text, $target)` => `await expect($target).toHaveText($text, {
             ignoreCase: true,
         })`,
-        `I.waitForText($text)` => `await $page.getByText($text).waitFor({ state: 'visible' })`,
-        `I.wait($timeout)` => `await $page.waitForTimeout($timeout * 1000)`,
-        `I.seeElement($target)` => `await expect($target).toBeVisible()`,
-        `I.dontSeeElement($target)` => `await expect($target).toBeHidden()`,
-        `I.seeElementInDOM($target)` => `await expect($target).toBeAttached()`,
-        `I.see($text, $target)` => `await expect($target).toContainText($text)`,
-        `I.see($text)` => `await expect($page.getByText($text)).toBeVisible()`,
-        `I.dontSee($text, $target)` => `await expect($target).not.toContainText($text)`,
-        `I.dontSee($text)` => `await expect($page.getByText($text)).toBeHidden()`,
-        `await I.grabValueFrom($target)` => `await $target.value()`,
-        `I.grabCSSPropertyFrom($target, $property)` => `await $target.evaluate((el) => {
+		`I.waitForText($text)` => `await $page.getByText($text).waitFor({ state: 'visible' })`,
+		`I.wait($timeout)` => `await $page.waitForTimeout($timeout * 1000)`,
+		`I.seeElement($target)` => `await expect($target).toBeVisible()`,
+		`I.dontSeeElement($target)` => `await expect($target).toBeHidden()`,
+		`I.seeElementInDOM($target)` => `await expect($target).toBeAttached()`,
+		`I.see($text, $target)` => `await expect($target).toContainText($text)`,
+		`I.see($text)` => `await expect($page.getByText($text)).toBeVisible()`,
+		`I.dontSee($text, $target)` => `await expect($target).not.toContainText($text)`,
+		`I.dontSee($text)` => `await expect($page.getByText($text)).toBeHidden()`,
+		`await I.grabValueFrom($target)` => `await $target.value()`,
+		`I.grabCSSPropertyFrom($target, $property)` => `await $target.evaluate((el) => {
           return window.getComputedStyle(el).getPropertyValue($property);
         })`,
-        `I.seeCssPropertiesOnElements($target, { $css })` as $orig where {
-            $css_assertions = [],
-            $css <: some bubble($target, $css_assertions) pair($key, $value) where {
-                $string_key = get_as_string($key),
-                $string_val = get_as_string($value),
-                $css_assertions += `await expect($target).toHaveCSS($string_key, $string_val)`,
-            },
-            $css_assertions = join(list=$css_assertions, separator=`;\n`),
-            $orig => $css_assertions,
-        },
-        `I.seeAttributesOnElements($target, { $attributes })` as $orig where {
-            $attr_assertions = [],
-            $attributes <: some bubble($target, $attr_assertions) pair($key, $value) where {
-                $string_key = get_as_string($key),
-                $string_val = get_as_string($value),
-                $attr_assertions += `await expect($target).toHaveAttribute($string_key, $string_val)`,
-            },
-            $attr_assertions = join(list=$attr_assertions, separator=`;\n`),
-            $orig => $attr_assertions,
-        },
-        `I.seeInField($target, $value)` => `await expect($target).toHaveValue($value)`,
-        `I.dontSeeInField($target, $value)` => `await expect($target).not.toHaveValue($value)`,
-        `I.seeInCurrentUrl($url)` => `await expect($page).toHaveURL(new RegExp($url))`,
-        `I.closeCurrentTab()` => `await $page.close()`,
-        `I.seeTextEquals($text, $target)` => `await expect($target).toHaveText($text)`,
-        `I.waitForElement($target, $timeout)` => `await $target.waitFor({ state: 'attached', timeout: $timeout * 1000 })`,
-        `I.waitForElement($target)` => `await $target.waitFor({ state: 'attached' })`,
-        `I.waitForVisible($target, $timeout)` => `await $target.waitFor({ state: 'visible', timeout: $timeout * 1000 })`,
-        `I.waitForVisible($target)` => `await $target.waitFor({ state: 'visible' })`,
-        `I.waitForEnabled($target)` => `await expect($target).toBeEnabled()`,
-        `I.waitForInvisible($target, $timeout)` => `await $target.waitFor({ state: 'hidden', timeout: $timeout * 1000 })`,
-        `I.waitForInvisible($target)` => `await $target.waitFor({ state: 'hidden' })`,
-        `$locator.withText($text)` => `$locator.and($page.locator(\`:has-text("\${$text}")\`))`,
-        `I.forceClick($target, $context)` => `await $context.locator($target).click({ force: true })`,
-        `I.forceClick($target)` => `await $target.click({ force: true })`,
-        `I.clickAtPoint($target, $x, $y)` => `await $target.click({ position: { x: $x, y: $y }})`,
-        `I.doubleClick($target, $context)` => `await $context.locator($target).dblclick()`,
-        `I.doubleClick($target)` => `await $target.dblclick()`,
-        `I.click($target, $context)` => `await $context.locator($target).click()`,
-        `I.click($target)` => `await $target.click()`,
-        `I.moveCursorTo($target)` => `await $target.hover()`,
-        `I.dragAndDrop($target, $destination, $opts)` => `await $target.dragTo($destination, $opts)`,
-        `I.dragAndDrop($target, $destination)` => `await $target.dragTo($destination)`,
-        `I.dragSlider($target, $x_offset)` => `await $target.dragTo($target, { targetPosition: { x: $x_offset, y: 0 } })`,
-        `I.dragToPoint($target, $x, $y)` => `await $target.dragTo($target, { targetPosition: { x: $x, y: $y } })`,
-        `I.pressKey($key)` => `await $page.keyboard.press($key)`,
-        `I.type($keys)` => `await $page.keyboard.type($keys)`,
-        `I.refreshPage()` => `await $page.reload()`,
-        `I.scrollTo($target)` => `await $target.scrollIntoViewIfNeeded()`,
-        `I.attachFile($target, $file)` => `await $target.setInputFiles($file)`,
-        `I.clearFieldValue($field)` => `await $field.clear()`,
-        `I.fillFieldViaPressKeys($target, $value)` => `await $target.fill($value)`,
-        `I.fillField($target, $value)` => `await $target.fill($value)`,
-        `I.grabNumberOfVisibleElements($target)` => `await $target.count()`,
-        `I.seeNumberOfVisibleElements($target, $count)` => `expect(await $target.count()).toEqual($count)`,
-        `I.waitNumberOfVisibleElements($target, $count)` => `await expect($target).toHaveCount($count)`,
-        `I.checkOption($target)` => `await $target.check()`,
-        `I.uncheckOption($target)` => `await $target.uncheck()`,
-        `I.assertEqual($actual, $expected)` => `expect($actual).toEqual($expected)`,
-        `I.assertNotEqual($actual, $expected)` => `expect($actual).not.toEqual($expected)`,
-        `I.backToPreviousPage()` => `await $page.goBack()`,
-        `I.seeCheckboxIsChecked($target)` => `await expect($target).toBeChecked()`,
-        `I.dontSeeCheckboxIsChecked($target)` => `await expect($target).not.toBeChecked()`,
-        `I.grabTextFrom($target)` => `page.locator($target).allInnerTexts()`,
-        `I.say($log)` => `console.log($log)`,
-        `$target.at($nth)` as $at where {
-            $nth <: number(),
-            $zero_indexed = $nth - 1,
-            $at => `$target.nth($zero_indexed)`,
-        },
-    } where {
-        if (! $target <: undefined) {
-            $target <: maybe or {
-                binary_expression(),
-                string(),
-                template_string()
-            } where {
-                $target => `$page.locator($target)`,
-            },
-        }
-    },
+		`I.seeCssPropertiesOnElements($target, { $css })` as $orig where {
+			$css_assertions = [],
+			$css <: some bubble($target, $css_assertions) pair($key, $value) where {
+				$string_key = get_as_string($key),
+				$string_val = get_as_string($value),
+				$css_assertions += `await expect($target).toHaveCSS($string_key, $string_val)`
+			},
+			$css_assertions = join(list=$css_assertions, separator=`;\n`),
+			$orig => $css_assertions
+		},
+		`I.seeAttributesOnElements($target, { $attributes })` as $orig where {
+			$attr_assertions = [],
+			$attributes <: some bubble($target, $attr_assertions) pair($key, $value) where {
+				$string_key = get_as_string($key),
+				$string_val = get_as_string($value),
+				$attr_assertions += `await expect($target).toHaveAttribute($string_key, $string_val)`
+			},
+			$attr_assertions = join(list=$attr_assertions, separator=`;\n`),
+			$orig => $attr_assertions
+		},
+		`I.seeInField($target, $value)` => `await expect($target).toHaveValue($value)`,
+		`I.dontSeeInField($target, $value)` => `await expect($target).not.toHaveValue($value)`,
+		`I.seeInCurrentUrl($url)` => `await expect($page).toHaveURL(new RegExp($url))`,
+		`I.closeCurrentTab()` => `await $page.close()`,
+		`I.seeTextEquals($text, $target)` => `await expect($target).toHaveText($text)`,
+		`I.waitForElement($target, $timeout)` => `await $target.waitFor({ state: 'attached', timeout: $timeout * 1000 })`,
+		`I.waitForElement($target)` => `await $target.waitFor({ state: 'attached' })`,
+		`I.waitForVisible($target, $timeout)` => `await $target.waitFor({ state: 'visible', timeout: $timeout * 1000 })`,
+		`I.waitForVisible($target)` => `await $target.waitFor({ state: 'visible' })`,
+		`I.waitForEnabled($target)` => `await expect($target).toBeEnabled()`,
+		`I.waitForInvisible($target, $timeout)` => `await $target.waitFor({ state: 'hidden', timeout: $timeout * 1000 })`,
+		`I.waitForInvisible($target)` => `await $target.waitFor({ state: 'hidden' })`,
+		`$locator.withText($text)` => `$locator.and($page.locator(\`:has-text("\${$text}")\`))`,
+		`I.forceClick($target, $context)` => `await $context.locator($target).click({ force: true })`,
+		`I.forceClick($target)` => `await $target.click({ force: true })`,
+		`I.clickAtPoint($target, $x, $y)` => `await $target.click({ position: { x: $x, y: $y }})`,
+		`I.doubleClick($target, $context)` => `await $context.locator($target).dblclick()`,
+		`I.doubleClick($target)` => `await $target.dblclick()`,
+		`I.click($target, $context)` => `await $context.locator($target).click()`,
+		`I.click($target)` => `await $target.click()`,
+		`I.moveCursorTo($target)` => `await $target.hover()`,
+		`I.dragAndDrop($target, $destination, $opts)` => `await $target.dragTo($destination, $opts)`,
+		`I.dragAndDrop($target, $destination)` => `await $target.dragTo($destination)`,
+		`I.dragSlider($target, $x_offset)` => `await $target.dragTo($target, { targetPosition: { x: $x_offset, y: 0 } })`,
+		`I.dragToPoint($target, $x, $y)` => `await $target.dragTo($target, { targetPosition: { x: $x, y: $y } })`,
+		`I.pressKey($key)` => `await $page.keyboard.press($key)`,
+		`I.type($keys)` => `await $page.keyboard.type($keys)`,
+		`I.refreshPage()` => `await $page.reload()`,
+		`I.scrollTo($target)` => `await $target.scrollIntoViewIfNeeded()`,
+		`I.attachFile($target, $file)` => `await $target.setInputFiles($file)`,
+		`I.clearFieldValue($field)` => `await $field.clear()`,
+		`I.fillFieldViaPressKeys($target, $value)` => `await $target.fill($value)`,
+		`I.fillField($target, $value)` => `await $target.fill($value)`,
+		`I.grabNumberOfVisibleElements($target)` => `await $target.count()`,
+		`I.seeNumberOfVisibleElements($target, $count)` => `expect(await $target.count()).toEqual($count)`,
+		`I.waitNumberOfVisibleElements($target, $count)` => `await expect($target).toHaveCount($count)`,
+		`I.checkOption($target)` => `await $target.check()`,
+		`I.uncheckOption($target)` => `await $target.uncheck()`,
+		`I.assertEqual($actual, $expected)` => `expect($actual).toEqual($expected)`,
+		`I.assertNotEqual($actual, $expected)` => `expect($actual).not.toEqual($expected)`,
+		`I.backToPreviousPage()` => `await $page.goBack()`,
+		`I.seeCheckboxIsChecked($target)` => `await expect($target).toBeChecked()`,
+		`I.dontSeeCheckboxIsChecked($target)` => `await expect($target).not.toBeChecked()`,
+		`I.grabTextFrom($target)` => `page.locator($target).allInnerTexts()`,
+		`I.say($log)` => `console.log($log)`,
+		`$target.at($nth)` as $at where {
+			$nth <: number(),
+			$zero_indexed = $nth - 1,
+			$at => `$target.nth($zero_indexed)`
+		}
+	} where {
+		if (! $target <: undefined) {
+			$target <: maybe or {
+				binary_expression(),
+				string(),
+				template_string()
+			} where { $target => `$page.locator($target)` }
+		}
+	}
 }
 
 pattern convert_hooks() {
-    or {
-        `BeforeSuite(({ $params }) => { $body })` => `test.beforeAll(async ({ page, request }) => { $body })`,
-        `Before(({ $params }) => { $body })` => `test.beforeEach(async ({ page, request }) => { $body })`,
-        `After(({ $params }) => { $body })` => `test.afterEach(async ({ page, request }) => { $body })`,
-        `AfterSuite(({ $params }) => { $body })` => `test.afterAll(async ({ page, request }) => { $body })`,
-    } where {
-        $body <: not contains `loginAs('admin')`,
-        $body <: maybe contains bubble convert_locators(page=`page`),
-    }
+	or {
+		`BeforeSuite(({ $params }) => { $body })` => `test.beforeAll(async ({ page, request }) => { $body })`,
+		`Before(({ $params }) => { $body })` => `test.beforeEach(async ({ page, request }) => { $body })`,
+		`After(({ $params }) => { $body })` => `test.afterEach(async ({ page, request }) => { $body })`,
+		`AfterSuite(({ $params }) => { $body })` => `test.afterAll(async ({ page, request }) => { $body })`
+	} where {
+		$body <: not contains `loginAs('admin')`,
+		$body <: maybe contains bubble convert_locators(page=`page`)
+	}
 }
 
 pattern convert_base_page() {
-    `export default { $properties }` where {
-        $program <: contains `const { I } = inject();` => .,
-        $properties <: maybe contains bubble or {
-            pair($key, $value) as $pair where or {
-                $value <: `($params) => { $body }` where {
-                    $pair => `$key($params) { $body }`,
-                },
-                $value <: `($params) => $exp` where {
-                    $pair => `$key($params) { return $exp }`,
-                },
-                $pair => `get $key() { return $value }`,
-            } where {
-                $pair <: not within method_definition(),
-                $pair <: not within pair() as $outer_pair where {
-                    $outer_pair <: not $pair,
-                }
-            },
-            method_definition($async, $static) as $method where {
-                $async <: false,
-                $method => `async $method`,
-            },
-            convert_locators(page=`this.page`),
-        },
-        $filename <: r".*?/?([^/]+)\.[a-zA-Z]*"($base_name),
-        $base_name = capitalize(string=$base_name),
-    } => `export default class $base_name extends BasePage {
+	`export default { $properties }` where {
+		$program <: contains `const { I } = inject();` => .,
+		$properties <: maybe contains bubble or {
+			pair($key, $value) as $pair where or {
+				$value <: `($params) => { $body }` where {
+					$pair => `$key($params) { $body }`
+				},
+				$value <: `($params) => $exp` where {
+					$pair => `$key($params) { return $exp }`
+				},
+				$pair => `get $key() { return $value }`
+			} where {
+				$pair <: not within method_definition() ,
+				$pair <: not within pair() as $outer_pair where {
+					$outer_pair <: not $pair
+				}
+			},
+			method_definition($async, $static) as $method where {
+				$async <: false,
+				$method => `async $method`
+			},
+			convert_locators(page=`this.page`)
+		},
+		$filename <: r".*?/?([^/]+)\.[a-zA-Z]*"($base_name),
+		$base_name = capitalize(string=$base_name)
+	} => `export default class $base_name extends BasePage {
         $properties
     }`
 }
 
 pattern wrap_describe() {
-    program($statements) where {
-        $statements <: maybe contains `Before(async ({ loginAs }) => {
+	program($statements) where {
+		$statements <: maybe contains `Before(async ({ loginAs }) => {
    await loginAs('admin');
  });` => .,
-        $statements <: contains `Feature($describer)` as $feature where {
-            $feature => .,
-            $to_wrap = ``,
-            $imports = ``,
-            $statements <: some bubble($to_wrap, $imports) {$statement where {
-                $statement <: or {
-                    import_statement() where $imports += `$statement\n`,
-                    $_ where $to_wrap += `$statement\n\n`
-                },
-            } },
-            $statements => `$imports
+		$statements <: contains `Feature($describer)` as $feature where {
+			$feature => .,
+			$to_wrap = ``,
+			$imports = ``,
+			$statements <: some bubble($to_wrap, $imports) {
+				$statement where {
+					$statement <: or {
+						import_statement() where $imports += `$statement\n`,
+						$_ where $to_wrap += `$statement\n\n`
+					}
+				}
+			},
+			$statements => `$imports
 test.describe($describer, () => {
     $to_wrap
 })`
-        }
-    }
+		}
+	}
 }
 
 sequential {
-    contains or {
-        convert_test(),
-        convert_parameterized_test(),
-        convert_data_table(),
-        convert_hooks(),
-        convert_base_page(),
-    } where {
-        $expect = `expect`,
-        $expect <: ensure_import_from(source=`"@playwright/test"`),
-    },
-    maybe contains convert_test(),
-    file($body) where { $body <: maybe wrap_describe() }
+	contains or {
+		convert_test(),
+		convert_parameterized_test(),
+		convert_data_table(),
+		convert_hooks(),
+		convert_base_page()
+	} where {
+		$expect = `expect`,
+		$expect <: ensure_import_from(source=`"@playwright/test"`)
+	},
+	maybe contains convert_test(),
+	file($body) where { $body <: maybe wrap_describe() }
 }
 ```
 

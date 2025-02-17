@@ -13,8 +13,8 @@ engine marzano(0.1)
 language js
 
 or {
-  `new Object()` => `{}`,
-  `new Object` => `{}`
+	`new Object()` => `{}`,
+	`new Object` => `{}`
 }
 ```
 

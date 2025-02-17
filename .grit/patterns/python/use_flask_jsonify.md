@@ -15,9 +15,12 @@ language python
 
 `@app.route($routesParams)
 def $func($funcParams):$funcBody` where {
-    $import = "jsonify",
-    $import <: ensure_import_from(source=`flask`),
-    $funcBody <: contains or {`return json.dumps($user_dict)`, `return dumps($user_dict)`} => `return jsonify($user_dict)`
+	$import = "jsonify",
+	$import <: ensure_import_from(source=`flask`),
+	$funcBody <: contains or {
+		`return json.dumps($user_dict)`,
+		`return dumps($user_dict)`
+	} => `return jsonify($user_dict)`
 }
 ```
 

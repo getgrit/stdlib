@@ -9,13 +9,13 @@ The Go SDK has been rewritten for v5 and contains significant changes.
 language go
 
 pattern fix_api_client() {
-  `$muxgo.NewAPIClient($cfg)` where {
-    $cfg <: contains `muxgo.NewConfiguration($opts)`,
-    $muxoption = require_import(source=`github.com/muxinc/mux-go/muxoption`),
-    $opts <: some bubble($muxgo, $muxoption) or {
-      `$muxgo.WithBasicAuth($a, $b)` => `$muxoption.WithTokenID($a), $muxoption.WithTokenSecret($b)`
-    }
-  } => `mux.NewClient($opts)`
+	`$muxgo.NewAPIClient($cfg)` where {
+		$cfg <: contains `muxgo.NewConfiguration($opts)`,
+		$muxoption = require_import(source=`github.com/muxinc/mux-go/muxoption`),
+		$opts <: some bubble($muxgo, $muxoption) or {
+			`$muxgo.WithBasicAuth($a, $b)` => `$muxoption.WithTokenID($a), $muxoption.WithTokenSecret($b)`
+		}
+	} => `mux.NewClient($opts)`
 }
 
 private pattern wrap_mux_fields() {
@@ -33,21 +33,19 @@ private pattern wrap_mux_fields() {
 pattern rename_params() {
 	or {
 		`$muxgo.ListDimensionValuesParams{$params}` where {
-			$data = require_import(source=`github.com/muxinc/mux-go/data`),
+			$data = require_import(source=`github.com/muxinc/mux-go/data`)
 		} => `$data.DimensionListValuesParams{$params}`,
 		`$muxgo.CreateAssetRequest{$params}` where {
-			$video = require_import(source=`github.com/muxinc/mux-go/video`),
-		} => `$video.AssetNewParams{$params}`,
-	} where {
-		$params <: maybe wrap_mux_fields(),
-	}
+			$video = require_import(source=`github.com/muxinc/mux-go/video`)
+		} => `$video.AssetNewParams{$params}`
+	} where { $params <: maybe wrap_mux_fields() }
 }
 
 pattern final_mux_renames() {
 	or {
-		`[]$muxgo.InputSettings{$params}` where {
+		`[]$muxgo.InputSettings{$params}` where {}
 			// $video = require_import(source=`github.com/muxinc/mux-go/video`),
-		} => `[]video.AssetNewParamsInput{$params}`,
+		=> `[]video.AssetNewParamsInput{$params}`
 	}
 }
 
@@ -57,25 +55,22 @@ pattern fix_api_calls() {
 		$call <: or {
 			`$client.DimensionsApi.ListDimensions` => `$client.Data.Dimensions.List`,
 			`$client.DimensionsApi.ListDimensionValues` => `$client.Data.Dimensions.ListValues`,
-			`$client.AssetsApi.CreateAsset` => `$client.Video.Assets.New`,
+			`$client.AssetsApi.CreateAsset` => `$client.Video.Assets.New`
 		},
 		$ctx = require_import(source=`context`),
-		if ($args <: .) {
-			$overall => `$call($ctx.TODO())`
-		} else {
+		if ($args <: .) { $overall => `$call($ctx.TODO())` } else {
 			$overall => `$call($ctx.TODO(), $args)`
 		}
 	}
 }
 
-
 sequential {
 	bubble file($name, $body) where {
-			$body <: contains or {
-				fix_api_client(),
-				fix_api_calls(),
-				rename_params(),
-			}
+		$body <: contains or {
+			fix_api_client(),
+			fix_api_calls(),
+			rename_params()
+		}
 	},
 	maybe bubble file($name, $body) where $body <: contains final_mux_renames()
 }

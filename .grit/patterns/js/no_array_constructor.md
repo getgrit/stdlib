@@ -13,11 +13,9 @@ engine marzano(0.1)
 language js
 
 or {
-  `new Array($args)` => `[$args]`,
-  `Array($args)` => `[$args]`
-} where {
-  $args <: [$_, $_, ...]
-}
+	`new Array($args)` => `[$args]`,
+	`Array($args)` => `[$args]`
+} where { $args <: [$_, $_, ...] }
 ```
 
 ```

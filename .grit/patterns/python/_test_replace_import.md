@@ -5,26 +5,11 @@ engine marzano(0.1)
 language python
 
 file($body) where {
-  $body <: contains or {
-    py_find_replace_import(
-      from_package=`langchain_community.chat_models`,
-      from_name=`ChatOpenAI`,
-      to_package=`langchain_openai`,
-      to_name=`ChatOpenAI`
-    ),
-    py_find_replace_import(
-      from_package=`anthropic_place`,
-      from_name=`EpicLinguist`,
-      to_package=`new_anthropic_place`,
-      to_name=`SauceLinguist`
-    ),
-    py_find_replace_import(
-      from_package=`langchain_community.chat_models`,
-      from_name=`MyLittleModel`,
-      to_package=`extra_lc_models`,
-      to_name=`MyBigModel`
-    ),
-  }
+	$body <: contains or {
+		py_find_replace_import(from_package=`langchain_community.chat_models`, from_name=`ChatOpenAI`, to_package=`langchain_openai`, to_name=`ChatOpenAI`),
+		py_find_replace_import(from_package=`anthropic_place`, from_name=`EpicLinguist`, to_package=`new_anthropic_place`, to_name=`SauceLinguist`),
+		py_find_replace_import(from_package=`langchain_community.chat_models`, from_name=`MyLittleModel`, to_package=`extra_lc_models`, to_name=`MyBigModel`)
+	}
 }
 ```
 

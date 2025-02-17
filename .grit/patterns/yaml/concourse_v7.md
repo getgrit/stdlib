@@ -15,86 +15,82 @@ function do_replace($input, $key, $value) js {
 }
 
 pattern distribute_variables() {
-    // build up a map from variable names to list of values the variable can take
-    $vars_map = {},
-    `across: $vars` as $across where {
-        $vars <: some bubble($vars_map, $max_in_flight) `- $this_variable` where {
-            $this_variable <: contains `var: $name`,
-            $this_variable <: contains `values: $vals`,
-            $val_list = [],
-            $vals <: some bubble($vars_map, $val_list) `- $name` where {
-                $val_list += $name
-            },
-            $vars_map.$name = $val_list,
-            if ($this_variable <: contains `max_in_flight: $in_flight_value`) {
-              $in_flight_value <: contains integer_scalar() as $max,
-              if ($max_in_flight <: undefined) {
-                $max_in_flight = $max
-              }
-            }
-        },
-        // construct a template consisting of all the tasks not including the 
-        // element defining all the variables
-        $across <: within block_mapping($items) where {
-            $template = [],
-            $items <: some bubble($template, $across, $key, $val) {
-                $item where {
-                    not $item <: $across,
-                    $new_item = text($item),
-                    if ($template <: []) {
-                        $template += `- $item`
-                    } else {
-                        $template += $item
-                    },
-                    $item => .
-                }
-            },
-            // join the template into a string
-            $accumulate = join(list = $template, separator = `\n  `),
-            $vars_map <: some bubble($accumulate) [$key, $vals] where {
-                // initial list that will replace $accumulate in the next iteration
-                $new = [],
-                // append a copy of the previous iteration with the variable replaced with each value it can take
-                $vals <: some bubble($accumulate, $key, $new) $value where {
-                    $replaced = do_replace($accumulate, $key, $value),
-                    $new += `  $replaced`
-                },
-                // set accumulate equal the new list
-                $accumulate = join(list = $new, separator = `\n`)
-            }
-        },
-        if ($max_in_flight <: not undefined) {
-            $across => raw`in_parallel:
+	// build up a map from variable names to list of values the variable can take
+	$vars_map = {},
+	`across: $vars` as $across where {
+		$vars <: some bubble($vars_map, $max_in_flight) `- $this_variable` where {
+			$this_variable <: contains `var: $name`,
+			$this_variable <: contains `values: $vals`,
+			$val_list = [],
+			$vals <: some bubble($vars_map, $val_list) `- $name` where {
+				$val_list += $name
+			},
+			$vars_map.$name = $val_list,
+			if ($this_variable <: contains `max_in_flight: $in_flight_value`) {
+				$in_flight_value <: contains integer_scalar() as $max,
+				if ($max_in_flight <: undefined) { $max_in_flight = $max }
+			}
+		},
+		// construct a template consisting of all the tasks not including the
+		// element defining all the variables
+		$across <: within block_mapping($items) where {
+			$template = [],
+			$items <: some bubble($template, $across, $key, $val) {
+				$item where {
+					not $item <: $across,
+					$new_item = text($item),
+					if ($template <: []) { $template += `- $item` } else {
+						$template += $item
+					},
+					$item => .
+				}
+			},
+			// join the template into a string
+			$accumulate = join(list=$template, separator=`\n  `),
+			$vars_map <: some bubble($accumulate) [$key, $vals] where {
+				// initial list that will replace $accumulate in the next iteration
+				$new = [],
+				// append a copy of the previous iteration with the variable replaced with each value it can take
+				$vals <: some bubble($accumulate, $key, $new) $value where {
+					$replaced = do_replace($accumulate, $key, $value),
+					$new += `  $replaced`
+				},
+				// set accumulate equal the new list
+				$accumulate = join(list=$new, separator=`\n`)
+			}
+		} ,
+		if ($max_in_flight <: not undefined) {
+			$across => raw`in_parallel:
   limit: $max_in_flight
   steps:
     $accumulate`
-        } else {
-            $across => raw`in_parallel:
+		} else {
+			$across => raw`in_parallel:
   steps:
     $accumulate`
-        }
-    }
+		}
+	}
 }
 
 sequential {
-  contains distribute_variables(),
-  maybe contains bubble `in_parallel: $tasks` where {
-    $task_names = [],
-    // Gather all unique task names
-    $tasks <: contains bubble($task_names) `task: $task_name` where {
-      $task_names += text($task_name)
-    },
-    $unique_task_names = distinct($task_names),
-    // Process each one
-    $unique_task_names <: some bubble($tasks) `$task_name` where {
-      $n = 0,
-      $tasks <: contains bubble($task_name, $n) `task: $task_name` where {
-        // $this_name <: "$task_name",
-        $n += 1,
-        $current_name = text(`$task_name-$n`),
-      } => `task: $current_name`
-    }
-  },
+	contains distribute_variables(),
+	maybe contains bubble `in_parallel: $tasks` where {
+		$task_names = [],
+		// Gather all unique task names
+		$tasks <: contains bubble($task_names) `task: $task_name` where {
+			$task_names += text($task_name)
+		},
+		$unique_task_names = distinct($task_names),
+		// Process each one
+		$unique_task_names <: some bubble($tasks) `$task_name` where {
+			$n = 0,
+			$tasks <: contains bubble($task_name, $n) `task: $task_name` where {
+				// $this_name <: "$task_name",
+				$n += 1,
+				$current_name = text(`$task_name-$n`)
+			} => `task: $current_name`
+		}
+	}
 }
 ```
 

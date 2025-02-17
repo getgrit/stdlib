@@ -8,12 +8,10 @@ To get the current time in UTC use a datetime object with the timezone explicitl
 engine marzano(0.1)
 language python
 
-and {
-    $new_import = `timezone`,
-    `datetime.utcnow()` => `datetime.now($new_import.utc)` where {
-        $new_import <: ensure_import_from(source = `datetime`),
-    }
-}
+and { $new_import = `timezone`,
+`datetime.utcnow()` => `datetime.now($new_import.utc)` where {
+	$new_import <: ensure_import_from(source=`datetime`)
+} }
 ```
 
 ## Aware date-time for UTC

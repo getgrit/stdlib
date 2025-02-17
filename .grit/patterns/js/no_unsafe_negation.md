@@ -17,8 +17,8 @@ engine marzano(0.1)
 language js
 
 or {
-  `!$key in $collection` => `!($key in $collection)`,
-  `!$key instanceof $collection` => `!($key instanceof $collection)`
+	`!$key in $collection` => `!($key in $collection)`,
+	`!$key instanceof $collection` => `!($key instanceof $collection)`
 }
 ```
 

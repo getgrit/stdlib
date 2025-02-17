@@ -9,12 +9,12 @@ Function invocations are expected to synchronous, and this function will execute
 language go
 
 file($name, $body) where {
-    $body <: contains `func $func() { go func() { $funcBody }() }` as $hiddenFunc => `func $func() {
+	$body <: contains `func $func() { go func() { $funcBody }() }` as $hiddenFunc => `func $func() {
         $funcBody
     }`,
-    $body <: maybe contains `func main(){ $mainBody }` where {
-        $mainBody <: contains `$func()` => `go $func()`
-    }
+	$body <: maybe contains `func main(){ $mainBody }` where {
+		$mainBody <: contains `$func()` => `go $func()`
+	}
 }
 ```
 

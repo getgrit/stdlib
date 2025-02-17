@@ -10,10 +10,10 @@ engine marzano(0.1)
 language sql
 
 pattern dollar_quote_procedure_body() {
-`CREATE PROCEDURE $name($args) AS $decl $block;` as $proc where {
-    $block => `$$$block;\n$$ LANGUAGE plpgsql`,
-    $decl => `DECLARE\n $decl`
-  }
+	`CREATE PROCEDURE $name($args) AS $decl $block;` as $proc where {
+		$block => `$$$block;\n$$ LANGUAGE plpgsql`,
+		$decl => `DECLARE\n $decl`
+	}
 }
 dollar_quote_procedure_body()
 ```

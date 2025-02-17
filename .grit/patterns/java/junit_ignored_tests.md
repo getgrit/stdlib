@@ -12,41 +12,40 @@ JUnit silently ignores private classes and private methods, static methods, and 
 language java
 
 pattern has_ignored_modifier() {
-    contains marker_annotation($name) where {
-        $name <: or { `Test`, `Nested` },
-    },
-    contains modifier() as $m where or {
-        $m <: or {
-            `private`, `static`
-        } => .,
-    }
+	contains marker_annotation($name) where {
+		$name <: or {
+			`Test`,
+			`Nested`
+		}
+	},
+	contains modifier() as $m where or {
+		$m <: or {
+			`private`,
+			`static`
+		} => .
+	}
 }
 
 pattern is_non_void() {
-    or {
-        boolean_type(),
-        integral_type(),
-        floating_point_type(),
-        identifier(),
-        type_identifier(),
-        scoped_type_identifier(),
-        generic_type(),
-    } => `void`,
+	or {
+		boolean_type(),
+		integral_type(),
+		floating_point_type(),
+		identifier(),
+		type_identifier(),
+		scoped_type_identifier(),
+		generic_type()
+	} => `void`
 }
 
 or {
-    method_declaration($modifiers, $type) where or {
-        $modifiers <: has_ignored_modifier(),
-        $type <: is_non_void(),
-    },
-    class_declaration($modifiers) where {
-        $modifiers <: has_ignored_modifier(),
-    }
+	method_declaration($modifiers, $type) where or {
+		$modifiers <: has_ignored_modifier(),
+		$type <: is_non_void()
+	},
+	class_declaration($modifiers) where { $modifiers <: has_ignored_modifier() }
 } where $program <: contains import_declaration() as $import where {
-    $import <: contains $junit where {
-        $junit <: `junit`,
-        $junit <: identifier(),
-    }
+	$import <: contains $junit where { $junit <: `junit`, $junit <: identifier() }
 }
 ```
 

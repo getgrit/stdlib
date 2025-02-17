@@ -8,28 +8,30 @@ Add thousands separator (`1_000_000`) to numbers (ints and floats, positive or n
 engine marzano(0.1)
 language python
 
-
-or { integer(), float() } as $number where {
-    or {
-        and {
-            $number <: r"(-?\d+)(\d{3})(\d{3})(\d{3})(\d{3})((?:\.\d+)?)$"($head, $g1, $g2, $g3, $g4, $fractional),
-            $groups = [$head, $g1, $g2, $g3, $g4],
-        },
-        and {
-            $number <: r"(-?\d+)(\d{3})(\d{3})(\d{3})((?:\.\d+)?)$"($head, $g1, $g2, $g3, $fractional),
-            $groups = [$head, $g1, $g2, $g3],
-        },
-        and {
-            $number <: r"(-?\d+)(\d{3})(\d{3})((?:\.\d+)?)$"($head, $g1, $g2, $fractional),
-            $groups = [$head, $g1, $g2],
-        },
-        and {
-            $number <: r"(-?\d+)(\d{3})((?:\.\d+)?)$"($head, $group, $fractional),
-            $groups = [$head, $group],
-        },
-    },
-    $formatted = join(list = $groups, separator = "_"),
-    $formatted = join(list = [$formatted, $fractional], separator = ""),
+or {
+	integer(),
+	float()
+} as $number where {
+	or {
+		and {
+			$number <: r"(-?\d+)(\d{3})(\d{3})(\d{3})(\d{3})((?:\.\d+)?)$"($head, $g1, $g2, $g3, $g4, $fractional),
+			$groups = [$head, $g1, $g2, $g3, $g4]
+		},
+		and {
+			$number <: r"(-?\d+)(\d{3})(\d{3})(\d{3})((?:\.\d+)?)$"($head, $g1, $g2, $g3, $fractional),
+			$groups = [$head, $g1, $g2, $g3]
+		},
+		and {
+			$number <: r"(-?\d+)(\d{3})(\d{3})((?:\.\d+)?)$"($head, $g1, $g2, $fractional),
+			$groups = [$head, $g1, $g2]
+		},
+		and {
+			$number <: r"(-?\d+)(\d{3})((?:\.\d+)?)$"($head, $group, $fractional),
+			$groups = [$head, $group]
+		}
+	},
+	$formatted = join(list=$groups, separator="_"),
+	$formatted = join(list=[$formatted, $fractional], separator="")
 } => `$formatted`
 ```
 

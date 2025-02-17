@@ -9,19 +9,18 @@ Unusued variables should not be defined on contracts, either as state variables 
 language sol
 
 or {
-    // find all our state variable definitions
-    state_variable_declaration(name = $name) as $dec where {
-        $dec <: within contract_declaration() as $contract,
-        $contract <: not contains function_definition(body=contains $name)
-    },
-
-    // find all our local variable definitions
-    variable_declaration(name=$id) as $def where {
-        // that are *not* used outside the variable declaration
-        ! $def <: within function_body(body=contains identifier() as $id where {
-            $id <: not within $def
-        })
-    }
+	// find all our state variable definitions
+	state_variable_declaration(name=$name) as $dec where {
+		$dec <: within contract_declaration() as $contract ,
+		$contract <: not contains function_definition(body=contains $name)
+	},
+	// find all our local variable definitions
+	variable_declaration(name=$id) as $def where {
+		// that are *not* used outside the variable declaration
+		! $def <: within function_body(body=contains identifier() as $id where {
+			$id <: not within $def
+		})
+	}
 }
 ```
 

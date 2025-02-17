@@ -10,9 +10,9 @@ tags: [angularjs, angular, upgrade, wip, hidden, ai, flaky]
 language js
 
 `angular.module("$mod").component($name, $args)` as $old where {
-    $capitalized = capitalize($mod),
-    $componentName = `$[capitalized]Component`,
-    $new = ai_transform($args, instruct="Convert this into an Angular component", pattern=contains $componentName),
+	$capitalized = capitalize($mod),
+	$componentName = `$[capitalized]Component`,
+	$new = ai_transform($args, instruct="Convert this into an Angular component", pattern=contains $componentName)
 } => $new
 ```
 

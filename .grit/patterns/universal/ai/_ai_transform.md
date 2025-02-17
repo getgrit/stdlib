@@ -9,9 +9,7 @@ GritQL can use AI to transform a target variable based on some instruction using
 ```grit
 language yaml
 
-pattern pair($key, $value) {
-  block_mapping_pair(key=contains $key, $value)
-}
+pattern pair($key, $value) { block_mapping_pair(key=contains $key, $value) }
 
 or {
   `- $task` where {

@@ -9,25 +9,27 @@ engine marzano(0.1)
 language python
 
 pattern prod_init($accum) {
-    or {
-        `$accum = 1`,
-        `$accum = 1.0`,
-    }
+	or {
+		`$accum = 1`,
+		`$accum = 1.0`
+	}
 }
 
 pattern prod_accum($accum, $factor) {
-    or {
-        `$accum *= $factor`,
-        `$accum = $accum * $factor`,
-        `$accum = $factor * $accum`,
-    }
+	or {
+		`$accum *= $factor`,
+		`$accum = $accum * $factor`,
+		`$accum = $factor * $accum`
+	}
 }
 
-for_statement(body=block(statements=[prod_accum(accum = $var, factor = $left)]), $left, $right) as $for where {
-    $for <: after prod_init(accum = $var) => .,
-    $left <: identifier(),
-    $import = `math`,
-    $import <: ensure_bare_import(),
+for_statement(body=block(statements=[
+	prod_accum(accum=$var, factor=$left)
+]), $left, $right) as $for where {
+	$for <: after prod_init(accum=$var) => .,
+	$left <: identifier(),
+	$import = `math`,
+	$import <: ensure_bare_import()
 } => `math.prod($right)`
 ```
 

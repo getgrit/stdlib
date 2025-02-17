@@ -12,275 +12,263 @@ language js
 
 // Rewrite the constructor
 pattern change_constructor() {
-    `new $constructor($params)` where {
-        $constructor <: `OpenAIApi` => `OpenAI`,
-        or {
-          $params <: contains `new Configuration($details)`,
-          and {
-            $params <: [$config],
-            $program <: contains or {
-                `const $config = new Configuration($details)`,
-                `let $config = new Configuration($details)`,
-                `var $config = new Configuration($details)`,
-                `$config = new Configuration($details)`,
-            } => .,
-          }
-        },
-        $params => `$details`,
-        $program <: maybe contains change_imports(),
-    }
+	`new $constructor($params)` where {
+		$constructor <: `OpenAIApi` => `OpenAI`,
+		or {
+			$params <: contains `new Configuration($details)`,
+			and {
+				$params <: [$config],
+				$program <: contains or {
+					`const $config = new Configuration($details)`,
+					`let $config = new Configuration($details)`,
+					`var $config = new Configuration($details)`,
+					`$config = new Configuration($details)`
+				} => .
+			}
+		},
+		$params => `$details`,
+		$program <: maybe contains change_imports()
+	}
 }
 
 pattern openai_named($object) {
-    variable_declarator(name=$object, $value) where {
-        $value <: contains `new $constructor($_)` where {
-            $constructor <: js"OpenAIApi"
-        }
-    }
+	variable_declarator(name=$object, $value) where {
+		$value <: contains `new $constructor($_)` where {
+			$constructor <: js"OpenAIApi"
+		}
+	}
 }
 
 pattern match_create_chat_completion() {
-    member_expression($object, $property) where {
-        or {
-            $object <: js"openai",
-            $program <: contains openai_named($object),
-        },
-        $property <: js"createChatCompletion" => js"chat.completions.create"
-    }
+	member_expression($object, $property) where {
+		or { $object <: js"openai", $program <: contains openai_named($object) },
+		$property <: js"createChatCompletion" => js"chat.completions.create"
+	}
 }
 
 pattern change_chat_completion() {
-    or {
-        js"$chatCompletion.data.choices" => js"$chatCompletion.choices" where {
-            $program <: contains variable_declarator($name, $value) where {
-                $name <: $chatCompletion,
-                $value <: contains match_create_chat_completion()
-            }
-        },
-        match_create_chat_completion()
-    }
+	or {
+		js"$chatCompletion.data.choices" => js"$chatCompletion.choices" where {
+			$program <: contains variable_declarator($name, $value) where {
+				$name <: $chatCompletion,
+				$value <: contains match_create_chat_completion()
+			}
+		},
+		match_create_chat_completion()
+	}
 }
 
 pattern match_create_completion() {
-    member_expression($object, $property) where {
-        or {
-            $object <: js"openai",
-            $program <: contains openai_named($object),
-        },
-        $property <: js"createCompletion" => js"completions.create"
-    }
+	member_expression($object, $property) where {
+		or { $object <: js"openai", $program <: contains openai_named($object) },
+		$property <: js"createCompletion" => js"completions.create"
+	}
 }
 
 pattern change_completion() {
-    or {
-        js"$completion.data.choices" => js"$completion.choices" where {
-            $program <: contains variable_declarator($name, $value) where {
-                $name <: $completion,
-                $value <: contains match_create_completion()
-            }
-        },
-        match_create_completion()
-    }
+	or {
+		js"$completion.data.choices" => js"$completion.choices" where {
+			$program <: contains variable_declarator($name, $value) where {
+				$name <: $completion,
+				$value <: contains match_create_completion()
+			}
+		},
+		match_create_completion()
+	}
 }
 
 pattern openai_misc_renames() {
-    call_expression($function, $arguments) where {
-        $function <: member_expression($object, $property) where {
-            or {
-                $object <: js"openai",
-                $program <: contains openai_named($object),
-            },
-            $property <: or {
-              `createFineTune` => `fineTunes.create`,
-              `cancelFineTune` => `fineTunes.cancel`,
-              `retrieveFineTune` => `fineTunes.retrieve`,
-              `listFineTunes` => `fineTunes.list`,
-              `listFineTuneEvents` => `fineTunes.listEvents`,
-              `createFile` => `files.create`,
-              `deleteFile` => `files.del`,
-              `retrieveFile` => `files.retrieve`,
-              `downloadFile` => `files.retrieveContent`,
-              `listFiles` => `files.list`,
-              `deleteModel` => `models.del`,
-              `listModels` => `models.list`,
-              `retrieveModel` => `models.del`,
-              `createImage` => `images.generate`,
-              `createImageEdit` => `images.edit`,
-              `createImageVariation` => `images.createVariation`,
-              `createEdit` => `edits.create`,
-              `createEmbedding` => `embeddings.create`,
-              `createModeration` => `moderations.create`,
-            }
-        },
-    }
+	call_expression($function, $arguments) where {
+		$function <: member_expression($object, $property) where {
+			or { $object <: js"openai", $program <: contains openai_named($object) },
+			$property <: or {
+				`createFineTune` => `fineTunes.create`,
+				`cancelFineTune` => `fineTunes.cancel`,
+				`retrieveFineTune` => `fineTunes.retrieve`,
+				`listFineTunes` => `fineTunes.list`,
+				`listFineTuneEvents` => `fineTunes.listEvents`,
+				`createFile` => `files.create`,
+				`deleteFile` => `files.del`,
+				`retrieveFile` => `files.retrieve`,
+				`downloadFile` => `files.retrieveContent`,
+				`listFiles` => `files.list`,
+				`deleteModel` => `models.del`,
+				`listModels` => `models.list`,
+				`retrieveModel` => `models.del`,
+				`createImage` => `images.generate`,
+				`createImageEdit` => `images.edit`,
+				`createImageVariation` => `images.createVariation`,
+				`createEdit` => `edits.create`,
+				`createEmbedding` => `embeddings.create`,
+				`createModeration` => `moderations.create`
+			}
+		}
+	}
 }
 
 pattern change_transcription() {
-    call_expression($function, $arguments) where {
-        $function <: member_expression($object, $property) where {
-            or {
-                $object <: js"openai",
-                $program <: contains openai_named($object),
-            },
-            $property <: js"createTranscription" => js"audio.transcriptions.create"
-        },
-        $arguments <: [$stream, $model, ...] => js"{ model: $model, file: $stream }"
-    }
+	call_expression($function, $arguments) where {
+		$function <: member_expression($object, $property) where {
+			or { $object <: js"openai", $program <: contains openai_named($object) },
+			$property <: js"createTranscription" => js"audio.transcriptions.create"
+		},
+		$arguments <: [$stream, $model, ...] => js"{ model: $model, file: $stream }"
+	}
 }
 
 pattern change_completion_try_catch() {
-    try_statement($body, $handler) where {
-        $body <: contains js"createCompletion",
-        $handler <: catch_clause(body=$catch_body, $parameter) where {
-            $catch_body <: maybe contains if_statement($condition) where {
-                $condition <: contains js"$parameter.response" as $cond where {
-                    $cond => js"$parameter instanceof OpenAI.APIError"
-                },
-                $condition <: not contains js"$parameter.response.$_",
-                $condition <: not contains binary_expression()
-            },
-            $catch_body <: maybe contains js"$parameter.response.status" => js"$parameter.status",
-            $catch_body <: maybe contains js"$parameter.response.data.message" => js"$parameter.message",
-            $catch_body <: maybe contains js"$parameter.response.data.code" => js"$parameter.code",
-            $catch_body <: maybe contains js"$parameter.response.data.type" => js"$parameter.type",
-        }
-    }
+	try_statement($body, $handler) where {
+		$body <: contains js"createCompletion",
+		$handler <: catch_clause(body=$catch_body, $parameter) where {
+			$catch_body <: maybe contains if_statement($condition) where {
+				$condition <: contains js"$parameter.response" as $cond where {
+					$cond => js"$parameter instanceof OpenAI.APIError"
+				},
+				$condition <: not contains js"$parameter.response.$_",
+				$condition <: not contains binary_expression()
+			},
+			$catch_body <: maybe contains js"$parameter.response.status" => js"$parameter.status",
+			$catch_body <: maybe contains js"$parameter.response.data.message" => js"$parameter.message",
+			$catch_body <: maybe contains js"$parameter.response.data.code" => js"$parameter.code",
+			$catch_body <: maybe contains js"$parameter.response.data.type" => js"$parameter.type"
+		}
+	}
 }
 
 pattern openai_v4_exports() {
-    or {
-        "ClientOptions",
-        "OpenAI",
-        "toFile",
-        "fileFromPath",
-        "APIError",
-        "APIConnectionError",
-        "APIConnectionTimeoutError",
-        "APIUserAbortError",
-        "NotFoundError",
-        "ConflictError",
-        "RateLimitError",
-        "BadRequestError",
-        "AuthenticationError",
-        "InternalServerError",
-        "PermissionDeniedError",
-        "UnprocessableEntityError",
-    }
+	or {
+		"ClientOptions",
+		"OpenAI",
+		"toFile",
+		"fileFromPath",
+		"APIError",
+		"APIConnectionError",
+		"APIConnectionTimeoutError",
+		"APIUserAbortError",
+		"NotFoundError",
+		"ConflictError",
+		"RateLimitError",
+		"BadRequestError",
+		"AuthenticationError",
+		"InternalServerError",
+		"PermissionDeniedError",
+		"UnprocessableEntityError"
+	}
 }
 
 pattern change_imports() {
-    or {
-        `import $old from $src` where {
-            $src <: `"openai"`,
-            $old <: or {
-                import_clause(name = named_imports($imports)) where {
-                    if ($imports <: not contains $import_name where $import_name <: openai_v4_exports()) {
-                        $old => js"OpenAI",
-                    } else {
-                        $imports <: some bubble $name => . where {
-                          $name <: not openai_v4_exports(),
-                        },
-                        if ($old <: not contains js"OpenAI") {
-                            $old => js"OpenAI, $old",
-                        }
-                    }
-                }
-            },
-        },
-        `$old = require($src)` as $require where {
-            $src <: `"openai"`,
-            $old <: object_pattern($properties) where {
-                if ($properties <: not contains $import_name where $import_name <: openai_v4_exports()) {
-                    $old => js"OpenAI",
-                } else {
-                    $properties <: some bubble $name => . where {
-                      $name <: not openai_v4_exports(),
-                    },
-                    if ($program <: not contains `OpenAI = require($src)`) {
-                        $require => `OpenAI = require($src);\nconst $require`
-                    }
-                }
-            }
-        }
-    }
+	or {
+		`import $old from $src` where {
+			$src <: `"openai"`,
+			$old <: or {
+				import_clause(name=named_imports($imports)) where {
+					if ($imports <: not contains $import_name where $import_name <: openai_v4_exports()) {
+						$old => js"OpenAI"
+					} else {
+						$imports <: some bubble $name => . where {
+							$name <: not openai_v4_exports()
+						},
+						if ($old <: not contains js"OpenAI") { $old => js"OpenAI, $old" }
+					}
+				}
+			}
+		},
+		`$old = require($src)` as $require where {
+			$src <: `"openai"`,
+			$old <: object_pattern($properties) where {
+				if ($properties <: not contains $import_name where $import_name <: openai_v4_exports()) {
+					$old => js"OpenAI"
+				} else {
+					$properties <: some bubble $name => . where {
+						$name <: not openai_v4_exports()
+					},
+					if ($program <: not contains `OpenAI = require($src)`) {
+						$require => `OpenAI = require($src);\nconst $require`
+					}
+				}
+			}
+		}
+	}
 }
 
 pattern fix_types() {
-    or {
-        `ChatCompletionRequestMessage` => `OpenAI.Chat.CreateChatCompletionRequestMessage`,
-        `ChatCompletionResponseMessage` => `OpenAI.Chat.Completions.ChatCompletionMessage`,
-        `CreateChatCompletionRequest` => `OpenAI.Chat.ChatCompletionCreateParamsNonStreaming`,
-        `CreateChatCompletionResponse` => `OpenAI.Chat.Completions.ChatCompletion`,
-        `CreateChatCompletionResponseChoicesInner` => `OpenAI.Chat.ChatCompletion.Choice`,
-        `CreateCompletionRequest` => `OpenAI.CompletionCreateParamsNonStreaming`,
-        `CreateCompletionResponse` => `OpenAI.Completion`,
-        `CreateCompletionResponseChoicesInner` => `OpenAI.CompletionChoice`,
-        `CreateCompletionResponseChoicesInnerLogprobs` => `OpenAI.CompletionChoice.Logprobs`,
-        `CreateCompletionResponseUsage` => `OpenAI.Completion.Usage`,
-        `CreateEditRequest` => `OpenAI.EditCreateParams`,
-        `CreateEditResponse` => `OpenAI.Edit`,
-        `CreateEmbeddingRequest` => `OpenAI.EmbeddingCreateParams`,
-        `CreateEmbeddingResponse` => `OpenAI.CreateEmbeddingResponse`,
-        `CreateEmbeddingResponseDataInner` => `OpenAI.Embedding`,
-        `CreateEmbeddingResponseUsage` => `OpenAI.CreateEmbeddingResponse.Usage`,
-        `CreateFineTuneRequest` => `OpenAI.FineTuneCreateParams`,
-        `CreateImageRequest` => `OpenAI.Images.ImageGenerateParams`,
-        `CreateModerationRequest` => `OpenAI.ModerationCreateParams`,
-        `CreateModerationResponse` => `OpenAI.Moderation`,
-        `CreateModerationResponseResultsInnerCategories` => `OpenAI.Moderation.Categories`,
-        `CreateModerationResponseResultsInnerCategoryScores` => `OpenAI.Moderation.CategoryScores`,
-        `CreateTranscriptionResponse` => `OpenAI.Audio.Transcription`,
-        `CreateTranslationResponse` => `OpenAI.Audio.Translation`,
-        `DeleteFileResponse` => `OpenAI.FileDeleted`,
-        `DeleteModelResponse` => `OpenAI.ModelDeleted`,
-        `FineTune` => `OpenAI.FineTune`,
-        `FineTuneEvent` => `OpenAI.FineTuneEvent`,
-        `ImagesResponse` => `OpenAI.ImagesResponse`,
-        `OpenAIFile` => `OpenAI.FileObject`,
-        `ChatCompletionRequestMessageFunctionCall` => `OpenAI.Chat.ChatCompletionMessage.FunctionCall`,
-        `ChatCompletionFunctions` => `OpenAI.Chat.ChatCompletionMessageParam.Function`,
-        `ConfigurationParameters` => `ClientOptions`,
-        `OpenAIApi` => `OpenAI`,
-    } as $thing where or {
-        $thing <: imported_from(from=`"openai"`),
-        $program <: contains `$old = require($from)` where {
-            $from <: `"openai"`,
-            $old <: contains $thing,
-        },
-    }
+	or {
+		`ChatCompletionRequestMessage` => `OpenAI.Chat.CreateChatCompletionRequestMessage`,
+		`ChatCompletionResponseMessage` => `OpenAI.Chat.Completions.ChatCompletionMessage`,
+		`CreateChatCompletionRequest` => `OpenAI.Chat.ChatCompletionCreateParamsNonStreaming`,
+		`CreateChatCompletionResponse` => `OpenAI.Chat.Completions.ChatCompletion`,
+		`CreateChatCompletionResponseChoicesInner` => `OpenAI.Chat.ChatCompletion.Choice`,
+		`CreateCompletionRequest` => `OpenAI.CompletionCreateParamsNonStreaming`,
+		`CreateCompletionResponse` => `OpenAI.Completion`,
+		`CreateCompletionResponseChoicesInner` => `OpenAI.CompletionChoice`,
+		`CreateCompletionResponseChoicesInnerLogprobs` => `OpenAI.CompletionChoice.Logprobs`,
+		`CreateCompletionResponseUsage` => `OpenAI.Completion.Usage`,
+		`CreateEditRequest` => `OpenAI.EditCreateParams`,
+		`CreateEditResponse` => `OpenAI.Edit`,
+		`CreateEmbeddingRequest` => `OpenAI.EmbeddingCreateParams`,
+		`CreateEmbeddingResponse` => `OpenAI.CreateEmbeddingResponse`,
+		`CreateEmbeddingResponseDataInner` => `OpenAI.Embedding`,
+		`CreateEmbeddingResponseUsage` => `OpenAI.CreateEmbeddingResponse.Usage`,
+		`CreateFineTuneRequest` => `OpenAI.FineTuneCreateParams`,
+		`CreateImageRequest` => `OpenAI.Images.ImageGenerateParams`,
+		`CreateModerationRequest` => `OpenAI.ModerationCreateParams`,
+		`CreateModerationResponse` => `OpenAI.Moderation`,
+		`CreateModerationResponseResultsInnerCategories` => `OpenAI.Moderation.Categories`,
+		`CreateModerationResponseResultsInnerCategoryScores` => `OpenAI.Moderation.CategoryScores`,
+		`CreateTranscriptionResponse` => `OpenAI.Audio.Transcription`,
+		`CreateTranslationResponse` => `OpenAI.Audio.Translation`,
+		`DeleteFileResponse` => `OpenAI.FileDeleted`,
+		`DeleteModelResponse` => `OpenAI.ModelDeleted`,
+		`FineTune` => `OpenAI.FineTune`,
+		`FineTuneEvent` => `OpenAI.FineTuneEvent`,
+		`ImagesResponse` => `OpenAI.ImagesResponse`,
+		`OpenAIFile` => `OpenAI.FileObject`,
+		`ChatCompletionRequestMessageFunctionCall` => `OpenAI.Chat.ChatCompletionMessage.FunctionCall`,
+		`ChatCompletionFunctions` => `OpenAI.Chat.ChatCompletionMessageParam.Function`,
+		`ConfigurationParameters` => `ClientOptions`,
+		`OpenAIApi` => `OpenAI`
+	} as $thing where or {
+		$thing <: imported_from(from=`"openai"`),
+		$program <: contains `$old = require($from)` where {
+			$from <: `"openai"`,
+			$old <: contains $thing
+		}
+	}
 }
 
 pattern openai_change_v4_names() {
-  `OpenAI.Chat.$old` where {
-    $old <: or {
-      `CompletionCreateParams` => `ChatCompletionCreateParams`,
-      `CompletionCreateParamsStreaming` => `ChatCompletionCreateParamsStreaming`,
-      `CompletionCreateParamsNonStreaming` => `ChatCompletionCreateParamsNonStreaming`,
-      `CreateChatCompletionRequestMessage` => `ChatCompletionCreateMessageParam`,
-    }
-  }
+	`OpenAI.Chat.$old` where {
+		$old <: or {
+			`CompletionCreateParams` => `ChatCompletionCreateParams`,
+			`CompletionCreateParamsStreaming` => `ChatCompletionCreateParamsStreaming`,
+			`CompletionCreateParamsNonStreaming` => `ChatCompletionCreateParamsNonStreaming`,
+			`CreateChatCompletionRequestMessage` => `ChatCompletionCreateMessageParam`
+		}
+	}
 }
 
-
-file(body = program($statements)) where $statements <: and {
-  or { includes "openai", includes "createCompletion", includes "OpenAIAPI", includes "createTranscription" },
-  any {
-    contains change_constructor(),
-    contains change_chat_completion(),
-    contains change_completion(),
-    contains change_transcription(),
-    contains openai_misc_renames(),
-    contains change_completion_try_catch(),
-    contains change_imports(),
-    contains openai_change_v4_names(),
-    contains fix_types() until or {
-        import_statement(),
-        variable_declarator($value) where {
-            $value <: call_expression(function="require")
-        }
-    },
-  }
-}
+file(body=program($statements)) where $statements <: and { or {
+	includes "openai",
+	includes "createCompletion",
+	includes "OpenAIAPI",
+	includes "createTranscription"
+},
+any {
+	contains change_constructor(),
+	contains change_chat_completion(),
+	contains change_completion(),
+	contains change_transcription(),
+	contains openai_misc_renames(),
+	contains change_completion_try_catch(),
+	contains change_imports(),
+	contains openai_change_v4_names(),
+	contains fix_types() until or {
+		import_statement(),
+		variable_declarator($value) where {
+			$value <: call_expression(function="require")
+		}
+	}
+} }
 ```
 
 ## Initialization

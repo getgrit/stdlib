@@ -10,14 +10,13 @@ Inspect nested loops.
 language sol
 
 pattern loop($body) {
-    bubble($body) or {
-        `while($_) { $body }`,
-        `for ($_; $_; $_) { $body }`
-    }
+	bubble($body) or {
+		`while($_) { $body }`,
+		`for ($_; $_; $_) { $body }`
+	}
 }
 
 loop($body) where $body <: contains loop(body=$_)
-
 ```
 
 ## Matches a simple nested loop

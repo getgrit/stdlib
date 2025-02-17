@@ -7,17 +7,17 @@ language js
 
 // Usage example
 file($body) where {
-  $imports = [],
-  $body <: contains bubble($imports) import_statement() as $import where {
-      $imports += $import
-  },
-  $grouped = group_blocks(target=$imports),
-  $index = ``,
-  $grouped <: some bubble($index) $block where {
-      $index += `\n// new block\n`,
-      $index += join(list=$block, separator=`\n`),
-  },
-  $body <: contains `const insert = $_` => $index
+	$imports = [],
+	$body <: contains bubble($imports) import_statement() as $import where {
+		$imports += $import
+	},
+	$grouped = group_blocks(target=$imports),
+	$index = ``,
+	$grouped <: some bubble($index) $block where {
+		$index += `\n// new block\n`,
+		$index += join(list=$block, separator=`\n`)
+	},
+	$body <: contains `const insert = $_` => $index
 }
 ```
 

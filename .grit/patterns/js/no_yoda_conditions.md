@@ -11,16 +11,16 @@ engine marzano(0.1)
 language js
 
 or {
-  `$x == $y` => `$y == $x`,
-  `$x === $y` => `$y === $x`,
-  `$x > $y` => `$y < $x`,
-  `$x < $y` => `$y > $x`,
-  `$x >= $y` => `$y <= $x`,
-  `$x <= $y` => `$y >= $x`
+	`$x == $y` => `$y == $x`,
+	`$x === $y` => `$y === $x`,
+	`$x > $y` => `$y < $x`,
+	`$x < $y` => `$y > $x`,
+	`$x >= $y` => `$y <= $x`,
+	`$x <= $y` => `$y >= $x`
 } where {
-  // In order to capture a yoda condition, the LHS $x must be a LiteralValue and the RHS $y must not be one
-  $x <: literal(),
-  ! $y <: literal()
+	// In order to capture a yoda condition, the LHS $x must be a LiteralValue and the RHS $y must not be one
+	$x <: literal(),
+	! $y <: literal()
 }
 ```
 

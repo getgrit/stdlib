@@ -7,8 +7,8 @@ engine marzano(0.1)
 language python
 
 `list = [$items]` where {
-  $new_items = sort($items),
-  $joined = join($new_items, ", "),
+	$new_items = sort($items),
+	$joined = join($new_items, ", ")
 } => `list = [$joined]`
 ```
 

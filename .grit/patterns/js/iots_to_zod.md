@@ -11,35 +11,38 @@ engine marzano(0.1)
 language js
 
 or {
-    `import * as $alias from "io-ts"` => `import z from 'zod'` where {
-        $program <: contains bubble($alias) or {
-            `$alias.$type($val)` as $exp => `z.$type($val)` where $exp <: or {                
-                `$alias.type($val)`  => `z.object($val)`,
-                `$alias.partial($val)`  => `z.object($val).partial()`,
-                `$alias.readonly($val)` => `$val.readonly()`,
-                `$alias.readonlyArray($val)` => `z.array($val).readonly()`,
-                `$alias.keyof($val)` => `$val.keyof()`,
-                `$alias.intersection([$args])` => `z.intersection($args)`,
-            },
-            `$alias.$type` => `z.$type` where $type <: or {                
-                `nullType` => `null()`,
-                `Int` => `number()`,
-                or {`void`, `voidType`} => `void()`,
-                `Function` => `function()`,
-                `UnknownArray` => `array(z.unknown())`,                                
-                `UnknownRecord` => `unknown()`, 
-            },            
-            `$alias.$type($val)` => `z.$type($val)`,
-            `$alias.$type` => `z.$type()`,
-        }
-    },
-    `import $alias from "fp-ts/Either"` => . where {
-         $program <: contains or {
-             `$schema.decode($val)` => `$schema.safeParse($val)`,
-             `$var.right` => `$var.data`,
-             `isLeft($data)` => `!$data.success` 
-         }
-    }
+	`import * as $alias from "io-ts"` => `import z from 'zod'` where {
+		$program <: contains bubble($alias) or {
+			`$alias.$type($val)` as $exp => `z.$type($val)` where $exp <: or {
+				`$alias.type($val)` => `z.object($val)`,
+				`$alias.partial($val)` => `z.object($val).partial()`,
+				`$alias.readonly($val)` => `$val.readonly()`,
+				`$alias.readonlyArray($val)` => `z.array($val).readonly()`,
+				`$alias.keyof($val)` => `$val.keyof()`,
+				`$alias.intersection([$args])` => `z.intersection($args)`
+			},
+			`$alias.$type` => `z.$type` where $type <: or {
+				`nullType` => `null()`,
+				`Int` => `number()`,
+				or {
+					`void`,
+					`voidType`
+				} => `void()`,
+				`Function` => `function()`,
+				`UnknownArray` => `array(z.unknown())`,
+				`UnknownRecord` => `unknown()`
+			},
+			`$alias.$type($val)` => `z.$type($val)`,
+			`$alias.$type` => `z.$type()`
+		}
+	},
+	`import $alias from "fp-ts/Either"` => . where {
+		$program <: contains or {
+			`$schema.decode($val)` => `$schema.safeParse($val)`,
+			`$var.right` => `$var.data`,
+			`isLeft($data)` => `!$data.success`
+		}
+	}
 }
 ```
 

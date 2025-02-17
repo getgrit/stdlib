@@ -11,14 +11,14 @@ engine marzano(0.1)
 language python
 
 or {
-  `import $pdb as $db`,
-  `import pdb` where $db = `pdb`
+	`import $pdb as $db`,
+	`import pdb` where $db = `pdb`
 } where {
-    $program <: maybe contains or {
-        `$db.set_trace($_)` => .,
-        `$db.Pdb.set_trace($_)` => .,
-        `$pdb.Pdb.set_trace($_)` => .,
-    }
+	$program <: maybe contains or {
+		`$db.set_trace($_)` => .,
+		`$db.Pdb.set_trace($_)` => .,
+		`$pdb.Pdb.set_trace($_)` => .
+	}
 }
 ```
 

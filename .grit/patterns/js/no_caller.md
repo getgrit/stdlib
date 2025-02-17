@@ -13,15 +13,13 @@ engine marzano(0.1)
 language js
 
 or {
-  `function $name($_) { $body }` where {
-    $body <: contains { `arguments.callee` => `$name` }
-  },
-
-  `function $name($_){ $body }` where {
-    $body <: contains  { `arguments.caller` => `$name.caller`}
-  }
+	`function $name($_) { $body }` where {
+		$body <: contains { `arguments.callee` => `$name` }
+	},
+	`function $name($_){ $body }` where {
+		$body <: contains { `arguments.caller` => `$name.caller` }
+	}
 }
-
 ```
 
 ## Remove arguments.callee

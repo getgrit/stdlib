@@ -9,8 +9,8 @@ engine marzano(0.1)
 language js
 
 or {
-  `$x & $y` => `$x && $y`,
-  `$x | $y` => `$x || $y`
+	`$x & $y` => `$x && $y`,
+	`$x | $y` => `$x || $y`
 }
 ```
 

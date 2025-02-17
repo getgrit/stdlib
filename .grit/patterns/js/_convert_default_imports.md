@@ -11,45 +11,38 @@ engine marzano(0.1)
 language js
 
 pattern replace_default_import($source, $new_name) {
-  or {
-    `import * as $alias from $source` as $import where {
-      if ($alias <: $new_name) {
-        $import => `import { $new_name } from $source`
-      } else {
-        $import => `import { $new_name as $alias } from $source`
-      }
-    },
-    `import { $imports } from $source` where {
-      $imports <: contains `default` => $new_name
-    },
-    `import $alias, { $imports } from $source` => `import { $imports } from $source` where {
-      $alias <: not .,
-      if ($alias <: $new_name) {
-        $imports += `, $new_name`,
-      } else {
-        $imports += `, $new_name as $alias`
-      }
-    },
-    `import $clause from $source` as $import where {
-      $clause <: import_clause(default=$alias),
-      $alias <: not .,
-      if ($alias <: $new_name) {
-        $import => `import { $new_name } from $source`
-      } else {
-        $import => `import { $new_name as $alias } from $source`
-      }
-    },
-    `export { $imports } from $source` as $import where {
-      $imports <: contains `default` => $new_name
-    },
-  }
+	or {
+		`import * as $alias from $source` as $import where {
+			if ($alias <: $new_name) {
+				$import => `import { $new_name } from $source`
+			} else { $import => `import { $new_name as $alias } from $source` }
+		},
+		`import { $imports } from $source` where {
+			$imports <: contains `default` => $new_name
+		},
+		`import $alias, { $imports } from $source` => `import { $imports } from $source` where {
+			$alias <: not .,
+			if ($alias <: $new_name) { $imports += `, $new_name` } else {
+				$imports += `, $new_name as $alias`
+			}
+		},
+		`import $clause from $source` as $import where {
+			$clause <: import_clause(default=$alias),
+			$alias <: not .,
+			if ($alias <: $new_name) {
+				$import => `import { $new_name } from $source`
+			} else { $import => `import { $new_name as $alias } from $source` }
+		},
+		`export { $imports } from $source` as $import where {
+			$imports <: contains `default` => $new_name
+		}
+	}
 }
-
 
 // Test it
 or {
-  replace_default_import(`'here'`, `namedImport`),
-  replace_default_import(source=$_, new_name=`myImport`) where $filename <: includes "here.js"
+	replace_default_import(`'here'`, `namedImport`),
+	replace_default_import(source=$_, new_name=`myImport`) where $filename <: includes "here.js"
 }
 ```
 

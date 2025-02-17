@@ -11,16 +11,26 @@ engine marzano(0.1)
 language js
 
 for_statement($condition, $increment, $initializer) where {
-    or {
-        and {
-            $condition <: contains or { `$x < $_` , `$x <= $_` , `$_ > $x` , `$_ >= $x`},
-            $increment <: contains { `$x--` => `$x++`}
-        },
-        and {
-            $condition <: contains or { `$x > $_` , `$x >= $_` , `$_ < $x` , `$_ <= $x`},
-            $increment <: contains { `$x++` => `$x--` }
-        }
-    }
+	or {
+		and {
+			$condition <: contains or {
+				`$x < $_`,
+				`$x <= $_`,
+				`$_ > $x`,
+				`$_ >= $x`
+			},
+			$increment <: contains { `$x--` => `$x++` }
+		},
+		and {
+			$condition <: contains or {
+				`$x > $_`,
+				`$x >= $_`,
+				`$_ < $x`,
+				`$_ <= $x`
+			},
+			$increment <: contains { `$x++` => `$x--` }
+		}
+	}
 }
 ```
 

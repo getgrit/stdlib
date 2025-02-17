@@ -9,8 +9,8 @@ Identical statements found in both the `if` and `else` bodies of an `if-statemen
 language go
 
 or {
-    `if ($conditon) { $body } else { $body }`,
-    `if ($conditon) { $body } else if ($conditon) { $body }`
+	`if ($conditon) { $body } else { $body }`,
+	`if ($conditon) { $body } else if ($conditon) { $body }`
 } => `if ($conditon) {
     $body
 }`

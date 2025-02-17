@@ -12,14 +12,14 @@ engine marzano(0.1)
 language js
 
 sequential {
-  contains or {
-    // Re-write all `const` declarations that initialize a moment object to `let`.
-    rewrite_const_to_let(),
-    // Rewrite all moment-js expressions to equivalent date-fns expressions
-    moment_exp_to_datefns_exp(),
-  },
-  contains add_helper_functions(),
-  contains add_datefns_imports()
+	contains or {
+		// Re-write all `const` declarations that initialize a moment object to `let`.
+		rewrite_const_to_let(),
+		// Rewrite all moment-js expressions to equivalent date-fns expressions
+		moment_exp_to_datefns_exp()
+	},
+	contains add_helper_functions(),
+	contains add_datefns_imports()
 }
 ```
 

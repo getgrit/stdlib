@@ -28,79 +28,76 @@ This migration handles some of the cases not covered in the [official codemod](h
 engine marzano(0.1)
 language js
 
-pattern rename_palette_type () {
-  `createTheme($theme)` where {
-    $theme <: contains `palette: { $palette }`,
-    $palette <: contains `type: $arg` => `mode: $arg`
-  }
+pattern rename_palette_type() {
+	`createTheme($theme)` where {
+		$theme <: contains `palette: { $palette }`,
+		$palette <: contains `type: $arg` => `mode: $arg`
+	}
 }
 
-pattern replace_theme_provider_import () {
-   `ThemeProvider` as $target where {
-    $target <: replace_import(old= `'@mui/styles'`, new=`'@mui/material/styles'`),
-  }
+pattern replace_theme_provider_import() {
+	`ThemeProvider` as $target where {
+		$target <: replace_import(old=`'@mui/styles'`, new=`'@mui/material/styles'`)
+	}
 }
 
-pattern upgrade_info_palette () {
-  `$mode: $color[$value]` as $info where {
-    $color <: r"cyan" => `lightBlue`,
-    // must be within a style object
-    $info <: within `style: {$_}`,
-    or {
-      $value <: `300` => `500`,
-      $value <: `500` => `700`,
-      $value <: `700` => `900`
-    }
-  }
+pattern upgrade_info_palette() {
+	`$mode: $color[$value]` as $info where {
+		$color <: r"cyan" => `lightBlue`,
+		// must be within a style object
+		$info <: within `style: {$_}` ,
+		or {
+			$value <: `300` => `500`,
+			$value <: `500` => `700`,
+			$value <: `700` => `900`
+		}
+	}
 }
 
-pattern upgrade_success_palette () {
-  `$mode: $color[$value]` as $success where {
-      $color <: r"green" => `green`,
-      // must be within a style object
-      $success <: within `style: {$_}`,
-    or {
-      $value <: `300` => `500`,
-      $value <: `500` => `800`,
-      $value <: `700` => `900`
-    }
-  }
+pattern upgrade_success_palette() {
+	`$mode: $color[$value]` as $success where {
+		$color <: r"green" => `green`,
+		// must be within a style object
+		$success <: within `style: {$_}` ,
+		or {
+			$value <: `300` => `500`,
+			$value <: `500` => `800`,
+			$value <: `700` => `900`
+		}
+	}
 }
 
-pattern upgrade_warning_palette () {
-  `$mode: $color[$value]` as $success where {
-      $color <: r"orange" => `orange`,
-      // must be within a style object
-      $success <: within `style: {$_}`,
-    or {
-      $value <: `300` => `500`,
-      $value <: `700` => `900`
-    }
-  }
+pattern upgrade_warning_palette() {
+	`$mode: $color[$value]` as $success where {
+		$color <: r"orange" => `orange`,
+		// must be within a style object
+		$success <: within `style: {$_}` ,
+		or { $value <: `300` => `500`, $value <: `700` => `900` }
+	}
 }
 
-pattern upgrade_warning_palette_500 () {
-  `$mode: $color` as $target where {
-    $target <: within `style: {$_}`,
-    $color <: `orange[500]` => `'#ED6C02'`
-  }
+pattern upgrade_warning_palette_500() {
+	`$mode: $color` as $target where {
+		$target <: within `style: {$_}` ,
+		$color <: `orange[500]` => `'#ED6C02'`
+	}
 }
 
 pattern restructure_component_definition() {
-  `createTheme({$themeBody})` where {
-    $themeBody <: contains `props: {$propsValue}` => `components: { $propsValue }`,
-    $propsValue <: contains `$component: {$props}` => `$component : defaultProps {$props}`,
-  }
+	`createTheme({$themeBody})` where {
+		$themeBody <: contains `props: {$propsValue}` => `components: { $propsValue }`,
+		$propsValue <: contains `$component: {$props}` => `$component : defaultProps {$props}`
+	}
 }
 
 or {
-  rename_palette_type(),
-  replace_theme_provider_import(),
-  upgrade_info_palette(),
-  upgrade_success_palette(),
-  upgrade_warning_palette(),
-  upgrade_warning_palette_500(),
-  restructure_component_definition()
+	rename_palette_type(),
+	replace_theme_provider_import(),
+	upgrade_info_palette(),
+	upgrade_success_palette(),
+	upgrade_warning_palette(),
+	upgrade_warning_palette_500(),
+	restructure_component_definition()
 }
 ```
 

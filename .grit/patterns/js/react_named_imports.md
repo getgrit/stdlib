@@ -11,7 +11,7 @@ engine marzano(0.1)
 language js(jsx)
 
 `React.$reactImport` where {
-    $reactImport <: ensure_import_from(`"react"`),
+	$reactImport <: ensure_import_from(`"react"`)
 } => `$reactImport`
 ```
 

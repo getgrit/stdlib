@@ -19,12 +19,12 @@ language json
     $config, 
     "Action": "sts:AssumeRole"
 }` where {
-    $config <: contains `"Principal": { "AWS": $key }` where {
-        $key <: contains or {
-            `*` where $type <: contains `Allow` => `Deny`,
-            `"arn:aws:iam::$account_id:root"` where $type <: contains `Deny` => `Allow`
-        }
-    },
+	$config <: contains `"Principal": { "AWS": $key }` where {
+		$key <: contains or {
+			`*` where $type <: contains `Allow` => `Deny`,
+			`"arn:aws:iam::$account_id:root"` where $type <: contains `Deny` => `Allow`
+		}
+	}
 }
 ```
 

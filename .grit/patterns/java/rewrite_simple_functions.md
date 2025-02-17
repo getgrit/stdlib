@@ -10,26 +10,26 @@ This pattern uses static analysis to find private methods that are only used onc
 language java
 
 class_body($declarations) where {
-    $declarations <: contains bubble($declarations) {
-        method_declaration($name, $modifiers) as $method where {
-            $modifiers <: contains `private`,
-            $modifiers <: not contains or {
-                marker_annotation(),
-                `native`,
-            },
-            $name <: not or {
-                `writeObject`,
-                `readObject`,
-            },
-            $method => ai_rewrite($method, "Inline the use of the private method $name in the class."),
-            $uses = 0,
-            $declarations <: contains bubble($uses, $name, $method) `$name` where {
-                $name <: not within $method,
-                $uses += 1,
-            },
-            $uses <: 1
-        }
-    }
+	$declarations <: contains bubble($declarations) {
+		method_declaration($name, $modifiers) as $method where {
+			$modifiers <: contains `private`,
+			$modifiers <: not contains or {
+				marker_annotation(),
+				`native`
+			},
+			$name <: not or {
+				`writeObject`,
+				`readObject`
+			},
+			$method => ai_rewrite($method, "Inline the use of the private method $name in the class."),
+			$uses = 0,
+			$declarations <: contains bubble($uses, $name, $method) `$name` where {
+				$name <: not within $method ,
+				$uses += 1
+			},
+			$uses <: 1
+		}
+	}
 }
 ```
 

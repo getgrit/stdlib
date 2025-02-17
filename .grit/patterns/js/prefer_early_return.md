@@ -11,12 +11,12 @@ engine marzano(0.1)
 language js
 
 `return $else` as $the_fallthrough where {
-    $the_fallthrough <: after if_statement($condition, $consequence, alternative = .) as $the_if,
-    // `if ($cond) { $cond_true }` as $the_if,
-    $consequence <: statement_block($statements),
-    $statements <: contains `return $_`,
-    $the_if => `if (!$condition) { return $else }`,
-    $the_fallthrough => `$statements`
+	$the_fallthrough <: after if_statement($condition, $consequence, alternative=.) as $the_if,
+	// `if ($cond) { $cond_true }` as $the_if,
+	$consequence <: statement_block($statements),
+	$statements <: contains `return $_`,
+	$the_if => `if (!$condition) { return $else }`,
+	$the_fallthrough => `$statements`
 }
 ```
 

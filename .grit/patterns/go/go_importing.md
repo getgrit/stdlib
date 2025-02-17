@@ -11,18 +11,18 @@ engine marzano(0.1)
 language go
 
 contains bubble or {
-  `use_real_getenv()` where {
-    $os = require_import(source="somepackage/somemodule")
-  } => `$os.Getenv()`,
-  `second_case()` where {
-    $case_two = require_import(source="somepackage/somemodule")
-  } => `$case_two.CaseTwo()`,
-  `module_two()` where {
-    $module = require_import(source="somepackage/packagetwo")
-  } => `$module.ModuleTwo()`,
-  `add_aliased_import()` where {
-    $alias = require_import(source="somepackage/my-model", as="model")
-  } => `$alias.my_import()`
+	`use_real_getenv()` where {
+		$os = require_import(source="somepackage/somemodule")
+	} => `$os.Getenv()`,
+	`second_case()` where {
+		$case_two = require_import(source="somepackage/somemodule")
+	} => `$case_two.CaseTwo()`,
+	`module_two()` where {
+		$module = require_import(source="somepackage/packagetwo")
+	} => `$module.ModuleTwo()`,
+	`add_aliased_import()` where {
+		$alias = require_import(source="somepackage/my-model", as="model")
+	} => `$alias.my_import()`
 }
 ```
 

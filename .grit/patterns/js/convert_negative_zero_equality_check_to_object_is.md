@@ -13,10 +13,16 @@ engine marzano(1.0)
 language js
 
 binary_expression($left, $operator, $right) as $exp where {
-    $operator <: or {
-        or { "==", "===" } where $exp => `Object.is($left, -0)`,
-        or { "!=", "!==" } where $exp => `!Object.is($left, -0)`
-    }
+	$operator <: or {
+		or {
+			"==",
+			"==="
+		} where $exp => `Object.is($left, -0)`,
+		or {
+			"!=",
+			"!=="
+		} where $exp => `!Object.is($left, -0)`
+	}
 }
 ```
 

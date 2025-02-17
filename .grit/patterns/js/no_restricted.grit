@@ -1,7 +1,5 @@
 language js
 
 pattern no_restricted_imports($modules) {
-    file($body) where {
-        $body <: contains `import $_ from "$src"`
-    }
+	file($body) where { $body <: contains `import $_ from "$src"` }
 }

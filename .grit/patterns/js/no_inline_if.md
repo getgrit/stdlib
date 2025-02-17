@@ -11,10 +11,7 @@ else $else` => `if ($cond) {
     $then
 } else {
     $else
-}` where {
-    $then <: not statement_block(),
-    $else <: not statement_block()
-}
+}` where { $then <: not statement_block(), $else <: not statement_block() }
 ```
 
 ## Examples

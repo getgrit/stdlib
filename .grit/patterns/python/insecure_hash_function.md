@@ -16,12 +16,12 @@ engine marzano(0.1)
 language python
 
 `hashlib.new($params)` where {
-    or {
-        $params <: contains `'md5'` => `'sha256'`,
-        $params <: contains `'MD5'` => `'sha256'`,
-        $params <: contains `'md4'` => `'sha256'`,
-        $params <: contains `'MD4'` => `'sha256'`,
-    }
+	or {
+		$params <: contains `'md5'` => `'sha256'`,
+		$params <: contains `'MD5'` => `'sha256'`,
+		$params <: contains `'md4'` => `'sha256'`,
+		$params <: contains `'MD4'` => `'sha256'`
+	}
 }
 ```
 

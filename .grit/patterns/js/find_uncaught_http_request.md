@@ -10,12 +10,12 @@ engine marzano(0.1)
 language js
 
 or {
-    `await request($body)` as $httpRequest => `try { $httpRequest } catch() {}` where {
-        !$httpRequest <: within `try { $_ } catch($catch) { $_ }`,
-    },
-    `return request($body)` as $httpRequestUnderFunc => `try { $httpRequestUnderFunc } catch(err) { return err}` where {
-        !$httpRequestUnderFunc <: within `async function $name(){ $httpRequestUnderFunc }`,
-    }
+	`await request($body)` as $httpRequest => `try { $httpRequest } catch() {}` where {
+		! $httpRequest <: within `try { $_ } catch($catch) { $_ }`
+	},
+	`return request($body)` as $httpRequestUnderFunc => `try { $httpRequestUnderFunc } catch(err) { return err}` where {
+		! $httpRequestUnderFunc <: within `async function $name(){ $httpRequestUnderFunc }`
+	}
 }
 ```
 

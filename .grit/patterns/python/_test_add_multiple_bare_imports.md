@@ -7,14 +7,13 @@ engine marzano(0.1)
 language python
 
 `$_` where {
-    $import_math = "math",
-    $import_math <: ensure_bare_import(),
-    $import_re = "re",
-    $import_re <: ensure_bare_import(),
-    $import_json = "json",
-    $import_json <: ensure_bare_import(),
+	$import_math = "math",
+	$import_math <: ensure_bare_import(),
+	$import_re = "re",
+	$import_re <: ensure_bare_import(),
+	$import_json = "json",
+	$import_json <: ensure_bare_import()
 }
-
 ```
 
 ## Add all imports if none is imported

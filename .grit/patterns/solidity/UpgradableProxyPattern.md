@@ -9,10 +9,14 @@ Looking for variations of the upgradable proxy pattern.
 ```grit
 language sol
 
-contract_declaration(heritage = $inherited) where {
-  $inherited <: contains or { "Proxy", "ERC1967Upgrade", "TransparentUpgradeableProxy", "UUPSUpgradeable" }
+contract_declaration(heritage=$inherited) where {
+	$inherited <: contains or {
+		"Proxy",
+		"ERC1967Upgrade",
+		"TransparentUpgradeableProxy",
+		"UUPSUpgradeable"
+	}
 }
-
 ```
 
 ## Simple class extending UUPSUpgradeable
