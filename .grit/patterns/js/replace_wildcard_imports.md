@@ -29,9 +29,11 @@ pattern replace_wildcard_import() {
 		$refs = distinct($refs),
 		$joined_refs = join($refs, `, `),
 		// Try the different scenarios
-		if ($refs <: []) {}
+		if ($refs <: []) {} else if (and {
 			// Found nothing, leave the wildcard
-		else if (and { ! $refs <: [], $kept_refs <: [] }) {
+			! $refs <: [],
+			$kept_refs <: []
+		}) {
 			// Found just refs we can replace, replace them
 			$import => `import { $joined_refs } from $src`
 		} else {

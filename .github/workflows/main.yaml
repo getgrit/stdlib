@@ -13,7 +13,7 @@ permissions:
   contents: read
 
 jobs:
-  build:
+  test:
     runs-on: ${{ matrix.runner }}
 
     strategy:
@@ -70,6 +70,10 @@ jobs:
 
       - name: Remove grit modules
         run: rm -rf .grit/.gritmodules
+
+      - name: check formatting
+        run: |
+          grit format
 
       - name: Run grit patterns test
         run: |
